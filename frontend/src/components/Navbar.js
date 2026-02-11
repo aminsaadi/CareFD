@@ -24,7 +24,8 @@ const Navbar = () => {
               <Logo />
             </Link>
             
-            {isAuthenticated && (\n              <div className="hidden md:flex ml-10 space-x-8 rtl:space-x-reverse">
+            {isAuthenticated && (
+              <div className="hidden md:flex ml-10 space-x-8 rtl:space-x-reverse">
                 <Link
                   to="/providers"
                   className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors"
