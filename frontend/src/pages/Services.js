@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import ServiceCard from '../components/ServiceCard';
+import SearchBar from '../components/SearchBar';
 import api from '../utils/api';
 
 const Services = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchServices();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchServices = async () => {
@@ -26,14 +28,25 @@ const Services = () => {
     }
   };
 
+  const handleSearch = (searchTerm) => {
+    console.log('Searching for:', searchTerm);
+    // Filter services by search term
+    fetchServices();
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale flex flex-col">
       <Navbar />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold mb-6" data-testid="services-title">
+      <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <h1 className="text-3xl font-bold mb-6 text-carelink-navy font-heading" data-testid="services-title">
           {t('services')}
         </h1>
+
+        <SearchBar
+          onSearch={handleSearch}
+          placeholder="חפש שירותים..."
+        />
 
         {loading ? (
           <div className="text-center py-12" data-testid="loading-indicator">
@@ -44,47 +57,15 @@ const Services = () => {
             לא נמצאו שירותים
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
             {services.map((service) => (
-              <div
-                key={service.service_id}
-                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition"
-                data-testid={`service-card-${service.service_id}`}
-              >
-                <h3 className="text-xl font-semibold mb-2">{service.name}</h3>
-                <p className="text-gray-700 mb-4">{service.description}</p>
-                
-                <div className="mb-4">
-                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                    {t(service.service_type)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-2xl font-bold text-blue-600">
-                    ₪{service.price}
-                  </span>
-                  <span className="text-sm text-gray-600">{t(service.pricing_type)}</span>
-                </div>
-
-                {service.provider && (
-                  <p className="text-sm text-gray-600 mb-4">
-                    ספק: {service.provider.business_name || 'ספק שירותים'}
-                  </p>
-                )}
-
-                <button
-                  onClick={() => navigate(`/book/${service.service_id}`)}
-                  className="w-full bg-carelink-teal text-white px-4 py-2 rounded hover:bg-carelink-teal-medium transition-colors"
-                  data-testid={`book-service-${service.service_id}`}
-                >
-                  {t('bookNow')}
-                </button>
-              </div>
+              <ServiceCard key={service.service_id} service={service} />
             ))}
           </div>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 };
