@@ -179,8 +179,13 @@ const ProviderProfile = () => {
                   {provider.business_name || 'ספק שירותים'}
                 </h1>
                 {provider.is_verified && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal px-3 py-1 rounded-full text-sm">
+                  <span className="inline-flex items-center gap-1 bg-carelink-teal px-3 py-1 rounded-full text-sm" data-testid="verified-badge">
                     <FaCheckCircle /> מאומת
+                  </span>
+                )}
+                {provider.is_recommended && (
+                  <span className="inline-flex items-center gap-1 bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-1 rounded-full text-sm" data-testid="recommended-badge">
+                    <FaAward /> מומלץ
                   </span>
                 )}
               </div>
@@ -204,6 +209,23 @@ const ProviderProfile = () => {
                   <span className="text-carelink-teal-pale">({provider.total_reviews || 0} ביקורות)</span>
                 </div>
               </div>
+
+              {/* Service Types */}
+              {provider.service_types && provider.service_types.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {provider.service_types.map((type) => {
+                    const config = serviceTypeConfig[type];
+                    if (!config) return null;
+                    const Icon = config.icon;
+                    return (
+                      <span key={type} className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium ${config.color}`}>
+                        <Icon />
+                        {config.label}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
               
               {provider.description && (
                 <p className="text-carelink-teal-pale text-lg max-w-2xl leading-relaxed mb-6">
@@ -214,12 +236,21 @@ const ProviderProfile = () => {
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3">
                 <button
-                  onClick={handleContact}
-                  className="inline-flex items-center gap-2 bg-carelink-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition shadow-lg"
-                  data-testid="contact-provider-btn"
+                  onClick={handleWhatsApp}
+                  className="inline-flex items-center gap-2 bg-green-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-600 transition shadow-lg"
+                  data-testid="whatsapp-btn"
                 >
-                  <FaComments />
-                  צור קשר
+                  <FaWhatsapp className="text-xl" />
+                  WhatsApp
+                </button>
+
+                <button
+                  onClick={handleCall}
+                  className="inline-flex items-center gap-2 bg-carelink-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition shadow-lg"
+                  data-testid="call-btn"
+                >
+                  <FaPhone />
+                  התקשר
                 </button>
                 
                 <button
