@@ -160,6 +160,7 @@ const AdminDashboard = () => {
     { id: 'overview', label: 'סקירה כללית', icon: FaChartBar },
     { id: 'users', label: 'משתמשים', icon: FaUsers },
     { id: 'providers', label: 'ספקים', icon: FaUserMd },
+    { id: 'pending', label: 'ממתינים לאישור', icon: FaHourglass, badge: pendingProviders.length },
     { id: 'bookings', label: 'תורים', icon: FaCalendarAlt },
     { id: 'reports', label: 'דוחות', icon: FaFileAlt },
     { id: 'notifications', label: 'התראות', icon: FaBell },
