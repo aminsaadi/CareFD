@@ -23,13 +23,22 @@ Build a comprehensive marketplace platform named "CareLink" connecting healthcar
 - [x] Dashboards (User, Provider, Admin)
 - [x] Publicly accessible provider/service pages
 - [x] Global footer component
-- [x] **NEW: Redesigned homepage with dummy data** (Feb 2025)
-- [x] **NEW: Service categories section**
-- [x] **NEW: Statistics display (250+ providers, 500+ services, etc.)**
-- [x] **NEW: Testimonials section**
-- [x] **NEW: "How it works" section**
-- [x] **NEW: Hero search bar with type selector and quick tags**
-- [x] **NEW: Professional provider profile page with tabs, stats, reviews**
+- [x] **Redesigned homepage with dummy data** (Feb 2025)
+- [x] **Service categories section**
+- [x] **Statistics display (250+ providers, 500+ services, etc.)**
+- [x] **Testimonials section**
+- [x] **"How it works" section**
+- [x] **Hero search bar with type selector and quick tags**
+- [x] **Professional provider profile page with tabs, stats, reviews**
+- [x] **NEW: Redesigned Login page (split layout, branding)**
+- [x] **NEW: Redesigned Register page (benefits list, social proof)**
+- [x] **NEW: Dedicated Provider Registration page (2-step form)**
+- [x] **NEW: Language switcher dropdown with flags**
+- [x] **NEW: Search icon in Navbar with expandable search bar**
+- [x] **NEW: Verified badge (מאומת) on provider cards/profiles**
+- [x] **NEW: Recommended badge (מומלץ) on provider cards/profiles**
+- [x] **NEW: Service type indicators (home visit, video call, clinic, phone)**
+- [x] **NEW: WhatsApp & Phone buttons on provider cards/profiles**
 
 ### Features Pending 🔄
 - [ ] **P1: Admin Dashboard Features** - Analytics, Reports & Exports, Notifications
