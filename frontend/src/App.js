@@ -6,6 +6,7 @@ import AuthCallback from './components/AuthCallback';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ProviderRegister from './pages/ProviderRegister';
 import Dashboard from './pages/Dashboard';
 import Providers from './pages/Providers';
 import Services from './pages/Services';
@@ -37,6 +38,7 @@ function AppRouter() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/register/provider" element={<ProviderRegister />} />
       <Route path="/providers" element={<Providers />} />
       <Route path="/services" element={<Services />} />
       <Route path="/providers/:providerId" element={<ProviderProfile />} />
