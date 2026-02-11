@@ -102,6 +102,16 @@ const ProviderProfile = () => {
     setShowContactModal(true);
   };
 
+  const handleWhatsApp = () => {
+    const phone = provider?.phone?.replace(/[^0-9]/g, '') || '972500000000';
+    window.open(`https://wa.me/${phone}?text=שלום, מצאתי אתכם ב-CareLink ואשמח לקבל מידע נוסף`, '_blank');
+  };
+
+  const handleCall = () => {
+    const phone = provider?.phone || '050-0000000';
+    window.location.href = `tel:${phone}`;
+  };
+
   const handleBookService = (serviceId) => {
     if (!isAuthenticated) {
       navigate('/login');
