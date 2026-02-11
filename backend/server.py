@@ -1287,6 +1287,23 @@ async def get_requests(
         "limit": limit
     }
 
+@api_router.get("/requests/my")
+async def get_my_requests(
+    authorization: Optional[str] = Header(None),
+    request: Request = None,
+    status: Optional[str] = None
+):
+    """Get current user's requests"""
+    user = await get_current_user(authorization, request)
+    
+    query = {"user_id": user["user_id"]}
+    if status:
+        query["status"] = status
+    
+    requests_list = await db.requests.find(query, {"_id": 0}).to_list(100)
+    
+    return {"requests": requests_list}
+
 @api_router.post("/offers")
 async def create_offer(
     offer_data: OfferCreate,
