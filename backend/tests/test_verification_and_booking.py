@@ -379,9 +379,13 @@ class TestAdminEndpoints:
         assert "users" in data
         print(f"Total users in system: {len(data.get('users', []))}")
     
-    def test_admin_unauthorized_access(self, api_client, user_token):
+    def test_admin_unauthorized_access(self, user_token):
         """Test that regular users cannot access admin endpoints"""
-        response = api_client.get(
+        # Use a fresh session to avoid header pollution
+        import requests
+        fresh_client = requests.Session()
+        fresh_client.headers.update({"Content-Type": "application/json"})
+        response = fresh_client.get(
             f"{BASE_URL}/api/admin/stats",
             headers={"Authorization": f"Bearer {user_token}"}
         )
