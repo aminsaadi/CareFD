@@ -53,9 +53,17 @@ const AdminDashboard = () => {
       }
 
       // Fetch providers
-      if (activeTab === 'providers') {
+      if (activeTab === 'providers' || activeTab === 'pending') {
         const providersRes = await api.get('/providers?limit=100');
         setProviders(providersRes.data.providers || []);
+        
+        // Fetch pending providers
+        try {
+          const pendingRes = await api.get('/admin/providers/pending');
+          setPendingProviders(pendingRes.data.providers || []);
+        } catch (err) {
+          console.error('Failed to fetch pending providers:', err);
+        }
       }
 
       // Fetch bookings
