@@ -922,6 +922,17 @@ async def create_booking(
     if not service:
         raise HTTPException(status_code=404, detail="Service not found")
     
+    # Check for conflicts
+    booking_date_str = booking_data.booking_date.isoformat()
+    existing = await db.bookings.find_one({
+        "provider_id": service["provider_id"],
+        "booking_date": booking_date_str,
+        "status": {"$in": ["pending", "confirmed"]}
+    })
+    
+    if existing:
+        raise HTTPException(status_code=400, detail="Time slot already booked")
+    
     booking = Booking(
         user_id=user["user_id"],
         provider_id=service["provider_id"],
@@ -935,24 +946,133 @@ async def create_booking(
     
     await db.bookings.insert_one(booking_dict)
     
+    # Send notification email
+    await send_email_async(
+        user["email"],
+        "CareLink - Booking Confirmation",
+        f"""
+        <h1>Booking Confirmed!</h1>
+        <p>Your booking has been created successfully.</p>
+        <p><strong>Service:</strong> {service.get('name', 'Service')}</p>
+        <p><strong>Date:</strong> {booking_data.booking_date.strftime('%Y-%m-%d %H:%M')}</p>
+        <p>Status: Pending confirmation from provider</p>
+        """
+    )
+    
     return booking.model_dump()
 
 @api_router.get("/bookings")
 async def get_bookings(
     authorization: Optional[str] = Header(None),
     request: Request = None,
-    status: Optional[str] = None
+    status: Optional[str] = None,
+    provider_id: Optional[str] = None
 ):
-    """Get user's bookings"""
+    """Get user's bookings or provider's bookings"""
     user = await get_current_user(authorization, request)
     
-    query = {"user_id": user["user_id"]}
+    # Check if user is a provider
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    
+    if provider_id:
+        # Get bookings for specific provider (must be the owner)
+        if not provider or provider["provider_id"] != provider_id:
+            raise HTTPException(status_code=403, detail="Not authorized")
+        query = {"provider_id": provider_id}
+    elif provider:
+        # Provider viewing their own bookings
+        query = {"provider_id": provider["provider_id"]}
+    else:
+        # Patient viewing their bookings
+        query = {"user_id": user["user_id"]}
+    
     if status:
         query["status"] = status
     
     bookings = await db.bookings.find(query, {"_id": 0}).to_list(100)
     
     return {"bookings": bookings}
+
+@api_router.put("/bookings/{booking_id}/cancel")
+async def cancel_booking(
+    booking_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Cancel a booking"""
+    user = await get_current_user(authorization, request)
+    
+    booking = await db.bookings.find_one({"booking_id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    # Check authorization
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    is_owner = booking["user_id"] == user["user_id"]
+    is_provider = provider and booking["provider_id"] == provider["provider_id"]
+    
+    if not (is_owner or is_provider):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    await db.bookings.update_one(
+        {"booking_id": booking_id},
+        {"$set": {"status": "cancelled"}}
+    )
+    
+    return {"message": "Booking cancelled successfully"}
+
+@api_router.put("/bookings/{booking_id}/confirm")
+async def confirm_booking(
+    booking_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Confirm a booking (provider only)"""
+    user = await get_current_user(authorization, request)
+    
+    booking = await db.bookings.find_one({"booking_id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    # Check if user is the provider
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider or booking["provider_id"] != provider["provider_id"]:
+        raise HTTPException(status_code=403, detail="Only provider can confirm bookings")
+    
+    await db.bookings.update_one(
+        {"booking_id": booking_id},
+        {"$set": {"status": "confirmed"}}
+    )
+    
+    return {"message": "Booking confirmed successfully"}
+
+@api_router.put("/bookings/{booking_id}/complete")
+async def complete_booking(
+    booking_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Mark booking as completed (provider only)"""
+    user = await get_current_user(authorization, request)
+    
+    booking = await db.bookings.find_one({"booking_id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    # Check if user is the provider
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider or booking["provider_id"] != provider["provider_id"]:
+        raise HTTPException(status_code=403, detail="Only provider can complete bookings")
+    
+    await db.bookings.update_one(
+        {"booking_id": booking_id},
+        {"$set": {
+            "status": "completed",
+            "completed_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"message": "Booking completed successfully"}
 
 # ==================== REVIEW ROUTES ====================
 
