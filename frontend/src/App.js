@@ -19,6 +19,7 @@ import RequestDetails from './pages/RequestDetails';
 import ChatRoom from './pages/ChatRoom';
 import ChatList from './pages/ChatList';
 import ProviderDashboard from './pages/ProviderDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import './i18n';
 import './App.css';
 
@@ -36,6 +37,9 @@ function AppRouter() {
       <Route path="/" element={<Landing />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/providers" element={<Providers />} />
+      <Route path="/services" element={<Services />} />
+      <Route path="/providers/:providerId" element={<ProviderProfile />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       
       <Route
@@ -48,19 +52,11 @@ function AppRouter() {
       />
       <Route
         path="/providers"
-        element={
-          <ProtectedRoute>
-            <Providers />
-          </ProtectedRoute>
-        }
+        element={<Providers />}
       />
       <Route
         path="/services"
-        element={
-          <ProtectedRoute>
-            <Services />
-          </ProtectedRoute>
-        }
+        element={<Services />}
       />
       <Route
         path="/requests"
@@ -80,11 +76,7 @@ function AppRouter() {
       />
       <Route
         path="/providers/:providerId"
-        element={
-          <ProtectedRoute>
-            <ProviderProfile />
-          </ProtectedRoute>
-        }
+        element={<ProviderProfile />}
       />
       <Route
         path="/provider/edit/:providerId"
@@ -139,6 +131,14 @@ function AppRouter() {
         element={
           <ProtectedRoute>
             <ProviderDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminDashboard />
           </ProtectedRoute>
         }
       />
