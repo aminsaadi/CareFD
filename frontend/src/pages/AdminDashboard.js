@@ -209,14 +209,23 @@ const AdminDashboard = () => {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right transition ${
+                      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-right transition ${
                         activeTab === tab.id
                           ? 'bg-purple-600 text-white'
                           : 'text-carelink-gray hover:bg-purple-50'
                       }`}
                     >
-                      <tab.icon />
-                      {tab.label}
+                      <div className="flex items-center gap-3">
+                        <tab.icon />
+                        {tab.label}
+                      </div>
+                      {tab.badge > 0 && (
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                          activeTab === tab.id ? 'bg-white text-purple-600' : 'bg-red-500 text-white'
+                        }`}>
+                          {tab.badge}
+                        </span>
+                      )}
                     </button>
                   ))}
                 </nav>
