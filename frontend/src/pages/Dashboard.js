@@ -21,10 +21,12 @@ const Dashboard = () => {
   const [chats, setChats] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showCompletionDialog, setShowCompletionDialog] = useState(null);
   const [stats, setStats] = useState({
     totalBookings: 0,
     pendingBookings: 0,
     completedBookings: 0,
+    awaitingConfirmation: 0,
     totalRequests: 0,
     unreadMessages: 0
   });
