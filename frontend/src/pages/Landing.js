@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -30,6 +30,18 @@ const categoryIcons = {
 
 const Landing = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchType, setSearchType] = useState('providers');
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/${searchType}?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      navigate(`/${searchType}`);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white">
