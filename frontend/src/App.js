@@ -15,6 +15,9 @@ import ProviderProfile from './pages/ProviderProfile';
 import ProviderEdit from './pages/ProviderEdit';
 import BookService from './pages/BookService';
 import MyBookings from './pages/MyBookings';
+import RequestDetails from './pages/RequestDetails';
+import ChatRoom from './pages/ChatRoom';
+import ChatList from './pages/ChatList';
 import './i18n';
 import './App.css';
 
@@ -103,6 +106,30 @@ function AppRouter() {
         element={
           <ProtectedRoute>
             <MyBookings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/requests/:requestId"
+        element={
+          <ProtectedRoute>
+            <RequestDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/chats"
+        element={
+          <ProtectedRoute>
+            <ChatList />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/chat/:roomId"
+        element={
+          <ProtectedRoute>
+            <ChatRoom />
           </ProtectedRoute>
         }
       />
