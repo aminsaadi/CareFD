@@ -663,38 +663,243 @@ async def get_provider(provider_id: str):
     
     return provider
 
+def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Calculate distance between two points in km using Haversine formula"""
+    import math
+    R = 6371  # Earth's radius in km
+    
+    lat1_rad = math.radians(lat1)
+    lat2_rad = math.radians(lat2)
+    delta_lat = math.radians(lat2 - lat1)
+    delta_lon = math.radians(lon2 - lon1)
+    
+    a = math.sin(delta_lat/2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(delta_lon/2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    
+    return R * c
+
 @api_router.get("/providers")
 async def search_providers(
-    specialization: Optional[str] = None,
+    # Text search
+    search: Optional[str] = None,
+    # Location filters
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    radius_km: Optional[float] = None,
     city: Optional[str] = None,
-    provider_type: Optional[str] = None,
+    # Category filters
+    specialization: Optional[str] = None,
+    specializations: Optional[str] = None,  # comma-separated list
+    category: Optional[str] = None,
+    # Rating filter
     min_rating: Optional[float] = None,
+    # Provider filters
+    provider_type: Optional[str] = None,
+    service_type: Optional[str] = None,  # home_visit, clinic_visit, video_call, phone_call
+    # Experience filter (years)
+    min_experience: Optional[int] = None,
+    # Verification filters
+    verified_only: Optional[bool] = False,
+    recommended_only: Optional[bool] = False,
+    # Pagination
     skip: int = 0,
-    limit: int = 20
+    limit: int = 20,
+    # Sorting
+    sort_by: Optional[str] = "rating",  # rating, distance, reviews
+    sort_order: Optional[str] = "desc"
 ):
-    """Search providers with filters"""
+    """Advanced search for providers with filters"""
     query = {}
     
+    # Text search in business_name and description
+    if search:
+        query["$or"] = [
+            {"business_name": {"$regex": search, "$options": "i"}},
+            {"description": {"$regex": search, "$options": "i"}},
+            {"specializations": {"$in": [search]}}
+        ]
+    
+    # City filter
+    if city:
+        query["location.city"] = {"$regex": city, "$options": "i"}
+    
+    # Specialization filter (single)
     if specialization:
         query["specializations"] = {"$in": [specialization]}
     
-    if city:
-        query["location.city"] = city
+    # Multiple specializations filter
+    if specializations:
+        spec_list = [s.strip() for s in specializations.split(",")]
+        query["specializations"] = {"$in": spec_list}
     
+    # Category filter (maps to specializations)
+    if category:
+        category_mapping = {
+            "nursing": ["סיעוד", "סיעוד ביתי", "טיפול בקשישים"],
+            "physiotherapy": ["פיזיותרפיה", "שיקום", "שיקום לאחר ניתוח"],
+            "doctor": ["רפואת משפחה", "רפואה פנימית"],
+            "eldercare": ["גריאטריה", "טיפול בקשישים", "סיעוד"],
+            "therapy": ["ריפוי בעיסוק", "ריפוי בדיבור"],
+            "alternative": ["רפואה משלימה", "דיקור", "עיסוי רפואי"]
+        }
+        if category in category_mapping:
+            query["specializations"] = {"$in": category_mapping[category]}
+    
+    # Provider type filter
     if provider_type:
         query["provider_type"] = provider_type
     
+    # Service type filter (need to check services)
+    if service_type:
+        query["service_types"] = {"$in": [service_type]}
+    
+    # Rating filter
     if min_rating:
         query["rating"] = {"$gte": min_rating}
     
-    providers = await db.providers.find(query, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
-    total = await db.providers.count_documents(query)
+    # Verified filter
+    if verified_only:
+        query["is_verified"] = True
+    
+    # Recommended filter
+    if recommended_only:
+        query["is_recommended"] = True
+    
+    # Experience filter (in years)
+    if min_experience:
+        cutoff_date = datetime.now(timezone.utc) - timedelta(days=min_experience * 365)
+        query["created_at"] = {"$lte": cutoff_date.isoformat()}
+    
+    # Execute query
+    providers = await db.providers.find(query, {"_id": 0}).to_list(1000)
+    
+    # Filter by distance if location provided
+    if latitude is not None and longitude is not None:
+        filtered_providers = []
+        for provider in providers:
+            if provider.get("location") and provider["location"].get("latitude") and provider["location"].get("longitude"):
+                distance = calculate_distance(
+                    latitude, longitude,
+                    provider["location"]["latitude"],
+                    provider["location"]["longitude"]
+                )
+                provider["distance_km"] = round(distance, 1)
+                
+                # Apply radius filter if specified
+                if radius_km is None or distance <= radius_km:
+                    filtered_providers.append(provider)
+            elif not radius_km:
+                # Include providers without coordinates if no radius filter
+                provider["distance_km"] = None
+                filtered_providers.append(provider)
+        providers = filtered_providers
+    
+    # Sorting
+    if sort_by == "distance" and latitude is not None:
+        providers.sort(key=lambda x: x.get("distance_km") or float('inf'), reverse=(sort_order == "desc"))
+    elif sort_by == "rating":
+        providers.sort(key=lambda x: x.get("rating") or 0, reverse=(sort_order == "desc"))
+    elif sort_by == "reviews":
+        providers.sort(key=lambda x: x.get("total_reviews") or 0, reverse=(sort_order == "desc"))
+    
+    total = len(providers)
+    
+    # Apply pagination after filtering and sorting
+    providers = providers[skip:skip + limit]
     
     return {
         "providers": providers,
         "total": total,
         "skip": skip,
-        "limit": limit
+        "limit": limit,
+        "filters_applied": {
+            "search": search,
+            "city": city,
+            "specialization": specialization,
+            "category": category,
+            "provider_type": provider_type,
+            "service_type": service_type,
+            "min_rating": min_rating,
+            "radius_km": radius_km,
+            "verified_only": verified_only,
+            "recommended_only": recommended_only
+        }
+    }
+
+# Get available filter options
+@api_router.get("/providers/filters/options")
+async def get_filter_options():
+    """Get available filter options based on existing data"""
+    # Get unique cities
+    cities = await db.providers.distinct("location.city")
+    cities = [c for c in cities if c]
+    
+    # Get unique specializations
+    specializations = await db.providers.distinct("specializations")
+    specializations = [s for s in specializations if s]
+    
+    # Get unique provider types
+    provider_types = await db.providers.distinct("provider_type")
+    
+    # Category options
+    categories = [
+        {"id": "nursing", "name": "סיעוד", "name_en": "Nursing"},
+        {"id": "physiotherapy", "name": "פיזיותרפיה", "name_en": "Physiotherapy"},
+        {"id": "doctor", "name": "רופא בבית", "name_en": "Doctor"},
+        {"id": "eldercare", "name": "טיפול בקשישים", "name_en": "Elder Care"},
+        {"id": "therapy", "name": "ריפוי בעיסוק", "name_en": "Occupational Therapy"},
+        {"id": "alternative", "name": "רפואה משלימה", "name_en": "Alternative Medicine"}
+    ]
+    
+    # Service types
+    service_types = [
+        {"id": "home_visit", "name": "ביקור בית", "name_en": "Home Visit"},
+        {"id": "clinic_visit", "name": "ביקור במרפאה", "name_en": "Clinic Visit"},
+        {"id": "video_call", "name": "טלרפואה", "name_en": "Video Call"},
+        {"id": "phone_call", "name": "שיחה טלפונית", "name_en": "Phone Call"}
+    ]
+    
+    # Provider types with labels
+    provider_type_options = [
+        {"id": "individual", "name": "עצמאי", "name_en": "Individual"},
+        {"id": "clinic", "name": "מרפאה", "name_en": "Clinic"},
+        {"id": "company", "name": "חברה", "name_en": "Company"}
+    ]
+    
+    # Rating options
+    rating_options = [
+        {"value": 4.5, "label": "4.5+ כוכבים"},
+        {"value": 4.0, "label": "4.0+ כוכבים"},
+        {"value": 3.5, "label": "3.5+ כוכבים"},
+        {"value": 3.0, "label": "3.0+ כוכבים"}
+    ]
+    
+    # Experience options
+    experience_options = [
+        {"value": 1, "label": "שנה+"},
+        {"value": 3, "label": "3 שנים+"},
+        {"value": 5, "label": "5 שנים+"},
+        {"value": 10, "label": "10 שנים+"}
+    ]
+    
+    # Radius options
+    radius_options = [
+        {"value": 5, "label": "5 ק\"מ"},
+        {"value": 10, "label": "10 ק\"מ"},
+        {"value": 25, "label": "25 ק\"מ"},
+        {"value": 50, "label": "50 ק\"מ"},
+        {"value": 100, "label": "100 ק\"מ"}
+    ]
+    
+    return {
+        "cities": sorted(cities) if cities else ["תל אביב", "ירושלים", "חיפה", "באר שבע", "רמת גן", "הרצליה", "פתח תקווה"],
+        "specializations": sorted(specializations) if specializations else [],
+        "categories": categories,
+        "service_types": service_types,
+        "provider_types": provider_type_options,
+        "rating_options": rating_options,
+        "experience_options": experience_options,
+        "radius_options": radius_options
     }
 
 @api_router.put("/providers/{provider_id}")
