@@ -13,11 +13,14 @@ export const dummyProviders = [
     is_verified: true,
     is_recommended: true,
     phone: "03-5551234",
+    years_experience: 8,
     service_types: ["clinic_visit", "home_visit"],
     location: {
       city: "תל אביב",
       address: "רחוב דיזנגוף 123",
-      country: "Israel"
+      country: "Israel",
+      latitude: 32.0853,
+      longitude: 34.7818
     }
   },
   {
@@ -31,11 +34,14 @@ export const dummyProviders = [
     is_verified: true,
     is_recommended: false,
     phone: "052-1234567",
+    years_experience: 15,
     service_types: ["home_visit", "video_call", "phone_call"],
     location: {
       city: "ירושלים",
       address: "רחוב בן יהודה 45",
-      country: "Israel"
+      country: "Israel",
+      latitude: 31.7683,
+      longitude: 35.2137
     }
   },
   {
@@ -49,11 +55,14 @@ export const dummyProviders = [
     is_verified: true,
     is_recommended: true,
     phone: "04-8765432",
+    years_experience: 12,
     service_types: ["clinic_visit", "home_visit"],
     location: {
       city: "חיפה",
       address: "רחוב הנביאים 78",
-      country: "Israel"
+      country: "Israel",
+      latitude: 32.7940,
+      longitude: 34.9896
     }
   },
   {
@@ -67,11 +76,14 @@ export const dummyProviders = [
     is_verified: true,
     is_recommended: false,
     phone: "054-9876543",
+    years_experience: 6,
     service_types: ["home_visit"],
     location: {
       city: "רמת גן",
       address: "רחוב ביאליק 34",
-      country: "Israel"
+      country: "Israel",
+      latitude: 32.0680,
+      longitude: 34.8248
     }
   },
   {
@@ -85,11 +97,14 @@ export const dummyProviders = [
     is_verified: false,
     is_recommended: false,
     phone: "09-7654321",
+    years_experience: 4,
     service_types: ["clinic_visit", "video_call"],
     location: {
       city: "הרצליה",
       address: "רחוב סוקולוב 56",
-      country: "Israel"
+      country: "Israel",
+      latitude: 32.1656,
+      longitude: 34.8467
     }
   },
   {
@@ -103,11 +118,14 @@ export const dummyProviders = [
     is_verified: true,
     is_recommended: true,
     phone: "050-1112233",
+    years_experience: 20,
     service_types: ["home_visit", "phone_call"],
     location: {
       city: "פתח תקווה",
       address: "רחוב רוטשילד 12",
-      country: "Israel"
+      country: "Israel",
+      latitude: 32.0841,
+      longitude: 34.8878
     }
   }
 ];
