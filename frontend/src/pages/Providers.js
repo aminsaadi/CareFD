@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import ProviderCard from '../components/ProviderCard';
 import SearchBar from '../components/SearchBar';
 import api from '../utils/api';
+import { dummyProviders } from '../data/dummyData';
 
 const Providers = () => {
   const { t } = useTranslation();
@@ -54,9 +55,13 @@ const Providers = () => {
       });
       
       const response = await api.get(`/providers?${params.toString()}`);
-      setProviders(response.data.providers || []);
+      const apiProviders = response.data.providers || [];
+      // Use dummy data if no providers from API
+      setProviders(apiProviders.length > 0 ? apiProviders : dummyProviders);
     } catch (error) {
       console.error('Failed to fetch providers:', error);
+      // Fallback to dummy data on error
+      setProviders(dummyProviders);
     } finally {
       setLoading(false);
     }
