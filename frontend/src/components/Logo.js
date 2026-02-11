@@ -1,19 +1,19 @@
 import React from 'react';
 
-const Logo = ({ className = "", size = "default" }) => {
-  const sizes = {
-    small: "text-xl",
-    default: "text-2xl",
-    large: "text-4xl"
+const Logo = ({ size = 'default', className = '' }) => {
+  const sizeClasses = {
+    small: 'h-6',
+    default: 'h-8',
+    large: 'h-12'
   };
 
   return (
-    <div className={`flex items-center ${className}`}>
-      <span className={`${sizes[size]} font-bold font-heading`}>
-        <span className="text-carelink-teal">Care</span>
-        <span className="text-carelink-navy">Link</span>
-      </span>
-    </div>
+    <img 
+      src="/logo.svg" 
+      alt="CareLink" 
+      className={`${sizeClasses[size] || sizeClasses.default} w-auto ${className}`}
+      data-testid="logo"
+    />
   );
 };
 
