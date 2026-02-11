@@ -57,6 +57,7 @@ const Dashboard = () => {
         totalBookings: userBookings.length,
         pendingBookings: userBookings.filter(b => b.status === 'pending').length,
         completedBookings: userBookings.filter(b => b.status === 'completed').length,
+        awaitingConfirmation: userBookings.filter(b => b.status === 'provider_completed').length,
         totalRequests: (requestsRes.data.requests || []).length,
         unreadMessages: (chatsRes.data.rooms || []).reduce((acc, r) => acc + (r.unread_count || 0), 0)
       });
@@ -72,6 +73,8 @@ const Dashboard = () => {
       case 'confirmed': return 'bg-green-100 text-green-600';
       case 'pending': return 'bg-yellow-100 text-yellow-600';
       case 'completed': return 'bg-blue-100 text-blue-600';
+      case 'provider_completed': return 'bg-purple-100 text-purple-600';
+      case 'in_progress': return 'bg-cyan-100 text-cyan-600';
       case 'cancelled': return 'bg-red-100 text-red-600';
       default: return 'bg-gray-100 text-gray-600';
     }
