@@ -1542,6 +1542,44 @@ async def get_bookings(
     
     return {"bookings": bookings}
 
+@api_router.get("/bookings/my")
+async def get_my_bookings(
+    authorization: Optional[str] = Header(None),
+    request: Request = None,
+    status: Optional[str] = None
+):
+    """Get current user's bookings (as patient)"""
+    user = await get_current_user(authorization, request)
+    
+    query = {"user_id": user["user_id"]}
+    if status:
+        query["status"] = status
+    
+    bookings = await db.bookings.find(query, {"_id": 0}).to_list(100)
+    
+    return {"bookings": bookings}
+
+@api_router.get("/bookings/provider")
+async def get_provider_bookings(
+    authorization: Optional[str] = Header(None),
+    request: Request = None,
+    status: Optional[str] = None
+):
+    """Get bookings for current provider"""
+    user = await get_current_user(authorization, request)
+    
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    query = {"provider_id": provider["provider_id"]}
+    if status:
+        query["status"] = status
+    
+    bookings = await db.bookings.find(query, {"_id": 0}).to_list(100)
+    
+    return {"bookings": bookings}
+
 @api_router.put("/bookings/{booking_id}/cancel")
 async def cancel_booking(
     booking_id: str,
