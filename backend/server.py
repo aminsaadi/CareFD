@@ -1226,6 +1226,25 @@ async def search_services(
         "limit": limit
     }
 
+@api_router.get("/services/my")
+async def get_my_services(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Get services for current provider"""
+    user = await get_current_user(authorization, request)
+    
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    services = await db.services.find(
+        {"provider_id": provider["provider_id"], "is_active": True},
+        {"_id": 0}
+    ).to_list(100)
+    
+    return {"services": services}
+
 # ==================== REQUEST & OFFER ROUTES ====================
 
 @api_router.post("/requests")
