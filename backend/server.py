@@ -118,6 +118,21 @@ class Availability(BaseModel):
     end_time: str  # "17:00"
     is_available: bool = True
 
+class VerificationStatus:
+    PENDING = "pending"
+    DOCUMENTS_SUBMITTED = "documents_submitted"
+    VERIFIED = "verified"
+    REJECTED = "rejected"
+
+class VerificationDocument(BaseModel):
+    document_id: str = Field(default_factory=lambda: f"doc_{uuid.uuid4().hex[:12]}")
+    document_type: str  # id_card, license, certificate, diploma
+    file_url: str
+    file_name: str
+    uploaded_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    status: str = "pending"  # pending, approved, rejected
+    rejection_reason: Optional[str] = None
+
 class Provider(BaseModel):
     model_config = ConfigDict(extra="ignore")
     provider_id: str = Field(default_factory=lambda: f"provider_{uuid.uuid4().hex[:12]}")
@@ -135,6 +150,16 @@ class Provider(BaseModel):
     subscription_tier: str = "free"  # free, pro, premium
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     is_verified: bool = False
+    is_recommended: bool = False
+    verification_status: str = VerificationStatus.PENDING
+    verification_documents: List[VerificationDocument] = []
+    verification_notes: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    website: Optional[str] = None
+    years_experience: Optional[int] = None
+    service_types: List[str] = []
+    views_count: int = 0
 
 class ProviderRegister(BaseModel):
     user_id: str
