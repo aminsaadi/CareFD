@@ -323,12 +323,21 @@ const Dashboard = () => {
                                         {new Date(booking.booking_date).toLocaleDateString('he-IL')}
                                       </p>
                                       <p className="text-sm text-carelink-gray">
-                                        {new Date(booking.booking_date).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
+                                        {booking.booking_time || new Date(booking.booking_date).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
                                       </p>
                                     </div>
                                     <span className={`px-4 py-2 rounded-xl text-sm font-medium ${getStatusColor(booking.status)}`}>
-                                      {t(booking.status)}
+                                      {booking.status === 'provider_completed' ? 'ממתין לאישורך' : t(booking.status)}
                                     </span>
+                                    {booking.status === 'provider_completed' && (
+                                      <button
+                                        onClick={() => setShowCompletionDialog(booking)}
+                                        className="bg-carelink-teal text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-carelink-teal-medium transition"
+                                        data-testid={`confirm-booking-${booking.booking_id}`}
+                                      >
+                                        אשר והעריך
+                                      </button>
+                                    )}
                                   </div>
                                 </div>
                               </div>
