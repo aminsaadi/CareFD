@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import ServiceCard from '../components/ServiceCard';
 import SearchBar from '../components/SearchBar';
 import api from '../utils/api';
+import { dummyServices } from '../data/dummyData';
 
 const Services = () => {
   const { t } = useTranslation();
@@ -20,9 +21,13 @@ const Services = () => {
     try {
       setLoading(true);
       const response = await api.get('/services');
-      setServices(response.data.services || []);
+      const apiServices = response.data.services || [];
+      // Use dummy data if no services from API
+      setServices(apiServices.length > 0 ? apiServices : dummyServices);
     } catch (error) {
       console.error('Failed to fetch services:', error);
+      // Fallback to dummy data on error
+      setServices(dummyServices);
     } finally {
       setLoading(false);
     }
