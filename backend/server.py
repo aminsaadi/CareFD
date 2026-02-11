@@ -1443,8 +1443,33 @@ async def cancel_booking(
     
     await db.bookings.update_one(
         {"booking_id": booking_id},
-        {"$set": {"status": "cancelled"}}
+        {"$set": {
+            "status": BookingStatus.CANCELLED,
+            "cancelled_at": datetime.now(timezone.utc).isoformat()
+        }}
     )
+    
+    # Notify the other party
+    if is_owner:
+        # Client cancelled - notify provider
+        target_provider = await db.providers.find_one({"provider_id": booking["provider_id"]}, {"_id": 0})
+        if target_provider:
+            await create_notification(
+                target_provider["user_id"],
+                NotificationType.BOOKING_CANCELLED,
+                "הזמנה בוטלה",
+                f"הלקוח ביטל את ההזמנה ל-{booking.get('service_name', 'שירות')}",
+                {"booking_id": booking_id}
+            )
+    else:
+        # Provider cancelled - notify client
+        await create_notification(
+            booking["user_id"],
+            NotificationType.BOOKING_CANCELLED,
+            "הזמנה בוטלה",
+            f"הספק ביטל את ההזמנה ל-{booking.get('service_name', 'שירות')}",
+            {"booking_id": booking_id}
+        )
     
     return {"message": "Booking cancelled successfully"}
 
@@ -1468,10 +1493,107 @@ async def confirm_booking(
     
     await db.bookings.update_one(
         {"booking_id": booking_id},
-        {"$set": {"status": "confirmed"}}
+        {"$set": {
+            "status": BookingStatus.CONFIRMED,
+            "confirmed_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    # Notify client
+    await create_notification(
+        booking["user_id"],
+        NotificationType.BOOKING_CONFIRMED,
+        "ההזמנה אושרה!",
+        f"הספק אישר את ההזמנה ל-{booking.get('service_name', 'שירות')} בתאריך {booking.get('booking_date', '')[:10]}",
+        {"booking_id": booking_id}
     )
     
     return {"message": "Booking confirmed successfully"}
+
+@api_router.put("/bookings/{booking_id}/provider-complete")
+async def provider_complete_booking(
+    booking_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Mark booking as completed by provider (awaiting client confirmation)"""
+    user = await get_current_user(authorization, request)
+    
+    booking = await db.bookings.find_one({"booking_id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    # Check if user is the provider
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider or booking["provider_id"] != provider["provider_id"]:
+        raise HTTPException(status_code=403, detail="Only provider can mark as completed")
+    
+    await db.bookings.update_one(
+        {"booking_id": booking_id},
+        {"$set": {
+            "status": BookingStatus.PROVIDER_COMPLETED,
+            "provider_completed_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    # Notify client to confirm completion
+    await create_notification(
+        booking["user_id"],
+        NotificationType.BOOKING_PROVIDER_COMPLETED,
+        "השירות הושלם - אנא אשר",
+        f"הספק סימן שהשירות '{booking.get('service_name', '')}' הושלם. אנא אשר ודרג את השירות.",
+        {"booking_id": booking_id, "provider_id": booking["provider_id"]}
+    )
+    
+    return {"message": "Booking marked as completed by provider"}
+
+@api_router.put("/bookings/{booking_id}/client-confirm")
+async def client_confirm_booking(
+    booking_id: str,
+    body: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Client confirms booking completion and records payment"""
+    user = await get_current_user(authorization, request)
+    
+    booking = await db.bookings.find_one({"booking_id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    # Check if user is the client
+    if booking["user_id"] != user["user_id"]:
+        raise HTTPException(status_code=403, detail="Only client can confirm completion")
+    
+    # Check status
+    if booking["status"] != BookingStatus.PROVIDER_COMPLETED:
+        raise HTTPException(status_code=400, detail="Booking must be marked as completed by provider first")
+    
+    final_price = body.get("final_price")
+    payment_notes = body.get("payment_notes")
+    
+    await db.bookings.update_one(
+        {"booking_id": booking_id},
+        {"$set": {
+            "status": BookingStatus.COMPLETED,
+            "completed_at": datetime.now(timezone.utc).isoformat(),
+            "final_price": final_price,
+            "payment_notes": payment_notes
+        }}
+    )
+    
+    # Notify provider
+    provider = await db.providers.find_one({"provider_id": booking["provider_id"]}, {"_id": 0})
+    if provider:
+        await create_notification(
+            provider["user_id"],
+            NotificationType.BOOKING_COMPLETED,
+            "הלקוח אישר את השלמת השירות!",
+            f"הלקוח אישר שהשירות '{booking.get('service_name', '')}' הושלם בהצלחה.",
+            {"booking_id": booking_id}
+        )
+    
+    return {"message": "Booking completed successfully"}
 
 @api_router.put("/bookings/{booking_id}/complete")
 async def complete_booking(
@@ -1479,7 +1601,7 @@ async def complete_booking(
     authorization: Optional[str] = Header(None),
     request: Request = None
 ):
-    """Mark booking as completed (provider only)"""
+    """Mark booking as completed (provider only) - Legacy endpoint"""
     user = await get_current_user(authorization, request)
     
     booking = await db.bookings.find_one({"booking_id": booking_id}, {"_id": 0})
@@ -1494,12 +1616,77 @@ async def complete_booking(
     await db.bookings.update_one(
         {"booking_id": booking_id},
         {"$set": {
-            "status": "completed",
-            "completed_at": datetime.now(timezone.utc).isoformat()
+            "status": BookingStatus.PROVIDER_COMPLETED,
+            "provider_completed_at": datetime.now(timezone.utc).isoformat()
         }}
     )
     
+    # Notify client
+    await create_notification(
+        booking["user_id"],
+        NotificationType.BOOKING_PROVIDER_COMPLETED,
+        "השירות הושלם - אנא אשר",
+        f"הספק סימן שהשירות '{booking.get('service_name', '')}' הושלם. אנא אשר ודרג את השירות.",
+        {"booking_id": booking_id, "provider_id": booking["provider_id"]}
+    )
+    
     return {"message": "Booking completed successfully"}
+
+@api_router.put("/bookings/{booking_id}/status")
+async def update_booking_status(
+    booking_id: str,
+    body: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Update booking status (provider only)"""
+    user = await get_current_user(authorization, request)
+    
+    booking = await db.bookings.find_one({"booking_id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider or booking["provider_id"] != provider["provider_id"]:
+        raise HTTPException(status_code=403, detail="Only provider can update booking status")
+    
+    new_status = body.get("status")
+    valid_statuses = ["pending", "confirmed", "in_progress", "provider_completed", "completed", "cancelled"]
+    if new_status not in valid_statuses:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    
+    update_data = {"status": new_status}
+    
+    if new_status == "confirmed":
+        update_data["confirmed_at"] = datetime.now(timezone.utc).isoformat()
+    elif new_status == "provider_completed":
+        update_data["provider_completed_at"] = datetime.now(timezone.utc).isoformat()
+    elif new_status == "cancelled":
+        update_data["cancelled_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.bookings.update_one(
+        {"booking_id": booking_id},
+        {"$set": update_data}
+    )
+    
+    # Notify client based on status
+    notification_map = {
+        "confirmed": (NotificationType.BOOKING_CONFIRMED, "ההזמנה אושרה!", "הספק אישר את ההזמנה"),
+        "cancelled": (NotificationType.BOOKING_CANCELLED, "ההזמנה בוטלה", "הספק ביטל את ההזמנה"),
+        "provider_completed": (NotificationType.BOOKING_PROVIDER_COMPLETED, "השירות הושלם", "הספק סימן שהשירות הושלם. אנא אשר.")
+    }
+    
+    if new_status in notification_map:
+        notif_type, title, message = notification_map[new_status]
+        await create_notification(
+            booking["user_id"],
+            notif_type,
+            title,
+            message,
+            {"booking_id": booking_id}
+        )
+    
+    return {"message": f"Booking status updated to {new_status}"}
 
 # ==================== REVIEW ROUTES ====================
 
