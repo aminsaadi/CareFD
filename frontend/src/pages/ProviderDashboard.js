@@ -297,6 +297,7 @@ const ProviderDashboard = () => {
     { id: 'requests', label: 'בקשות פתוחות', icon: FaFileAlt },
     { id: 'reviews', label: 'ביקורות', icon: FaStar },
     { id: 'profile', label: 'פרופיל', icon: FaUser },
+    { id: 'verification', label: 'אימות', icon: FaAward },
     { id: 'settings', label: 'הגדרות', icon: FaCog }
   ];
 
@@ -305,6 +306,8 @@ const ProviderDashboard = () => {
       case 'confirmed': return 'bg-green-100 text-green-600';
       case 'pending': return 'bg-yellow-100 text-yellow-600';
       case 'completed': return 'bg-blue-100 text-blue-600';
+      case 'provider_completed': return 'bg-purple-100 text-purple-600';
+      case 'in_progress': return 'bg-cyan-100 text-cyan-600';
       case 'cancelled': return 'bg-red-100 text-red-600';
       default: return 'bg-gray-100 text-gray-600';
     }
