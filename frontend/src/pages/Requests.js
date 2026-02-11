@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import RequestCard from '../components/RequestCard';
 import api from '../utils/api';
 
 const Requests = () => {
@@ -19,6 +22,7 @@ const Requests = () => {
 
   useEffect(() => {
     fetchRequests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchRequests = async () => {
@@ -51,13 +55,13 @@ const Requests = () => {
       
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold" data-testid="requests-title">
+          <h1 className="text-3xl font-bold text-carelink-navy font-heading" data-testid="requests-title">
             {t('requests')}
           </h1>
           {user?.role === 'patient' && (
             <button
               onClick={() => setShowCreateForm(!showCreateForm)}
-              className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+              className="bg-carelink-teal text-white px-6 py-2 rounded-lg hover:bg-carelink-teal-medium transition font-medium"
               data-testid="create-request-btn"
             >
               {t('createRequest')}
@@ -67,11 +71,11 @@ const Requests = () => {
 
         {/* Create Request Form */}
         {showCreateForm && (
-          <div className="bg-white p-6 rounded-lg shadow-md mb-6" data-testid="create-request-form">
-            <h2 className="text-xl font-semibold mb-4">{t('createRequest')}</h2>
+          <div className="bg-white p-6 rounded-xl shadow-lg mb-6 border-2 border-carelink-teal" data-testid="create-request-form">
+            <h2 className="text-xl font-semibold mb-4 text-carelink-navy">{t('createRequest')}</h2>
             <form onSubmit={handleCreateRequest} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-carelink-navy">
                   {t('requestTitle')}
                 </label>
                 <input
@@ -79,51 +83,51 @@ const Requests = () => {
                   required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
                   data-testid="request-title-input"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-carelink-navy">
                   {t('requestDescription')}
                 </label>
                 <textarea
                   required
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
                   rows="4"
                   data-testid="request-description-input"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-carelink-navy">
                   {t('specialization')}
                 </label>
                 <input
                   type="text"
                   value={formData.specialization}
                   onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
                   data-testid="request-specialization-input"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-carelink-navy">
                   {t('budget')}
                 </label>
                 <input
                   type="number"
                   value={formData.budget}
                   onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
                   data-testid="request-budget-input"
                 />
               </div>
               <div className="flex gap-4">
                 <button
                   type="submit"
-                  className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                  className="bg-carelink-teal text-white px-6 py-2 rounded-lg hover:bg-carelink-teal-medium transition"
                   data-testid="submit-request-btn"
                 >
                   {t('submit')}
@@ -131,7 +135,7 @@ const Requests = () => {
                 <button
                   type="button"
                   onClick={() => setShowCreateForm(false)}
-                  className="bg-gray-300 text-gray-700 px-6 py-2 rounded hover:bg-gray-400"
+                  className="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400 transition"
                   data-testid="cancel-request-btn"
                 >
                   {t('cancel')}
@@ -151,50 +155,19 @@ const Requests = () => {
             לא נמצאו בקשות
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {requests.map((request) => (
-              <div
+              <RequestCard
                 key={request.request_id}
-                className="bg-white p-6 rounded-lg shadow-md"
-                data-testid={`request-card-${request.request_id}`}
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-xl font-semibold">{request.title}</h3>
-                    <p className="text-sm text-gray-600">
-                      {new Date(request.created_at).toLocaleDateString('he-IL')}
-                    </p>
-                  </div>
-                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">
-                    {request.status}
-                  </span>
-                </div>
-                <p className="text-gray-700 mb-4">{request.description}</p>
-                {request.specialization && (
-                  <p className="text-sm text-gray-600 mb-2">
-                    <strong>{t('specialization')}:</strong> {request.specialization}
-                  </p>
-                )}
-                {request.budget && (
-                  <p className="text-sm text-gray-600 mb-4">
-                    <strong>{t('budget')}:</strong> ₪{request.budget}
-                  </p>
-                )}
-                {user?.role === 'provider' && (
-                  <button
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                    data-testid={`make-offer-${request.request_id}`}
-                  >
-                    {t('makeOffer')}
-                  </button>
-                )}
-              </div>
+                request={request}
+                showActions={user?.role === 'provider'}
+              />
             ))}
           </div>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 };
-
-export default Requests;
