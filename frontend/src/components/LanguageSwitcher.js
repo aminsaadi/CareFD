@@ -16,10 +16,10 @@ const LanguageSwitcher = () => {
     <div className="flex gap-2">
       <button
         onClick={() => changeLanguage('he')}
-        className={`px-3 py-1 rounded text-sm ${
+        className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
           i18n.language === 'he'
-            ? 'bg-blue-600 text-white'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            ? 'bg-carelink-teal text-white'
+            : 'bg-carelink-light-gray text-carelink-navy hover:bg-carelink-teal-pale'
         }`}
         data-testid="lang-he-btn"
       >
@@ -27,10 +27,10 @@ const LanguageSwitcher = () => {
       </button>
       <button
         onClick={() => changeLanguage('ar')}
-        className={`px-3 py-1 rounded text-sm ${
+        className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
           i18n.language === 'ar'
-            ? 'bg-blue-600 text-white'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            ? 'bg-carelink-teal text-white'
+            : 'bg-carelink-light-gray text-carelink-navy hover:bg-carelink-teal-pale'
         }`}
         data-testid="lang-ar-btn"
       >
@@ -38,10 +38,10 @@ const LanguageSwitcher = () => {
       </button>
       <button
         onClick={() => changeLanguage('en')}
-        className={`px-3 py-1 rounded text-sm ${
+        className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
           i18n.language === 'en'
-            ? 'bg-blue-600 text-white'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            ? 'bg-carelink-teal text-white'
+            : 'bg-carelink-light-gray text-carelink-navy hover:bg-carelink-teal-pale'
         }`}
         data-testid="lang-en-btn"
       >
