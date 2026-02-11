@@ -281,6 +281,29 @@ class ReviewCreate(BaseModel):
     booking_id: Optional[str] = None
     rating: float
     comment: str
+
+# Notification Models
+class NotificationType:
+    BOOKING_NEW = "booking_new"
+    BOOKING_CONFIRMED = "booking_confirmed"
+    BOOKING_CANCELLED = "booking_cancelled"
+    BOOKING_COMPLETED = "booking_completed"
+    MESSAGE_NEW = "message_new"
+    OFFER_NEW = "offer_new"
+    OFFER_ACCEPTED = "offer_accepted"
+    REVIEW_NEW = "review_new"
+    SYSTEM = "system"
+
+class Notification(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    notification_id: str = Field(default_factory=lambda: f"notif_{uuid.uuid4().hex[:12]}")
+    user_id: str
+    type: str
+    title: str
+    message: str
+    data: Optional[dict] = None
+    is_read: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     
     @field_validator('rating')
     @classmethod
