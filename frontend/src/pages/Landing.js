@@ -4,154 +4,421 @@ import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Logo from '../components/Logo';
+import ProviderCard from '../components/ProviderCard';
+import ServiceCard from '../components/ServiceCard';
+import { 
+  FaUserNurse, FaWalking, FaUserMd, FaHeart, 
+  FaHandHoldingHeart, FaSpa, FaStar, FaSearch,
+  FaUsers, FaMapMarkerAlt, FaCheckCircle, FaArrowLeft
+} from 'react-icons/fa';
+import { 
+  dummyProviders, 
+  dummyServices, 
+  serviceCategories, 
+  statistics, 
+  testimonials 
+} from '../data/dummyData';
+
+const categoryIcons = {
+  nursing: FaUserNurse,
+  physiotherapy: FaWalking,
+  doctor: FaUserMd,
+  eldercare: FaHeart,
+  therapy: FaHandHoldingHeart,
+  alternative: FaSpa
+};
 
 const Landing = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale">
+    <div className="min-h-screen bg-white">
       <Navbar />
       
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-carelink-navy via-carelink-slate to-carelink-teal text-white" data-testid="hero-section">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <div className="flex justify-center mb-6">
-              <div className="bg-white px-8 py-4 rounded-2xl shadow-xl">
-                <Logo size="large" />
+      <section className="relative bg-gradient-to-br from-carelink-navy via-carelink-slate to-carelink-teal overflow-hidden" data-testid="hero-section">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute bottom-0 right-0 w-72 h-72 bg-carelink-teal rounded-full translate-x-1/3 translate-y-1/3"></div>
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div className="text-white">
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
+                <span className="w-2 h-2 bg-carelink-teal rounded-full animate-pulse"></span>
+                <span className="text-sm text-carelink-teal-pale">הפלטפורמה המובילה לשירותי בריאות בישראל</span>
+              </div>
+              
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 font-heading leading-tight" data-testid="hero-title">
+                {t('heroTitle')}
+              </h1>
+              
+              <p className="text-lg lg:text-xl mb-8 text-carelink-teal-pale max-w-xl leading-relaxed" data-testid="hero-subtitle">
+                {t('heroSubtitle')}
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link
+                  to="/register"
+                  className="inline-flex items-center justify-center gap-2 bg-carelink-teal text-white px-8 py-4 rounded-xl font-semibold hover:bg-carelink-teal-medium transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  data-testid="get-started-btn"
+                >
+                  {t('getStarted')}
+                  <FaArrowLeft className="rtl:rotate-180" />
+                </Link>
+                <Link
+                  to="/providers"
+                  className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all border border-white/20"
+                  data-testid="browse-providers-btn"
+                >
+                  <FaSearch />
+                  חפש ספקים
+                </Link>
               </div>
             </div>
-            <p className="text-sm text-carelink-teal-pale mb-4 font-medium uppercase tracking-wide">
-              Connecting Care Providers
+            
+            {/* Right Content - Stats Cards */}
+            <div className="hidden lg:grid grid-cols-2 gap-4">
+              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
+                <div className="text-4xl font-bold text-white mb-2">{statistics.providers}+</div>
+                <div className="text-carelink-teal-pale">ספקים מאומתים</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20 mt-8">
+                <div className="text-4xl font-bold text-white mb-2">{statistics.services}+</div>
+                <div className="text-carelink-teal-pale">שירותים זמינים</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20">
+                <div className="text-4xl font-bold text-white mb-2">{statistics.happyClients}+</div>
+                <div className="text-carelink-teal-pale">לקוחות מרוצים</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20 mt-8">
+                <div className="text-4xl font-bold text-white mb-2">{statistics.cities}+</div>
+                <div className="text-carelink-teal-pale">ערים בישראל</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Categories Section */}
+      <section className="py-16 bg-gradient-to-b from-white to-carelink-teal-pale/30" data-testid="categories-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-carelink-navy font-heading mb-4">
+              קטגוריות שירותים
+            </h2>
+            <p className="text-carelink-slate max-w-2xl mx-auto">
+              מצאו את השירות המתאים לכם מתוך מגוון רחב של קטגוריות
             </p>
-            <h1 className="text-5xl font-bold mb-6 font-heading" data-testid="hero-title">
-              {t('heroTitle')}
-            </h1>
-            <p className="text-xl mb-8 text-carelink-teal-pale max-w-2xl mx-auto" data-testid="hero-subtitle">
-              {t('heroSubtitle')}
-            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {serviceCategories.map((category) => {
+              const IconComponent = categoryIcons[category.id] || FaHeart;
+              return (
+                <Link
+                  key={category.id}
+                  to={`/services?category=${category.id}`}
+                  className="group bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition-all border-2 border-transparent hover:border-carelink-teal text-center"
+                  data-testid={`category-${category.id}`}
+                >
+                  <div className="w-14 h-14 mx-auto bg-carelink-teal-pale rounded-xl flex items-center justify-center mb-4 group-hover:bg-carelink-teal transition-colors">
+                    <IconComponent className="text-2xl text-carelink-teal group-hover:text-white transition-colors" />
+                  </div>
+                  <h3 className="font-bold text-carelink-navy mb-1">{category.name}</h3>
+                  <p className="text-xs text-carelink-gray line-clamp-2">{category.description}</p>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Providers Section */}
+      <section className="py-16 bg-white" data-testid="featured-providers-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-carelink-navy font-heading mb-2">
+                ספקים מומלצים
+              </h2>
+              <p className="text-carelink-slate">הספקים הכי מדורגים בפלטפורמה שלנו</p>
+            </div>
             <Link
-              to="/register"
-              className="inline-block bg-carelink-teal text-white px-8 py-4 rounded-lg font-semibold hover:bg-carelink-teal-medium transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              data-testid="get-started-btn"
+              to="/providers"
+              className="hidden md:flex items-center gap-2 text-carelink-teal hover:text-carelink-teal-medium font-semibold transition-colors"
+              data-testid="view-all-providers"
             >
-              {t('getStarted')}
+              צפה בכל הספקים
+              <FaArrowLeft className="rtl:rotate-180" />
+            </Link>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {dummyProviders.slice(0, 3).map((provider) => (
+              <ProviderCard key={provider.provider_id} provider={provider} />
+            ))}
+          </div>
+          
+          <div className="mt-8 text-center md:hidden">
+            <Link
+              to="/providers"
+              className="inline-flex items-center gap-2 text-carelink-teal font-semibold"
+            >
+              צפה בכל הספקים
+              <FaArrowLeft className="rtl:rotate-180" />
             </Link>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Features Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12 text-carelink-navy font-heading" data-testid="how-it-works-title">
-          {t('howItWorks')}
-        </h2>
-        
-        <div className="grid md:grid-cols-2 gap-12">
-          {/* For Patients */}
-          <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition border-2 border-carelink-teal-pale" data-testid="patients-card">
-            <div className="flex items-center mb-4">
-              <div className="bg-carelink-teal text-white p-3 rounded-lg">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold mr-3 text-carelink-navy font-heading">
-                {t('forPatients')}
-              </h3>
-            </div>
-            <ul className="space-y-3 text-carelink-slate">
-              <li className="flex items-start">
-                <span className="text-carelink-teal mr-2 text-xl">✓</span>
-                <span>חפש ספקי שירותי בריאות לפי מיקום והתמחות</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-carelink-teal mr-2 text-xl">✓</span>
-                <span>פרסם בקשה וקבל הצעות ממספר ספקים</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-carelink-teal mr-2 text-xl">✓</span>
-                <span>הזמן שירותים ישירות דרך הפלטפורמה</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-carelink-teal mr-2 text-xl">✓</span>
-                <span>קרא ביקורות מאומתות</span>
-              </li>
-            </ul>
+      {/* How It Works Section */}
+      <section className="py-16 bg-gradient-to-b from-carelink-teal-pale/30 to-white" data-testid="how-it-works-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-carelink-navy font-heading mb-4" data-testid="how-it-works-title">
+              {t('howItWorks')}
+            </h2>
+            <p className="text-carelink-slate max-w-2xl mx-auto">
+              שלושה צעדים פשוטים למציאת השירות המושלם עבורכם
+            </p>
           </div>
-
-          {/* For Providers */}
-          <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition border-2 border-carelink-navy" data-testid="providers-card">
-            <div className="flex items-center mb-4">
-              <div className="bg-carelink-navy text-white p-3 rounded-lg">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Step 1 */}
+            <div className="relative">
+              <div className="bg-white p-8 rounded-2xl shadow-lg border-2 border-carelink-teal-pale hover:border-carelink-teal transition-colors">
+                <div className="w-12 h-12 bg-carelink-teal text-white rounded-full flex items-center justify-center text-xl font-bold mb-6">
+                  1
+                </div>
+                <h3 className="text-xl font-bold text-carelink-navy mb-3">חפש שירות</h3>
+                <p className="text-carelink-slate">
+                  השתמשו במנוע החיפוש שלנו כדי למצוא ספקים לפי מיקום, התמחות או סוג שירות
+                </p>
               </div>
-              <h3 className="text-2xl font-bold mr-3 text-carelink-navy font-heading">
-                {t('forProviders')}
-              </h3>
+              <div className="hidden md:block absolute top-1/2 -left-4 w-8 h-0.5 bg-carelink-teal-light"></div>
             </div>
-            <ul className="space-y-3 text-carelink-slate">
-              <li className="flex items-start">
-                <span className="text-carelink-navy mr-2 text-xl">✓</span>
-                <span>צור פרופיל מקצועי והצג את השירותים שלך</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-carelink-navy mr-2 text-xl">✓</span>
-                <span>הגש הצעות לבקשות פעילות</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-carelink-navy mr-2 text-xl">✓</span>
-                <span>נהל את הזמינות והפגישות שלך</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-carelink-navy mr-2 text-xl">✓</span>
-                <span>בנה את המוניטין המקצועי שלך</span>
-              </li>
-            </ul>
+            
+            {/* Step 2 */}
+            <div className="relative">
+              <div className="bg-white p-8 rounded-2xl shadow-lg border-2 border-carelink-teal-pale hover:border-carelink-teal transition-colors">
+                <div className="w-12 h-12 bg-carelink-teal text-white rounded-full flex items-center justify-center text-xl font-bold mb-6">
+                  2
+                </div>
+                <h3 className="text-xl font-bold text-carelink-navy mb-3">השוו והחליטו</h3>
+                <p className="text-carelink-slate">
+                  קראו ביקורות, בדקו דירוגים והשוו מחירים כדי לבחור את הספק המתאים
+                </p>
+              </div>
+              <div className="hidden md:block absolute top-1/2 -left-4 w-8 h-0.5 bg-carelink-teal-light"></div>
+            </div>
+            
+            {/* Step 3 */}
+            <div>
+              <div className="bg-white p-8 rounded-2xl shadow-lg border-2 border-carelink-teal-pale hover:border-carelink-teal transition-colors">
+                <div className="w-12 h-12 bg-carelink-teal text-white rounded-full flex items-center justify-center text-xl font-bold mb-6">
+                  3
+                </div>
+                <h3 className="text-xl font-bold text-carelink-navy mb-3">הזמינו וקבלו שירות</h3>
+                <p className="text-carelink-slate">
+                  הזמינו ישירות דרך הפלטפורמה וקבלו שירות מקצועי ואיכותי
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Featured Services Section */}
+      <section className="py-16 bg-white" data-testid="featured-services-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-carelink-navy font-heading mb-2">
+                שירותים פופולריים
+              </h2>
+              <p className="text-carelink-slate">השירותים הכי מבוקשים בפלטפורמה שלנו</p>
+            </div>
+            <Link
+              to="/services"
+              className="hidden md:flex items-center gap-2 text-carelink-teal hover:text-carelink-teal-medium font-semibold transition-colors"
+              data-testid="view-all-services"
+            >
+              צפה בכל השירותים
+              <FaArrowLeft className="rtl:rotate-180" />
+            </Link>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {dummyServices.slice(0, 6).map((service) => (
+              <ServiceCard key={service.service_id} service={service} />
+            ))}
+          </div>
+          
+          <div className="mt-8 text-center md:hidden">
+            <Link
+              to="/services"
+              className="inline-flex items-center gap-2 text-carelink-teal font-semibold"
+            >
+              צפה בכל השירותים
+              <FaArrowLeft className="rtl:rotate-180" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-16 bg-gradient-to-b from-carelink-navy to-carelink-slate" data-testid="testimonials-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-white font-heading mb-4">
+              מה הלקוחות שלנו אומרים
+            </h2>
+            <p className="text-carelink-teal-pale max-w-2xl mx-auto">
+              אלפי לקוחות מרוצים כבר השתמשו בשירותים שלנו
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            {testimonials.map((testimonial) => (
+              <div
+                key={testimonial.id}
+                className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20"
+                data-testid={`testimonial-${testimonial.id}`}
+              >
+                <div className="flex items-center gap-1 mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <FaStar key={i} className="text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-white mb-6 leading-relaxed">"{testimonial.content}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-carelink-teal rounded-full flex items-center justify-center text-white font-bold">
+                    {testimonial.avatar}
+                  </div>
+                  <div>
+                    <div className="font-bold text-white">{testimonial.name}</div>
+                    <div className="text-sm text-carelink-teal-pale">{testimonial.role}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* For Patients & Providers Section */}
+      <section className="py-16 bg-white" data-testid="for-who-section">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* For Patients */}
+            <div className="bg-gradient-to-br from-carelink-teal to-carelink-teal-medium p-8 rounded-2xl text-white" data-testid="patients-card">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                  <FaUsers className="text-2xl" />
+                </div>
+                <h3 className="text-2xl font-bold font-heading">{t('forPatients')}</h3>
+              </div>
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-start gap-3">
+                  <FaCheckCircle className="text-carelink-teal-pale mt-1 flex-shrink-0" />
+                  <span>חפש ספקי שירותי בריאות לפי מיקום והתמחות</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <FaCheckCircle className="text-carelink-teal-pale mt-1 flex-shrink-0" />
+                  <span>פרסם בקשה וקבל הצעות ממספר ספקים</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <FaCheckCircle className="text-carelink-teal-pale mt-1 flex-shrink-0" />
+                  <span>הזמן שירותים ישירות דרך הפלטפורמה</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <FaCheckCircle className="text-carelink-teal-pale mt-1 flex-shrink-0" />
+                  <span>קרא ביקורות מאומתות וקבל החלטות מושכלות</span>
+                </li>
+              </ul>
+              <Link
+                to="/register"
+                className="inline-flex items-center gap-2 bg-white text-carelink-teal px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-pale transition-colors"
+                data-testid="register-patient-btn"
+              >
+                {t('registerAsPatient')}
+                <FaArrowLeft className="rtl:rotate-180" />
+              </Link>
+            </div>
+
+            {/* For Providers */}
+            <div className="bg-gradient-to-br from-carelink-navy to-carelink-slate p-8 rounded-2xl text-white" data-testid="providers-card">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                  <FaUserMd className="text-2xl" />
+                </div>
+                <h3 className="text-2xl font-bold font-heading">{t('forProviders')}</h3>
+              </div>
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-start gap-3">
+                  <FaCheckCircle className="text-carelink-teal-light mt-1 flex-shrink-0" />
+                  <span>צור פרופיל מקצועי והצג את השירותים שלך</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <FaCheckCircle className="text-carelink-teal-light mt-1 flex-shrink-0" />
+                  <span>הגש הצעות לבקשות פעילות והרחב את קהל הלקוחות</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <FaCheckCircle className="text-carelink-teal-light mt-1 flex-shrink-0" />
+                  <span>נהל את הזמינות והפגישות שלך בקלות</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <FaCheckCircle className="text-carelink-teal-light mt-1 flex-shrink-0" />
+                  <span>בנה את המוניטין המקצועי שלך דרך ביקורות</span>
+                </li>
+              </ul>
+              <Link
+                to="/register"
+                className="inline-flex items-center gap-2 bg-carelink-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition-colors"
+                data-testid="register-provider-btn"
+              >
+                {t('registerAsProvider')}
+                <FaArrowLeft className="rtl:rotate-180" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* CTA Section */}
-      <div className="bg-gradient-to-r from-carelink-teal to-carelink-teal-light py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-6 text-white font-heading">
+      <section className="py-16 bg-gradient-to-r from-carelink-teal to-carelink-teal-medium" data-testid="cta-section">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl lg:text-4xl font-bold text-white font-heading mb-6">
             מוכנים להתחיל?
           </h2>
-          <div className="flex justify-center gap-4 flex-wrap">
+          <p className="text-xl text-white/90 mb-8">
+            הצטרפו לאלפי משתמשים שכבר מצאו את השירות המושלם עבורם
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/register"
-              className="bg-white text-carelink-teal px-8 py-3 rounded-lg font-semibold hover:bg-carelink-teal-pale transition shadow-lg hover:shadow-xl"
+              className="inline-flex items-center justify-center gap-2 bg-white text-carelink-teal px-8 py-4 rounded-xl font-semibold hover:bg-carelink-teal-pale transition-all shadow-lg hover:shadow-xl"
               data-testid="cta-register-btn"
             >
               {t('register')}
+              <FaArrowLeft className="rtl:rotate-180" />
             </Link>
             <Link
               to="/login"
-              className="bg-carelink-navy text-white px-8 py-3 rounded-lg font-semibold hover:bg-carelink-slate transition border-2 border-white shadow-lg hover:shadow-xl"
+              className="inline-flex items-center justify-center gap-2 bg-transparent text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all border-2 border-white"
               data-testid="cta-login-btn"
             >
               {t('login')}
             </Link>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Footer */}
-      <footer className="bg-carelink-navy text-white py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center mb-4">
-            <div className="bg-white px-6 py-2 rounded-lg">
-              <Logo />
-            </div>
-          </div>
-          <p className="text-center text-carelink-teal-light">
-            © 2025 CareLink. Connecting Care Providers. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
