@@ -101,8 +101,23 @@ const AdminDashboard = () => {
     try {
       await api.put(`/admin/providers/${providerId}/verify`);
       fetchAdminData();
+      alert('הספק אומת בהצלחה!');
     } catch (error) {
       console.error('Failed to verify provider:', error);
+      alert('שגיאה באימות הספק');
+    }
+  };
+
+  const rejectProvider = async (providerId, reason) => {
+    try {
+      await api.put(`/admin/providers/${providerId}/reject`, { reason });
+      fetchAdminData();
+      setShowRejectDialog(null);
+      setRejectReason('');
+      alert('בקשת האימות נדחתה');
+    } catch (error) {
+      console.error('Failed to reject provider:', error);
+      alert('שגיאה בדחיית הבקשה');
     }
   };
 
