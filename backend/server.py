@@ -1270,7 +1270,7 @@ async def create_booking(
     authorization: Optional[str] = Header(None),
     request: Request = None
 ):
-    """Create a booking"""
+    """Create a booking with full details"""
     user = await get_current_user(authorization, request)
     
     # Get service
@@ -1278,40 +1278,111 @@ async def create_booking(
     if not service:
         raise HTTPException(status_code=404, detail="Service not found")
     
+    # Get provider
+    provider = await db.providers.find_one({"provider_id": service["provider_id"]}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    # Check if provider is verified
+    if provider.get("verification_status") not in ["verified", None] and not provider.get("is_verified"):
+        raise HTTPException(status_code=400, detail="Provider is not verified yet")
+    
     # Check for conflicts
     booking_date_str = booking_data.booking_date.isoformat()
     existing = await db.bookings.find_one({
         "provider_id": service["provider_id"],
         "booking_date": booking_date_str,
-        "status": {"$in": ["pending", "confirmed"]}
+        "booking_time": booking_data.booking_time,
+        "status": {"$in": ["pending", "confirmed", "in_progress"]}
     })
     
     if existing:
         raise HTTPException(status_code=400, detail="Time slot already booked")
     
+    # Build contact person
+    contact_person = None
+    if booking_data.contact_person_name:
+        contact_person = ContactPerson(
+            name=booking_data.contact_person_name,
+            phone=booking_data.contact_person_phone or booking_data.client_phone,
+            relationship=booking_data.contact_person_relationship
+        )
+    
+    # Build service location
+    service_location = ServiceLocation(
+        address=booking_data.service_address,
+        city=booking_data.service_city,
+        floor=booking_data.service_floor,
+        apartment=booking_data.service_apartment,
+        entry_code=booking_data.service_entry_code,
+        notes=booking_data.service_notes,
+        latitude=booking_data.service_latitude,
+        longitude=booking_data.service_longitude
+    )
+    
     booking = Booking(
         user_id=user["user_id"],
         provider_id=service["provider_id"],
         service_id=booking_data.service_id,
-        booking_date=booking_data.booking_date
+        booking_date=booking_data.booking_date,
+        booking_time=booking_data.booking_time,
+        client_name=booking_data.client_name,
+        client_phone=booking_data.client_phone,
+        client_email=booking_data.client_email or user.get("email"),
+        contact_person=contact_person,
+        service_location=service_location,
+        notes=booking_data.notes,
+        special_requirements=booking_data.special_requirements,
+        service_name=service.get("name"),
+        provider_name=provider.get("business_name"),
+        user_name=user.get("name")
     )
     
     booking_dict = booking.model_dump()
     booking_dict['created_at'] = booking_dict['created_at'].isoformat()
     booking_dict['booking_date'] = booking_dict['booking_date'].isoformat()
+    if booking_dict.get('contact_person'):
+        booking_dict['contact_person'] = dict(booking_dict['contact_person'])
+    if booking_dict.get('service_location'):
+        booking_dict['service_location'] = dict(booking_dict['service_location'])
     
     await db.bookings.insert_one(booking_dict)
     
-    # Send notification email
+    # Create notification for provider
+    await create_notification(
+        provider["user_id"],
+        NotificationType.BOOKING_NEW,
+        "הזמנה חדשה!",
+        f"{user.get('name', 'לקוח')} הזמין {service.get('name', 'שירות')} לתאריך {booking_data.booking_date.strftime('%d/%m/%Y')}",
+        {"booking_id": booking.booking_id, "service_id": service["service_id"]}
+    )
+    
+    # Send notification email to provider
+    provider_user = await db.users.find_one({"user_id": provider["user_id"]}, {"_id": 0})
+    if provider_user:
+        await send_email_async(
+            provider_user.get("email"),
+            "CareLink - הזמנה חדשה!",
+            f"""
+            <h1>יש לך הזמנה חדשה!</h1>
+            <p><strong>לקוח:</strong> {booking_data.client_name}</p>
+            <p><strong>שירות:</strong> {service.get('name', 'שירות')}</p>
+            <p><strong>תאריך:</strong> {booking_data.booking_date.strftime('%d/%m/%Y')}</p>
+            <p><strong>כתובת:</strong> {booking_data.service_address}, {booking_data.service_city}</p>
+            <p>היכנס לדשבורד כדי לאשר את ההזמנה.</p>
+            """
+        )
+    
+    # Send confirmation email to client
     await send_email_async(
-        user["email"],
-        "CareLink - Booking Confirmation",
+        booking_data.client_email or user["email"],
+        "CareLink - אישור הזמנה",
         f"""
-        <h1>Booking Confirmed!</h1>
-        <p>Your booking has been created successfully.</p>
-        <p><strong>Service:</strong> {service.get('name', 'Service')}</p>
-        <p><strong>Date:</strong> {booking_data.booking_date.strftime('%Y-%m-%d %H:%M')}</p>
-        <p>Status: Pending confirmation from provider</p>
+        <h1>ההזמנה נשלחה בהצלחה!</h1>
+        <p><strong>שירות:</strong> {service.get('name', 'שירות')}</p>
+        <p><strong>ספק:</strong> {provider.get('business_name', 'ספק')}</p>
+        <p><strong>תאריך:</strong> {booking_data.booking_date.strftime('%d/%m/%Y')}</p>
+        <p>סטטוס: ממתין לאישור הספק</p>
         """
     )
     
