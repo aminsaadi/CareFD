@@ -1,0 +1,80 @@
+.carelink-calendar {
+  width: 100%;
+  border: 2px solid #B8C2C9;
+  border-radius: 12px;
+  padding: 10px;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.carelink-calendar .react-calendar__navigation {
+  margin-bottom: 1em;
+}
+
+.carelink-calendar .react-calendar__navigation button {
+  color: #1E4D5F;
+  min-width: 44px;
+  background: none;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.carelink-calendar .react-calendar__navigation button:enabled:hover,
+.carelink-calendar .react-calendar__navigation button:enabled:focus {
+  background-color: #ACEDEA;
+  border-radius: 6px;
+}
+
+.carelink-calendar .react-calendar__tile {
+  max-width: 100%;
+  padding: 10px 6px;
+  background: none;
+  text-align: center;
+  line-height: 16px;
+  font-size: 0.9em;
+  border-radius: 6px;
+  color: #4C6D7F;
+}
+
+.carelink-calendar .react-calendar__tile:enabled:hover,
+.carelink-calendar .react-calendar__tile:enabled:focus {
+  background-color: #75D9D2;
+  color: white;
+}
+
+.carelink-calendar .react-calendar__tile--active {
+  background: #19B8BA;
+  color: white;
+  font-weight: 600;
+}
+
+.carelink-calendar .react-calendar__tile--active:enabled:hover,
+.carelink-calendar .react-calendar__tile--active:enabled:focus {
+  background: #41C9C2;
+}
+
+.carelink-calendar .react-calendar__tile:disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.carelink-calendar .react-calendar__tile.booked-date {
+  background-color: #ACEDEA;
+  color: #1E4D5F;
+}
+
+.carelink-calendar .react-calendar__month-view__days__day--weekend {
+  color: #19B8BA;
+}
+
+.carelink-calendar .react-calendar__tile--now {
+  background: #ACEDEA;
+  font-weight: 600;
+}
+
+.carelink-calendar .react-calendar__tile--now:enabled:hover,
+.carelink-calendar .react-calendar__tile--now:enabled:focus {
+  background: #75D9D2;
+  color: white;
+}
