@@ -1,21 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import api from '../utils/api';
-import { FaStar, FaMapMarkerAlt, FaClock, FaEdit } from 'react-icons/fa';
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import { 
+  FaStar, FaMapMarkerAlt, FaClock, FaEdit, FaPhone, FaEnvelope,
+  FaCheckCircle, FaUserMd, FaCalendarAlt, FaComments, FaShareAlt,
+  FaHeart, FaBriefcase, FaUsers, FaAward, FaQuoteRight
+} from 'react-icons/fa';
+import { dummyProviders, dummyServices } from '../data/dummyData';
+
+// Demo reviews for display
+const demoReviews = [
+  {
+    review_id: 'review_1',
+    rating: 5,
+    comment: 'שירות מקצועי ואדיב מאוד. ממליץ בחום!',
+    created_at: '2025-01-10T10:00:00Z',
+    user: { name: 'יוסי כהן', picture: null }
+  },
+  {
+    review_id: 'review_2',
+    rating: 5,
+    comment: 'הטיפול עזר לי מאוד. צוות מסור ומקצועי.',
+    created_at: '2025-01-05T14:00:00Z',
+    user: { name: 'רחל לוי', picture: null }
+  },
+  {
+    review_id: 'review_3',
+    rating: 4,
+    comment: 'חוויה טובה, זמני המתנה סבירים והצוות נעים.',
+    created_at: '2024-12-20T09:00:00Z',
+    user: { name: 'דוד ישראלי', picture: null }
+  }
+];
 
 const ProviderProfile = () => {
   const { t } = useTranslation();
   const { providerId } = useParams();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [provider, setProvider] = useState(null);
   const [loading, setLoading] = useState(true);
   const [reviews, setReviews] = useState([]);
+  const [activeTab, setActiveTab] = useState('services');
+  const [showContactModal, setShowContactModal] = useState(false);
 
   useEffect(() => {
     fetchProvider();
@@ -29,6 +60,13 @@ const ProviderProfile = () => {
       setProvider(response.data);
     } catch (error) {
       console.error('Failed to fetch provider:', error);
+      // Fallback to dummy data
+      const dummyProvider = dummyProviders.find(p => p.provider_id === providerId);
+      if (dummyProvider) {
+        // Add services to dummy provider
+        const providerServices = dummyServices.filter(s => s.provider_id === providerId);
+        setProvider({ ...dummyProvider, services_list: providerServices });
+      }
     } finally {
       setLoading(false);
     }
@@ -37,193 +75,525 @@ const ProviderProfile = () => {
   const fetchReviews = async () => {
     try {
       const response = await api.get(`/providers/${providerId}/reviews`);
-      setReviews(response.data.reviews || []);
+      const apiReviews = response.data.reviews || [];
+      setReviews(apiReviews.length > 0 ? apiReviews : demoReviews);
     } catch (error) {
       console.error('Failed to fetch reviews:', error);
+      setReviews(demoReviews);
     }
   };
 
   const isOwner = user?.user_id === provider?.user_id;
 
+  const handleContact = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    setShowContactModal(true);
+  };
+
+  const handleBookService = (serviceId) => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    navigate(`/book/${serviceId}`);
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale flex flex-col">
         <Navbar />
-        <div className="text-center py-12">{t('loading')}</div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-carelink-slate">{t('loading')}</p>
+          </div>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   if (!provider) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale flex flex-col">
         <Navbar />
-        <div className="text-center py-12">ספק לא נמצא</div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <FaUserMd className="text-6xl text-carelink-gray mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-carelink-navy mb-2">ספק לא נמצא</h2>
+            <p className="text-carelink-slate mb-4">הספק שחיפשת לא קיים במערכת</p>
+            <Link
+              to="/providers"
+              className="inline-flex items-center gap-2 bg-carelink-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition"
+            >
+              חזור לרשימת הספקים
+            </Link>
+          </div>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale flex flex-col">
       <Navbar />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="bg-white rounded-lg shadow-md p-8 mb-6">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h1 className="text-3xl font-bold mb-2" data-testid="provider-name">
-                {provider.business_name || 'ספק שירותים'}
-              </h1>
-              <p className="text-gray-600">{t(provider.provider_type)}</p>
+      {/* Hero Header */}
+      <div className="bg-gradient-to-r from-carelink-navy via-carelink-slate to-carelink-teal text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex flex-col lg:flex-row gap-8 items-start">
+            {/* Provider Avatar/Logo */}
+            <div className="w-32 h-32 lg:w-40 lg:h-40 bg-white rounded-2xl shadow-xl flex items-center justify-center flex-shrink-0">
+              <span className="text-5xl lg:text-6xl font-bold text-carelink-teal">
+                {(provider.business_name || 'ס')[0]}
+              </span>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center">
-                <FaStar className="text-yellow-500 mr-1" />
-                <span className="text-2xl font-bold">{provider.rating.toFixed(1)}</span>
-                <span className="text-gray-600 mr-2">({provider.total_reviews})</span>
-              </div>
-              {isOwner && (
-                <button
-                  onClick={() => navigate(`/provider/edit/${providerId}`)}
-                  className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                  data-testid="edit-profile-btn"
-                >
-                  <FaEdit /> {t('editProfile')}
-                </button>
-              )}
-            </div>
-          </div>
-
-          {provider.description && (
-            <p className="text-gray-700 mb-4">{provider.description}</p>
-          )}
-
-          {/* Specializations */}
-          {provider.specializations && provider.specializations.length > 0 && (
-            <div className="mb-4">
-              <h3 className="font-semibold mb-2">{t('specializations')}:</h3>
-              <div className="flex flex-wrap gap-2">
-                {provider.specializations.map((spec, idx) => (
-                  <span
-                    key={idx}
-                    className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
-                  >
-                    {spec}
+            
+            {/* Provider Info */}
+            <div className="flex-1">
+              <div className="flex flex-wrap items-center gap-3 mb-3">
+                <h1 className="text-3xl lg:text-4xl font-bold font-heading" data-testid="provider-name">
+                  {provider.business_name || 'ספק שירותים'}
+                </h1>
+                {provider.is_verified && (
+                  <span className="inline-flex items-center gap-1 bg-carelink-teal px-3 py-1 rounded-full text-sm">
+                    <FaCheckCircle /> מאומת
                   </span>
-                ))}
+                )}
               </div>
-            </div>
-          )}
-
-          {/* Location */}
-          {provider.location && (
-            <div className="mb-4">
-              <div className="flex items-center gap-2 text-gray-700 mb-2">
-                <FaMapMarkerAlt className="text-red-500" />
-                <span>
-                  {provider.location.address}, {provider.location.city}
+              
+              <div className="flex flex-wrap items-center gap-4 mb-4">
+                <span className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
+                  <FaBriefcase />
+                  {t(provider.provider_type)}
                 </span>
+                
+                {provider.location && (
+                  <span className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
+                    <FaMapMarkerAlt />
+                    {provider.location.city}
+                  </span>
+                )}
+                
+                <div className="inline-flex items-center gap-2 bg-yellow-500/20 px-3 py-1 rounded-full">
+                  <FaStar className="text-yellow-400" />
+                  <span className="font-bold">{provider.rating?.toFixed(1) || '0.0'}</span>
+                  <span className="text-carelink-teal-pale">({provider.total_reviews || 0} ביקורות)</span>
+                </div>
               </div>
-              {provider.location.latitude && provider.location.longitude && (
-                <div className="h-64 rounded-lg overflow-hidden border border-gray-300 mt-2">
-                  <MapContainer
-                    center={[provider.location.latitude, provider.location.longitude]}
-                    zoom={13}
-                    style={{ height: '100%', width: '100%' }}
-                  >
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      attribution='&copy; OpenStreetMap contributors'
-                    />
-                    <Marker position={[provider.location.latitude, provider.location.longitude]} />
-                  </MapContainer>
-                </div>
+              
+              {provider.description && (
+                <p className="text-carelink-teal-pale text-lg max-w-2xl leading-relaxed mb-6">
+                  {provider.description}
+                </p>
               )}
-            </div>
-          )}
-        </div>
-
-        {/* Services */}
-        {provider.services_list && provider.services_list.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-8 mb-6">
-            <h2 className="text-2xl font-bold mb-4">{t('services')}</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {provider.services_list.map((service) => (
-                <div
-                  key={service.service_id}
-                  className="border border-gray-200 p-4 rounded-lg"
-                  data-testid={`service-${service.service_id}`}
+              
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={handleContact}
+                  className="inline-flex items-center gap-2 bg-carelink-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition shadow-lg"
+                  data-testid="contact-provider-btn"
                 >
-                  <h3 className="font-semibold mb-2">{service.name}</h3>
-                  <p className="text-gray-600 text-sm mb-2">{service.description}</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-blue-600">₪{service.price}</span>
-                    <span className="text-sm text-gray-600">{t(service.pricing_type)}</span>
-                  </div>
-                </div>
-              ))}
+                  <FaComments />
+                  צור קשר
+                </button>
+                
+                <button
+                  onClick={() => setActiveTab('services')}
+                  className="inline-flex items-center gap-2 bg-white text-carelink-navy px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-pale transition"
+                  data-testid="view-services-btn"
+                >
+                  <FaCalendarAlt />
+                  הזמן תור
+                </button>
+                
+                {isOwner && (
+                  <button
+                    onClick={() => navigate(`/provider/edit/${providerId}`)}
+                    className="inline-flex items-center gap-2 bg-white/10 text-white px-6 py-3 rounded-xl font-semibold hover:bg-white/20 transition border border-white/20"
+                    data-testid="edit-profile-btn"
+                  >
+                    <FaEdit />
+                    {t('editProfile')}
+                  </button>
+                )}
+                
+                <button className="inline-flex items-center justify-center w-12 h-12 bg-white/10 text-white rounded-xl hover:bg-white/20 transition border border-white/20">
+                  <FaShareAlt />
+                </button>
+                
+                <button className="inline-flex items-center justify-center w-12 h-12 bg-white/10 text-white rounded-xl hover:bg-white/20 transition border border-white/20">
+                  <FaHeart />
+                </button>
+              </div>
             </div>
           </div>
-        )}
-
-        {/* Team Members */}
-        {provider.team_members && provider.team_members.length > 0 && (
-          <div className="bg-white rounded-lg shadow-md p-8 mb-6">
-            <h2 className="text-2xl font-bold mb-4">צוות</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {provider.team_members.map((member) => (
-                <div
-                  key={member.member_id}
-                  className="border border-gray-200 p-4 rounded-lg"
-                >
-                  <h3 className="font-semibold">{member.name}</h3>
-                  <p className="text-sm text-gray-600">{member.role}</p>
-                  {member.specializations && member.specializations.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {member.specializations.map((spec, idx) => (
-                        <span key={idx} className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
-                          {spec}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Reviews */}
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold mb-4">{t('reviews')}</h2>
-          {reviews.length === 0 ? (
-            <p className="text-gray-600">עדיין אין ביקורות</p>
-          ) : (
-            <div className="space-y-4">
-              {reviews.map((review) => (
-                <div key={review.review_id} className="border-b border-gray-200 pb-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="flex">
-                      {[...Array(5)].map((_, i) => (
-                        <FaStar
-                          key={i}
-                          className={i < review.rating ? 'text-yellow-500' : 'text-gray-300'}
-                        />
-                      ))}
-                    </div>
-                    <span className="font-semibold">{review.user?.name || 'משתמש'}</span>
-                    <span className="text-sm text-gray-600">
-                      {new Date(review.created_at).toLocaleDateString('he-IL')}
-                    </span>
-                  </div>
-                  <p className="text-gray-700">{review.comment}</p>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Stats Bar */}
+      <div className="bg-white border-b border-carelink-teal-pale">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-carelink-teal mb-1">
+                {provider.services_list?.length || 0}
+              </div>
+              <div className="text-sm text-carelink-gray">שירותים</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-carelink-teal mb-1">
+                {provider.total_reviews || 0}
+              </div>
+              <div className="text-sm text-carelink-gray">ביקורות</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-carelink-teal mb-1">
+                {provider.team_members?.length || 1}
+              </div>
+              <div className="text-sm text-carelink-gray">אנשי צוות</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-carelink-teal mb-1">
+                {provider.specializations?.length || 0}
+              </div>
+              <div className="text-sm text-carelink-gray">התמחויות</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Left Column - Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Tabs */}
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="flex border-b border-carelink-teal-pale">
+                {[
+                  { id: 'services', label: 'שירותים', icon: FaCalendarAlt },
+                  { id: 'reviews', label: 'ביקורות', icon: FaStar },
+                  { id: 'team', label: 'הצוות', icon: FaUsers }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 font-semibold transition ${
+                      activeTab === tab.id
+                        ? 'text-carelink-teal border-b-2 border-carelink-teal bg-carelink-teal-pale/20'
+                        : 'text-carelink-gray hover:text-carelink-navy hover:bg-gray-50'
+                    }`}
+                    data-testid={`tab-${tab.id}`}
+                  >
+                    <tab.icon />
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+              
+              <div className="p-6">
+                {/* Services Tab */}
+                {activeTab === 'services' && (
+                  <div className="space-y-4" data-testid="services-section">
+                    {provider.services_list && provider.services_list.length > 0 ? (
+                      provider.services_list.map((service) => (
+                        <div
+                          key={service.service_id}
+                          className="border-2 border-carelink-teal-pale rounded-xl p-5 hover:border-carelink-teal transition group"
+                          data-testid={`service-${service.service_id}`}
+                        >
+                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="flex-1">
+                              <h3 className="text-xl font-bold text-carelink-navy mb-2">{service.name}</h3>
+                              <p className="text-carelink-slate mb-3">{service.description}</p>
+                              <div className="flex flex-wrap gap-3">
+                                <span className="inline-flex items-center gap-1 text-sm text-carelink-gray">
+                                  <FaClock className="text-carelink-teal" />
+                                  {service.duration_minutes ? `${service.duration_minutes} דקות` : t(service.pricing_type)}
+                                </span>
+                                <span className="bg-carelink-navy text-white text-xs px-3 py-1 rounded-full">
+                                  {t(service.service_type)}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex flex-col items-end gap-3">
+                              <div className="text-3xl font-bold text-carelink-teal">
+                                ₪{service.price}
+                              </div>
+                              <button
+                                onClick={() => handleBookService(service.service_id)}
+                                className="bg-carelink-teal text-white px-6 py-2 rounded-lg font-semibold hover:bg-carelink-teal-medium transition"
+                                data-testid={`book-${service.service_id}`}
+                              >
+                                הזמן עכשיו
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-carelink-gray">
+                        <FaCalendarAlt className="text-4xl mx-auto mb-3 text-carelink-teal-pale" />
+                        <p>אין שירותים להצגה כרגע</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Reviews Tab */}
+                {activeTab === 'reviews' && (
+                  <div className="space-y-6" data-testid="reviews-section">
+                    {/* Rating Summary */}
+                    <div className="bg-carelink-teal-pale/20 rounded-xl p-6 mb-6">
+                      <div className="flex items-center gap-6">
+                        <div className="text-center">
+                          <div className="text-5xl font-bold text-carelink-teal mb-1">
+                            {provider.rating?.toFixed(1) || '0.0'}
+                          </div>
+                          <div className="flex justify-center mb-1">
+                            {[...Array(5)].map((_, i) => (
+                              <FaStar
+                                key={i}
+                                className={i < Math.round(provider.rating || 0) ? 'text-yellow-500' : 'text-gray-300'}
+                              />
+                            ))}
+                          </div>
+                          <div className="text-sm text-carelink-gray">
+                            {provider.total_reviews || 0} ביקורות
+                          </div>
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          {[5, 4, 3, 2, 1].map((stars) => {
+                            const count = reviews.filter(r => Math.round(r.rating) === stars).length;
+                            const percentage = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
+                            return (
+                              <div key={stars} className="flex items-center gap-2">
+                                <span className="text-sm w-3">{stars}</span>
+                                <FaStar className="text-yellow-500 text-sm" />
+                                <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-yellow-500 rounded-full"
+                                    style={{ width: `${percentage}%` }}
+                                  ></div>
+                                </div>
+                                <span className="text-sm text-carelink-gray w-8">{count}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Reviews List */}
+                    {reviews.length > 0 ? (
+                      reviews.map((review) => (
+                        <div key={review.review_id} className="border-b border-carelink-teal-pale pb-6 last:border-0">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 bg-carelink-teal rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                              {(review.user?.name || 'מ')[0]}
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex flex-wrap items-center gap-3 mb-2">
+                                <span className="font-bold text-carelink-navy">{review.user?.name || 'משתמש'}</span>
+                                <div className="flex">
+                                  {[...Array(5)].map((_, i) => (
+                                    <FaStar
+                                      key={i}
+                                      className={i < review.rating ? 'text-yellow-500' : 'text-gray-300'}
+                                    />
+                                  ))}
+                                </div>
+                                <span className="text-sm text-carelink-gray">
+                                  {new Date(review.created_at).toLocaleDateString('he-IL')}
+                                </span>
+                              </div>
+                              <p className="text-carelink-slate leading-relaxed">
+                                <FaQuoteRight className="inline text-carelink-teal-pale ml-2" />
+                                {review.comment}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-carelink-gray">
+                        <FaStar className="text-4xl mx-auto mb-3 text-carelink-teal-pale" />
+                        <p>עדיין אין ביקורות</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Team Tab */}
+                {activeTab === 'team' && (
+                  <div data-testid="team-section">
+                    {provider.team_members && provider.team_members.length > 0 ? (
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {provider.team_members.map((member) => (
+                          <div
+                            key={member.member_id}
+                            className="border-2 border-carelink-teal-pale rounded-xl p-5 hover:border-carelink-teal transition"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="w-16 h-16 bg-carelink-navy rounded-xl flex items-center justify-center text-white text-xl font-bold">
+                                {member.name[0]}
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-carelink-navy text-lg">{member.name}</h4>
+                                <p className="text-carelink-teal">{member.role}</p>
+                              </div>
+                            </div>
+                            {member.specializations && member.specializations.length > 0 && (
+                              <div className="flex flex-wrap gap-2 mt-4">
+                                {member.specializations.map((spec, idx) => (
+                                  <span key={idx} className="bg-carelink-teal-pale text-carelink-navy text-xs px-3 py-1 rounded-full">
+                                    {spec}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="w-20 h-20 bg-carelink-navy rounded-xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                          {(provider.business_name || 'ס')[0]}
+                        </div>
+                        <h4 className="font-bold text-carelink-navy text-lg mb-1">{provider.business_name}</h4>
+                        <p className="text-carelink-gray">בעלים</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Sidebar */}
+          <div className="space-y-6">
+            {/* Specializations */}
+            {provider.specializations && provider.specializations.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-lg p-6">
+                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
+                  <FaAward className="text-carelink-teal" />
+                  התמחויות
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {provider.specializations.map((spec, idx) => (
+                    <span
+                      key={idx}
+                      className="bg-carelink-teal text-white px-4 py-2 rounded-full text-sm font-medium"
+                    >
+                      {spec}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Location */}
+            {provider.location && (
+              <div className="bg-white rounded-2xl shadow-lg p-6">
+                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
+                  <FaMapMarkerAlt className="text-carelink-teal" />
+                  מיקום
+                </h3>
+                <p className="text-carelink-slate mb-4">
+                  {provider.location.address && `${provider.location.address}, `}
+                  {provider.location.city}
+                </p>
+                {/* Map placeholder */}
+                <div className="h-48 bg-carelink-teal-pale/30 rounded-xl flex items-center justify-center">
+                  <div className="text-center text-carelink-gray">
+                    <FaMapMarkerAlt className="text-3xl mx-auto mb-2 text-carelink-teal" />
+                    <p className="text-sm">מפה תוצג כאן</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Contact Card */}
+            <div className="bg-gradient-to-br from-carelink-teal to-carelink-teal-medium rounded-2xl shadow-lg p-6 text-white">
+              <h3 className="text-lg font-bold mb-4">צור קשר</h3>
+              <p className="text-white/80 mb-6">
+                מעוניינים בשירותים? צרו קשר ונשמח לעזור
+              </p>
+              <button
+                onClick={handleContact}
+                className="w-full bg-white text-carelink-teal py-3 rounded-xl font-semibold hover:bg-carelink-teal-pale transition"
+              >
+                שלח הודעה
+              </button>
+            </div>
+
+            {/* Working Hours */}
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
+                <FaClock className="text-carelink-teal" />
+                שעות פעילות
+              </h3>
+              <div className="space-y-2 text-sm">
+                {['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי'].map((day) => (
+                  <div key={day} className="flex justify-between">
+                    <span className="text-carelink-gray">{day}</span>
+                    <span className="text-carelink-navy font-medium">09:00 - 18:00</span>
+                  </div>
+                ))}
+                <div className="flex justify-between">
+                  <span className="text-carelink-gray">שישי</span>
+                  <span className="text-carelink-navy font-medium">09:00 - 13:00</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-carelink-gray">שבת</span>
+                  <span className="text-red-500 font-medium">סגור</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Contact Modal */}
+      {showContactModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-carelink-navy mb-4">צור קשר עם {provider.business_name}</h3>
+            <p className="text-carelink-gray mb-6">
+              שלח הודעה ישירה לספק השירות
+            </p>
+            <textarea
+              className="w-full border-2 border-carelink-teal-pale rounded-xl p-4 h-32 focus:border-carelink-teal focus:outline-none resize-none"
+              placeholder="כתוב את ההודעה שלך..."
+            ></textarea>
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={() => setShowContactModal(false)}
+                className="flex-1 bg-gray-100 text-carelink-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
+              >
+                ביטול
+              </button>
+              <button
+                onClick={() => {
+                  setShowContactModal(false);
+                  navigate('/chats');
+                }}
+                className="flex-1 bg-carelink-teal text-white py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition"
+              >
+                שלח הודעה
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Footer />
     </div>
   );
 };
