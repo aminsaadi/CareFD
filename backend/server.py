@@ -2207,17 +2207,24 @@ async def admin_get_bookings(
 @api_router.put("/admin/providers/{provider_id}/verify")
 async def admin_verify_provider(
     provider_id: str,
+    body: dict = None,
     authorization: Optional[str] = Header(None),
     request: Request = None
 ):
-    """Admin: Verify a provider"""
+    """Admin: Verify a provider (full approval)"""
     user = await get_current_user(authorization, request)
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     
+    notes = body.get("notes") if body else None
+    
     result = await db.providers.update_one(
         {"provider_id": provider_id},
-        {"$set": {"is_verified": True}}
+        {"$set": {
+            "is_verified": True,
+            "verification_status": VerificationStatus.VERIFIED,
+            "verification_notes": notes
+        }}
     )
     
     if result.modified_count == 0:
@@ -2228,13 +2235,160 @@ async def admin_verify_provider(
     if provider:
         await create_notification(
             provider["user_id"],
-            NotificationType.SYSTEM,
-            "החשבון שלך אומת!",
-            "הפרופיל שלך אומת בהצלחה. כעת הלקוחות יכולים לראות שאתה ספק מאומת.",
+            NotificationType.PROVIDER_VERIFIED,
+            "החשבון שלך אומת! 🎉",
+            "הפרופיל שלך אומת בהצלחה. כעת הלקוחות יכולים להזמין שירותים ולראות שאתה ספק מאומת.",
             {"provider_id": provider_id}
         )
+        
+        # Send email
+        provider_user = await db.users.find_one({"user_id": provider["user_id"]}, {"_id": 0})
+        if provider_user:
+            await send_email_async(
+                provider_user.get("email"),
+                "CareLink - החשבון שלך אומת!",
+                f"""
+                <h1>ברכות! החשבון שלך אומת 🎉</h1>
+                <p>שלום {provider.get('business_name', 'ספק')},</p>
+                <p>אנו שמחים לבשר לך שהפרופיל שלך אומת בהצלחה!</p>
+                <p>כעת לקוחות יכולים לראות את תג האימות שלך ולהזמין את השירותים שלך.</p>
+                <p>בהצלחה!</p>
+                <p>צוות CareLink</p>
+                """
+            )
     
     return {"message": "Provider verified"}
+
+@api_router.put("/admin/providers/{provider_id}/reject")
+async def admin_reject_provider(
+    provider_id: str,
+    body: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Reject a provider verification"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    reason = body.get("reason", "הבקשה נדחתה")
+    
+    result = await db.providers.update_one(
+        {"provider_id": provider_id},
+        {"$set": {
+            "is_verified": False,
+            "verification_status": VerificationStatus.REJECTED,
+            "verification_notes": reason
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    # Notify provider
+    provider = await db.providers.find_one({"provider_id": provider_id}, {"_id": 0})
+    if provider:
+        await create_notification(
+            provider["user_id"],
+            NotificationType.PROVIDER_REJECTED,
+            "בקשת האימות נדחתה",
+            f"בקשת האימות שלך נדחתה. סיבה: {reason}",
+            {"provider_id": provider_id, "reason": reason}
+        )
+    
+    return {"message": "Provider verification rejected"}
+
+@api_router.get("/admin/providers/pending")
+async def admin_get_pending_providers(
+    authorization: Optional[str] = Header(None),
+    request: Request = None,
+    skip: int = 0,
+    limit: int = 50
+):
+    """Admin: Get providers pending verification"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    query = {
+        "$or": [
+            {"verification_status": VerificationStatus.PENDING},
+            {"verification_status": VerificationStatus.DOCUMENTS_SUBMITTED},
+            {"is_verified": False, "verification_status": {"$exists": False}}
+        ]
+    }
+    
+    providers = await db.providers.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.providers.count_documents(query)
+    
+    # Enrich with user data
+    for provider in providers:
+        provider_user = await db.users.find_one({"user_id": provider["user_id"]}, {"_id": 0, "password_hash": 0})
+        if provider_user:
+            provider["user_info"] = provider_user
+    
+    return {"providers": providers, "total": total, "skip": skip, "limit": limit}
+
+@api_router.put("/admin/providers/{provider_id}/documents/{document_id}/approve")
+async def admin_approve_document(
+    provider_id: str,
+    document_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Approve a specific document"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.providers.update_one(
+        {"provider_id": provider_id, "verification_documents.document_id": document_id},
+        {"$set": {"verification_documents.$.status": "approved"}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    return {"message": "Document approved"}
+
+@api_router.put("/admin/providers/{provider_id}/documents/{document_id}/reject")
+async def admin_reject_document(
+    provider_id: str,
+    document_id: str,
+    body: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Reject a specific document"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    reason = body.get("reason", "המסמך נדחה")
+    
+    result = await db.providers.update_one(
+        {"provider_id": provider_id, "verification_documents.document_id": document_id},
+        {"$set": {
+            "verification_documents.$.status": "rejected",
+            "verification_documents.$.rejection_reason": reason
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    # Notify provider
+    provider = await db.providers.find_one({"provider_id": provider_id}, {"_id": 0})
+    if provider:
+        await create_notification(
+            provider["user_id"],
+            NotificationType.SYSTEM,
+            "מסמך נדחה",
+            f"אחד המסמכים שהעלית נדחה. סיבה: {reason}",
+            {"provider_id": provider_id, "document_id": document_id}
+        )
+    
+    return {"message": "Document rejected"}
 
 @api_router.put("/admin/providers/{provider_id}/recommend")
 async def admin_recommend_provider(
