@@ -76,6 +76,9 @@ const Navbar = () => {
               <FaSearch className="text-lg" />
             </button>
 
+            {/* Notifications */}
+            {isAuthenticated && <NotificationBell />}
+
             <LanguageSwitcher />
             
             {/* Desktop Auth Buttons */}
