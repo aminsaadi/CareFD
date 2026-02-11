@@ -1,5 +1,6 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Header, Response, Request
+from fastapi import FastAPI, APIRouter, HTTPException, Header, Response, Request, UploadFile, File
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -15,8 +16,11 @@ from jose import jwt
 import httpx
 import resend
 import asyncio
+import shutil
 
 ROOT_DIR = Path(__file__).parent
+UPLOAD_DIR = ROOT_DIR / "uploads"
+UPLOAD_DIR.mkdir(exist_ok=True)
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
