@@ -18,6 +18,7 @@ import MyBookings from './pages/MyBookings';
 import RequestDetails from './pages/RequestDetails';
 import ChatRoom from './pages/ChatRoom';
 import ChatList from './pages/ChatList';
+import ProviderDashboard from './pages/ProviderDashboard';
 import './i18n';
 import './App.css';
 
@@ -130,6 +131,14 @@ function AppRouter() {
         element={
           <ProtectedRoute>
             <ChatRoom />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/provider/dashboard"
+        element={
+          <ProtectedRoute>
+            <ProviderDashboard />
           </ProtectedRoute>
         }
       />
