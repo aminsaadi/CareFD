@@ -272,8 +272,25 @@ class OfferCreate(BaseModel):
 class BookingStatus:
     PENDING = "pending"
     CONFIRMED = "confirmed"
+    IN_PROGRESS = "in_progress"
+    PROVIDER_COMPLETED = "provider_completed"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
+
+class ContactPerson(BaseModel):
+    name: str
+    phone: str
+    relationship: Optional[str] = None  # self, family, caregiver
+
+class ServiceLocation(BaseModel):
+    address: str
+    city: str
+    floor: Optional[str] = None
+    apartment: Optional[str] = None
+    entry_code: Optional[str] = None
+    notes: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 class Booking(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -282,13 +299,53 @@ class Booking(BaseModel):
     provider_id: str
     service_id: str
     booking_date: datetime
+    booking_time: Optional[str] = None  # "09:00"
     status: str = BookingStatus.PENDING
+    # Client details
+    client_name: Optional[str] = None
+    client_phone: Optional[str] = None
+    client_email: Optional[str] = None
+    # Contact person
+    contact_person: Optional[ContactPerson] = None
+    # Service location
+    service_location: Optional[ServiceLocation] = None
+    # Additional info
+    notes: Optional[str] = None
+    special_requirements: Optional[str] = None
+    # Payment
+    final_price: Optional[float] = None
+    payment_notes: Optional[str] = None
+    # Status timestamps
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    confirmed_at: Optional[datetime] = None
+    provider_completed_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
+    cancelled_at: Optional[datetime] = None
+    # Provider/Client names for easy display
+    service_name: Optional[str] = None
+    provider_name: Optional[str] = None
+    user_name: Optional[str] = None
 
 class BookingCreate(BaseModel):
     service_id: str
     booking_date: datetime
+    booking_time: Optional[str] = None
+    client_name: str
+    client_phone: str
+    client_email: Optional[str] = None
+    contact_person_name: Optional[str] = None
+    contact_person_phone: Optional[str] = None
+    contact_person_relationship: Optional[str] = None
+    service_address: str
+    service_city: str
+    service_floor: Optional[str] = None
+    service_apartment: Optional[str] = None
+    service_entry_code: Optional[str] = None
+    service_notes: Optional[str] = None
+    service_latitude: Optional[float] = None
+    service_longitude: Optional[float] = None
+    notes: Optional[str] = None
+    special_requirements: Optional[str] = None
 
 # Review Models
 class Review(BaseModel):
