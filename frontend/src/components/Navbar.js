@@ -24,22 +24,23 @@ const Navbar = () => {
               <Logo />
             </Link>
             
-            {isAuthenticated && (
-              <div className="hidden md:flex ml-10 space-x-8 rtl:space-x-reverse">
-                <Link
-                  to="/providers"
-                  className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors"
-                  data-testid="nav-providers"
-                >
-                  {t('providers')}
-                </Link>
-                <Link
-                  to="/services"
-                  className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors"
-                  data-testid="nav-services"
-                >
-                  {t('services')}
-                </Link>
+            {/* Public navigation links - visible to all */}
+            <div className="hidden md:flex ml-10 space-x-8 rtl:space-x-reverse">
+              <Link
+                to="/providers"
+                className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors"
+                data-testid="nav-providers"
+              >
+                {t('providers')}
+              </Link>
+              <Link
+                to="/services"
+                className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors"
+                data-testid="nav-services"
+              >
+                {t('services')}
+              </Link>
+              {isAuthenticated && (
                 <Link
                   to="/requests"
                   className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors"
@@ -47,8 +48,8 @@ const Navbar = () => {
                 >
                   {t('requests')}
                 </Link>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           <div className="flex items-center space-x-4 rtl:space-x-reverse">
