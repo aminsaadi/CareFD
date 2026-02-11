@@ -54,11 +54,15 @@ const resources = {
       "clinic": "מרפאה",
       
       // Service Types
-      "homeVisit": "ביקור בית",
+      "homeVisit": "בקור בית",
       "clinicVisit": "ביקור במרפאה",
       "videoCall": "וידאו קונפרנס",
       "phoneCall": "שיחת טלפון",
       "hospital": "בית חולים",
+      "consultation": "ייעוץ",
+      "per_hour": "לפי שעה",
+      "home_visit": "ביקור בית",
+      "clinic_visit": "ביקור במרפאה",
       
       // Request & Offer
       "createRequest": "צור בקשה חדשה",
@@ -153,6 +157,10 @@ const resources = {
       "videoCall": "مكالمة فيديو",
       "phoneCall": "مكالمة هاتفية",
       "hospital": "مستشفى",
+      "consultation": "استشارة",
+      "per_hour": "بالساعة",
+      "home_visit": "زيارة منزلية",
+      "clinic_visit": "زيارة العيادة",
       
       // Request & Offer
       "createRequest": "إنشاء طلب جديد",
@@ -189,6 +197,104 @@ const resources = {
       "errorOccurred": "حدث خطأ",
       "invalidCredentials": "بيانات اعتماد غير صالحة",
     }
+  },
+  en: {
+    translation: {
+      // Common
+      "welcome": "Welcome to CareLink",
+      "login": "Login",
+      "register": "Register",
+      "logout": "Logout",
+      "email": "Email",
+      "password": "Password",
+      "name": "Name",
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "search": "Search",
+      "filter": "Filter",
+      "loading": "Loading...",
+      
+      // Auth
+      "loginWithGoogle": "Login with Google",
+      "orContinueWith": "Or continue with",
+      "dontHaveAccount": "Don't have an account?",
+      "alreadyHaveAccount": "Already have an account?",
+      "registerNow": "Register Now",
+      "loginNow": "Login Now",
+      "registerAsPatient": "Register as Patient",
+      "registerAsProvider": "Register as Provider",
+      
+      // Navigation
+      "home": "Home",
+      "providers": "Providers",
+      "services": "Services",
+      "requests": "Requests",
+      "products": "Products",
+      "myProfile": "My Profile",
+      "myBookings": "My Bookings",
+      "myRequests": "My Requests",
+      "dashboard": "Dashboard",
+      
+      // Landing Page
+      "heroTitle": "Find the Best Healthcare Services in Israel",
+      "heroSubtitle": "An integrated platform connecting patients with healthcare service providers",
+      "getStarted": "Get Started",
+      "howItWorks": "How It Works",
+      "forPatients": "For Patients",
+      "forProviders": "For Providers",
+      
+      // Provider Types
+      "individual": "Individual",
+      "company": "Company",
+      "clinic": "Clinic",
+      
+      // Service Types
+      "homeVisit": "Home Visit",
+      "clinicVisit": "Clinic Visit",
+      "videoCall": "Video Call",
+      "phoneCall": "Phone Call",
+      "hospital": "Hospital",
+      "consultation": "Consultation",
+      "per_hour": "Per Hour",
+      "home_visit": "Home Visit",
+      "clinic_visit": "Clinic Visit",
+      
+      // Request & Offer
+      "createRequest": "Create New Request",
+      "viewOffers": "View Offers",
+      "makeOffer": "Make Offer",
+      "acceptOffer": "Accept Offer",
+      "requestTitle": "Request Title",
+      "requestDescription": "Request Description",
+      "budget": "Budget",
+      "specialization": "Specialization",
+      
+      // Booking
+      "bookNow": "Book Now",
+      "selectDate": "Select Date",
+      "selectTime": "Select Time",
+      "confirmBooking": "Confirm Booking",
+      
+      // Reviews
+      "reviews": "Reviews",
+      "rating": "Rating",
+      "writeReview": "Write Review",
+      
+      // Profile
+      "editProfile": "Edit Profile",
+      "businessName": "Business Name",
+      "description": "Description",
+      "location": "Location",
+      "availability": "Availability",
+      "specializations": "Specializations",
+      
+      // Messages
+      "loginSuccess": "Login Successful",
+      "registerSuccess": "Registration Successful",
+      "errorOccurred": "An Error Occurred",
+      "invalidCredentials": "Invalid Credentials",
+    }
   }
 };
 
@@ -202,5 +308,21 @@ i18n
       escapeValue: false
     }
   });
+
+// Set initial direction
+const setDirection = (lang) => {
+  const rtlLanguages = ['he', 'ar'];
+  const dir = rtlLanguages.includes(lang) ? 'rtl' : 'ltr';
+  document.documentElement.dir = dir;
+  document.documentElement.lang = lang;
+};
+
+// Set direction on init
+setDirection(i18n.language);
+
+// Listen for language changes
+i18n.on('languageChanged', (lng) => {
+  setDirection(lng);
+});
 
 export default i18n;
