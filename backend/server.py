@@ -356,6 +356,11 @@ class Review(BaseModel):
     booking_id: Optional[str] = None
     rating: float  # 1-5
     comment: str
+    service_quality: Optional[int] = None  # 1-5
+    punctuality: Optional[int] = None  # 1-5
+    communication: Optional[int] = None  # 1-5
+    price_value: Optional[int] = None  # 1-5
+    would_recommend: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class ReviewCreate(BaseModel):
@@ -363,6 +368,11 @@ class ReviewCreate(BaseModel):
     booking_id: Optional[str] = None
     rating: float
     comment: str
+    service_quality: Optional[int] = None
+    punctuality: Optional[int] = None
+    communication: Optional[int] = None
+    price_value: Optional[int] = None
+    would_recommend: bool = True
 
 # Notification Models
 class NotificationType:
