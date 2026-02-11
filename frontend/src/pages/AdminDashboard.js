@@ -20,6 +20,7 @@ const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [providers, setProviders] = useState([]);
+  const [pendingProviders, setPendingProviders] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -27,6 +28,8 @@ const AdminDashboard = () => {
   const [broadcastTitle, setBroadcastTitle] = useState('');
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [broadcastRole, setBroadcastRole] = useState('');
+  const [rejectReason, setRejectReason] = useState('');
+  const [showRejectDialog, setShowRejectDialog] = useState(null);
 
   useEffect(() => {
     fetchAdminData();
