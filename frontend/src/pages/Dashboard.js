@@ -494,6 +494,18 @@ const Dashboard = () => {
       </div>
 
       <Footer />
+
+      {/* Completion Confirmation Dialog */}
+      {showCompletionDialog && (
+        <CompletionConfirmDialog
+          booking={showCompletionDialog}
+          onClose={() => setShowCompletionDialog(null)}
+          onSuccess={() => {
+            setShowCompletionDialog(null);
+            fetchDashboardData();
+          }}
+        />
+      )}
     </div>
   );
 };
