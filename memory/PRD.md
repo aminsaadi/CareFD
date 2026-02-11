@@ -28,6 +28,7 @@ Build a comprehensive marketplace platform named "CareLink" connecting healthcar
 - [x] **NEW: Statistics display (250+ providers, 500+ services, etc.)**
 - [x] **NEW: Testimonials section**
 - [x] **NEW: "How it works" section**
+- [x] **NEW: Hero search bar with type selector and quick tags**
 
 ### Features Pending 🔄
 - [ ] **P1: Admin Dashboard Features** - Analytics, Reports & Exports, Notifications
