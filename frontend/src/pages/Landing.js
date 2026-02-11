@@ -71,6 +71,63 @@ const Landing = () => {
               <p className="text-lg lg:text-xl mb-8 text-carelink-teal-pale max-w-xl leading-relaxed" data-testid="hero-subtitle">
                 {t('heroSubtitle')}
               </p>
+
+              {/* Hero Search Bar */}
+              <form onSubmit={handleSearch} className="mb-8" data-testid="hero-search-form">
+                <div className="flex flex-col sm:flex-row gap-3 bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/20">
+                  {/* Search Type Selector */}
+                  <select
+                    value={searchType}
+                    onChange={(e) => setSearchType(e.target.value)}
+                    className="bg-white text-carelink-navy px-4 py-3 rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-carelink-teal cursor-pointer"
+                    data-testid="search-type-select"
+                  >
+                    <option value="providers">ספקים</option>
+                    <option value="services">שירותים</option>
+                  </select>
+                  
+                  {/* Search Input */}
+                  <div className="flex-1 relative">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="חפש לפי התמחות, שירות או מיקום..."
+                      className="w-full bg-white text-carelink-navy px-5 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-carelink-teal placeholder-carelink-gray"
+                      data-testid="hero-search-input"
+                    />
+                  </div>
+                  
+                  {/* Search Button */}
+                  <button
+                    type="submit"
+                    className="bg-carelink-teal text-white px-8 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition-all flex items-center justify-center gap-2 shadow-lg"
+                    data-testid="hero-search-btn"
+                  >
+                    <FaSearch />
+                    <span>חפש</span>
+                  </button>
+                </div>
+                
+                {/* Quick Search Tags */}
+                <div className="flex flex-wrap gap-2 mt-4">
+                  <span className="text-sm text-carelink-teal-pale">חיפושים פופולריים:</span>
+                  {['סיעוד', 'פיזיותרפיה', 'רופא בבית', 'טיפול בקשישים'].map((tag) => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery(tag);
+                        navigate(`/providers?search=${encodeURIComponent(tag)}`);
+                      }}
+                      className="text-sm bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors"
+                      data-testid={`quick-search-${tag}`}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </form>
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
