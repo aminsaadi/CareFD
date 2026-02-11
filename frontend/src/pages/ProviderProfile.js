@@ -8,9 +8,18 @@ import api from '../utils/api';
 import { 
   FaStar, FaMapMarkerAlt, FaClock, FaEdit, FaPhone, FaEnvelope,
   FaCheckCircle, FaUserMd, FaCalendarAlt, FaComments, FaShareAlt,
-  FaHeart, FaBriefcase, FaUsers, FaAward, FaQuoteRight
+  FaHeart, FaBriefcase, FaUsers, FaAward, FaQuoteRight, FaWhatsapp,
+  FaHome, FaVideo, FaClinicMedical, FaPhoneAlt
 } from 'react-icons/fa';
 import { dummyProviders, dummyServices } from '../data/dummyData';
+
+// Service type config
+const serviceTypeConfig = {
+  home_visit: { icon: FaHome, label: 'ביקור בית', color: 'bg-blue-100 text-blue-600' },
+  video_call: { icon: FaVideo, label: 'טלרפואה', color: 'bg-purple-100 text-purple-600' },
+  clinic_visit: { icon: FaClinicMedical, label: 'ביקור במרפאה', color: 'bg-green-100 text-green-600' },
+  phone_call: { icon: FaPhoneAlt, label: 'שיחה טלפונית', color: 'bg-orange-100 text-orange-600' }
+};
 
 // Demo reviews for display
 const demoReviews = [
