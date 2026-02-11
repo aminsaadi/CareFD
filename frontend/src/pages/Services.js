@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../utils/api';
 
 const Services = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -72,7 +74,8 @@ const Services = () => {
                 )}
 
                 <button
-                  className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                  onClick={() => navigate(`/book/${service.service_id}`)}
+                  className="w-full bg-carelink-teal text-white px-4 py-2 rounded hover:bg-carelink-teal-medium transition-colors"
                   data-testid={`book-service-${service.service_id}`}
                 >
                   {t('bookNow')}

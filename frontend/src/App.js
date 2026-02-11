@@ -13,6 +13,8 @@ import Requests from './pages/Requests';
 import ProviderSetup from './pages/ProviderSetup';
 import ProviderProfile from './pages/ProviderProfile';
 import ProviderEdit from './pages/ProviderEdit';
+import BookService from './pages/BookService';
+import MyBookings from './pages/MyBookings';
 import './i18n';
 import './App.css';
 
@@ -85,6 +87,22 @@ function AppRouter() {
         element={
           <ProtectedRoute>
             <ProviderEdit />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/book/:serviceId"
+        element={
+          <ProtectedRoute>
+            <BookService />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/bookings"
+        element={
+          <ProtectedRoute>
+            <MyBookings />
           </ProtectedRoute>
         }
       />
