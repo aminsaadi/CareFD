@@ -153,13 +153,13 @@ const Providers = () => {
                   </p>
                 )}
 
-                <a
-                  href={`/providers/${provider.provider_id}`}
+                <Link
+                  to={`/providers/${provider.provider_id}`}
                   className="block w-full text-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                   data-testid={`view-provider-${provider.provider_id}`}
                 >
                   צפה בפרופיל
-                </a>
+                </Link>
               </div>
             ))}
           </div>

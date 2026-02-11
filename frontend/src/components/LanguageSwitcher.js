@@ -6,7 +6,9 @@ const LanguageSwitcher = () => {
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
-    document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr';
+    const rtlLanguages = ['he', 'ar'];
+    const dir = rtlLanguages.includes(lng) ? 'rtl' : 'ltr';
+    document.documentElement.dir = dir;
     document.documentElement.lang = lng;
   };
 
@@ -14,7 +16,7 @@ const LanguageSwitcher = () => {
     <div className="flex gap-2">
       <button
         onClick={() => changeLanguage('he')}
-        className={`px-3 py-1 rounded ${
+        className={`px-3 py-1 rounded text-sm ${
           i18n.language === 'he'
             ? 'bg-blue-600 text-white'
             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -25,7 +27,7 @@ const LanguageSwitcher = () => {
       </button>
       <button
         onClick={() => changeLanguage('ar')}
-        className={`px-3 py-1 rounded ${
+        className={`px-3 py-1 rounded text-sm ${
           i18n.language === 'ar'
             ? 'bg-blue-600 text-white'
             : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -33,6 +35,17 @@ const LanguageSwitcher = () => {
         data-testid="lang-ar-btn"
       >
         العربية
+      </button>
+      <button
+        onClick={() => changeLanguage('en')}
+        className={`px-3 py-1 rounded text-sm ${
+          i18n.language === 'en'
+            ? 'bg-blue-600 text-white'
+            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+        }`}
+        data-testid="lang-en-btn"
+      >
+        English
       </button>
     </div>
   );
