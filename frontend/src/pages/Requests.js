@@ -171,3 +171,5 @@ const Requests = () => {
     </div>
   );
 };
+
+export default Requests;
