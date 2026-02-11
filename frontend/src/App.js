@@ -10,6 +10,9 @@ import Dashboard from './pages/Dashboard';
 import Providers from './pages/Providers';
 import Services from './pages/Services';
 import Requests from './pages/Requests';
+import ProviderSetup from './pages/ProviderSetup';
+import ProviderProfile from './pages/ProviderProfile';
+import ProviderEdit from './pages/ProviderEdit';
 import './i18n';
 import './App.css';
 
@@ -58,6 +61,30 @@ function AppRouter() {
         element={
           <ProtectedRoute>
             <Requests />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/provider/setup"
+        element={
+          <ProtectedRoute>
+            <ProviderSetup />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/providers/:providerId"
+        element={
+          <ProtectedRoute>
+            <ProviderProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/provider/edit/:providerId"
+        element={
+          <ProtectedRoute>
+            <ProviderEdit />
           </ProtectedRoute>
         }
       />
