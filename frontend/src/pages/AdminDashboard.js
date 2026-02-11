@@ -622,6 +622,111 @@ const AdminDashboard = () => {
                     </div>
                   )}
 
+                  {/* Pending Providers Tab */}
+                  {activeTab === 'pending' && (
+                    <div className="bg-white p-6 rounded-2xl shadow-lg">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-bold text-carelink-navy">ספקים ממתינים לאישור</h3>
+                        <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium">
+                          {pendingProviders.length} ממתינים
+                        </span>
+                      </div>
+                      
+                      {pendingProviders.length === 0 ? (
+                        <div className="text-center py-12 text-carelink-gray">
+                          <FaCheckCircle className="text-5xl mx-auto mb-3 text-green-300" />
+                          <p className="text-lg">אין ספקים ממתינים לאישור</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {pendingProviders.map((provider) => (
+                            <div key={provider.provider_id} className="border-2 border-orange-200 rounded-xl p-5 hover:border-orange-300 transition">
+                              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-3 mb-2">
+                                    <h4 className="font-bold text-carelink-navy text-lg">{provider.business_name || 'ללא שם'}</h4>
+                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                      provider.verification_status === 'documents_submitted' 
+                                        ? 'bg-blue-100 text-blue-600' 
+                                        : 'bg-yellow-100 text-yellow-600'
+                                    }`}>
+                                      {provider.verification_status === 'documents_submitted' ? 'מסמכים הוגשו' : 'ממתין'}
+                                    </span>
+                                  </div>
+                                  
+                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-carelink-gray">
+                                    <div>
+                                      <span className="font-medium">אימייל:</span> {provider.user_info?.email || provider.email || '-'}
+                                    </div>
+                                    <div>
+                                      <span className="font-medium">סוג:</span> {provider.provider_type || '-'}
+                                    </div>
+                                    <div>
+                                      <span className="font-medium">התמחויות:</span> {provider.specializations?.join(', ') || '-'}
+                                    </div>
+                                    <div>
+                                      <span className="font-medium">נרשם:</span> {new Date(provider.created_at).toLocaleDateString('he-IL')}
+                                    </div>
+                                  </div>
+
+                                  {/* Documents */}
+                                  {provider.verification_documents?.length > 0 && (
+                                    <div className="mt-3">
+                                      <p className="text-sm font-medium text-carelink-navy mb-2">מסמכים שהועלו:</p>
+                                      <div className="flex flex-wrap gap-2">
+                                        {provider.verification_documents.map((doc, idx) => (
+                                          <a
+                                            key={idx}
+                                            href={doc.file_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-lg text-sm transition"
+                                          >
+                                            <FaFileContract className="text-purple-500" />
+                                            {doc.document_type === 'id_card' ? 'ת.ז' : 
+                                             doc.document_type === 'license' ? 'רישיון' :
+                                             doc.document_type === 'certificate' ? 'תעודה' :
+                                             doc.document_type === 'diploma' ? 'תואר' : 'מסמך'}
+                                          </a>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => verifyProvider(provider.provider_id)}
+                                    className="bg-green-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-green-700 transition flex items-center gap-2"
+                                    data-testid={`verify-provider-${provider.provider_id}`}
+                                  >
+                                    <FaCheckCircle />
+                                    אשר
+                                  </button>
+                                  <button
+                                    onClick={() => setShowRejectDialog(provider.provider_id)}
+                                    className="bg-red-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-red-700 transition flex items-center gap-2"
+                                    data-testid={`reject-provider-${provider.provider_id}`}
+                                  >
+                                    <FaTimesCircle />
+                                    דחה
+                                  </button>
+                                  <Link
+                                    to={`/providers/${provider.provider_id}`}
+                                    className="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl font-medium hover:bg-gray-300 transition flex items-center gap-2"
+                                  >
+                                    <FaEye />
+                                    צפה
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Settings Tab */}
                   {activeTab === 'settings' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
