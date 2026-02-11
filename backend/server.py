@@ -304,13 +304,6 @@ class Notification(BaseModel):
     data: Optional[dict] = None
     is_read: bool = False
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    
-    @field_validator('rating')
-    @classmethod
-    def validate_rating(cls, v):
-        if not 1 <= v <= 5:
-            raise ValueError('Rating must be between 1 and 5')
-        return v
 
 # Chat Models
 class ChatRoom(BaseModel):
