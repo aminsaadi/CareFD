@@ -1080,6 +1080,11 @@ const ProviderDashboard = () => {
                       </div>
                     </div>
                   )}
+
+                  {/* Verification Tab */}
+                  {activeTab === 'verification' && (
+                    <VerificationDocuments />
+                  )}
                 </>
               )}
             </div>
