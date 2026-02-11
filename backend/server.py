@@ -289,6 +289,31 @@ class ReviewCreate(BaseModel):
             raise ValueError('Rating must be between 1 and 5')
         return v
 
+# Chat Models
+class ChatRoom(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    room_id: str = Field(default_factory=lambda: f"room_{uuid.uuid4().hex[:12]}")
+    user_id: str
+    provider_id: str
+    request_id: Optional[str] = None
+    booking_id: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    last_message_at: Optional[datetime] = None
+
+class Message(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    message_id: str = Field(default_factory=lambda: f"msg_{uuid.uuid4().hex[:12]}")
+    room_id: str
+    sender_id: str
+    sender_role: str  # patient or provider
+    content: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    is_read: bool = False
+
+class MessageCreate(BaseModel):
+    room_id: str
+    content: str
+
 # ==================== HELPER FUNCTIONS ====================
 
 def hash_password(password: str) -> str:
@@ -1124,6 +1149,168 @@ async def get_provider_reviews(provider_id: str, skip: int = 0, limit: int = 20)
             }
     
     return {"reviews": reviews}
+
+# ==================== CHAT ROUTES ====================
+
+@api_router.post("/chat/rooms")
+async def create_chat_room(
+    room_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Create a chat room"""
+    user = await get_current_user(authorization, request)
+    
+    # Check if room already exists
+    existing = await db.chat_rooms.find_one({
+        "user_id": room_data.get("user_id"),
+        "provider_id": room_data.get("provider_id")
+    }, {"_id": 0})
+    
+    if existing:
+        return existing
+    
+    chat_room = ChatRoom(
+        user_id=room_data.get("user_id"),
+        provider_id=room_data.get("provider_id"),
+        request_id=room_data.get("request_id"),
+        booking_id=room_data.get("booking_id")
+    )
+    
+    room_dict = chat_room.model_dump()
+    room_dict['created_at'] = room_dict['created_at'].isoformat()
+    if room_dict.get('last_message_at'):
+        room_dict['last_message_at'] = room_dict['last_message_at'].isoformat()
+    
+    await db.chat_rooms.insert_one(room_dict)
+    
+    return chat_room.model_dump()
+
+@api_router.get("/chat/rooms")
+async def get_chat_rooms(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Get user's chat rooms"""
+    user = await get_current_user(authorization, request)
+    
+    # Check if user is a provider
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    
+    if provider:
+        query = {"provider_id": provider["provider_id"]}
+    else:
+        query = {"user_id": user["user_id"]}
+    
+    rooms = await db.chat_rooms.find(query, {"_id": 0}).sort("last_message_at", -1).to_list(100)
+    
+    # Enrich with user/provider info
+    for room in rooms:
+        if provider:
+            # Provider viewing - get patient info
+            patient = await db.users.find_one({"user_id": room["user_id"]}, {"_id": 0, "password_hash": 0})
+            if patient:
+                room["other_user"] = patient
+        else:
+            # Patient viewing - get provider info
+            provider_info = await db.providers.find_one({"provider_id": room["provider_id"]}, {"_id": 0})
+            if provider_info:
+                room["other_user"] = provider_info
+        
+        # Get last message
+        last_msg = await db.messages.find_one(
+            {"room_id": room["room_id"]},
+            {"_id": 0}
+        ).sort("created_at", -1).limit(1).to_list(1)
+        if last_msg:
+            room["last_message"] = last_msg[0]
+    
+    return {"rooms": rooms}
+
+@api_router.post("/chat/messages")
+async def send_message(
+    message_data: MessageCreate,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Send a message"""
+    user = await get_current_user(authorization, request)
+    
+    # Verify room access
+    room = await db.chat_rooms.find_one({"room_id": message_data.room_id}, {"_id": 0})
+    if not room:
+        raise HTTPException(status_code=404, detail="Chat room not found")
+    
+    # Check authorization
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    is_participant = (
+        room["user_id"] == user["user_id"] or 
+        (provider and room["provider_id"] == provider["provider_id"])
+    )
+    
+    if not is_participant:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    sender_role = "provider" if provider else "patient"
+    
+    message = Message(
+        room_id=message_data.room_id,
+        sender_id=user["user_id"],
+        sender_role=sender_role,
+        content=message_data.content
+    )
+    
+    message_dict = message.model_dump()
+    message_dict['created_at'] = message_dict['created_at'].isoformat()
+    
+    await db.messages.insert_one(message_dict)
+    
+    # Update room's last_message_at
+    await db.chat_rooms.update_one(
+        {"room_id": message_data.room_id},
+        {"$set": {"last_message_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return message.model_dump()
+
+@api_router.get("/chat/messages/{room_id}")
+async def get_messages(
+    room_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None,
+    skip: int = 0,
+    limit: int = 50
+):
+    """Get messages in a room"""
+    user = await get_current_user(authorization, request)
+    
+    # Verify room access
+    room = await db.chat_rooms.find_one({"room_id": room_id}, {"_id": 0})
+    if not room:
+        raise HTTPException(status_code=404, detail="Chat room not found")
+    
+    # Check authorization
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    is_participant = (
+        room["user_id"] == user["user_id"] or 
+        (provider and room["provider_id"] == provider["provider_id"])
+    )
+    
+    if not is_participant:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    messages = await db.messages.find(
+        {"room_id": room_id},
+        {"_id": 0}
+    ).sort("created_at", 1).skip(skip).limit(limit).to_list(limit)
+    
+    # Mark messages as read
+    await db.messages.update_many(
+        {"room_id": room_id, "sender_id": {"$ne": user["user_id"]}, "is_read": False},
+        {"$set": {"is_read": True}}
+    )
+    
+    return {"messages": messages}
 
 # Include the router in the main app
 app.include_router(api_router)
