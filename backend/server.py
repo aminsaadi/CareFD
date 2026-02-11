@@ -743,20 +743,23 @@ async def create_provider(provider_data: ProviderRegister, authorization: Option
     if existing:
         raise HTTPException(status_code=400, detail="Provider already exists")
     
-    # Create provider
+    # Create provider with pending verification status
     provider = Provider(
         user_id=user["user_id"],
         provider_type=provider_data.provider_type,
         business_name=provider_data.business_name,
         description=provider_data.description,
         specializations=provider_data.specializations,
-        location=provider_data.location
+        location=provider_data.location,
+        verification_status=VerificationStatus.PENDING,
+        is_verified=False
     )
     
     provider_dict = provider.model_dump()
     provider_dict['created_at'] = provider_dict['created_at'].isoformat()
     if provider_dict.get('location'):
         provider_dict['location'] = dict(provider_dict['location'])
+    provider_dict['verification_documents'] = []
     
     await db.providers.insert_one(provider_dict)
     
@@ -766,7 +769,99 @@ async def create_provider(provider_data: ProviderRegister, authorization: Option
         {"$set": {"role": UserRole.PROVIDER}}
     )
     
+    # Notify all admins about new provider registration
+    admins = await db.users.find({"role": "admin"}, {"user_id": 1}).to_list(100)
+    for admin in admins:
+        await create_notification(
+            admin["user_id"],
+            NotificationType.PROVIDER_NEW_REGISTRATION,
+            "ספק חדש נרשם!",
+            f"ספק חדש נרשם למערכת: {provider_data.business_name or user.get('name', 'ספק')}. נדרש אימות.",
+            {"provider_id": provider.provider_id, "user_id": user["user_id"]}
+        )
+    
     return provider.model_dump(exclude={"created_at": False})
+
+@api_router.get("/providers/me")
+async def get_my_provider(authorization: Optional[str] = Header(None), request: Request = None):
+    """Get current user's provider profile"""
+    user = await get_current_user(authorization, request)
+    
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    return provider
+
+@api_router.post("/providers/documents")
+async def upload_verification_document(
+    body: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Upload a verification document"""
+    user = await get_current_user(authorization, request)
+    
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    document_type = body.get("document_type")  # id_card, license, certificate, diploma
+    file_url = body.get("file_url")
+    file_name = body.get("file_name")
+    
+    if not document_type or not file_url:
+        raise HTTPException(status_code=400, detail="Document type and file URL required")
+    
+    valid_types = ["id_card", "license", "certificate", "diploma", "other"]
+    if document_type not in valid_types:
+        raise HTTPException(status_code=400, detail=f"Invalid document type. Must be one of: {valid_types}")
+    
+    document = VerificationDocument(
+        document_type=document_type,
+        file_url=file_url,
+        file_name=file_name or f"{document_type}.pdf"
+    )
+    
+    doc_dict = document.model_dump()
+    doc_dict['uploaded_at'] = doc_dict['uploaded_at'].isoformat()
+    
+    # Add document to provider's documents list
+    await db.providers.update_one(
+        {"provider_id": provider["provider_id"]},
+        {
+            "$push": {"verification_documents": doc_dict},
+            "$set": {"verification_status": VerificationStatus.DOCUMENTS_SUBMITTED}
+        }
+    )
+    
+    # Notify admins
+    admins = await db.users.find({"role": "admin"}, {"user_id": 1}).to_list(100)
+    for admin in admins:
+        await create_notification(
+            admin["user_id"],
+            NotificationType.PROVIDER_DOCUMENTS_SUBMITTED,
+            "מסמכי אימות הועלו",
+            f"הספק {provider.get('business_name', 'ספק')} העלה מסמכי אימות לבדיקה.",
+            {"provider_id": provider["provider_id"]}
+        )
+    
+    return {"message": "Document uploaded successfully", "document": doc_dict}
+
+@api_router.get("/providers/documents")
+async def get_my_documents(authorization: Optional[str] = Header(None), request: Request = None):
+    """Get current provider's verification documents"""
+    user = await get_current_user(authorization, request)
+    
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    return {
+        "documents": provider.get("verification_documents", []),
+        "verification_status": provider.get("verification_status", "pending"),
+        "verification_notes": provider.get("verification_notes")
+    }
 
 @api_router.get("/providers/{provider_id}")
 async def get_provider(provider_id: str):
@@ -774,6 +869,12 @@ async def get_provider(provider_id: str):
     provider = await db.providers.find_one({"provider_id": provider_id}, {"_id": 0})
     if not provider:
         raise HTTPException(status_code=404, detail="Provider not found")
+    
+    # Increment view count
+    await db.providers.update_one(
+        {"provider_id": provider_id},
+        {"$inc": {"views_count": 1}}
+    )
     
     # Get services
     services = await db.services.find({"provider_id": provider_id, "is_active": True}, {"_id": 0}).to_list(100)
