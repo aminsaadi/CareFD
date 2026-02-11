@@ -1548,6 +1548,326 @@ async def get_messages(
     
     return {"messages": messages}
 
+# ==================== NOTIFICATIONS ROUTES ====================
+
+async def create_notification(user_id: str, notif_type: str, title: str, message: str, data: dict = None):
+    """Helper function to create notifications"""
+    notification = Notification(
+        user_id=user_id,
+        type=notif_type,
+        title=title,
+        message=message,
+        data=data
+    )
+    notif_dict = notification.model_dump()
+    notif_dict['created_at'] = notif_dict['created_at'].isoformat()
+    await db.notifications.insert_one(notif_dict)
+    return notification
+
+@api_router.get("/notifications")
+async def get_notifications(
+    authorization: Optional[str] = Header(None),
+    request: Request = None,
+    unread_only: bool = False,
+    skip: int = 0,
+    limit: int = 50
+):
+    """Get user notifications"""
+    user = await get_current_user(authorization, request)
+    
+    query = {"user_id": user["user_id"]}
+    if unread_only:
+        query["is_read"] = False
+    
+    notifications = await db.notifications.find(
+        query, {"_id": 0}
+    ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    unread_count = await db.notifications.count_documents({
+        "user_id": user["user_id"],
+        "is_read": False
+    })
+    
+    return {
+        "notifications": notifications,
+        "unread_count": unread_count
+    }
+
+@api_router.put("/notifications/{notification_id}/read")
+async def mark_notification_read(
+    notification_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Mark notification as read"""
+    user = await get_current_user(authorization, request)
+    
+    result = await db.notifications.update_one(
+        {"notification_id": notification_id, "user_id": user["user_id"]},
+        {"$set": {"is_read": True}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    
+    return {"message": "Notification marked as read"}
+
+@api_router.put("/notifications/read-all")
+async def mark_all_notifications_read(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Mark all notifications as read"""
+    user = await get_current_user(authorization, request)
+    
+    await db.notifications.update_many(
+        {"user_id": user["user_id"], "is_read": False},
+        {"$set": {"is_read": True}}
+    )
+    
+    return {"message": "All notifications marked as read"}
+
+@api_router.delete("/notifications/{notification_id}")
+async def delete_notification(
+    notification_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Delete a notification"""
+    user = await get_current_user(authorization, request)
+    
+    result = await db.notifications.delete_one({
+        "notification_id": notification_id,
+        "user_id": user["user_id"]
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    
+    return {"message": "Notification deleted"}
+
+# ==================== ADMIN ROUTES ====================
+
+@api_router.get("/admin/users")
+async def admin_get_users(
+    authorization: Optional[str] = Header(None),
+    request: Request = None,
+    role: Optional[str] = None,
+    search: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 50
+):
+    """Admin: Get all users"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    query = {}
+    if role:
+        query["role"] = role
+    if search:
+        query["$or"] = [
+            {"name": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}}
+        ]
+    
+    users = await db.users.find(
+        query,
+        {"_id": 0, "password_hash": 0}
+    ).skip(skip).limit(limit).to_list(limit)
+    
+    total = await db.users.count_documents(query)
+    
+    return {"users": users, "total": total, "skip": skip, "limit": limit}
+
+@api_router.put("/admin/users/{user_id}/role")
+async def admin_update_user_role(
+    user_id: str,
+    role_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update user role"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    new_role = role_data.get("role")
+    if new_role not in ["patient", "provider", "admin"]:
+        raise HTTPException(status_code=400, detail="Invalid role")
+    
+    result = await db.users.update_one(
+        {"user_id": user_id},
+        {"$set": {"role": new_role}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": f"User role updated to {new_role}"}
+
+@api_router.delete("/admin/users/{user_id}")
+async def admin_delete_user(
+    user_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Delete user"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Don't allow deleting self
+    if admin["user_id"] == user_id:
+        raise HTTPException(status_code=400, detail="Cannot delete yourself")
+    
+    result = await db.users.delete_one({"user_id": user_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User deleted"}
+
+@api_router.get("/admin/bookings")
+async def admin_get_bookings(
+    authorization: Optional[str] = Header(None),
+    request: Request = None,
+    status: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 50
+):
+    """Admin: Get all bookings"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    query = {}
+    if status:
+        query["status"] = status
+    
+    bookings = await db.bookings.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.bookings.count_documents(query)
+    
+    return {"bookings": bookings, "total": total, "skip": skip, "limit": limit}
+
+@api_router.put("/admin/providers/{provider_id}/verify")
+async def admin_verify_provider(
+    provider_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Verify a provider"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.providers.update_one(
+        {"provider_id": provider_id},
+        {"$set": {"is_verified": True}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    # Notify provider
+    provider = await db.providers.find_one({"provider_id": provider_id}, {"_id": 0})
+    if provider:
+        await create_notification(
+            provider["user_id"],
+            NotificationType.SYSTEM,
+            "החשבון שלך אומת!",
+            "הפרופיל שלך אומת בהצלחה. כעת הלקוחות יכולים לראות שאתה ספק מאומת.",
+            {"provider_id": provider_id}
+        )
+    
+    return {"message": "Provider verified"}
+
+@api_router.put("/admin/providers/{provider_id}/recommend")
+async def admin_recommend_provider(
+    provider_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Set provider as recommended"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.providers.update_one(
+        {"provider_id": provider_id},
+        {"$set": {"is_recommended": True}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    return {"message": "Provider marked as recommended"}
+
+@api_router.get("/admin/stats")
+async def admin_get_stats(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get platform statistics"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    stats = {
+        "total_users": await db.users.count_documents({}),
+        "total_providers": await db.providers.count_documents({}),
+        "verified_providers": await db.providers.count_documents({"is_verified": True}),
+        "total_services": await db.services.count_documents({"is_active": True}),
+        "total_bookings": await db.bookings.count_documents({}),
+        "pending_bookings": await db.bookings.count_documents({"status": "pending"}),
+        "total_requests": await db.requests.count_documents({}),
+        "open_requests": await db.requests.count_documents({"status": "open"}),
+        "total_reviews": await db.reviews.count_documents({}),
+        "total_messages": await db.messages.count_documents({})
+    }
+    
+    # Get recent registrations (last 7 days)
+    week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    stats["new_users_week"] = await db.users.count_documents({
+        "created_at": {"$gte": week_ago}
+    })
+    stats["new_bookings_week"] = await db.bookings.count_documents({
+        "created_at": {"$gte": week_ago}
+    })
+    
+    return stats
+
+@api_router.post("/admin/notifications/broadcast")
+async def admin_broadcast_notification(
+    notif_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Broadcast notification to all users"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    title = notif_data.get("title")
+    message = notif_data.get("message")
+    target_role = notif_data.get("role")  # Optional: target specific role
+    
+    query = {}
+    if target_role:
+        query["role"] = target_role
+    
+    users = await db.users.find(query, {"user_id": 1}).to_list(10000)
+    
+    for u in users:
+        await create_notification(
+            u["user_id"],
+            NotificationType.SYSTEM,
+            title,
+            message
+        )
+    
+    return {"message": f"Notification sent to {len(users)} users"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
