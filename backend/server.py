@@ -1417,8 +1417,30 @@ async def create_booking(
     authorization: Optional[str] = Header(None),
     request: Request = None
 ):
-    """Create a booking with full details"""
-    user = await get_current_user(authorization, request)
+    """Create a booking with full details - supports both authenticated users and guests"""
+    
+    # Check if this is a guest booking
+    is_guest_booking = booking_data.guest_booking and booking_data.guest_name and booking_data.guest_phone
+    
+    user = None
+    user_id = None
+    user_name = None
+    user_email = None
+    
+    if is_guest_booking:
+        # Guest booking - no authentication required
+        user_id = f"guest_{uuid.uuid4().hex[:12]}"
+        user_name = booking_data.guest_name
+        user_email = booking_data.guest_email
+    else:
+        # Authenticated booking
+        try:
+            user = await get_current_user(authorization, request)
+            user_id = user["user_id"]
+            user_name = user.get("name")
+            user_email = user.get("email")
+        except HTTPException:
+            raise HTTPException(status_code=401, detail="Authentication required for non-guest bookings")
     
     # Get service
     service = await db.services.find_one({"service_id": booking_data.service_id}, {"_id": 0})
