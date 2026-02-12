@@ -162,8 +162,35 @@ const ProviderProfile = () => {
   };
 
   const handleCall = () => {
-    const phone = provider?.phone || '050-0000000';
-    window.location.href = `tel:${phone}`;
+    // Check if mobile device
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // On mobile, directly call
+      const phone = provider?.phone || '050-0000000';
+      window.location.href = `tel:${phone}`;
+    } else {
+      // On desktop, show phone number modal
+      setShowPhoneModal(true);
+    }
+  };
+
+  const handleStartChat = async () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      // Create or get existing chat room
+      const response = await api.post('/chat/rooms', {
+        user_id: user.user_id,
+        provider_id: providerId
+      });
+      navigate(`/chat/${response.data.room_id}`);
+    } catch (error) {
+      console.error('Failed to create chat room:', error);
+    }
   };
 
   const handleBookService = (serviceId) => {
