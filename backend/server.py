@@ -2590,6 +2590,144 @@ async def admin_reject_document(
     
     return {"message": "Document rejected"}
 
+# ==================== REGIONS MANAGEMENT ====================
+
+@api_router.get("/regions")
+async def get_regions():
+    """Get all regions"""
+    regions = await db.regions.find({}, {"_id": 0}).to_list(100)
+    
+    # Return default regions if none exist
+    if not regions:
+        default_regions = [
+            {"region_id": "north", "name": "צפון", "cities": ["חיפה", "נהריה", "עכו", "כרמיאל", "צפת", "טבריה", "קריות", "נצרת"]},
+            {"region_id": "center", "name": "מרכז", "cities": ["תל אביב", "רמת גן", "פתח תקווה", "הרצליה", "רעננה", "נתניה", "ראשון לציון", "חולון"]},
+            {"region_id": "south", "name": "דרום", "cities": ["באר שבע", "אשדוד", "אשקלון", "אילת", "דימונה", "קריית גת"]},
+            {"region_id": "jerusalem", "name": "ירושלים והסביבה", "cities": ["ירושלים", "בית שמש", "מודיעין", "מעלה אדומים"]}
+        ]
+        # Insert defaults
+        await db.regions.insert_many(default_regions)
+        return {"regions": default_regions}
+    
+    return {"regions": regions}
+
+@api_router.post("/admin/regions")
+async def create_region(
+    region_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Create a new region"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    region = {
+        "region_id": f"region_{uuid.uuid4().hex[:8]}",
+        "name": region_data.get("name"),
+        "cities": region_data.get("cities", []),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.regions.insert_one(region)
+    del region["_id"] if "_id" in region else None
+    
+    return {"message": "Region created", "region": region}
+
+@api_router.put("/admin/regions/{region_id}")
+async def update_region(
+    region_id: str,
+    region_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update a region"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    update_data = {}
+    if "name" in region_data:
+        update_data["name"] = region_data["name"]
+    if "cities" in region_data:
+        update_data["cities"] = region_data["cities"]
+    
+    result = await db.regions.update_one(
+        {"region_id": region_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Region not found")
+    
+    return {"message": "Region updated"}
+
+@api_router.delete("/admin/regions/{region_id}")
+async def delete_region(
+    region_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Delete a region"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.regions.delete_one({"region_id": region_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Region not found")
+    
+    return {"message": "Region deleted"}
+
+@api_router.post("/admin/regions/{region_id}/cities")
+async def add_city_to_region(
+    region_id: str,
+    city_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Add a city to a region"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    city_name = city_data.get("city")
+    if not city_name:
+        raise HTTPException(status_code=400, detail="City name required")
+    
+    result = await db.regions.update_one(
+        {"region_id": region_id},
+        {"$addToSet": {"cities": city_name}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Region not found")
+    
+    return {"message": f"City '{city_name}' added to region"}
+
+@api_router.delete("/admin/regions/{region_id}/cities/{city_name}")
+async def remove_city_from_region(
+    region_id: str,
+    city_name: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Remove a city from a region"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.regions.update_one(
+        {"region_id": region_id},
+        {"$pull": {"cities": city_name}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Region not found")
+    
+    return {"message": f"City '{city_name}' removed from region"}
+
 @api_router.put("/admin/providers/{provider_id}/recommend")
 async def admin_recommend_provider(
     provider_id: str,
