@@ -9,7 +9,7 @@ import api from '../utils/api';
 import { dummyProviders } from '../data/dummyData';
 import { 
   FaSearch, FaFilter, FaTimes, FaSortAmountDown, FaMapMarkerAlt,
-  FaThLarge, FaList
+  FaThLarge, FaList, FaCrosshairs, FaSpinner
 } from 'react-icons/fa';
 
 const Providers = () => {
@@ -21,7 +21,24 @@ const Providers = () => {
   const [viewMode, setViewMode] = useState('grid'); // grid or list
   const [sortBy, setSortBy] = useState('rating');
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [locationQuery, setLocationQuery] = useState(searchParams.get('city') || '');
+  const [isLocating, setIsLocating] = useState(false);
   
+  // Israeli regions for quick selection
+  const regions = [
+    { id: 'north', name: 'צפון', cities: ['חיפה', 'נהריה', 'עכו', 'כרמיאל', 'צפת'] },
+    { id: 'center', name: 'מרכז', cities: ['תל אביב', 'רמת גן', 'פתח תקווה', 'הרצליה', 'רעננה'] },
+    { id: 'south', name: 'דרום', cities: ['באר שבע', 'אשדוד', 'אשקלון', 'אילת'] },
+    { id: 'jerusalem', name: 'ירושלים', cities: ['ירושלים', 'בית שמש', 'מודיעין'] }
+  ];
+
+  const radiusOptions = [
+    { value: 5, label: '5 ק"מ' },
+    { value: 10, label: '10 ק"מ' },
+    { value: 25, label: '25 ק"מ' },
+    { value: 50, label: '50 ק"מ' }
+  ];
+
   const [filters, setFilters] = useState({
     search: searchParams.get('search') || '',
     city: searchParams.get('city') || null,
@@ -33,11 +50,18 @@ const Providers = () => {
     minExperience: searchParams.get('minExperience') ? parseInt(searchParams.get('minExperience')) : null,
     verifiedOnly: searchParams.get('verifiedOnly') === 'true',
     recommendedOnly: searchParams.get('recommendedOnly') === 'true',
-    latitude: null,
-    longitude: null,
-    radius: null,
-    useMyLocation: false
+    latitude: searchParams.get('latitude') ? parseFloat(searchParams.get('latitude')) : null,
+    longitude: searchParams.get('longitude') ? parseFloat(searchParams.get('longitude')) : null,
+    radius: searchParams.get('radius_km') ? parseFloat(searchParams.get('radius_km')) : null,
+    useMyLocation: searchParams.has('latitude') && searchParams.has('longitude')
   });
+
+  // Initialize location if provided via URL
+  useEffect(() => {
+    if (searchParams.has('latitude') && searchParams.has('longitude')) {
+      setLocationQuery('המיקום שלי');
+    }
+  }, []);
 
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
 
