@@ -1473,38 +1473,46 @@ async def create_booking(
     if booking_data.contact_person_name:
         contact_person = ContactPerson(
             name=booking_data.contact_person_name,
-            phone=booking_data.contact_person_phone or booking_data.client_phone,
+            phone=booking_data.contact_person_phone or booking_data.client_phone or booking_data.guest_phone,
             relationship=booking_data.contact_person_relationship
         )
     
     # Build service location
-    service_location = ServiceLocation(
-        address=booking_data.service_address,
-        city=booking_data.service_city,
-        floor=booking_data.service_floor,
-        apartment=booking_data.service_apartment,
-        entry_code=booking_data.service_entry_code,
-        notes=booking_data.service_notes,
-        latitude=booking_data.service_latitude,
-        longitude=booking_data.service_longitude
-    )
+    service_location = None
+    if booking_data.service_address or booking_data.guest_address:
+        service_location = ServiceLocation(
+            address=booking_data.service_address or booking_data.guest_address or "",
+            city=booking_data.service_city or "",
+            floor=booking_data.service_floor,
+            apartment=booking_data.service_apartment,
+            entry_code=booking_data.service_entry_code,
+            notes=booking_data.service_notes,
+            latitude=booking_data.service_latitude,
+            longitude=booking_data.service_longitude
+        )
+    
+    # Determine client details
+    client_name = booking_data.client_name or booking_data.guest_name or user_name or "אורח"
+    client_phone = booking_data.client_phone or booking_data.guest_phone or ""
+    client_email = booking_data.client_email or booking_data.guest_email or user_email
     
     booking = Booking(
-        user_id=user["user_id"],
+        user_id=user_id,
         provider_id=service["provider_id"],
         service_id=booking_data.service_id,
         booking_date=booking_data.booking_date,
         booking_time=booking_data.booking_time,
-        client_name=booking_data.client_name,
-        client_phone=booking_data.client_phone,
-        client_email=booking_data.client_email or user.get("email"),
+        client_name=client_name,
+        client_phone=client_phone,
+        client_email=client_email,
         contact_person=contact_person,
         service_location=service_location,
         notes=booking_data.notes,
         special_requirements=booking_data.special_requirements,
         service_name=service.get("name"),
         provider_name=provider.get("business_name"),
-        user_name=user.get("name")
+        user_name=user_name or client_name,
+        is_guest_booking=is_guest_booking
     )
     
     booking_dict = booking.model_dump()
