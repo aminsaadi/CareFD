@@ -227,7 +227,8 @@ const AdminDashboard = () => {
     { id: 'bookings', label: 'תורים', icon: FaCalendarAlt },
     { id: 'reports', label: 'דוחות', icon: FaFileAlt },
     { id: 'notifications', label: 'התראות', icon: FaBell },
-    { id: 'settings', label: 'הגדרות', icon: FaCog }
+    { id: 'settings', label: 'הגדרות', icon: FaCog },
+    { id: 'regions', label: 'ניהול מחוזות', icon: FaMapMarkerAlt }
   ];
 
   const getRoleBadge = (role) => {
