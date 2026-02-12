@@ -9,7 +9,8 @@ import ServiceCard from '../components/ServiceCard';
 import { 
   FaUserNurse, FaWalking, FaUserMd, FaHeart, 
   FaHandHoldingHeart, FaSpa, FaStar, FaSearch,
-  FaUsers, FaMapMarkerAlt, FaCheckCircle, FaArrowLeft
+  FaUsers, FaMapMarkerAlt, FaCheckCircle, FaArrowLeft,
+  FaCrosshairs, FaSpinner
 } from 'react-icons/fa';
 import { 
   dummyProviders, 
