@@ -750,6 +750,107 @@ const ProviderProfile = () => {
         </div>
       )}
 
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowShareModal(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-carelink-navy mb-4">שתף את הפרופיל</h3>
+            <p className="text-carelink-gray mb-6">
+              שתף את {provider?.business_name || 'הספק'} עם חברים ומשפחה
+            </p>
+            
+            {/* Copy Link */}
+            <div className="flex items-center gap-2 mb-4">
+              <div className="flex-1 bg-carelink-teal-pale/30 px-4 py-3 rounded-xl text-sm text-carelink-navy truncate">
+                {window.location.href}
+              </div>
+              <button
+                onClick={copyToClipboard}
+                className={`px-4 py-3 rounded-xl font-semibold transition flex items-center gap-2 ${
+                  copied 
+                    ? 'bg-green-500 text-white' 
+                    : 'bg-carelink-teal text-white hover:bg-carelink-teal-medium'
+                }`}
+              >
+                {copied ? <FaCheck /> : <FaCopy />}
+                {copied ? 'הועתק!' : 'העתק'}
+              </button>
+            </div>
+
+            {/* Share Options */}
+            <div className="flex gap-3">
+              <button
+                onClick={shareToWhatsApp}
+                className="flex-1 flex items-center justify-center gap-2 bg-green-500 text-white py-3 rounded-xl font-semibold hover:bg-green-600 transition"
+              >
+                <FaWhatsapp className="text-xl" />
+                WhatsApp
+              </button>
+              <button
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: provider?.business_name || 'CareLink',
+                      text: `בדוק את ${provider?.business_name || 'הספק הזה'} ב-CareLink`,
+                      url: window.location.href
+                    });
+                  }
+                }}
+                className="flex-1 flex items-center justify-center gap-2 bg-blue-500 text-white py-3 rounded-xl font-semibold hover:bg-blue-600 transition"
+              >
+                <FaShareAlt />
+                שתף
+              </button>
+            </div>
+
+            <button
+              onClick={() => setShowShareModal(false)}
+              className="w-full mt-4 bg-gray-100 text-carelink-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
+            >
+              סגור
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Phone Modal (Desktop) */}
+      {showPhoneModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowPhoneModal(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center" onClick={(e) => e.stopPropagation()}>
+            <div className="w-16 h-16 bg-carelink-teal rounded-full flex items-center justify-center mx-auto mb-4">
+              <FaPhone className="text-2xl text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-carelink-navy mb-2">מספר טלפון</h3>
+            <p className="text-carelink-gray mb-4">{provider?.business_name || 'ספק שירותים'}</p>
+            
+            <div className="bg-carelink-teal-pale/30 px-6 py-4 rounded-xl mb-4">
+              <p className="text-2xl font-bold text-carelink-navy direction-ltr">
+                {provider?.phone || '050-0000000'}
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(provider?.phone || '050-0000000');
+                  setShowPhoneModal(false);
+                }}
+                className="flex-1 flex items-center justify-center gap-2 bg-carelink-teal text-white py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition"
+              >
+                <FaCopy />
+                העתק
+              </button>
+              <button
+                onClick={() => setShowPhoneModal(false)}
+                className="flex-1 bg-gray-100 text-carelink-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
+              >
+                סגור
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );
