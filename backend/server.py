@@ -334,14 +334,14 @@ class BookingCreate(BaseModel):
     service_id: str
     booking_date: datetime
     booking_time: Optional[str] = None
-    client_name: str
-    client_phone: str
+    client_name: Optional[str] = None
+    client_phone: Optional[str] = None
     client_email: Optional[str] = None
     contact_person_name: Optional[str] = None
     contact_person_phone: Optional[str] = None
     contact_person_relationship: Optional[str] = None
-    service_address: str
-    service_city: str
+    service_address: Optional[str] = None
+    service_city: Optional[str] = None
     service_floor: Optional[str] = None
     service_apartment: Optional[str] = None
     service_entry_code: Optional[str] = None
@@ -350,6 +350,12 @@ class BookingCreate(BaseModel):
     service_longitude: Optional[float] = None
     notes: Optional[str] = None
     special_requirements: Optional[str] = None
+    # Guest booking fields
+    guest_booking: bool = False
+    guest_name: Optional[str] = None
+    guest_email: Optional[str] = None
+    guest_phone: Optional[str] = None
+    guest_address: Optional[str] = None
 
 # Review Models
 class Review(BaseModel):
