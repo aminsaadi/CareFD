@@ -2630,7 +2630,8 @@ async def create_region(
     }
     
     await db.regions.insert_one(region)
-    del region["_id"] if "_id" in region else None
+    if "_id" in region:
+        del region["_id"]
     
     return {"message": "Region created", "region": region}
 
