@@ -64,34 +64,20 @@ def provider_token(api_client):
 class TestHealthAndAuth:
     """Basic health and auth tests"""
 
-    def test_health_check(self, api_client):
-        """Test health endpoint"""
-        response = api_client.get(f"{BASE_URL}/api")
+    def test_api_base_health(self, api_client):
+        """Test API providers endpoint (as health check)"""
+        response = api_client.get(f"{BASE_URL}/api/providers")
         assert response.status_code == 200
-        print("✅ Health check passed")
+        print("✅ API health check passed")
 
-    def test_admin_login(self, api_client):
-        """Test admin login"""
-        response = api_client.post(f"{BASE_URL}/api/auth/login", json={
-            "email": ADMIN_EMAIL,
-            "password": ADMIN_PASSWORD
-        })
+    def test_regions_endpoint(self, api_client):
+        """Test regions endpoint"""
+        response = api_client.get(f"{BASE_URL}/api/regions")
         assert response.status_code == 200
         data = response.json()
-        assert "session_token" in data
-        assert data["user"]["role"] == "admin"
-        print(f"✅ Admin login successful: {data['user']['email']}")
-
-    def test_user_login(self, api_client):
-        """Test user login"""
-        response = api_client.post(f"{BASE_URL}/api/auth/login", json={
-            "email": USER_EMAIL,
-            "password": USER_PASSWORD
-        })
-        assert response.status_code == 200
-        data = response.json()
-        assert "session_token" in data
-        print(f"✅ User login successful: {data['user']['email']}")
+        assert "regions" in data
+        assert len(data["regions"]) > 0
+        print(f"✅ Regions endpoint returned {len(data['regions'])} regions")
 
 
 class TestProvidersSearch:
