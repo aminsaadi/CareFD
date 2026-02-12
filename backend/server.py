@@ -329,6 +329,8 @@ class Booking(BaseModel):
     service_name: Optional[str] = None
     provider_name: Optional[str] = None
     user_name: Optional[str] = None
+    # Guest booking flag
+    is_guest_booking: bool = False
 
 class BookingCreate(BaseModel):
     service_id: str
