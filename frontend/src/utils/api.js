@@ -29,9 +29,20 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('session_token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+      // Don't redirect if the request has a custom flag to skip redirect
+      // or if it's a request that doesn't require auth (e.g., checking availability)
+      const skipRedirect = error.config?.skipAuthRedirect;
+      const url = error.config?.url || '';
+      
+      // Skip redirect for public endpoints being queried without auth
+      const publicEndpoints = ['/bookings', '/favorites/check'];
+      const isPublicQuery = publicEndpoints.some(ep => url.includes(ep));
+      
+      if (!skipRedirect && !isPublicQuery) {
+        localStorage.removeItem('session_token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
