@@ -341,6 +341,7 @@ const Providers = () => {
       useMyLocation: false
     });
     setSearchQuery('');
+    setLocationQuery('');
     setSearchParams({});
   };
 
