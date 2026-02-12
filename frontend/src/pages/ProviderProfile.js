@@ -547,6 +547,17 @@ const ProviderProfile = () => {
                       </div>
                     </div>
 
+                    {/* Add Review Form */}
+                    {isAuthenticated && !isOwner && (
+                      <div className="bg-carelink-teal-pale/20 rounded-xl p-6 mb-6">
+                        <h4 className="font-bold text-carelink-navy mb-4">הוסף ביקורת</h4>
+                        <AddReviewForm 
+                          providerId={providerId} 
+                          onReviewAdded={fetchReviews}
+                        />
+                      </div>
+                    )}
+
                     {/* Reviews List */}
                     {reviews.length > 0 ? (
                       reviews.map((review) => (
@@ -582,6 +593,9 @@ const ProviderProfile = () => {
                       <div className="text-center py-8 text-carelink-gray">
                         <FaStar className="text-4xl mx-auto mb-3 text-carelink-teal-pale" />
                         <p>עדיין אין ביקורות</p>
+                        {isAuthenticated && !isOwner && (
+                          <p className="mt-2">היה הראשון לכתוב ביקורת!</p>
+                        )}
                       </div>
                     )}
                   </div>
