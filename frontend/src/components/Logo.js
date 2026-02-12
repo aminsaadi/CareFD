@@ -3,7 +3,7 @@ import React from 'react';
 const Logo = ({ size = 'default', className = '' }) => {
   const sizeClasses = {
     small: 'h-6',
-    default: 'h-8',
+    default: 'h-[4rem]',
     large: 'h-12'
   };
 
