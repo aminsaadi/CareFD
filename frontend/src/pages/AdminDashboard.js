@@ -829,6 +829,131 @@ const AdminDashboard = () => {
                       </div>
                     </div>
                   )}
+
+                  {/* Regions Tab */}
+                  {activeTab === 'regions' && (
+                    <div className="space-y-6">
+                      <div className="bg-white rounded-2xl shadow-lg p-6">
+                        <h2 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
+                          <FaMapMarkerAlt className="text-purple-600" />
+                          ניהול מחוזות וערים
+                        </h2>
+
+                        {/* Add New Region */}
+                        <div className="bg-purple-50 rounded-xl p-4 mb-6">
+                          <h3 className="font-medium text-carelink-navy mb-3">הוסף מחוז חדש</h3>
+                          <div className="flex gap-3">
+                            <input
+                              type="text"
+                              value={newRegionName}
+                              onChange={(e) => setNewRegionName(e.target.value)}
+                              placeholder="שם המחוז..."
+                              className="flex-1 px-4 py-2 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            />
+                            <button
+                              onClick={createRegion}
+                              disabled={!newRegionName.trim()}
+                              className="px-6 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition disabled:opacity-50 flex items-center gap-2"
+                            >
+                              <FaPlus />
+                              הוסף
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Regions List */}
+                        <div className="space-y-4">
+                          {regions.map((region) => (
+                            <div key={region.region_id} className="border-2 border-gray-100 rounded-xl p-4 hover:border-purple-200 transition">
+                              <div className="flex items-center justify-between mb-3">
+                                {editingRegion === region.region_id ? (
+                                  <input
+                                    type="text"
+                                    defaultValue={region.name}
+                                    className="px-3 py-1 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                    onBlur={(e) => updateRegion(region.region_id, { name: e.target.value })}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                        updateRegion(region.region_id, { name: e.target.value });
+                                      }
+                                    }}
+                                    autoFocus
+                                  />
+                                ) : (
+                                  <h3 className="font-bold text-carelink-navy text-lg flex items-center gap-2">
+                                    <FaMapMarkerAlt className="text-purple-500" />
+                                    {region.name}
+                                    <span className="text-sm font-normal text-carelink-gray">
+                                      ({region.cities?.length || 0} ערים)
+                                    </span>
+                                  </h3>
+                                )}
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => setEditingRegion(editingRegion === region.region_id ? null : region.region_id)}
+                                    className="p-2 text-gray-500 hover:text-purple-600 transition"
+                                    title="ערוך שם"
+                                  >
+                                    <FaEdit />
+                                  </button>
+                                  <button
+                                    onClick={() => deleteRegion(region.region_id)}
+                                    className="p-2 text-gray-500 hover:text-red-600 transition"
+                                    title="מחק מחוז"
+                                  >
+                                    <FaTrash />
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Cities */}
+                              <div className="flex flex-wrap gap-2 mb-3">
+                                {region.cities?.map((city) => (
+                                  <span
+                                    key={city}
+                                    className="inline-flex items-center gap-1 bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm group"
+                                  >
+                                    {city}
+                                    <button
+                                      onClick={() => removeCityFromRegion(region.region_id, city)}
+                                      className="text-purple-400 hover:text-red-500 transition opacity-0 group-hover:opacity-100"
+                                    >
+                                      <FaTimes className="text-xs" />
+                                    </button>
+                                  </span>
+                                ))}
+                              </div>
+
+                              {/* Add City */}
+                              <div className="flex gap-2">
+                                <input
+                                  type="text"
+                                  placeholder="הוסף עיר..."
+                                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && e.target.value.trim()) {
+                                      const city = e.target.value.trim();
+                                      api.post(`/admin/regions/${region.region_id}/cities`, { city })
+                                        .then(() => fetchAdminData())
+                                        .catch(err => console.error('Failed to add city:', err));
+                                      e.target.value = '';
+                                    }
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+
+                          {regions.length === 0 && (
+                            <div className="text-center py-8 text-carelink-gray">
+                              <FaMapMarkerAlt className="text-4xl mx-auto mb-3 text-gray-300" />
+                              <p>אין מחוזות. הוסף מחוז ראשון למעלה.</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </>
               )}
             </div>
