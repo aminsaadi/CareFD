@@ -134,34 +134,114 @@ const Landing = () => {
 
               {/* Hero Search Bar */}
               <form onSubmit={handleSearch} className="mb-8" data-testid="hero-search-form">
-                <div className="flex flex-col sm:flex-row gap-3 bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/20">
+                <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
                   {/* Search Type Selector */}
-                  <select
-                    value={searchType}
-                    onChange={(e) => setSearchType(e.target.value)}
-                    className="bg-white text-carelink-navy px-4 py-3 rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-carelink-teal cursor-pointer"
-                    data-testid="search-type-select"
-                  >
-                    <option value="providers">ספקים</option>
-                    <option value="services">שירותים</option>
-                  </select>
-                  
-                  {/* Search Input */}
-                  <div className="flex-1 relative">
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="חפש לפי התמחות, שירות או מיקום..."
-                      className="w-full bg-white text-carelink-navy px-5 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-carelink-teal placeholder-carelink-gray"
-                      data-testid="hero-search-input"
-                    />
+                  <div className="flex gap-2 mb-3">
+                    <button
+                      type="button"
+                      onClick={() => setSearchType('providers')}
+                      className={`flex-1 py-2 px-4 rounded-xl font-medium transition-all ${
+                        searchType === 'providers'
+                          ? 'bg-carelink-teal text-white'
+                          : 'bg-white/20 text-white hover:bg-white/30'
+                      }`}
+                      data-testid="search-type-providers"
+                    >
+                      ספקים
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSearchType('services')}
+                      className={`flex-1 py-2 px-4 rounded-xl font-medium transition-all ${
+                        searchType === 'services'
+                          ? 'bg-carelink-teal text-white'
+                          : 'bg-white/20 text-white hover:bg-white/30'
+                      }`}
+                      data-testid="search-type-services"
+                    >
+                      שירותים
+                    </button>
                   </div>
-                  
+
+                  {/* Two Column Search */}
+                  <div className="grid md:grid-cols-2 gap-3">
+                    {/* Column 1: Profession/Category */}
+                    <div className="relative">
+                      <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="מקצוע, התמחות, קטגוריה..."
+                        className="w-full bg-white text-carelink-navy px-5 py-3 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-carelink-teal placeholder-carelink-gray"
+                        data-testid="hero-search-input"
+                      />
+                    </div>
+                    
+                    {/* Column 2: Location */}
+                    <div className="relative flex gap-2">
+                      <div className="flex-1 relative">
+                        <FaMapMarkerAlt className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
+                        <input
+                          type="text"
+                          value={locationQuery}
+                          onChange={(e) => {
+                            setLocationQuery(e.target.value);
+                            if (e.target.value !== 'המיקום שלי') {
+                              setUserLocation(null);
+                            }
+                          }}
+                          placeholder="עיר, אזור או 'המיקום שלי'"
+                          className="w-full bg-white text-carelink-navy px-5 py-3 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-carelink-teal placeholder-carelink-gray"
+                          data-testid="hero-location-input"
+                        />
+                      </div>
+                      
+                      {/* GPS Button */}
+                      <button
+                        type="button"
+                        onClick={handleGetLocation}
+                        disabled={isLocating}
+                        className="bg-white text-carelink-teal px-4 rounded-xl hover:bg-carelink-teal-pale transition-colors disabled:opacity-50 flex items-center justify-center"
+                        title="השתמש במיקום שלי"
+                        data-testid="gps-btn"
+                      >
+                        {isLocating ? (
+                          <FaSpinner className="animate-spin" />
+                        ) : (
+                          <FaCrosshairs className="text-lg" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Radius selector (appears when using GPS) */}
+                  {userLocation && (
+                    <div className="mt-3 flex items-center gap-3">
+                      <span className="text-white text-sm">רדיוס חיפוש:</span>
+                      <div className="flex gap-2">
+                        {radiusOptions.map((option) => (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => setSelectedRadius(option.value)}
+                            className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                              selectedRadius === option.value
+                                ? 'bg-carelink-teal text-white'
+                                : 'bg-white/20 text-white hover:bg-white/30'
+                            }`}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Search Button */}
                   <button
                     type="submit"
-                    className="bg-carelink-teal text-white px-8 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition-all flex items-center justify-center gap-2 shadow-lg"
+                    className="w-full mt-3 bg-carelink-teal text-white px-8 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition-all flex items-center justify-center gap-2 shadow-lg"
                     data-testid="hero-search-btn"
                   >
                     <FaSearch />
@@ -169,8 +249,27 @@ const Landing = () => {
                   </button>
                 </div>
                 
-                {/* Quick Search Tags */}
+                {/* Quick Location Tags */}
                 <div className="flex flex-wrap gap-2 mt-4">
+                  <span className="text-sm text-carelink-teal-pale">אזורים:</span>
+                  {regions.map((region) => (
+                    <button
+                      key={region.id}
+                      type="button"
+                      onClick={() => {
+                        setLocationQuery(region.name);
+                        setUserLocation(null);
+                      }}
+                      className="text-sm bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors"
+                      data-testid={`region-${region.id}`}
+                    >
+                      {region.name}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Quick Search Tags */}
+                <div className="flex flex-wrap gap-2 mt-2">
                   <span className="text-sm text-carelink-teal-pale">חיפושים פופולריים:</span>
                   {['סיעוד', 'פיזיותרפיה', 'רופא בבית', 'טיפול בקשישים'].map((tag) => (
                     <button
@@ -178,7 +277,6 @@ const Landing = () => {
                       type="button"
                       onClick={() => {
                         setSearchQuery(tag);
-                        navigate(`/providers?search=${encodeURIComponent(tag)}`);
                       }}
                       className="text-sm bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors"
                       data-testid={`quick-search-${tag}`}
