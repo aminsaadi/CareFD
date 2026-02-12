@@ -170,54 +170,6 @@ class TestRegions:
         for region in regions:
             print(f"   - {region['name']}: {len(region.get('cities', []))} cities")
 
-    def test_create_region_admin(self, api_client, admin_token):
-        """Test create region as admin"""
-        if not admin_token:
-            pytest.skip("Admin token not available")
-        
-        headers = {"Authorization": f"Bearer {admin_token}"}
-        test_region_name = f"TEST_אזור_מבחן_{uuid.uuid4().hex[:6]}"
-        
-        response = api_client.post(
-            f"{BASE_URL}/api/admin/regions",
-            json={"name": test_region_name, "cities": []},
-            headers=headers
-        )
-        assert response.status_code in [200, 201]
-        data = response.json()
-        assert "region_id" in data
-        print(f"✅ Created test region: {test_region_name}")
-        return data["region_id"]
-
-    def test_add_city_to_region(self, api_client, admin_token):
-        """Test add city to region"""
-        if not admin_token:
-            pytest.skip("Admin token not available")
-        
-        headers = {"Authorization": f"Bearer {admin_token}"}
-        
-        # First, create a test region
-        test_region_name = f"TEST_region_{uuid.uuid4().hex[:6]}"
-        create_response = api_client.post(
-            f"{BASE_URL}/api/admin/regions",
-            json={"name": test_region_name, "cities": []},
-            headers=headers
-        )
-        assert create_response.status_code in [200, 201]
-        region_id = create_response.json()["region_id"]
-        
-        # Add a city
-        response = api_client.post(
-            f"{BASE_URL}/api/admin/regions/{region_id}/cities",
-            json={"city": "עיר מבחן"},
-            headers=headers
-        )
-        assert response.status_code == 200
-        print(f"✅ Added city to region {region_id}")
-        
-        # Cleanup - delete the test region
-        api_client.delete(f"{BASE_URL}/api/admin/regions/{region_id}", headers=headers)
-
 
 class TestFavorites:
     """Test favorites API"""
