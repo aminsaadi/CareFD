@@ -10,7 +10,7 @@ import {
   FaStar, FaComments, FaCog, FaBell, FaCheckCircle, FaTimes,
   FaEye, FaTrash, FaEdit, FaSearch, FaDownload, FaAward,
   FaChartLine, FaMoneyBillWave, FaExclamationTriangle, FaHourglass,
-  FaFileContract, FaTimesCircle
+  FaFileContract, FaTimesCircle, FaMapMarkerAlt, FaPlus, FaCity
 } from 'react-icons/fa';
 
 const AdminDashboard = () => {
