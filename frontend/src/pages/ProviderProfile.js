@@ -9,7 +9,8 @@ import {
   FaStar, FaMapMarkerAlt, FaClock, FaEdit, FaPhone, FaEnvelope,
   FaCheckCircle, FaUserMd, FaCalendarAlt, FaComments, FaShareAlt,
   FaHeart, FaBriefcase, FaUsers, FaAward, FaQuoteRight, FaWhatsapp,
-  FaHome, FaVideo, FaClinicMedical, FaPhoneAlt
+  FaHome, FaVideo, FaClinicMedical, FaPhoneAlt, FaRegHeart, FaLink,
+  FaCopy, FaCheck
 } from 'react-icons/fa';
 import { dummyProviders, dummyServices } from '../data/dummyData';
 
@@ -56,6 +57,10 @@ const ProviderProfile = () => {
   const [reviews, setReviews] = useState([]);
   const [activeTab, setActiveTab] = useState('services');
   const [showContactModal, setShowContactModal] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [showPhoneModal, setShowPhoneModal] = useState(false);
 
   useEffect(() => {
     fetchProvider();
