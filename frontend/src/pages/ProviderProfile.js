@@ -65,8 +65,11 @@ const ProviderProfile = () => {
   useEffect(() => {
     fetchProvider();
     fetchReviews();
+    if (isAuthenticated) {
+      checkFavorite();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [providerId]);
+  }, [providerId, isAuthenticated]);
 
   const fetchProvider = async () => {
     try {
@@ -95,6 +98,52 @@ const ProviderProfile = () => {
       console.error('Failed to fetch reviews:', error);
       setReviews(demoReviews);
     }
+  };
+
+  const checkFavorite = async () => {
+    try {
+      const response = await api.get(`/favorites/check/${providerId}`);
+      setIsFavorite(response.data.is_favorite);
+    } catch (error) {
+      console.error('Failed to check favorite:', error);
+    }
+  };
+
+  const toggleFavorite = async () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      if (isFavorite) {
+        await api.delete(`/favorites/${providerId}`);
+        setIsFavorite(false);
+      } else {
+        await api.post(`/favorites/${providerId}`);
+        setIsFavorite(true);
+      }
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+    }
+  };
+
+  const handleShare = () => {
+    setShowShareModal(true);
+  };
+
+  const copyToClipboard = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const shareToWhatsApp = () => {
+    const url = window.location.href;
+    const text = `בדוק את ${provider?.business_name || 'הספק הזה'} ב-CareLink: ${url}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   const isOwner = user?.user_id === provider?.user_id;
