@@ -30,6 +30,11 @@ const AdminDashboard = () => {
   const [broadcastRole, setBroadcastRole] = useState('');
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectDialog, setShowRejectDialog] = useState(null);
+  // Regions management
+  const [regions, setRegions] = useState([]);
+  const [editingRegion, setEditingRegion] = useState(null);
+  const [newRegionName, setNewRegionName] = useState('');
+  const [newCity, setNewCity] = useState('');
 
   useEffect(() => {
     fetchAdminData();
