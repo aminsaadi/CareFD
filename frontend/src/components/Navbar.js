@@ -32,7 +32,7 @@ const Navbar = () => {
   return (
     <nav className="bg-white shadow-md border-b border-carelink-light-gray sticky top-0 z-40" data-testid="navbar">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between h-20">
           <div className="flex items-center">
             <Link to="/" className="flex items-center" data-testid="logo-link">
               <Logo />
