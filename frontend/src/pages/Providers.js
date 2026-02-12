@@ -238,16 +238,80 @@ const Providers = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setFilters(prev => ({ ...prev, search: searchQuery }));
+    const newFilters = { ...filters, search: searchQuery };
+    
+    // Handle location
+    if (locationQuery && locationQuery !== 'המיקום שלי') {
+      newFilters.city = locationQuery;
+      newFilters.useMyLocation = false;
+      newFilters.latitude = null;
+      newFilters.longitude = null;
+    } else if (locationQuery === '' || !locationQuery) {
+      newFilters.city = null;
+    }
+    
+    setFilters(newFilters);
     
     // Update URL
-    const newParams = new URLSearchParams(searchParams);
-    if (searchQuery) {
-      newParams.set('search', searchQuery);
-    } else {
-      newParams.delete('search');
-    }
+    const newParams = new URLSearchParams();
+    if (searchQuery) newParams.set('search', searchQuery);
+    if (newFilters.city) newParams.set('city', newFilters.city);
+    if (newFilters.latitude) newParams.set('latitude', newFilters.latitude);
+    if (newFilters.longitude) newParams.set('longitude', newFilters.longitude);
+    if (newFilters.radius) newParams.set('radius_km', newFilters.radius);
     setSearchParams(newParams);
+  };
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      alert('הדפדפן שלך לא תומך באיתור מיקום');
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const newFilters = {
+          ...filters,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          useMyLocation: true,
+          city: null,
+          radius: filters.radius || 10
+        };
+        setFilters(newFilters);
+        setLocationQuery('המיקום שלי');
+        setIsLocating(false);
+        
+        // Update sort to distance
+        setSortBy('distance');
+        
+        // Update URL
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('latitude', position.coords.latitude);
+        newParams.set('longitude', position.coords.longitude);
+        newParams.set('radius_km', newFilters.radius);
+        newParams.delete('city');
+        setSearchParams(newParams);
+      },
+      (error) => {
+        console.error('Location error:', error);
+        alert('לא הצלחנו לאתר את המיקום שלך');
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  const handleRadiusChange = (radius) => {
+    const newFilters = { ...filters, radius };
+    setFilters(newFilters);
+    
+    if (filters.useMyLocation) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set('radius_km', radius);
+      setSearchParams(newParams);
+    }
   };
 
   const handleFilterChange = (newFilters) => {
