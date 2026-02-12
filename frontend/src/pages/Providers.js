@@ -360,31 +360,126 @@ const Providers = () => {
 
           {/* Search and Filter Bar */}
           <div className="bg-white rounded-2xl shadow-lg p-4 mb-6">
-            <div className="flex flex-col lg:flex-row gap-4">
-              {/* Search */}
-              <form onSubmit={handleSearch} className="flex-1">
+            <form onSubmit={handleSearch} className="space-y-4">
+              {/* Two Column Search */}
+              <div className="grid md:grid-cols-2 gap-3">
+                {/* Column 1: Profession/Category */}
                 <div className="relative">
-                  <FaSearch className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
+                  <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="חפש ספקים לפי שם, התמחות..."
-                    className="w-full px-4 py-3 pr-12 rtl:pr-4 rtl:pl-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
+                    placeholder="מקצוע, התמחות, קטגוריה..."
+                    className="w-full px-4 py-3 pr-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
                     data-testid="search-input"
                   />
                 </div>
-              </form>
+                
+                {/* Column 2: Location */}
+                <div className="flex gap-2">
+                  <div className="flex-1 relative">
+                    <FaMapMarkerAlt className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
+                    <input
+                      type="text"
+                      value={locationQuery}
+                      onChange={(e) => {
+                        setLocationQuery(e.target.value);
+                        if (e.target.value !== 'המיקום שלי') {
+                          setFilters(prev => ({ ...prev, useMyLocation: false, latitude: null, longitude: null }));
+                        }
+                      }}
+                      placeholder="עיר, אזור או 'המיקום שלי'"
+                      className="w-full px-4 py-3 pr-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
+                      data-testid="location-input"
+                    />
+                  </div>
+                  
+                  {/* GPS Button */}
+                  <button
+                    type="button"
+                    onClick={handleGetLocation}
+                    disabled={isLocating}
+                    className="px-4 border-2 border-carelink-teal-pale rounded-xl hover:bg-carelink-teal-pale/30 transition-colors disabled:opacity-50 flex items-center justify-center text-carelink-teal"
+                    title="השתמש במיקום שלי"
+                    data-testid="gps-btn"
+                  >
+                    {isLocating ? (
+                      <FaSpinner className="animate-spin" />
+                    ) : (
+                      <FaCrosshairs className="text-lg" />
+                    )}
+                  </button>
+                  
+                  {/* Search Button */}
+                  <button
+                    type="submit"
+                    className="px-6 py-3 bg-carelink-teal text-white rounded-xl font-semibold hover:bg-carelink-teal-medium transition-colors flex items-center gap-2"
+                    data-testid="search-btn"
+                  >
+                    <FaSearch />
+                    <span className="hidden sm:inline">חפש</span>
+                  </button>
+                </div>
+              </div>
 
-              {/* Action Buttons */}
+              {/* Radius selector (appears when using GPS) */}
+              {filters.useMyLocation && (
+                <div className="flex items-center gap-3 pt-2 border-t border-carelink-teal-pale">
+                  <span className="text-sm text-carelink-gray">רדיוס חיפוש:</span>
+                  <div className="flex gap-2">
+                    {radiusOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => handleRadiusChange(option.value)}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                          filters.radius === option.value
+                            ? 'bg-carelink-teal text-white'
+                            : 'bg-carelink-teal-pale/50 text-carelink-navy hover:bg-carelink-teal-pale'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Quick Region Tags */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm text-carelink-gray">אזורים:</span>
+                {regions.map((region) => (
+                  <button
+                    key={region.id}
+                    type="button"
+                    onClick={() => {
+                      setLocationQuery(region.name);
+                      setFilters(prev => ({ ...prev, city: region.name, useMyLocation: false, latitude: null, longitude: null }));
+                    }}
+                    className={`text-sm px-3 py-1 rounded-full transition-colors ${
+                      locationQuery === region.name
+                        ? 'bg-carelink-teal text-white'
+                        : 'bg-carelink-teal-pale/50 text-carelink-navy hover:bg-carelink-teal-pale'
+                    }`}
+                    data-testid={`region-${region.id}`}
+                  >
+                    {region.name}
+                  </button>
+                ))}
+              </div>
+            </form>
+
+            {/* Action Buttons Row */}
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-carelink-teal-pale">
               <div className="flex gap-3">
                 {/* Filter Toggle (Mobile) */}
                 <button
                   onClick={() => setShowFilters(true)}
-                  className="lg:hidden flex items-center gap-2 px-4 py-3 bg-carelink-navy text-white rounded-xl font-medium"
+                  className="lg:hidden flex items-center gap-2 px-4 py-2 bg-carelink-navy text-white rounded-xl font-medium"
                 >
                   <FaFilter />
-                  סינון
+                  סינון מתקדם
                   {activeFiltersCount > 0 && (
                     <span className="bg-carelink-teal px-2 py-0.5 rounded-full text-xs">
                       {activeFiltersCount}
@@ -396,28 +491,28 @@ const Providers = () => {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal bg-white"
+                  className="px-4 py-2 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal bg-white text-sm"
                 >
                   <option value="rating">מיון: דירוג</option>
                   <option value="reviews">מיון: ביקורות</option>
                   {filters.useMyLocation && <option value="distance">מיון: מרחק</option>}
                 </select>
+              </div>
 
-                {/* View Mode */}
-                <div className="hidden md:flex border-2 border-carelink-teal-pale rounded-xl overflow-hidden">
-                  <button
-                    onClick={() => setViewMode('grid')}
-                    className={`px-3 py-3 ${viewMode === 'grid' ? 'bg-carelink-teal text-white' : 'bg-white text-carelink-gray'}`}
-                  >
-                    <FaThLarge />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
-                    className={`px-3 py-3 ${viewMode === 'list' ? 'bg-carelink-teal text-white' : 'bg-white text-carelink-gray'}`}
-                  >
-                    <FaList />
-                  </button>
-                </div>
+              {/* View Mode */}
+              <div className="hidden md:flex border-2 border-carelink-teal-pale rounded-xl overflow-hidden">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`px-3 py-2 ${viewMode === 'grid' ? 'bg-carelink-teal text-white' : 'bg-white text-carelink-gray'}`}
+                >
+                  <FaThLarge />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-3 py-2 ${viewMode === 'list' ? 'bg-carelink-teal text-white' : 'bg-white text-carelink-gray'}`}
+                >
+                  <FaList />
+                </button>
               </div>
             </div>
 
@@ -425,15 +520,31 @@ const Providers = () => {
             {activeFiltersCount > 0 && (
               <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-carelink-teal-pale">
                 {filters.useMyLocation && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-navy px-3 py-1 rounded-full text-sm">
+                  <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
                     <FaMapMarkerAlt /> המיקום שלי
                     {filters.radius && ` (${filters.radius} ק"מ)`}
+                    <button onClick={() => {
+                      setFilters(prev => ({ ...prev, useMyLocation: false, latitude: null, longitude: null }));
+                      setLocationQuery('');
+                    }}><FaTimes className="text-xs" /></button>
                   </span>
                 )}
-                {filters.city && (
+                {filters.city && !filters.useMyLocation && (
                   <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-navy px-3 py-1 rounded-full text-sm">
-                    עיר: {filters.city}
-                    <button onClick={() => setFilters(prev => ({ ...prev, city: null }))}><FaTimes className="text-xs" /></button>
+                    <FaMapMarkerAlt /> {filters.city}
+                    <button onClick={() => {
+                      setFilters(prev => ({ ...prev, city: null }));
+                      setLocationQuery('');
+                    }}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.search && (
+                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-navy px-3 py-1 rounded-full text-sm">
+                    חיפוש: {filters.search}
+                    <button onClick={() => {
+                      setFilters(prev => ({ ...prev, search: '' }));
+                      setSearchQuery('');
+                    }}><FaTimes className="text-xs" /></button>
                   </span>
                 )}
                 {filters.category && (
