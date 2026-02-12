@@ -353,13 +353,39 @@ const ProviderProfile = () => {
                     {t('editProfile')}
                   </button>
                 )}
+
+                {/* Chat Button */}
+                <button
+                  onClick={handleStartChat}
+                  className="inline-flex items-center gap-2 bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 transition shadow-lg"
+                  data-testid="chat-btn"
+                >
+                  <FaComments className="text-xl" />
+                  צ'אט
+                </button>
                 
-                <button className="inline-flex items-center justify-center w-12 h-12 bg-white/10 text-white rounded-xl hover:bg-white/20 transition border border-white/20">
+                {/* Share Button */}
+                <button 
+                  onClick={handleShare}
+                  className="inline-flex items-center justify-center w-12 h-12 bg-white/10 text-white rounded-xl hover:bg-white/20 transition border border-white/20"
+                  data-testid="share-btn"
+                  title="שתף"
+                >
                   <FaShareAlt />
                 </button>
                 
-                <button className="inline-flex items-center justify-center w-12 h-12 bg-white/10 text-white rounded-xl hover:bg-white/20 transition border border-white/20">
-                  <FaHeart />
+                {/* Favorite Button */}
+                <button 
+                  onClick={toggleFavorite}
+                  className={`inline-flex items-center justify-center w-12 h-12 rounded-xl transition border border-white/20 ${
+                    isFavorite 
+                      ? 'bg-red-500 text-white hover:bg-red-600' 
+                      : 'bg-white/10 text-white hover:bg-white/20'
+                  }`}
+                  data-testid="favorite-btn"
+                  title={isFavorite ? 'הסר ממועדפים' : 'הוסף למועדפים'}
+                >
+                  {isFavorite ? <FaHeart /> : <FaRegHeart />}
                 </button>
               </div>
             </div>
