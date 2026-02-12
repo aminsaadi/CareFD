@@ -90,11 +90,7 @@ function AppRouter() {
       />
       <Route
         path="/book/:serviceId"
-        element={
-          <ProtectedRoute>
-            <BookService />
-          </ProtectedRoute>
-        }
+        element={<BookService />}
       />
       <Route
         path="/bookings"
