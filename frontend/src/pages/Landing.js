@@ -33,15 +33,74 @@ const Landing = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [locationQuery, setLocationQuery] = useState('');
   const [searchType, setSearchType] = useState('providers');
+  const [isLocating, setIsLocating] = useState(false);
+  const [userLocation, setUserLocation] = useState(null);
+  const [selectedRadius, setSelectedRadius] = useState('');
+
+  // Israeli regions for quick selection
+  const regions = [
+    { id: 'north', name: 'צפון', cities: ['חיפה', 'נהריה', 'עכו', 'כרמיאל', 'צפת'] },
+    { id: 'center', name: 'מרכז', cities: ['תל אביב', 'רמת גן', 'פתח תקווה', 'הרצליה', 'רעננה'] },
+    { id: 'south', name: 'דרום', cities: ['באר שבע', 'אשדוד', 'אשקלון', 'אילת'] },
+    { id: 'jerusalem', name: 'ירושלים', cities: ['ירושלים', 'בית שמש', 'מודיעין'] }
+  ];
+
+  const radiusOptions = [
+    { value: '5', label: '5 ק"מ' },
+    { value: '10', label: '10 ק"מ' },
+    { value: '25', label: '25 ק"מ' },
+    { value: '50', label: '50 ק"מ' }
+  ];
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      alert('הדפדפן שלך לא תומך באיתור מיקום');
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        });
+        setLocationQuery('המיקום שלי');
+        setIsLocating(false);
+      },
+      (error) => {
+        console.error('Location error:', error);
+        alert('לא הצלחנו לאתר את המיקום שלך');
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
+    const params = new URLSearchParams();
+    
     if (searchQuery.trim()) {
-      navigate(`/${searchType}?search=${encodeURIComponent(searchQuery.trim())}`);
-    } else {
-      navigate(`/${searchType}`);
+      params.set('search', searchQuery.trim());
     }
+    
+    if (locationQuery.trim() && locationQuery !== 'המיקום שלי') {
+      params.set('city', locationQuery.trim());
+    }
+    
+    if (userLocation && locationQuery === 'המיקום שלי') {
+      params.set('latitude', userLocation.latitude);
+      params.set('longitude', userLocation.longitude);
+      if (selectedRadius) {
+        params.set('radius_km', selectedRadius);
+      }
+    }
+
+    const queryString = params.toString();
+    navigate(`/${searchType}${queryString ? `?${queryString}` : ''}`);
   };
 
   return (
