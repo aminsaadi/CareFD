@@ -1,8 +1,8 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { 
   FaClock, FaMoneyBillWave, FaHome, FaVideo, FaClinicMedical, 
-  FaPhoneAlt, FaStar, FaWhatsapp
+  FaPhoneAlt, FaStar, FaWhatsapp, FaComments, FaPhone
 } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 
@@ -25,6 +25,18 @@ const ServiceCard = ({ service, showProvider = true }) => {
     e.stopPropagation();
     const phone = service.provider?.phone?.replace(/[^0-9]/g, '') || '972500000000';
     window.open(`https://wa.me/${phone}?text=שלום, אני מתעניין/ת בשירות "${service.name}"`, '_blank');
+  };
+
+  const handleCall = (e) => {
+    e.stopPropagation();
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const phone = service.provider?.phone || '050-0000000';
+    
+    if (isMobile) {
+      window.location.href = `tel:${phone}`;
+    } else {
+      alert(`מספר טלפון: ${phone}`);
+    }
   };
 
   return (
@@ -63,13 +75,17 @@ const ServiceCard = ({ service, showProvider = true }) => {
       </div>
 
       {showProvider && service.provider && (
-        <div className="flex items-center justify-between bg-carelink-teal-pale/20 rounded-xl p-3 mb-4">
+        <Link 
+          to={`/provider/${service.provider.provider_id}`}
+          className="flex items-center justify-between bg-carelink-teal-pale/20 rounded-xl p-3 mb-4 hover:bg-carelink-teal-pale/40 transition-colors cursor-pointer"
+          data-testid={`provider-link-${service.provider.provider_id}`}
+        >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-carelink-navy rounded-full flex items-center justify-center text-white font-bold">
               {(service.provider.business_name || 'ס')[0]}
             </div>
             <div>
-              <p className="text-sm font-semibold text-carelink-navy">
+              <p className="text-sm font-semibold text-carelink-navy hover:text-carelink-teal transition-colors">
                 {service.provider.business_name || 'ספק שירותים'}
               </p>
               {service.provider.rating && (
@@ -80,7 +96,7 @@ const ServiceCard = ({ service, showProvider = true }) => {
               )}
             </div>
           </div>
-        </div>
+        </Link>
       )}
 
       {/* Action Buttons */}
@@ -91,6 +107,13 @@ const ServiceCard = ({ service, showProvider = true }) => {
           data-testid={`book-service-${service.service_id}`}
         >
           {t('bookNow')}
+        </button>
+        <button
+          onClick={handleCall}
+          className="w-11 h-11 flex items-center justify-center bg-carelink-navy text-white rounded-xl hover:bg-carelink-slate transition-colors"
+          title="התקשר"
+        >
+          <FaPhone className="text-lg" />
         </button>
         <button
           onClick={handleWhatsApp}
