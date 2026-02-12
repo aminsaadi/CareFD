@@ -76,10 +76,68 @@ const AdminDashboard = () => {
         const bookingsRes = await api.get('/admin/bookings');
         setBookings(bookingsRes.data.bookings || []);
       }
+
+      // Fetch regions
+      if (activeTab === 'regions') {
+        const regionsRes = await api.get('/regions');
+        setRegions(regionsRes.data.regions || []);
+      }
     } catch (error) {
       console.error('Failed to fetch admin data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Region management functions
+  const createRegion = async () => {
+    if (!newRegionName.trim()) return;
+    try {
+      await api.post('/admin/regions', { name: newRegionName, cities: [] });
+      setNewRegionName('');
+      fetchAdminData();
+    } catch (error) {
+      console.error('Failed to create region:', error);
+    }
+  };
+
+  const updateRegion = async (regionId, data) => {
+    try {
+      await api.put(`/admin/regions/${regionId}`, data);
+      setEditingRegion(null);
+      fetchAdminData();
+    } catch (error) {
+      console.error('Failed to update region:', error);
+    }
+  };
+
+  const deleteRegion = async (regionId) => {
+    if (!window.confirm('האם אתה בטוח שברצונך למחוק מחוז זה?')) return;
+    try {
+      await api.delete(`/admin/regions/${regionId}`);
+      fetchAdminData();
+    } catch (error) {
+      console.error('Failed to delete region:', error);
+    }
+  };
+
+  const addCityToRegion = async (regionId) => {
+    if (!newCity.trim()) return;
+    try {
+      await api.post(`/admin/regions/${regionId}/cities`, { city: newCity });
+      setNewCity('');
+      fetchAdminData();
+    } catch (error) {
+      console.error('Failed to add city:', error);
+    }
+  };
+
+  const removeCityFromRegion = async (regionId, cityName) => {
+    try {
+      await api.delete(`/admin/regions/${regionId}/cities/${encodeURIComponent(cityName)}`);
+      fetchAdminData();
+    } catch (error) {
+      console.error('Failed to remove city:', error);
     }
   };
 
