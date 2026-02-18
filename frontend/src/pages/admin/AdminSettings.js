@@ -106,7 +106,7 @@ const AdminSettings = () => {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center h-96">
-          <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-12 h-12 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
         </div>
       </AdminLayout>
     );
@@ -118,13 +118,13 @@ const AdminSettings = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">הגדרות האתר</h1>
-            <p className="text-slate-400 mt-1">הגדרות כלליות ועיצוב האתר</p>
+            <h1 className="text-2xl font-bold text-carelink-navy">הגדרות האתר</h1>
+            <p className="text-carelink-slate mt-1">הגדרות כלליות ועיצוב האתר</p>
           </div>
           <button
             onClick={saveSettings}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-2.5 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal/90 transition shadow-md disabled:opacity-50"
           >
             <FiSave size={18} />
             {saving ? 'שומר...' : 'שמור הגדרות'}
@@ -134,15 +134,15 @@ const AdminSettings = () => {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Tabs */}
           <div className="lg:w-56 flex-shrink-0">
-            <div className="bg-slate-800 rounded-xl border border-slate-700 p-2">
+            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-2">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition ${
                     activeTab === tab.id
-                      ? 'bg-indigo-600 text-white'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                      ? 'bg-carelink-teal text-white shadow-md'
+                      : 'text-carelink-slate hover:text-carelink-navy hover:bg-gray-50'
                   }`}
                 >
                   <tab.icon size={18} />
@@ -153,36 +153,36 @@ const AdminSettings = () => {
           </div>
 
           {/* Content */}
-          <div className="flex-1 bg-slate-800 rounded-xl border border-slate-700 p-6">
+          <div className="flex-1 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
             {/* General Tab */}
             {activeTab === 'general' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-white mb-4">הגדרות כלליות</h2>
+                <h2 className="text-lg font-semibold text-carelink-navy mb-4">הגדרות כלליות</h2>
                 
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">שם האתר</label>
+                  <label className="block text-sm text-carelink-slate mb-2">שם האתר</label>
                   <input
                     type="text"
                     value={settings.site_name}
                     onChange={(e) => updateSetting('site_name', e.target.value)}
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">סלוגן</label>
+                  <label className="block text-sm text-carelink-slate mb-2">סלוגן</label>
                   <input
                     type="text"
                     value={settings.site_tagline}
                     onChange={(e) => updateSetting('site_tagline', e.target.value)}
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-carelink-teal-pale/20 rounded-lg border border-carelink-teal-pale">
                   <div>
-                    <p className="text-white font-medium">אפשר הרשמה</p>
-                    <p className="text-slate-400 text-sm">אפשר למשתמשים חדשים להירשם</p>
+                    <p className="text-carelink-navy font-medium">אפשר הרשמה</p>
+                    <p className="text-carelink-slate text-sm">אפשר למשתמשים חדשים להירשם</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -191,14 +191,14 @@ const AdminSettings = () => {
                       onChange={(e) => updateSetting('allow_registrations', e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-slate-600 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                    <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
                   </label>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-carelink-teal-pale/20 rounded-lg border border-carelink-teal-pale">
                   <div>
-                    <p className="text-white font-medium">אימות אימייל</p>
-                    <p className="text-slate-400 text-sm">דרוש אימות אימייל בהרשמה</p>
+                    <p className="text-carelink-navy font-medium">אימות אימייל</p>
+                    <p className="text-carelink-slate text-sm">דרוש אימות אימייל בהרשמה</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -207,7 +207,7 @@ const AdminSettings = () => {
                       onChange={(e) => updateSetting('require_email_verification', e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-slate-600 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                    <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
                   </label>
                 </div>
               </div>
@@ -216,39 +216,39 @@ const AdminSettings = () => {
             {/* Appearance Tab */}
             {activeTab === 'appearance' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-white mb-4">עיצוב</h2>
+                <h2 className="text-lg font-semibold text-carelink-navy mb-4">עיצוב</h2>
                 
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">לוגו (URL)</label>
+                  <label className="block text-sm text-carelink-slate mb-2">לוגו (URL)</label>
                   <div className="flex gap-3">
                     <input
                       type="text"
                       value={settings.logo_url}
                       onChange={(e) => updateSetting('logo_url', e.target.value)}
                       placeholder="https://example.com/logo.png"
-                      className="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 outline-none"
+                      className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                       dir="ltr"
                     />
-                    <button className="px-4 py-2.5 bg-slate-700 text-slate-300 rounded-lg hover:bg-slate-600 transition flex items-center gap-2">
+                    <button className="px-4 py-2.5 bg-white border border-gray-200 text-carelink-slate rounded-lg hover:bg-gray-50 transition flex items-center gap-2">
                       <FiUpload size={18} />
                       העלה
                     </button>
                   </div>
                   {settings.logo_url && (
-                    <div className="mt-3 p-4 bg-slate-700/50 rounded-lg">
+                    <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
                       <img src={settings.logo_url} alt="Logo preview" className="h-12 object-contain" />
                     </div>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">Favicon (URL)</label>
+                  <label className="block text-sm text-carelink-slate mb-2">Favicon (URL)</label>
                   <input
                     type="text"
                     value={settings.favicon_url}
                     onChange={(e) => updateSetting('favicon_url', e.target.value)}
                     placeholder="https://example.com/favicon.ico"
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                     dir="ltr"
                   />
                 </div>
@@ -258,46 +258,46 @@ const AdminSettings = () => {
             {/* Contact Tab */}
             {activeTab === 'contact' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-white mb-4">פרטי התקשרות</h2>
+                <h2 className="text-lg font-semibold text-carelink-navy mb-4">פרטי התקשרות</h2>
                 
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2 flex items-center gap-2">
-                    <FiMail size={14} />
+                  <label className="block text-sm text-carelink-slate mb-2 flex items-center gap-2">
+                    <FiMail size={14} className="text-carelink-teal" />
                     אימייל
                   </label>
                   <input
                     type="email"
                     value={settings.contact_email}
                     onChange={(e) => updateSetting('contact_email', e.target.value)}
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                     dir="ltr"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2 flex items-center gap-2">
-                    <FiPhone size={14} />
+                  <label className="block text-sm text-carelink-slate mb-2 flex items-center gap-2">
+                    <FiPhone size={14} className="text-carelink-teal" />
                     טלפון
                   </label>
                   <input
                     type="tel"
                     value={settings.contact_phone}
                     onChange={(e) => updateSetting('contact_phone', e.target.value)}
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                     dir="ltr"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2 flex items-center gap-2">
-                    <FiMapPin size={14} />
+                  <label className="block text-sm text-carelink-slate mb-2 flex items-center gap-2">
+                    <FiMapPin size={14} className="text-carelink-teal" />
                     כתובת
                   </label>
                   <input
                     type="text"
                     value={settings.contact_address}
                     onChange={(e) => updateSetting('contact_address', e.target.value)}
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                   />
                 </div>
               </div>
@@ -306,7 +306,7 @@ const AdminSettings = () => {
             {/* Social Tab */}
             {activeTab === 'social' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-white mb-4">רשתות חברתיות</h2>
+                <h2 className="text-lg font-semibold text-carelink-navy mb-4">רשתות חברתיות</h2>
                 
                 {[
                   { key: 'social_facebook', label: 'Facebook', icon: FiFacebook, placeholder: 'https://facebook.com/...' },
@@ -316,8 +316,8 @@ const AdminSettings = () => {
                   { key: 'social_youtube', label: 'YouTube', icon: FiYoutube, placeholder: 'https://youtube.com/...' },
                 ].map(({ key, label, icon: Icon, placeholder }) => (
                   <div key={key}>
-                    <label className="block text-sm text-slate-400 mb-2 flex items-center gap-2">
-                      <Icon size={14} />
+                    <label className="block text-sm text-carelink-slate mb-2 flex items-center gap-2">
+                      <Icon size={14} className="text-carelink-teal" />
                       {label}
                     </label>
                     <input
@@ -325,7 +325,7 @@ const AdminSettings = () => {
                       value={settings[key]}
                       onChange={(e) => updateSetting(key, e.target.value)}
                       placeholder={placeholder}
-                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 outline-none"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                       dir="ltr"
                     />
                   </div>
@@ -336,29 +336,29 @@ const AdminSettings = () => {
             {/* Footer Tab */}
             {activeTab === 'footer' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-white mb-4">הגדרות פוטר</h2>
+                <h2 className="text-lg font-semibold text-carelink-navy mb-4">הגדרות פוטר</h2>
                 
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">טקסט זכויות יוצרים</label>
+                  <label className="block text-sm text-carelink-slate mb-2">טקסט זכויות יוצרים</label>
                   <input
                     type="text"
                     value={settings.footer_text}
                     onChange={(e) => updateSetting('footer_text', e.target.value)}
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-slate-400 mb-3">קישורי פוטר</label>
+                  <label className="block text-sm text-carelink-slate mb-3">קישורי פוטר</label>
                   <div className="space-y-2 mb-4">
                     {settings.footer_links?.map((link, index) => (
-                      <div key={index} className="flex items-center gap-3 p-3 bg-slate-700/50 rounded-lg">
-                        <span className="text-white">{link.label}</span>
-                        <span className="text-slate-500">→</span>
-                        <span className="text-slate-400 text-sm" dir="ltr">{link.url}</span>
+                      <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <span className="text-carelink-navy">{link.label}</span>
+                        <span className="text-carelink-gray">→</span>
+                        <span className="text-carelink-slate text-sm" dir="ltr">{link.url}</span>
                         <button
                           onClick={() => removeFooterLink(index)}
-                          className="mr-auto text-slate-400 hover:text-red-400"
+                          className="mr-auto text-carelink-gray hover:text-red-500"
                         >
                           ✕
                         </button>
@@ -372,19 +372,19 @@ const AdminSettings = () => {
                       value={newFooterLink.label}
                       onChange={(e) => setNewFooterLink(prev => ({ ...prev, label: e.target.value }))}
                       placeholder="תווית"
-                      className="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:border-indigo-500 outline-none"
+                      className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-carelink-navy focus:border-carelink-teal outline-none"
                     />
                     <input
                       type="text"
                       value={newFooterLink.url}
                       onChange={(e) => setNewFooterLink(prev => ({ ...prev, url: e.target.value }))}
                       placeholder="/page-url"
-                      className="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:border-indigo-500 outline-none"
+                      className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-carelink-navy focus:border-carelink-teal outline-none"
                       dir="ltr"
                     />
                     <button
                       onClick={addFooterLink}
-                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                      className="px-4 py-2 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal/90 transition"
                     >
                       הוסף
                     </button>
@@ -396,38 +396,38 @@ const AdminSettings = () => {
             {/* SEO Tab */}
             {activeTab === 'seo' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-white mb-4">אופטימיזציה למנועי חיפוש</h2>
+                <h2 className="text-lg font-semibold text-carelink-navy mb-4">אופטימיזציה למנועי חיפוש</h2>
                 
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">תיאור מטא</label>
+                  <label className="block text-sm text-carelink-slate mb-2">תיאור מטא</label>
                   <textarea
                     value={settings.meta_description}
                     onChange={(e) => updateSetting('meta_description', e.target.value)}
                     placeholder="תיאור האתר לתוצאות חיפוש..."
                     rows={3}
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 outline-none resize-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none resize-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">מילות מפתח</label>
+                  <label className="block text-sm text-carelink-slate mb-2">מילות מפתח</label>
                   <input
                     type="text"
                     value={settings.meta_keywords}
                     onChange={(e) => updateSetting('meta_keywords', e.target.value)}
                     placeholder="מילה1, מילה2, מילה3..."
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">Google Analytics ID</label>
+                  <label className="block text-sm text-carelink-slate mb-2">Google Analytics ID</label>
                   <input
                     type="text"
                     value={settings.google_analytics_id}
                     onChange={(e) => updateSetting('google_analytics_id', e.target.value)}
                     placeholder="G-XXXXXXXXXX"
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                     dir="ltr"
                   />
                 </div>
@@ -437,12 +437,12 @@ const AdminSettings = () => {
             {/* Advanced Tab */}
             {activeTab === 'advanced' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-white mb-4">הגדרות מתקדמות</h2>
+                <h2 className="text-lg font-semibold text-carelink-navy mb-4">הגדרות מתקדמות</h2>
                 
-                <div className="flex items-center justify-between p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-red-50 border border-red-200 rounded-lg">
                   <div>
-                    <p className="text-red-400 font-medium">מצב תחזוקה</p>
-                    <p className="text-red-400/70 text-sm">השבת גישה לאתר למשתמשים</p>
+                    <p className="text-red-700 font-medium">מצב תחזוקה</p>
+                    <p className="text-red-600 text-sm">השבת גישה לאתר למשתמשים</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -451,22 +451,22 @@ const AdminSettings = () => {
                       onChange={(e) => updateSetting('maintenance_mode', e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-slate-600 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                    <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
                   </label>
                 </div>
 
-                <div className="p-4 bg-slate-700/50 rounded-lg">
-                  <h3 className="text-white font-medium mb-2">גיבוי נתונים</h3>
-                  <p className="text-slate-400 text-sm mb-3">הורד גיבוי מלא של כל הנתונים</p>
-                  <button className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="text-carelink-navy font-medium mb-2">גיבוי נתונים</h3>
+                  <p className="text-carelink-slate text-sm mb-3">הורד גיבוי מלא של כל הנתונים</p>
+                  <button className="px-4 py-2 bg-white border border-gray-200 text-carelink-navy rounded-lg hover:bg-gray-100 transition">
                     הורד גיבוי
                   </button>
                 </div>
 
-                <div className="p-4 bg-slate-700/50 rounded-lg">
-                  <h3 className="text-white font-medium mb-2">נקה מטמון</h3>
-                  <p className="text-slate-400 text-sm mb-3">נקה את כל הנתונים השמורים במטמון</p>
-                  <button className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-500 transition">
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="text-carelink-navy font-medium mb-2">נקה מטמון</h3>
+                  <p className="text-carelink-slate text-sm mb-3">נקה את כל הנתונים השמורים במטמון</p>
+                  <button className="px-4 py-2 bg-white border border-gray-200 text-carelink-navy rounded-lg hover:bg-gray-100 transition">
                     נקה מטמון
                   </button>
                 </div>
