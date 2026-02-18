@@ -24,6 +24,9 @@ import AdminDashboard from './pages/AdminDashboard';
 // New Admin Pages
 import AdminOverview from './pages/admin/AdminOverview';
 import AdminUsers from './pages/admin/AdminUsers';
+import AdminProviders from './pages/admin/AdminProviders';
+import AdminBookings from './pages/admin/AdminBookings';
+import AdminVerification from './pages/admin/AdminVerification';
 import AdminProfessions from './pages/admin/AdminProfessions';
 import AdminRegions from './pages/admin/AdminRegions';
 import AdminPages from './pages/admin/AdminPages';
