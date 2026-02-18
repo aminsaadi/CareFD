@@ -6,6 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
+import random
 from pathlib import Path
 from pydantic import BaseModel, Field, EmailStr, ConfigDict, field_validator
 from typing import List, Optional, Dict, Any
@@ -22,6 +23,15 @@ ROOT_DIR = Path(__file__).parent
 UPLOAD_DIR = ROOT_DIR / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 load_dotenv(ROOT_DIR / '.env')
+
+# Helper function to generate unique user numbers
+def generate_user_number():
+    """Generate user number like U5566889"""
+    return f"U{random.randint(1000000, 9999999)}"
+
+def generate_provider_number():
+    """Generate provider number like P7784569"""
+    return f"P{random.randint(1000000, 9999999)}"
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
