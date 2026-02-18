@@ -2818,6 +2818,596 @@ async def admin_broadcast_notification(
     
     return {"message": f"Notification sent to {len(users)} users"}
 
+# ==================== ADMIN SETTINGS ====================
+
+@api_router.get("/admin/settings")
+async def admin_get_settings(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get site settings"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    settings = await db.site_settings.find_one({}, {"_id": 0})
+    if not settings:
+        # Return default settings
+        settings = {
+            "site_name": "CareLink",
+            "site_tagline": "Connecting Care Providers",
+            "logo_url": "",
+            "favicon_url": "",
+            "contact_email": "info@carelink.co.il",
+            "contact_phone": "03-1234567",
+            "contact_address": "תל אביב, ישראל",
+            "footer_text": "© 2024 CareLink. כל הזכויות שמורות.",
+            "social_facebook": "",
+            "social_instagram": "",
+            "social_twitter": "",
+            "social_linkedin": "",
+            "social_youtube": "",
+            "footer_links": [
+                {"label": "אודות", "url": "/about"},
+                {"label": "תנאי שימוש", "url": "/terms"},
+                {"label": "מדיניות פרטיות", "url": "/privacy"},
+                {"label": "צור קשר", "url": "/contact"}
+            ],
+            "maintenance_mode": False,
+            "allow_registrations": True,
+            "require_email_verification": True,
+            "google_analytics_id": "",
+            "meta_description": "",
+            "meta_keywords": ""
+        }
+    return settings
+
+@api_router.put("/admin/settings")
+async def admin_update_settings(
+    settings_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update site settings"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    settings_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.site_settings.update_one(
+        {},
+        {"$set": settings_data},
+        upsert=True
+    )
+    
+    return {"message": "Settings updated successfully"}
+
+# ==================== ADMIN PROFESSIONS ====================
+
+@api_router.get("/admin/professions")
+async def admin_get_professions(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get all professions with hierarchy"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    professions = await db.professions.find({}, {"_id": 0}).to_list(100)
+    
+    if not professions:
+        # Return default structure
+        professions = [
+            {
+                "profession_id": "prof_medicine",
+                "name": "רפואה",
+                "name_en": "Medicine",
+                "sub_professions": [
+                    {"sub_profession_id": "sub_family", "name": "רפואת משפחה", "name_en": "Family Medicine", "categories": []},
+                    {"sub_profession_id": "sub_pediatrics", "name": "ילדים", "name_en": "Pediatrics", "categories": []}
+                ]
+            },
+            {
+                "profession_id": "prof_nursing",
+                "name": "סיעוד",
+                "name_en": "Nursing",
+                "sub_professions": [
+                    {"sub_profession_id": "sub_home_care", "name": "סיעוד ביתי", "name_en": "Home Care", "categories": []}
+                ]
+            },
+            {
+                "profession_id": "prof_therapy",
+                "name": "טיפול",
+                "name_en": "Therapy",
+                "sub_professions": [
+                    {"sub_profession_id": "sub_physio", "name": "פיזיותרפיה", "name_en": "Physiotherapy", "categories": []},
+                    {"sub_profession_id": "sub_occupational", "name": "ריפוי בעיסוק", "name_en": "Occupational Therapy", "categories": []}
+                ]
+            }
+        ]
+    
+    return {"professions": professions}
+
+@api_router.post("/admin/professions")
+async def admin_create_profession(
+    profession_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Create a new profession"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    profession = {
+        "profession_id": f"prof_{uuid.uuid4().hex[:12]}",
+        "name": profession_data.get("name"),
+        "name_en": profession_data.get("name_en", ""),
+        "sub_professions": [],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.professions.insert_one(profession)
+    
+    return {"message": "Profession created", "profession": {k: v for k, v in profession.items() if k != "_id"}}
+
+@api_router.post("/admin/professions/{profession_id}/sub-professions")
+async def admin_create_sub_profession(
+    profession_id: str,
+    sub_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Create a sub-profession"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    sub_profession = {
+        "sub_profession_id": f"sub_{uuid.uuid4().hex[:12]}",
+        "name": sub_data.get("name"),
+        "name_en": sub_data.get("name_en", ""),
+        "categories": []
+    }
+    
+    result = await db.professions.update_one(
+        {"profession_id": profession_id},
+        {"$push": {"sub_professions": sub_profession}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Profession not found")
+    
+    return {"message": "Sub-profession created", "sub_profession": sub_profession}
+
+@api_router.post("/admin/sub-professions/{sub_profession_id}/categories")
+async def admin_create_category(
+    sub_profession_id: str,
+    category_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Create a category under a sub-profession"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    category = {
+        "category_id": f"cat_{uuid.uuid4().hex[:12]}",
+        "name": category_data.get("name"),
+        "name_en": category_data.get("name_en", "")
+    }
+    
+    result = await db.professions.update_one(
+        {"sub_professions.sub_profession_id": sub_profession_id},
+        {"$push": {"sub_professions.$.categories": category}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Sub-profession not found")
+    
+    return {"message": "Category created", "category": category}
+
+@api_router.delete("/admin/professions/{profession_id}")
+async def admin_delete_profession(
+    profession_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Delete a profession"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.professions.delete_one({"profession_id": profession_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Profession not found")
+    
+    return {"message": "Profession deleted"}
+
+@api_router.delete("/admin/sub-professions/{sub_profession_id}")
+async def admin_delete_sub_profession(
+    sub_profession_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Delete a sub-profession"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.professions.update_one(
+        {"sub_professions.sub_profession_id": sub_profession_id},
+        {"$pull": {"sub_professions": {"sub_profession_id": sub_profession_id}}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Sub-profession not found")
+    
+    return {"message": "Sub-profession deleted"}
+
+@api_router.delete("/admin/categories/{category_id}")
+async def admin_delete_category(
+    category_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Delete a category"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.professions.update_one(
+        {"sub_professions.categories.category_id": category_id},
+        {"$pull": {"sub_professions.$.categories": {"category_id": category_id}}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    return {"message": "Category deleted"}
+
+# ==================== ADMIN ADS ====================
+
+@api_router.get("/admin/ads")
+async def admin_get_ads(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get all ads"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    ads = await db.ads.find({}, {"_id": 0}).to_list(100)
+    return {"ads": ads}
+
+@api_router.post("/admin/ads")
+async def admin_create_ad(
+    ad_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Create a new ad"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    ad = {
+        "ad_id": f"ad_{uuid.uuid4().hex[:12]}",
+        "title": ad_data.get("title"),
+        "image_url": ad_data.get("image_url"),
+        "link_url": ad_data.get("link_url", ""),
+        "position": ad_data.get("position", "homepage_top"),
+        "start_date": ad_data.get("start_date"),
+        "end_date": ad_data.get("end_date"),
+        "is_active": ad_data.get("is_active", True),
+        "views": 0,
+        "clicks": 0,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.ads.insert_one(ad)
+    
+    return {"message": "Ad created", "ad": {k: v for k, v in ad.items() if k != "_id"}}
+
+@api_router.put("/admin/ads/{ad_id}")
+async def admin_update_ad(
+    ad_id: str,
+    ad_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update an ad"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    ad_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.ads.update_one(
+        {"ad_id": ad_id},
+        {"$set": ad_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Ad not found")
+    
+    return {"message": "Ad updated"}
+
+@api_router.delete("/admin/ads/{ad_id}")
+async def admin_delete_ad(
+    ad_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Delete an ad"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.ads.delete_one({"ad_id": ad_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Ad not found")
+    
+    return {"message": "Ad deleted"}
+
+# ==================== ADMIN BLOG ====================
+
+@api_router.get("/admin/blog")
+async def admin_get_blog_posts(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get all blog posts"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    posts = await db.blog_posts.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return {"posts": posts}
+
+@api_router.post("/admin/blog")
+async def admin_create_blog_post(
+    post_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Create a new blog post"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    post = {
+        "post_id": f"post_{uuid.uuid4().hex[:12]}",
+        "title": post_data.get("title"),
+        "slug": post_data.get("slug", ""),
+        "excerpt": post_data.get("excerpt", ""),
+        "content": post_data.get("content", ""),
+        "featured_image": post_data.get("featured_image", ""),
+        "tags": post_data.get("tags", []),
+        "is_published": post_data.get("is_published", False),
+        "views": 0,
+        "author_id": user.get("user_id"),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.blog_posts.insert_one(post)
+    
+    return {"message": "Blog post created", "post": {k: v for k, v in post.items() if k != "_id"}}
+
+@api_router.put("/admin/blog/{post_id}")
+async def admin_update_blog_post(
+    post_id: str,
+    post_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update a blog post"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    post_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.blog_posts.update_one(
+        {"post_id": post_id},
+        {"$set": post_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Blog post not found")
+    
+    return {"message": "Blog post updated"}
+
+@api_router.delete("/admin/blog/{post_id}")
+async def admin_delete_blog_post(
+    post_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Delete a blog post"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.blog_posts.delete_one({"post_id": post_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Blog post not found")
+    
+    return {"message": "Blog post deleted"}
+
+# ==================== ADMIN BOOKINGS STATUS ====================
+
+@api_router.put("/admin/bookings/{booking_id}/status")
+async def admin_update_booking_status(
+    booking_id: str,
+    status_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update booking status"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    new_status = status_data.get("status")
+    valid_statuses = ["pending", "confirmed", "in_progress", "completed", "cancelled"]
+    
+    if new_status not in valid_statuses:
+        raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {valid_statuses}")
+    
+    update_data = {"status": new_status}
+    
+    if new_status == "confirmed":
+        update_data["confirmed_at"] = datetime.now(timezone.utc).isoformat()
+    elif new_status == "completed":
+        update_data["completed_at"] = datetime.now(timezone.utc).isoformat()
+    elif new_status == "cancelled":
+        update_data["cancelled_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.bookings.update_one(
+        {"booking_id": booking_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    return {"message": f"Booking status updated to {new_status}"}
+
+# ==================== ADMIN PAGES (Static Pages) ====================
+
+@api_router.get("/admin/pages")
+async def admin_get_pages(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get all static pages"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    pages = await db.static_pages.find({}, {"_id": 0}).to_list(100)
+    
+    if not pages:
+        # Return default pages
+        pages = [
+            {"page_id": "page_about", "title": "אודות", "slug": "about", "content": "", "is_published": True},
+            {"page_id": "page_terms", "title": "תנאי שימוש", "slug": "terms", "content": "", "is_published": True},
+            {"page_id": "page_privacy", "title": "מדיניות פרטיות", "slug": "privacy", "content": "", "is_published": True},
+            {"page_id": "page_contact", "title": "צור קשר", "slug": "contact", "content": "", "is_published": True}
+        ]
+    
+    return {"pages": pages}
+
+@api_router.post("/admin/pages")
+async def admin_create_page(
+    page_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Create a new static page"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    page = {
+        "page_id": f"page_{uuid.uuid4().hex[:12]}",
+        "title": page_data.get("title"),
+        "slug": page_data.get("slug", ""),
+        "content": page_data.get("content", ""),
+        "is_published": page_data.get("is_published", False),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.static_pages.insert_one(page)
+    
+    return {"message": "Page created", "page": {k: v for k, v in page.items() if k != "_id"}}
+
+@api_router.put("/admin/pages/{page_id}")
+async def admin_update_page(
+    page_id: str,
+    page_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update a static page"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    page_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.static_pages.update_one(
+        {"page_id": page_id},
+        {"$set": page_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Page not found")
+    
+    return {"message": "Page updated"}
+
+@api_router.delete("/admin/pages/{page_id}")
+async def admin_delete_page(
+    page_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Delete a static page"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.static_pages.delete_one({"page_id": page_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Page not found")
+    
+    return {"message": "Page deleted"}
+
+# ==================== ADMIN FEATURED PROVIDERS ====================
+
+@api_router.put("/admin/providers/{provider_id}/unrecommend")
+async def admin_unrecommend_provider(
+    provider_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Remove provider from recommended"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.providers.update_one(
+        {"provider_id": provider_id},
+        {"$set": {"is_recommended": False}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    return {"message": "Provider removed from recommended"}
+
+@api_router.get("/admin/featured")
+async def admin_get_featured_providers(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get all featured/recommended providers"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    providers = await db.providers.find({"is_recommended": True}, {"_id": 0}).to_list(100)
+    return {"providers": providers}
+
 # ==================== FILE UPLOAD ====================
 
 @api_router.post("/upload")
