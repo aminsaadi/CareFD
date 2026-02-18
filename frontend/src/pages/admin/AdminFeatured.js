@@ -123,12 +123,12 @@ const AdminFeatured = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">הבלטת ספקים</h1>
-            <p className="text-slate-400 mt-1">ניהול ספקים מובלטים בתוצאות החיפוש</p>
+            <h1 className="text-2xl font-bold text-carelink-navy">הבלטת ספקים</h1>
+            <p className="text-carelink-slate mt-1">ניהול ספקים מובלטים בתוצאות החיפוש</p>
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
+            className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-carelink-navy rounded-lg hover:bg-amber-700 transition"
           >
             <FiStar size={18} />
             הבלט ספק
@@ -137,65 +137,65 @@ const AdminFeatured = () => {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+          <div className="bg-white rounded-xl p-4 border border-gray-100">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-amber-500/20 rounded-lg flex items-center justify-center">
                 <FiStar className="text-amber-400" size={20} />
               </div>
               <div>
-                <p className="text-slate-400 text-sm">ספקים מובלטים</p>
-                <p className="text-2xl font-bold text-white">{featuredProviders.filter(f => f.is_active).length}</p>
+                <p className="text-carelink-slate text-sm">ספקים מובלטים</p>
+                <p className="text-2xl font-bold text-carelink-navy">{featuredProviders.filter(f => f.is_active).length}</p>
               </div>
             </div>
           </div>
-          <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+          <div className="bg-white rounded-xl p-4 border border-gray-100">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-emerald-500/20 rounded-lg flex items-center justify-center">
                 <FiCheck className="text-emerald-400" size={20} />
               </div>
               <div>
-                <p className="text-slate-400 text-sm">פעילים</p>
-                <p className="text-2xl font-bold text-white">{featuredProviders.filter(f => f.is_active && getDaysRemaining(f.end_date) > 0).length}</p>
+                <p className="text-carelink-slate text-sm">פעילים</p>
+                <p className="text-2xl font-bold text-carelink-navy">{featuredProviders.filter(f => f.is_active && getDaysRemaining(f.end_date) > 0).length}</p>
               </div>
             </div>
           </div>
-          <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+          <div className="bg-white rounded-xl p-4 border border-gray-100">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
                 <FiClock className="text-red-400" size={20} />
               </div>
               <div>
-                <p className="text-slate-400 text-sm">פג תוקף</p>
-                <p className="text-2xl font-bold text-white">{featuredProviders.filter(f => getDaysRemaining(f.end_date) <= 0).length}</p>
+                <p className="text-carelink-slate text-sm">פג תוקף</p>
+                <p className="text-2xl font-bold text-carelink-navy">{featuredProviders.filter(f => getDaysRemaining(f.end_date) <= 0).length}</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Featured Providers List */}
-        <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
-          <div className="p-4 border-b border-slate-700">
-            <h2 className="text-lg font-semibold text-white">ספקים מובלטים</h2>
+        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+          <div className="p-4 border-b border-gray-100">
+            <h2 className="text-lg font-semibold text-carelink-navy">ספקים מובלטים</h2>
           </div>
           
           {loading ? (
             <div className="py-12 text-center">
-              <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+              <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
             </div>
           ) : featuredProviders.length === 0 ? (
-            <div className="py-12 text-center text-slate-400">
+            <div className="py-12 text-center text-carelink-slate">
               <FiAward className="mx-auto mb-3" size={32} />
               אין ספקים מובלטים. לחץ על "הבלט ספק" להוספה.
             </div>
           ) : (
             <table className="w-full">
               <thead>
-                <tr className="border-b border-slate-700">
-                  <th className="text-right py-4 px-6 text-slate-400 font-medium text-sm">ספק</th>
-                  <th className="text-right py-4 px-6 text-slate-400 font-medium text-sm">סוג</th>
-                  <th className="text-right py-4 px-6 text-slate-400 font-medium text-sm">תקופה</th>
-                  <th className="text-right py-4 px-6 text-slate-400 font-medium text-sm">סטטוס</th>
-                  <th className="text-right py-4 px-6 text-slate-400 font-medium text-sm">פעולות</th>
+                <tr className="border-b border-gray-100">
+                  <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">ספק</th>
+                  <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">סוג</th>
+                  <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">תקופה</th>
+                  <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">סטטוס</th>
+                  <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">פעולות</th>
                 </tr>
               </thead>
               <tbody>
@@ -205,32 +205,32 @@ const AdminFeatured = () => {
                   const isExpiringSoon = daysRemaining > 0 && daysRemaining <= 7;
                   
                   return (
-                    <tr key={featured.featured_id} className="border-b border-slate-700/50 hover:bg-slate-700/30 transition">
+                    <tr key={featured.featured_id} className="border-b border-gray-100/50 hover:bg-gray-50/30 transition">
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center text-white font-medium">
+                          <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center text-carelink-navy font-medium">
                             {featured.provider_name?.[0] || 'P'}
                           </div>
                           <div>
                             <Link 
                               to={`/providers/${featured.provider_id}`}
-                              className="text-white font-medium hover:text-amber-400"
+                              className="text-carelink-navy font-medium hover:text-amber-400"
                             >
                               {featured.provider_name}
                             </Link>
                           </div>
                         </div>
                       </td>
-                      <td className="py-4 px-6 text-slate-400">
+                      <td className="py-4 px-6 text-carelink-slate">
                         {featured.provider_type}
                       </td>
                       <td className="py-4 px-6">
-                        <div className="text-slate-400 text-sm flex items-center gap-1">
+                        <div className="text-carelink-slate text-sm flex items-center gap-1">
                           <FiCalendar size={14} />
                           {new Date(featured.start_date).toLocaleDateString('he-IL')} - {new Date(featured.end_date).toLocaleDateString('he-IL')}
                         </div>
                         {!isExpired && (
-                          <p className={`text-xs mt-1 ${isExpiringSoon ? 'text-amber-400' : 'text-slate-500'}`}>
+                          <p className={`text-xs mt-1 ${isExpiringSoon ? 'text-amber-400' : 'text-carelink-gray'}`}>
                             {daysRemaining} ימים נותרו
                           </p>
                         )}
@@ -249,7 +249,7 @@ const AdminFeatured = () => {
                       <td className="py-4 px-6">
                         <button
                           onClick={() => removeFeatured(featured.featured_id)}
-                          className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
+                          className="p-2 text-carelink-slate hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
                         >
                           <FiTrash2 size={16} />
                         </button>
@@ -265,17 +265,17 @@ const AdminFeatured = () => {
 
       {/* Add Featured Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-800 rounded-xl w-full max-w-lg border border-slate-700">
-            <div className="flex items-center justify-between p-4 border-b border-slate-700">
-              <h2 className="text-lg font-bold text-white">הבלט ספק</h2>
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-lg border border-gray-100">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-carelink-navy">הבלט ספק</h2>
               <button
                 onClick={() => {
                   setShowAddModal(false);
                   setSelectedProvider(null);
                   setSearchQuery('');
                 }}
-                className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition"
+                className="p-2 text-carelink-slate hover:text-carelink-navy hover:bg-gray-50 rounded-lg transition"
               >
                 ✕
               </button>
@@ -284,20 +284,20 @@ const AdminFeatured = () => {
             <div className="p-6 space-y-4">
               {/* Search */}
               <div className="relative">
-                <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carelink-slate" size={18} />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="חפש ספק..."
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg pr-10 pl-4 py-2.5 text-white placeholder-slate-400 focus:border-indigo-500 outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg pr-10 pl-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal outline-none"
                 />
               </div>
 
               {/* Provider List */}
               <div className="max-h-64 overflow-y-auto space-y-2">
                 {filteredProviders.length === 0 ? (
-                  <p className="text-center text-slate-400 py-4">לא נמצאו ספקים</p>
+                  <p className="text-center text-carelink-slate py-4">לא נמצאו ספקים</p>
                 ) : (
                   filteredProviders.map((provider) => (
                     <button
@@ -306,15 +306,15 @@ const AdminFeatured = () => {
                       className={`w-full flex items-center gap-3 p-3 rounded-lg border transition ${
                         selectedProvider?.provider_id === provider.provider_id
                           ? 'border-amber-500 bg-amber-500/10'
-                          : 'border-slate-600 hover:border-slate-500 hover:bg-slate-700/50'
+                          : 'border-gray-200 hover:border-slate-500 hover:bg-gray-50/50'
                       }`}
                     >
-                      <div className="w-10 h-10 bg-slate-600 rounded-full flex items-center justify-center text-white">
+                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-carelink-navy">
                         {provider.business_name?.[0] || 'P'}
                       </div>
                       <div className="text-right flex-1">
-                        <p className="text-white font-medium">{provider.business_name}</p>
-                        <p className="text-slate-400 text-sm">{provider.provider_type}</p>
+                        <p className="text-carelink-navy font-medium">{provider.business_name}</p>
+                        <p className="text-carelink-slate text-sm">{provider.provider_type}</p>
                       </div>
                       {selectedProvider?.provider_id === provider.provider_id && (
                         <FiCheck className="text-amber-400" size={20} />
@@ -327,11 +327,11 @@ const AdminFeatured = () => {
               {/* Duration */}
               {selectedProvider && (
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">תקופת הבלטה</label>
+                  <label className="block text-sm text-carelink-slate mb-2">תקופת הבלטה</label>
                   <select
                     value={featuredDuration}
                     onChange={(e) => setFeaturedDuration(Number(e.target.value))}
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal outline-none"
                   >
                     <option value={7}>שבוע (7 ימים)</option>
                     <option value={14}>שבועיים (14 ימים)</option>
@@ -343,21 +343,21 @@ const AdminFeatured = () => {
               )}
             </div>
 
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-slate-700">
+            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-100">
               <button
                 onClick={() => {
                   setShowAddModal(false);
                   setSelectedProvider(null);
                   setSearchQuery('');
                 }}
-                className="px-6 py-2.5 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition"
+                className="px-6 py-2.5 bg-gray-50 text-carelink-navy rounded-lg hover:bg-gray-100 transition"
               >
                 ביטול
               </button>
               <button
                 onClick={addFeatured}
                 disabled={!selectedProvider}
-                className="flex items-center gap-2 px-6 py-2.5 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-2.5 bg-amber-600 text-carelink-navy rounded-lg hover:bg-amber-700 transition disabled:opacity-50"
               >
                 <FiStar size={18} />
                 הבלט

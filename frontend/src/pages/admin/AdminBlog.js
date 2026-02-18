@@ -161,12 +161,12 @@ const AdminBlog = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">ניהול בלוג</h1>
-            <p className="text-slate-400 mt-1">צור ונהל פוסטים בבלוג</p>
+            <h1 className="text-2xl font-bold text-carelink-navy">ניהול בלוג</h1>
+            <p className="text-carelink-slate mt-1">צור ונהל פוסטים בבלוג</p>
           </div>
           <button
             onClick={() => openEditor()}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+            className="flex items-center gap-2 px-4 py-2 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition"
           >
             <FiPlus size={18} />
             פוסט חדש
@@ -176,22 +176,22 @@ const AdminBlog = () => {
         {/* Posts Grid */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : posts.length === 0 ? (
-          <div className="bg-slate-800 rounded-xl p-12 text-center border border-slate-700">
+          <div className="bg-white rounded-xl p-12 text-center border border-gray-100">
             <FiEdit2 className="mx-auto text-slate-600 mb-4" size={48} />
-            <p className="text-slate-400">אין פוסטים. צור את הפוסט הראשון!</p>
+            <p className="text-carelink-slate">אין פוסטים. צור את הפוסט הראשון!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {posts.map((post) => (
               <div 
                 key={post.post_id} 
-                className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden hover:border-indigo-500/50 transition group"
+                className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:border-carelink-teal/50 transition group"
               >
                 {/* Image */}
-                <div className="h-40 bg-slate-700 relative">
+                <div className="h-40 bg-gray-50 relative">
                   {post.featured_image ? (
                     <img 
                       src={post.featured_image} 
@@ -206,8 +206,8 @@ const AdminBlog = () => {
                   {/* Status Badge */}
                   <div className={`absolute top-3 right-3 px-2 py-1 rounded text-xs font-medium ${
                     post.is_published 
-                      ? 'bg-emerald-500/90 text-white' 
-                      : 'bg-slate-600/90 text-slate-300'
+                      ? 'bg-emerald-500/90 text-carelink-navy' 
+                      : 'bg-gray-100/90 text-carelink-slate'
                   }`}>
                     {post.is_published ? 'מפורסם' : 'טיוטה'}
                   </div>
@@ -215,14 +215,14 @@ const AdminBlog = () => {
 
                 {/* Content */}
                 <div className="p-4">
-                  <h3 className="text-white font-medium mb-2 line-clamp-2">{post.title}</h3>
-                  <p className="text-slate-400 text-sm mb-3 line-clamp-2">{post.excerpt}</p>
+                  <h3 className="text-carelink-navy font-medium mb-2 line-clamp-2">{post.title}</h3>
+                  <p className="text-carelink-slate text-sm mb-3 line-clamp-2">{post.excerpt}</p>
                   
                   {/* Tags */}
                   {post.tags?.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-3">
                       {post.tags.slice(0, 3).map((tag) => (
-                        <span key={tag} className="bg-slate-700 text-slate-400 px-2 py-0.5 rounded text-xs">
+                        <span key={tag} className="bg-gray-50 text-carelink-slate px-2 py-0.5 rounded text-xs">
                           {tag}
                         </span>
                       ))}
@@ -230,7 +230,7 @@ const AdminBlog = () => {
                   )}
 
                   {/* Meta */}
-                  <div className="flex items-center justify-between text-sm text-slate-500">
+                  <div className="flex items-center justify-between text-sm text-carelink-gray">
                     <span className="flex items-center gap-1">
                       <FiEye size={14} />
                       {post.views || 0} צפיות
@@ -243,28 +243,28 @@ const AdminBlog = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center border-t border-slate-700">
+                <div className="flex items-center border-t border-gray-100">
                   <button
                     onClick={() => openEditor(post)}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 transition"
+                    className="flex-1 flex items-center justify-center gap-2 py-3 text-carelink-slate hover:text-carelink-teal hover:bg-carelink-teal/10 transition"
                   >
                     <FiEdit2 size={16} />
                     ערוך
                   </button>
-                  <div className="w-px h-8 bg-slate-700"></div>
+                  <div className="w-px h-8 bg-gray-50"></div>
                   <a
                     href={`/blog/${post.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-2 py-3 text-slate-400 hover:text-white hover:bg-slate-700/50 transition"
+                    className="flex-1 flex items-center justify-center gap-2 py-3 text-carelink-slate hover:text-carelink-navy hover:bg-gray-50/50 transition"
                   >
                     <FiEye size={16} />
                     צפה
                   </a>
-                  <div className="w-px h-8 bg-slate-700"></div>
+                  <div className="w-px h-8 bg-gray-50"></div>
                   <button
                     onClick={() => deletePost(post.post_id)}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition"
+                    className="flex-1 flex items-center justify-center gap-2 py-3 text-carelink-slate hover:text-red-400 hover:bg-red-500/10 transition"
                   >
                     <FiTrash2 size={16} />
                     מחק
@@ -278,16 +278,16 @@ const AdminBlog = () => {
 
       {/* Editor Modal */}
       {showEditor && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-800 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-slate-700 flex flex-col">
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-gray-100 flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-700">
-              <h2 className="text-lg font-bold text-white">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-carelink-navy">
                 {editingPost ? 'עריכת פוסט' : 'פוסט חדש'}
               </h2>
               <button
                 onClick={() => setShowEditor(false)}
-                className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition"
+                className="p-2 text-carelink-slate hover:text-carelink-navy hover:bg-gray-50 rounded-lg transition"
               >
                 <FiX size={20} />
               </button>
@@ -297,58 +297,58 @@ const AdminBlog = () => {
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">כותרת</label>
+                  <label className="block text-sm text-carelink-slate mb-2">כותרת</label>
                   <input
                     type="text"
                     value={currentPost.title}
                     onChange={(e) => setCurrentPost(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="כותרת הפוסט..."
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">נתיב (Slug)</label>
+                  <label className="block text-sm text-carelink-slate mb-2">נתיב (Slug)</label>
                   <input
                     type="text"
                     value={currentPost.slug}
                     onChange={(e) => setCurrentPost(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') }))}
                     placeholder="post-url"
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                     dir="ltr"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-slate-400 mb-2">תקציר</label>
+                <label className="block text-sm text-carelink-slate mb-2">תקציר</label>
                 <textarea
                   value={currentPost.excerpt}
                   onChange={(e) => setCurrentPost(prev => ({ ...prev, excerpt: e.target.value }))}
                   placeholder="תקציר קצר של הפוסט..."
                   rows={2}
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none resize-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none resize-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-slate-400 mb-2">תמונה ראשית (URL)</label>
+                <label className="block text-sm text-carelink-slate mb-2">תמונה ראשית (URL)</label>
                 <input
                   type="text"
                   value={currentPost.featured_image}
                   onChange={(e) => setCurrentPost(prev => ({ ...prev, featured_image: e.target.value }))}
                   placeholder="https://example.com/image.jpg"
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                   dir="ltr"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-slate-400 mb-2">תגיות</label>
+                <label className="block text-sm text-carelink-slate mb-2">תגיות</label>
                 <div className="flex flex-wrap gap-2 mb-2">
                   {currentPost.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center gap-1 bg-indigo-500/20 text-indigo-400 px-3 py-1 rounded-lg text-sm"
+                      className="inline-flex items-center gap-1 bg-carelink-teal/20 text-carelink-teal px-3 py-1 rounded-lg text-sm"
                     >
                       {tag}
                       <button onClick={() => removeTag(tag)} className="hover:text-red-400">
@@ -364,11 +364,11 @@ const AdminBlog = () => {
                     onChange={(e) => setNewTag(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                     placeholder="הוסף תגית..."
-                    className="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                   />
                   <button
                     onClick={addTag}
-                    className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition"
+                    className="px-4 py-2 bg-gray-50 text-carelink-navy rounded-lg hover:bg-gray-100 transition"
                   >
                     הוסף
                   </button>
@@ -376,13 +376,13 @@ const AdminBlog = () => {
               </div>
 
               <div>
-                <label className="block text-sm text-slate-400 mb-2">תוכן</label>
+                <label className="block text-sm text-carelink-slate mb-2">תוכן</label>
                 <textarea
                   value={currentPost.content}
                   onChange={(e) => setCurrentPost(prev => ({ ...prev, content: e.target.value }))}
                   placeholder="כתוב את תוכן הפוסט כאן..."
                   rows={12}
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none resize-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none resize-none"
                 />
               </div>
 
@@ -394,24 +394,24 @@ const AdminBlog = () => {
                     onChange={(e) => setCurrentPost(prev => ({ ...prev, is_published: e.target.checked }))}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-slate-600 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                  <div className="w-11 h-6 bg-gray-100 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
                 </label>
-                <span className="text-slate-300">פרסם עכשיו</span>
+                <span className="text-carelink-slate">פרסם עכשיו</span>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-slate-700">
+            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-100">
               <button
                 onClick={() => setShowEditor(false)}
-                className="px-6 py-2.5 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition"
+                className="px-6 py-2.5 bg-gray-50 text-carelink-navy rounded-lg hover:bg-gray-100 transition"
               >
                 ביטול
               </button>
               <button
                 onClick={savePost}
                 disabled={!currentPost.title.trim()}
-                className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-2.5 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition disabled:opacity-50"
               >
                 <FiSave size={18} />
                 שמור

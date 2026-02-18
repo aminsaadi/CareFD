@@ -134,12 +134,12 @@ const AdminProfessions = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">מקצועות וקטגוריות</h1>
-            <p className="text-slate-400 mt-1">ניהול היררכיית המקצועות באתר</p>
+            <h1 className="text-2xl font-bold text-carelink-navy">מקצועות וקטגוריות</h1>
+            <p className="text-carelink-slate mt-1">ניהול היררכיית המקצועות באתר</p>
           </div>
           <button
             onClick={() => setShowAddModal('profession')}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+            className="flex items-center gap-2 px-4 py-2 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition"
           >
             <FiPlus size={18} />
             הוסף מקצוע
@@ -147,34 +147,34 @@ const AdminProfessions = () => {
         </div>
 
         {/* Search */}
-        <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+        <div className="bg-white rounded-xl p-4 border border-gray-100">
           <div className="relative">
-            <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carelink-slate" size={18} />
             <input
               type="text"
               placeholder="חפש מקצוע..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-700 border border-slate-600 rounded-lg pr-10 pl-4 py-2.5 text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg pr-10 pl-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
             />
           </div>
         </div>
 
         {/* Hierarchy Guide */}
-        <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700 flex items-center gap-6">
+        <div className="bg-white/50 rounded-xl p-4 border border-gray-100 flex items-center gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-indigo-500 rounded"></div>
-            <span className="text-slate-400 text-sm">מקצוע</span>
+            <div className="w-4 h-4 bg-carelink-teal rounded"></div>
+            <span className="text-carelink-slate text-sm">מקצוע</span>
           </div>
           <FiChevronRight className="text-slate-600" />
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-purple-500 rounded"></div>
-            <span className="text-slate-400 text-sm">תת-מקצוע</span>
+            <span className="text-carelink-slate text-sm">תת-מקצוע</span>
           </div>
           <FiChevronRight className="text-slate-600" />
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 bg-emerald-500 rounded"></div>
-            <span className="text-slate-400 text-sm">קטגוריה</span>
+            <span className="text-carelink-slate text-sm">קטגוריה</span>
           </div>
         </div>
 
@@ -182,28 +182,28 @@ const AdminProfessions = () => {
         <div className="space-y-3">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-10 h-10 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : filteredProfessions.length === 0 ? (
-            <div className="bg-slate-800 rounded-xl p-12 text-center border border-slate-700">
+            <div className="bg-white rounded-xl p-12 text-center border border-gray-100">
               <FiGrid className="mx-auto text-slate-600 mb-4" size={48} />
-              <p className="text-slate-400">לא נמצאו מקצועות</p>
+              <p className="text-carelink-slate">לא נמצאו מקצועות</p>
             </div>
           ) : (
             filteredProfessions.map((profession) => (
-              <div key={profession.profession_id} className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+              <div key={profession.profession_id} className="bg-white rounded-xl border border-gray-100 overflow-hidden">
                 {/* Profession Header */}
                 <div
-                  className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-700/30 transition"
+                  className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50/30 transition"
                   onClick={() => setExpandedProfession(expandedProfession === profession.profession_id ? null : profession.profession_id)}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-indigo-500/20 rounded-lg flex items-center justify-center">
-                      <FiGrid className="text-indigo-400" size={20} />
+                    <div className="w-10 h-10 bg-carelink-teal/20 rounded-lg flex items-center justify-center">
+                      <FiGrid className="text-carelink-teal" size={20} />
                     </div>
                     <div>
-                      <h3 className="text-white font-medium">{profession.name}</h3>
-                      <p className="text-slate-400 text-sm">{profession.name_en} • {profession.sub_professions?.length || 0} תתי-מקצועות</p>
+                      <h3 className="text-carelink-navy font-medium">{profession.name}</h3>
+                      <p className="text-carelink-slate text-sm">{profession.name_en} • {profession.sub_professions?.length || 0} תתי-מקצועות</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -213,7 +213,7 @@ const AdminProfessions = () => {
                         setSelectedParent(profession.profession_id);
                         setShowAddModal('sub');
                       }}
-                      className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition"
+                      className="p-2 text-carelink-slate hover:text-carelink-teal hover:bg-carelink-teal/10 rounded-lg transition"
                     >
                       <FiPlus size={18} />
                     </button>
@@ -222,12 +222,12 @@ const AdminProfessions = () => {
                         e.stopPropagation();
                         deleteItem('professions', profession.profession_id);
                       }}
-                      className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
+                      className="p-2 text-carelink-slate hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
                     >
                       <FiTrash2 size={18} />
                     </button>
                     <FiChevronDown 
-                      className={`text-slate-400 transition-transform ${expandedProfession === profession.profession_id ? 'rotate-180' : ''}`}
+                      className={`text-carelink-slate transition-transform ${expandedProfession === profession.profession_id ? 'rotate-180' : ''}`}
                       size={20}
                     />
                   </div>
@@ -235,17 +235,17 @@ const AdminProfessions = () => {
 
                 {/* Sub-professions */}
                 {expandedProfession === profession.profession_id && (
-                  <div className="border-t border-slate-700">
+                  <div className="border-t border-gray-100">
                     {profession.sub_professions?.length === 0 ? (
-                      <div className="p-4 text-center text-slate-500">
+                      <div className="p-4 text-center text-carelink-gray">
                         אין תתי-מקצועות. לחץ על + להוספה.
                       </div>
                     ) : (
                       profession.sub_professions?.map((subProf) => (
-                        <div key={subProf.sub_profession_id} className="border-b border-slate-700/50 last:border-b-0">
+                        <div key={subProf.sub_profession_id} className="border-b border-gray-100/50 last:border-b-0">
                           {/* Sub-profession Header */}
                           <div
-                            className="flex items-center justify-between p-4 pr-8 cursor-pointer hover:bg-slate-700/20 transition"
+                            className="flex items-center justify-between p-4 pr-8 cursor-pointer hover:bg-gray-50/20 transition"
                             onClick={() => setExpandedSubProfession(expandedSubProfession === subProf.sub_profession_id ? null : subProf.sub_profession_id)}
                           >
                             <div className="flex items-center gap-3">
@@ -253,8 +253,8 @@ const AdminProfessions = () => {
                                 <FiTag className="text-purple-400" size={16} />
                               </div>
                               <div>
-                                <h4 className="text-white text-sm font-medium">{subProf.name}</h4>
-                                <p className="text-slate-500 text-xs">{subProf.name_en} • {subProf.categories?.length || 0} קטגוריות</p>
+                                <h4 className="text-carelink-navy text-sm font-medium">{subProf.name}</h4>
+                                <p className="text-carelink-gray text-xs">{subProf.name_en} • {subProf.categories?.length || 0} קטגוריות</p>
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
@@ -264,7 +264,7 @@ const AdminProfessions = () => {
                                   setSelectedParent(subProf.sub_profession_id);
                                   setShowAddModal('category');
                                 }}
-                                className="p-1.5 text-slate-400 hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition"
+                                className="p-1.5 text-carelink-slate hover:text-purple-400 hover:bg-purple-500/10 rounded-lg transition"
                               >
                                 <FiPlus size={16} />
                               </button>
@@ -273,12 +273,12 @@ const AdminProfessions = () => {
                                   e.stopPropagation();
                                   deleteItem('sub-professions', subProf.sub_profession_id);
                                 }}
-                                className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
+                                className="p-1.5 text-carelink-slate hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
                               >
                                 <FiTrash2 size={16} />
                               </button>
                               <FiChevronDown 
-                                className={`text-slate-400 transition-transform ${expandedSubProfession === subProf.sub_profession_id ? 'rotate-180' : ''}`}
+                                className={`text-carelink-slate transition-transform ${expandedSubProfession === subProf.sub_profession_id ? 'rotate-180' : ''}`}
                                 size={16}
                               />
                             </div>
@@ -288,7 +288,7 @@ const AdminProfessions = () => {
                           {expandedSubProfession === subProf.sub_profession_id && (
                             <div className="pr-16 pb-4">
                               {subProf.categories?.length === 0 ? (
-                                <p className="text-slate-500 text-sm py-2">אין קטגוריות</p>
+                                <p className="text-carelink-gray text-sm py-2">אין קטגוריות</p>
                               ) : (
                                 <div className="flex flex-wrap gap-2">
                                   {subProf.categories?.map((cat) => (
@@ -323,32 +323,32 @@ const AdminProfessions = () => {
 
       {/* Add Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-800 rounded-xl w-full max-w-md p-6 border border-slate-700">
-            <h3 className="text-lg font-bold text-white mb-4">
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-100">
+            <h3 className="text-lg font-bold text-carelink-navy mb-4">
               {showAddModal === 'profession' && 'הוסף מקצוע'}
               {showAddModal === 'sub' && 'הוסף תת-מקצוע'}
               {showAddModal === 'category' && 'הוסף קטגוריה'}
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-slate-400 mb-1">שם בעברית</label>
+                <label className="block text-sm text-carelink-slate mb-1">שם בעברית</label>
                 <input
                   type="text"
                   value={newItemName}
                   onChange={(e) => setNewItemName(e.target.value)}
                   placeholder="הזן שם..."
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                 />
               </div>
               <div>
-                <label className="block text-sm text-slate-400 mb-1">שם באנגלית</label>
+                <label className="block text-sm text-carelink-slate mb-1">שם באנגלית</label>
                 <input
                   type="text"
                   value={newItemNameEn}
                   onChange={(e) => setNewItemNameEn(e.target.value)}
                   placeholder="Enter name..."
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                   dir="ltr"
                 />
               </div>
@@ -360,14 +360,14 @@ const AdminProfessions = () => {
                   setNewItemName('');
                   setNewItemNameEn('');
                 }}
-                className="flex-1 px-4 py-2.5 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition"
+                className="flex-1 px-4 py-2.5 bg-gray-50 text-carelink-navy rounded-lg hover:bg-gray-100 transition"
               >
                 ביטול
               </button>
               <button
                 onClick={addItem}
                 disabled={!newItemName.trim()}
-                className="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition disabled:opacity-50"
               >
                 הוסף
               </button>

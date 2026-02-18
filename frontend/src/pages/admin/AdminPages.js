@@ -112,12 +112,12 @@ const AdminPages = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">דפים סטטיים</h1>
-            <p className="text-slate-400 mt-1">ניהול דפי תוכן קבועים באתר</p>
+            <h1 className="text-2xl font-bold text-carelink-navy">דפים סטטיים</h1>
+            <p className="text-carelink-slate mt-1">ניהול דפי תוכן קבועים באתר</p>
           </div>
           <button
             onClick={() => openEditor()}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+            className="flex items-center gap-2 px-4 py-2 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition"
           >
             <FiPlus size={18} />
             דף חדש
@@ -125,44 +125,44 @@ const AdminPages = () => {
         </div>
 
         {/* Pages List */}
-        <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-700">
-                <th className="text-right py-4 px-6 text-slate-400 font-medium text-sm">כותרת</th>
-                <th className="text-right py-4 px-6 text-slate-400 font-medium text-sm">נתיב</th>
-                <th className="text-right py-4 px-6 text-slate-400 font-medium text-sm">סטטוס</th>
-                <th className="text-right py-4 px-6 text-slate-400 font-medium text-sm">עדכון אחרון</th>
-                <th className="text-right py-4 px-6 text-slate-400 font-medium text-sm">פעולות</th>
+              <tr className="border-b border-gray-100">
+                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">כותרת</th>
+                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">נתיב</th>
+                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">סטטוס</th>
+                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">עדכון אחרון</th>
+                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">פעולות</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
                   <td colSpan={5} className="py-12 text-center">
-                    <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
                   </td>
                 </tr>
               ) : pages.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-slate-400">
+                  <td colSpan={5} className="py-12 text-center text-carelink-slate">
                     <FiFileText className="mx-auto mb-3" size={32} />
                     אין דפים. צור דף ראשון.
                   </td>
                 </tr>
               ) : (
                 pages.map((page) => (
-                  <tr key={page.page_id} className="border-b border-slate-700/50 hover:bg-slate-700/30 transition">
+                  <tr key={page.page_id} className="border-b border-gray-100/50 hover:bg-gray-50/30 transition">
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-indigo-500/20 rounded-lg flex items-center justify-center">
-                          <FiFileText className="text-indigo-400" size={18} />
+                        <div className="w-10 h-10 bg-carelink-teal/20 rounded-lg flex items-center justify-center">
+                          <FiFileText className="text-carelink-teal" size={18} />
                         </div>
-                        <span className="text-white font-medium">{page.title}</span>
+                        <span className="text-carelink-navy font-medium">{page.title}</span>
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <code className="text-slate-400 bg-slate-700 px-2 py-1 rounded text-sm">/{page.slug}</code>
+                      <code className="text-carelink-slate bg-gray-50 px-2 py-1 rounded text-sm">/{page.slug}</code>
                     </td>
                     <td className="py-4 px-6">
                       <button
@@ -170,7 +170,7 @@ const AdminPages = () => {
                         className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm ${
                           page.is_published 
                             ? 'bg-emerald-500/20 text-emerald-400' 
-                            : 'bg-slate-600/50 text-slate-400'
+                            : 'bg-gray-100/50 text-carelink-slate'
                         }`}
                       >
                         {page.is_published ? (
@@ -186,7 +186,7 @@ const AdminPages = () => {
                         )}
                       </button>
                     </td>
-                    <td className="py-4 px-6 text-slate-400 text-sm">
+                    <td className="py-4 px-6 text-carelink-slate text-sm">
                       {page.updated_at ? new Date(page.updated_at).toLocaleDateString('he-IL') : '-'}
                     </td>
                     <td className="py-4 px-6">
@@ -195,19 +195,19 @@ const AdminPages = () => {
                           href={`/${page.slug}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition"
+                          className="p-2 text-carelink-slate hover:text-carelink-navy hover:bg-gray-50 rounded-lg transition"
                         >
                           <FiEye size={16} />
                         </a>
                         <button
                           onClick={() => openEditor(page)}
-                          className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition"
+                          className="p-2 text-carelink-slate hover:text-carelink-teal hover:bg-carelink-teal/10 rounded-lg transition"
                         >
                           <FiEdit2 size={16} />
                         </button>
                         <button
                           onClick={() => deletePage(page.page_id)}
-                          className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
+                          className="p-2 text-carelink-slate hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
                         >
                           <FiTrash2 size={16} />
                         </button>
@@ -223,16 +223,16 @@ const AdminPages = () => {
 
       {/* Page Editor Modal */}
       {showEditor && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-800 rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-slate-700 flex flex-col">
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-gray-100 flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-700">
-              <h2 className="text-lg font-bold text-white">
+            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-carelink-navy">
                 {editingPage ? 'עריכת דף' : 'דף חדש'}
               </h2>
               <button
                 onClick={() => setShowEditor(false)}
-                className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition"
+                className="p-2 text-carelink-slate hover:text-carelink-navy hover:bg-gray-50 rounded-lg transition"
               >
                 <FiX size={20} />
               </button>
@@ -242,25 +242,25 @@ const AdminPages = () => {
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">כותרת הדף</label>
+                  <label className="block text-sm text-carelink-slate mb-2">כותרת הדף</label>
                   <input
                     type="text"
                     value={currentPage.title}
                     onChange={(e) => setCurrentPage(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="לדוגמה: אודות"
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-400 mb-2">נתיב (Slug)</label>
-                  <div className="flex items-center bg-slate-700 border border-slate-600 rounded-lg overflow-hidden focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
-                    <span className="px-3 text-slate-500">/</span>
+                  <label className="block text-sm text-carelink-slate mb-2">נתיב (Slug)</label>
+                  <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg overflow-hidden focus-within:border-carelink-teal focus-within:ring-1 focus-within:ring-indigo-500">
+                    <span className="px-3 text-carelink-gray">/</span>
                     <input
                       type="text"
                       value={currentPage.slug}
                       onChange={(e) => setCurrentPage(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') }))}
                       placeholder="about"
-                      className="flex-1 bg-transparent py-2.5 text-white placeholder-slate-400 outline-none"
+                      className="flex-1 bg-transparent py-2.5 text-carelink-navy placeholder-carelink-gray outline-none"
                       dir="ltr"
                     />
                   </div>
@@ -268,24 +268,24 @@ const AdminPages = () => {
               </div>
 
               <div>
-                <label className="block text-sm text-slate-400 mb-2">תיאור מטא (SEO)</label>
+                <label className="block text-sm text-carelink-slate mb-2">תיאור מטא (SEO)</label>
                 <input
                   type="text"
                   value={currentPage.meta_description}
                   onChange={(e) => setCurrentPage(prev => ({ ...prev, meta_description: e.target.value }))}
                   placeholder="תיאור קצר לתוצאות חיפוש..."
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-slate-400 mb-2">תוכן הדף</label>
+                <label className="block text-sm text-carelink-slate mb-2">תוכן הדף</label>
                 <textarea
                   value={currentPage.content}
                   onChange={(e) => setCurrentPage(prev => ({ ...prev, content: e.target.value }))}
                   placeholder="כתוב את תוכן הדף כאן... (תומך ב-HTML)"
                   rows={12}
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none resize-none font-mono text-sm"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none resize-none font-mono text-sm"
                 />
               </div>
 
@@ -297,24 +297,24 @@ const AdminPages = () => {
                     onChange={(e) => setCurrentPage(prev => ({ ...prev, is_published: e.target.checked }))}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-slate-600 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                  <div className="w-11 h-6 bg-gray-100 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
                 </label>
-                <span className="text-slate-300">פרסם דף (גלוי לציבור)</span>
+                <span className="text-carelink-slate">פרסם דף (גלוי לציבור)</span>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-slate-700">
+            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-100">
               <button
                 onClick={() => setShowEditor(false)}
-                className="px-6 py-2.5 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition"
+                className="px-6 py-2.5 bg-gray-50 text-carelink-navy rounded-lg hover:bg-gray-100 transition"
               >
                 ביטול
               </button>
               <button
                 onClick={savePage}
                 disabled={!currentPage.title.trim() || !currentPage.slug.trim()}
-                className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-2.5 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition disabled:opacity-50"
               >
                 <FiSave size={18} />
                 שמור
