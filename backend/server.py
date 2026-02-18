@@ -3408,6 +3408,136 @@ async def admin_get_featured_providers(
     providers = await db.providers.find({"is_recommended": True}, {"_id": 0}).to_list(100)
     return {"providers": providers}
 
+# ==================== ADMIN REPORTS ====================
+
+@api_router.get("/admin/reports")
+async def admin_get_reports(
+    period: str = "month",  # week, month, year
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get reports data for charts"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    now = datetime.now(timezone.utc)
+    
+    # Calculate date range based on period
+    if period == "week":
+        start_date = now - timedelta(days=7)
+        date_format = "%d/%m"
+        group_days = 1
+    elif period == "year":
+        start_date = now - timedelta(days=365)
+        date_format = "%m/%Y"
+        group_days = 30
+    else:  # month (default)
+        start_date = now - timedelta(days=30)
+        date_format = "%d/%m"
+        group_days = 1
+    
+    start_date_str = start_date.isoformat()
+    
+    # Get bookings in period
+    bookings = await db.bookings.find(
+        {"created_at": {"$gte": start_date_str}},
+        {"_id": 0, "created_at": 1, "status": 1, "provider_id": 1, "provider_name": 1, "final_price": 1}
+    ).to_list(10000)
+    
+    # Bookings over time
+    bookings_by_date = {}
+    for booking in bookings:
+        try:
+            created = booking.get("created_at", "")
+            if isinstance(created, str) and created:
+                date_obj = datetime.fromisoformat(created.replace("Z", "+00:00"))
+                date_key = date_obj.strftime(date_format)
+                bookings_by_date[date_key] = bookings_by_date.get(date_key, 0) + 1
+        except:
+            pass
+    
+    # Generate all dates in range for complete chart
+    bookings_timeline = []
+    current = start_date
+    while current <= now:
+        date_key = current.strftime(date_format)
+        bookings_timeline.append({
+            "date": date_key,
+            "bookings": bookings_by_date.get(date_key, 0)
+        })
+        current += timedelta(days=group_days)
+    
+    # Status distribution
+    status_counts = {"pending": 0, "confirmed": 0, "completed": 0, "cancelled": 0}
+    for booking in bookings:
+        status = booking.get("status", "pending")
+        if status in status_counts:
+            status_counts[status] += 1
+    
+    status_distribution = [
+        {"name": "ממתינות", "value": status_counts["pending"], "color": "#f59e0b"},
+        {"name": "מאושרות", "value": status_counts["confirmed"], "color": "#10b981"},
+        {"name": "הושלמו", "value": status_counts["completed"], "color": "#3b82f6"},
+        {"name": "בוטלו", "value": status_counts["cancelled"], "color": "#ef4444"}
+    ]
+    
+    # Top providers by bookings
+    provider_bookings = {}
+    for booking in bookings:
+        provider_name = booking.get("provider_name", "לא ידוע")
+        provider_bookings[provider_name] = provider_bookings.get(provider_name, 0) + 1
+    
+    top_providers = sorted(
+        [{"name": k, "bookings": v} for k, v in provider_bookings.items()],
+        key=lambda x: x["bookings"],
+        reverse=True
+    )[:10]
+    
+    # Revenue calculation (from completed bookings with price)
+    total_revenue = 0
+    revenue_by_date = {}
+    for booking in bookings:
+        if booking.get("status") == "completed" and booking.get("final_price"):
+            total_revenue += booking["final_price"]
+            try:
+                created = booking.get("created_at", "")
+                if isinstance(created, str) and created:
+                    date_obj = datetime.fromisoformat(created.replace("Z", "+00:00"))
+                    date_key = date_obj.strftime(date_format)
+                    revenue_by_date[date_key] = revenue_by_date.get(date_key, 0) + booking["final_price"]
+            except:
+                pass
+    
+    # New users in period
+    users_in_period = await db.users.count_documents({"created_at": {"$gte": start_date_str}})
+    
+    # New providers in period
+    providers_in_period = await db.providers.count_documents({"created_at": {"$gte": start_date_str}})
+    
+    # Reviews in period
+    reviews_in_period = await db.reviews.count_documents({"created_at": {"$gte": start_date_str}})
+    
+    # Average rating
+    all_reviews = await db.reviews.find({}, {"_id": 0, "rating": 1}).to_list(10000)
+    avg_rating = sum(r.get("rating", 0) for r in all_reviews) / len(all_reviews) if all_reviews else 0
+    
+    return {
+        "period": period,
+        "summary": {
+            "total_bookings": len(bookings),
+            "total_revenue": total_revenue,
+            "new_users": users_in_period,
+            "new_providers": providers_in_period,
+            "new_reviews": reviews_in_period,
+            "avg_rating": round(avg_rating, 2)
+        },
+        "bookings_timeline": bookings_timeline,
+        "status_distribution": status_distribution,
+        "top_providers": top_providers,
+        "revenue_by_date": [{"date": k, "revenue": v} for k, v in revenue_by_date.items()]
+    }
+
 # ==================== FILE UPLOAD ====================
 
 @api_router.post("/upload")
