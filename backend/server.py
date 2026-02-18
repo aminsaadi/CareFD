@@ -2401,6 +2401,304 @@ async def admin_delete_user(
     
     return {"message": "User deleted"}
 
+@api_router.get("/admin/users/{user_id}")
+async def admin_get_user_details(
+    user_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get detailed user information including provider data if applicable"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    user = await db.users.find_one({"user_id": user_id}, {"_id": 0, "password_hash": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Get provider data if user is a provider
+    provider_data = None
+    if user.get("role") == "provider":
+        provider_data = await db.providers.find_one({"user_id": user_id}, {"_id": 0})
+    
+    # Get user's bookings count
+    bookings_count = await db.bookings.count_documents({"user_id": user_id})
+    
+    # Get user's messages count
+    messages = await db.messages.find({"sender_id": user_id}).to_list(1000)
+    messages_count = len(messages)
+    
+    return {
+        "user": user,
+        "provider": provider_data,
+        "stats": {
+            "bookings_count": bookings_count,
+            "messages_count": messages_count
+        }
+    }
+
+@api_router.put("/admin/users/{user_id}")
+async def admin_update_user(
+    user_id: str,
+    user_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update user details"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Fields that can be updated
+    allowed_fields = ["name", "email", "phone", "role", "is_verified"]
+    update_data = {k: v for k, v in user_data.items() if k in allowed_fields}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No valid fields to update")
+    
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.users.update_one(
+        {"user_id": user_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User updated successfully"}
+
+@api_router.put("/admin/users/{user_id}/suspend")
+async def admin_suspend_user(
+    user_id: str,
+    suspend_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Suspend or unsuspend a user"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Don't allow suspending self
+    if admin["user_id"] == user_id:
+        raise HTTPException(status_code=400, detail="Cannot suspend yourself")
+    
+    is_suspended = suspend_data.get("is_suspended", True)
+    reason = suspend_data.get("reason", "")
+    
+    update_data = {
+        "is_suspended": is_suspended,
+        "suspension_reason": reason if is_suspended else None,
+        "suspended_at": datetime.now(timezone.utc).isoformat() if is_suspended else None
+    }
+    
+    result = await db.users.update_one(
+        {"user_id": user_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Send notification to user
+    action = "הושעה" if is_suspended else "שוחרר מהשעיה"
+    await create_notification(
+        user_id,
+        "account_status",
+        f"החשבון שלך {action}",
+        reason if is_suspended else "החשבון שלך חזר לפעילות מלאה.",
+        {"suspended": is_suspended}
+    )
+    
+    return {"message": f"User {'suspended' if is_suspended else 'unsuspended'} successfully"}
+
+@api_router.post("/admin/users/{user_id}/message")
+async def admin_send_message_to_user(
+    user_id: str,
+    message_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Send a private message to a user"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    subject = message_data.get("subject", "הודעה ממנהל המערכת")
+    content = message_data.get("content", "")
+    
+    if not content:
+        raise HTTPException(status_code=400, detail="Message content is required")
+    
+    # Create notification
+    await create_notification(
+        user_id,
+        "admin_message",
+        subject,
+        content,
+        {"from_admin": True, "admin_id": admin["user_id"]}
+    )
+    
+    # Store in admin messages collection
+    admin_message = {
+        "message_id": f"admin_msg_{uuid.uuid4().hex[:12]}",
+        "from_admin_id": admin["user_id"],
+        "to_user_id": user_id,
+        "subject": subject,
+        "content": content,
+        "sent_at": datetime.now(timezone.utc).isoformat(),
+        "is_read": False
+    }
+    await db.admin_messages.insert_one(admin_message)
+    
+    return {"message": "Message sent successfully"}
+
+@api_router.get("/admin/users/{user_id}/verification-documents")
+async def admin_get_user_verification_documents(
+    user_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get user's verification documents"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Check if user is a provider
+    provider = await db.providers.find_one({"user_id": user_id}, {"_id": 0})
+    if not provider:
+        return {"documents": [], "verification_status": "not_provider"}
+    
+    return {
+        "documents": provider.get("verification_documents", []),
+        "verification_status": provider.get("verification_status", "pending"),
+        "verification_notes": provider.get("verification_notes")
+    }
+
+@api_router.put("/admin/verification-documents/{document_id}/status")
+async def admin_update_document_status(
+    document_id: str,
+    status_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Approve or reject a verification document"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    new_status = status_data.get("status")  # approved, rejected
+    rejection_reason = status_data.get("rejection_reason", "")
+    
+    if new_status not in ["approved", "rejected"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    
+    result = await db.providers.update_one(
+        {"verification_documents.document_id": document_id},
+        {"$set": {
+            "verification_documents.$.status": new_status,
+            "verification_documents.$.rejection_reason": rejection_reason if new_status == "rejected" else None
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Document not found")
+    
+    return {"message": f"Document {new_status}"}
+
+# ==================== ADMIN SERVICES ====================
+
+@api_router.get("/admin/services")
+async def admin_get_services(
+    authorization: Optional[str] = Header(None),
+    request: Request = None,
+    provider_id: Optional[str] = None,
+    category: Optional[str] = None,
+    search: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 50
+):
+    """Admin: Get all services"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    query = {}
+    if provider_id:
+        query["provider_id"] = provider_id
+    if category:
+        query["category"] = category
+    if search:
+        query["$or"] = [
+            {"name": {"$regex": search, "$options": "i"}},
+            {"description": {"$regex": search, "$options": "i"}}
+        ]
+    
+    services = await db.services.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.services.count_documents(query)
+    
+    # Enrich with provider info
+    for service in services:
+        provider = await db.providers.find_one(
+            {"provider_id": service.get("provider_id")},
+            {"_id": 0, "business_name": 1, "provider_number": 1}
+        )
+        if provider:
+            service["provider_name"] = provider.get("business_name", "לא ידוע")
+            service["provider_number"] = provider.get("provider_number", "")
+    
+    return {"services": services, "total": total}
+
+@api_router.put("/admin/services/{service_id}")
+async def admin_update_service(
+    service_id: str,
+    service_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update a service"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Fields that can be updated
+    allowed_fields = ["name", "description", "price", "duration", "is_active", "category"]
+    update_data = {k: v for k, v in service_data.items() if k in allowed_fields}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No valid fields to update")
+    
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.services.update_one(
+        {"service_id": service_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    return {"message": "Service updated successfully"}
+
+@api_router.delete("/admin/services/{service_id}")
+async def admin_delete_service(
+    service_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Delete a service"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.services.delete_one({"service_id": service_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    return {"message": "Service deleted"}
+
 @api_router.get("/admin/bookings")
 async def admin_get_bookings(
     authorization: Optional[str] = Header(None),
