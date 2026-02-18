@@ -70,14 +70,19 @@ class UserRole:
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
     user_id: str = Field(default_factory=lambda: f"user_{uuid.uuid4().hex[:12]}")
+    user_number: str = Field(default_factory=generate_user_number)
     email: EmailStr
     name: str
+    phone: Optional[str] = None
     password_hash: Optional[str] = None
     role: str = UserRole.PATIENT
     language_preference: str = "he"  # he or ar
     picture: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     is_verified: bool = False
+    is_suspended: bool = False
+    suspended_at: Optional[datetime] = None
+    suspension_reason: Optional[str] = None
 
 class UserRegister(BaseModel):
     email: EmailStr
