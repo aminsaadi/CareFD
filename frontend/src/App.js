@@ -146,7 +146,79 @@ function AppRouter() {
         path="/admin"
         element={
           <ProtectedRoute>
+            <AdminOverview />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/old"
+        element={
+          <ProtectedRoute>
             <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedRoute>
+            <AdminUsers />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/professions"
+        element={
+          <ProtectedRoute>
+            <AdminProfessions />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/regions"
+        element={
+          <ProtectedRoute>
+            <AdminRegions />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/pages"
+        element={
+          <ProtectedRoute>
+            <AdminPages />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/blog"
+        element={
+          <ProtectedRoute>
+            <AdminBlog />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/ads"
+        element={
+          <ProtectedRoute>
+            <AdminAds />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/featured"
+        element={
+          <ProtectedRoute>
+            <AdminFeatured />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/settings"
+        element={
+          <ProtectedRoute>
+            <AdminSettings />
           </ProtectedRoute>
         }
       />
