@@ -21,6 +21,16 @@ import ChatRoom from './pages/ChatRoom';
 import ChatList from './pages/ChatList';
 import ProviderDashboard from './pages/ProviderDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+// New Admin Pages
+import AdminOverview from './pages/admin/AdminOverview';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminProfessions from './pages/admin/AdminProfessions';
+import AdminRegions from './pages/admin/AdminRegions';
+import AdminPages from './pages/admin/AdminPages';
+import AdminBlog from './pages/admin/AdminBlog';
+import AdminAds from './pages/admin/AdminAds';
+import AdminFeatured from './pages/admin/AdminFeatured';
+import AdminSettings from './pages/admin/AdminSettings';
 import './i18n';
 import './App.css';
 
