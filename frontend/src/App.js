@@ -170,6 +170,30 @@ function AppRouter() {
         }
       />
       <Route
+        path="/admin/providers"
+        element={
+          <ProtectedRoute>
+            <AdminProviders />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/verification"
+        element={
+          <ProtectedRoute>
+            <AdminVerification />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/bookings"
+        element={
+          <ProtectedRoute>
+            <AdminBookings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/admin/professions"
         element={
           <ProtectedRoute>
