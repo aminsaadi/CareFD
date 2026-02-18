@@ -1421,8 +1421,8 @@ async def create_booking(
 ):
     """Create a booking with full details - supports both authenticated users and guests"""
     
-    # Check if this is a guest booking
-    is_guest_booking = booking_data.guest_booking and booking_data.guest_name and booking_data.guest_phone
+    # Check if this is a guest booking (must use bool() to avoid Python's and returning last truthy value)
+    is_guest_booking = bool(booking_data.guest_booking and booking_data.guest_name and booking_data.guest_phone)
     
     user = None
     user_id = None
