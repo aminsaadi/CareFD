@@ -4,13 +4,26 @@ import { format } from 'date-fns';
 const TimeSlotPicker = ({ selectedDate, availability = [], onTimeSelect, bookedTimes = [] }) => {
   const [selectedTime, setSelectedTime] = useState('');
 
+  // Default availability if provider hasn't set one
+  const defaultAvailability = [
+    { day: 'sunday', start_time: '09:00', end_time: '18:00', is_available: true },
+    { day: 'monday', start_time: '09:00', end_time: '18:00', is_available: true },
+    { day: 'tuesday', start_time: '09:00', end_time: '18:00', is_available: true },
+    { day: 'wednesday', start_time: '09:00', end_time: '18:00', is_available: true },
+    { day: 'thursday', start_time: '09:00', end_time: '18:00', is_available: true },
+    { day: 'friday', start_time: '09:00', end_time: '14:00', is_available: true },
+    { day: 'saturday', start_time: '00:00', end_time: '00:00', is_available: false },
+  ];
+
+  const effectiveAvailability = availability && availability.length > 0 ? availability : defaultAvailability;
+
   const generateTimeSlots = () => {
-    if (!selectedDate || !availability || availability.length === 0) {
+    if (!selectedDate) {
       return [];
     }
 
     const dayName = format(selectedDate, 'EEEE').toLowerCase();
-    const dayAvailability = availability.find(
+    const dayAvailability = effectiveAvailability.find(
       slot => slot.day.toLowerCase() === dayName && slot.is_available
     );
 
