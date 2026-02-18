@@ -1,0 +1,238 @@
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import AdminLayout from '../../components/admin/AdminLayout';
+import api from '../../utils/api';
+import {
+  FiSearch, FiFilter, FiEye, FiCheck, FiX, FiStar,
+  FiMapPin, FiPhone, FiMail, FiAward, FiShield
+} from 'react-icons/fi';
+
+const AdminProviders = () => {
+  const [providers, setProviders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0 });
+
+  useEffect(() => {
+    fetchProviders();
+  }, [searchQuery, filterStatus, pagination.page]);
+
+  const fetchProviders = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (searchQuery) params.append('search', searchQuery);
+      if (filterStatus) params.append('status', filterStatus);
+      params.append('limit', pagination.limit);
+      params.append('skip', (pagination.page - 1) * pagination.limit);
+      
+      const response = await api.get(`/providers?${params.toString()}`);
+      setProviders(response.data.providers || []);
+      setPagination(prev => ({ ...prev, total: response.data.total || 0 }));
+    } catch (error) {
+      console.error('Failed to fetch providers:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyProvider = async (providerId) => {
+    try {
+      await api.put(`/admin/providers/${providerId}/verify`);
+      fetchProviders();
+    } catch (error) {
+      console.error('Failed to verify provider:', error);
+    }
+  };
+
+  const toggleRecommended = async (providerId, isRecommended) => {
+    try {
+      if (isRecommended) {
+        await api.put(`/admin/providers/${providerId}/unrecommend`);
+      } else {
+        await api.put(`/admin/providers/${providerId}/recommend`);
+      }
+      fetchProviders();
+    } catch (error) {
+      console.error('Failed to toggle recommended:', error);
+    }
+  };
+
+  return (
+    <AdminLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white">ניהול ספקים</h1>
+            <p className="text-slate-400 mt-1">{pagination.total} ספקים במערכת</p>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <input
+                type="text"
+                placeholder="חפש לפי שם, עיר..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-700 border border-slate-600 rounded-lg pr-10 pl-4 py-2.5 text-white placeholder-slate-400 focus:border-indigo-500 outline-none"
+              />
+            </div>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 outline-none min-w-[150px]"
+            >
+              <option value="">כל הסטטוסים</option>
+              <option value="verified">מאומתים</option>
+              <option value="pending">ממתינים</option>
+              <option value="recommended">מומלצים</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+            <p className="text-slate-400 text-sm">סה"כ ספקים</p>
+            <p className="text-2xl font-bold text-white mt-1">{providers.length}</p>
+          </div>
+          <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+            <p className="text-slate-400 text-sm">מאומתים</p>
+            <p className="text-2xl font-bold text-emerald-400 mt-1">{providers.filter(p => p.is_verified).length}</p>
+          </div>
+          <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+            <p className="text-slate-400 text-sm">ממתינים לאימות</p>
+            <p className="text-2xl font-bold text-amber-400 mt-1">{providers.filter(p => !p.is_verified).length}</p>
+          </div>
+          <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+            <p className="text-slate-400 text-sm">מומלצים</p>
+            <p className="text-2xl font-bold text-purple-400 mt-1">{providers.filter(p => p.is_recommended).length}</p>
+          </div>
+        </div>
+
+        {/* Providers Table */}
+        <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-700">
+                  <th className="text-right py-4 px-6 text-slate-400 font-medium text-sm">ספק</th>
+                  <th className="text-right py-4 px-6 text-slate-400 font-medium text-sm">מיקום</th>
+                  <th className="text-right py-4 px-6 text-slate-400 font-medium text-sm">דירוג</th>
+                  <th className="text-right py-4 px-6 text-slate-400 font-medium text-sm">סטטוס</th>
+                  <th className="text-right py-4 px-6 text-slate-400 font-medium text-sm">פעולות</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={5} className="py-12 text-center">
+                      <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    </td>
+                  </tr>
+                ) : providers.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-12 text-center text-slate-400">
+                      לא נמצאו ספקים
+                    </td>
+                  </tr>
+                ) : (
+                  providers.map((provider) => (
+                    <tr key={provider.provider_id} className="border-b border-slate-700/50 hover:bg-slate-700/30 transition">
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium text-lg">
+                            {provider.business_name?.[0] || 'P'}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-white font-medium">{provider.business_name}</p>
+                              {provider.is_verified && (
+                                <FiShield className="text-emerald-400" size={14} title="מאומת" />
+                              )}
+                              {provider.is_recommended && (
+                                <FiAward className="text-amber-400" size={14} title="מומלץ" />
+                              )}
+                            </div>
+                            <p className="text-slate-400 text-sm">{provider.provider_type}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-1 text-slate-400 text-sm">
+                          <FiMapPin size={14} />
+                          {provider.location?.city || '-'}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-1">
+                          <FiStar className="text-amber-400" size={14} />
+                          <span className="text-white">{provider.rating?.toFixed(1) || '0.0'}</span>
+                          <span className="text-slate-500 text-sm">({provider.reviews_count || 0})</span>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex flex-col gap-1">
+                          {provider.is_verified ? (
+                            <span className="inline-flex items-center gap-1 text-emerald-400 text-sm">
+                              <FiCheck size={14} />
+                              מאומת
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-amber-400 text-sm">
+                              <FiX size={14} />
+                              לא מאומת
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-2">
+                          <Link
+                            to={`/providers/${provider.provider_id}`}
+                            className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition"
+                            title="צפה בפרופיל"
+                          >
+                            <FiEye size={16} />
+                          </Link>
+                          {!provider.is_verified && (
+                            <button
+                              onClick={() => verifyProvider(provider.provider_id)}
+                              className="p-2 text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition"
+                              title="אמת ספק"
+                            >
+                              <FiShield size={16} />
+                            </button>
+                          )}
+                          <button
+                            onClick={() => toggleRecommended(provider.provider_id, provider.is_recommended)}
+                            className={`p-2 rounded-lg transition ${
+                              provider.is_recommended
+                                ? 'text-amber-400 hover:bg-amber-500/10'
+                                : 'text-slate-400 hover:text-amber-400 hover:bg-amber-500/10'
+                            }`}
+                            title={provider.is_recommended ? 'הסר המלצה' : 'המלץ'}
+                          >
+                            <FiAward size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </AdminLayout>
+  );
+};
+
+export default AdminProviders;
