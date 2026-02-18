@@ -117,6 +117,14 @@ CareLink is a healthcare services platform in Israel connecting users with healt
 
 ## Change Log
 
+### Feb 18, 2026
+- **CRITICAL BUG FIX**: Fixed booking service - Python's `and` operator returning phone string instead of boolean
+  - Root cause: `is_guest_booking = x and y and z` returns last truthy value (phone number), not True
+  - Fix: Wrapped with `bool()` on line 1425 in server.py
+  - Added default availability to TimeSlotPicker for providers without set availability
+- Fixed notification emails for guest bookings (was accessing `user` which is None for guests)
+- Verified both guest and authenticated booking flows work correctly
+
 ### Feb 12, 2026
 - Added GPS-based search with radius
 - Added region quick-select buttons
