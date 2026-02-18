@@ -133,7 +133,8 @@ CareLink is a healthcare services platform in Israel connecting users with healt
 ```
 
 ## Testing Credentials
-- Admin: newadmin@carelink.co.il / admin123
+- Admin: admin_test@carelink.co.il / test123456
+- Admin (backup): newadmin@carelink.co.il / admin123
 - Provider: provider@carelink.co.il / password
 - User: user@carelink.co.il / password
 
