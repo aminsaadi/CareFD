@@ -155,6 +155,7 @@ class VerificationDocument(BaseModel):
 class Provider(BaseModel):
     model_config = ConfigDict(extra="ignore")
     provider_id: str = Field(default_factory=lambda: f"provider_{uuid.uuid4().hex[:12]}")
+    provider_number: str = Field(default_factory=generate_provider_number)
     user_id: str
     provider_type: str  # individual, company, clinic
     business_name: Optional[str] = None
