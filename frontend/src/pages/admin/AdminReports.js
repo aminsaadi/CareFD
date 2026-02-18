@@ -149,7 +149,7 @@ const AdminReports = () => {
               <h2 className="text-lg font-semibold text-carelink-navy">הזמנות לאורך זמן</h2>
             </div>
             <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
                 <AreaChart data={reports?.bookings_timeline || []}>
                   <defs>
                     <linearGradient id="bookingsGradient" x1="0" y1="0" x2="0" y2="1">
@@ -188,7 +188,7 @@ const AdminReports = () => {
               <h2 className="text-lg font-semibold text-carelink-navy">התפלגות סטטוס הזמנות</h2>
             </div>
             <div className="h-64 flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
                 <PieChart>
                   <Pie
                     data={reports?.status_distribution || []}
@@ -220,7 +220,7 @@ const AdminReports = () => {
               <h2 className="text-lg font-semibold text-carelink-navy">ספקים מובילים</h2>
             </div>
             <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
                 <BarChart 
                   data={reports?.top_providers || []} 
                   layout="vertical"
@@ -253,7 +253,7 @@ const AdminReports = () => {
               <h2 className="text-lg font-semibold text-carelink-navy">הכנסות לאורך זמן</h2>
             </div>
             <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
                 <LineChart data={reports?.revenue_by_date || []}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis 
