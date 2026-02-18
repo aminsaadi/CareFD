@@ -133,13 +133,29 @@ CareLink is a healthcare services platform in Israel connecting users with healt
 ```
 
 ## Testing Credentials
-- Admin: admin@carelink.co.il / password
+- Admin: newadmin@carelink.co.il / admin123
 - Provider: provider@carelink.co.il / password
 - User: user@carelink.co.il / password
 
 ## Change Log
 
-### Feb 18, 2026
+### Feb 18, 2026 (Session 2)
+- **NEW: Professional Admin Dashboard System**
+  - Complete redesign with Dark Mode professional UI
+  - Sidebar navigation with collapsible sections
+  - Overview with stats, quick actions, recent activity
+  - User management with search, filter, role changes
+  - Provider management and verification queue
+  - Booking management with status updates
+  - Professions/Categories (3-level hierarchy)
+  - Regions and cities management
+  - Static pages CMS
+  - Blog management
+  - Advertisements with positions and tracking
+  - Featured providers highlighting
+  - Site settings (7 tabs: general, appearance, contact, social, footer, SEO, advanced)
+
+### Feb 18, 2026 (Session 1)
 - **CRITICAL BUG FIX**: Fixed booking service - Python's `and` operator returning phone string instead of boolean
   - Root cause: `is_guest_booking = x and y and z` returns last truthy value (phone number), not True
   - Fix: Wrapped with `bool()` on line 1425 in server.py
