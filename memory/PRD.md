@@ -137,11 +137,44 @@ CareLink is a healthcare services platform in Israel connecting users with healt
 - Provider: provider@carelink.co.il / password
 - User: user@carelink.co.il / password
 
+## Admin API Endpoints (New)
+- `GET /api/admin/stats` - Platform statistics
+- `GET/PUT /api/admin/settings` - Site settings CRUD
+- `GET/POST /api/admin/professions` - Professions management
+- `POST /api/admin/professions/{id}/sub-professions` - Add sub-profession
+- `POST /api/admin/sub-professions/{id}/categories` - Add category
+- `DELETE /api/admin/professions/{id}` - Delete profession
+- `DELETE /api/admin/sub-professions/{id}` - Delete sub-profession
+- `DELETE /api/admin/categories/{id}` - Delete category
+- `GET/POST /api/admin/ads` - Ads CRUD
+- `PUT/DELETE /api/admin/ads/{id}` - Update/delete ad
+- `GET/POST /api/admin/blog` - Blog posts CRUD
+- `PUT/DELETE /api/admin/blog/{id}` - Update/delete post
+- `GET/POST /api/admin/pages` - Static pages CRUD
+- `PUT/DELETE /api/admin/pages/{id}` - Update/delete page
+- `PUT /api/admin/bookings/{id}/status` - Update booking status
+- `GET /api/admin/featured` - Get featured providers
+- `PUT /api/admin/providers/{id}/unrecommend` - Remove from featured
+
 ## Change Log
+
+### Feb 18, 2026 (Session 3 - Current)
+- **ADMIN DASHBOARD API INTEGRATION COMPLETE**
+  - Created all backend APIs for admin dashboard
+  - Connected AdminOverview.js to /api/admin/stats
+  - Connected AdminSettings.js to /api/admin/settings (GET/PUT)
+  - Connected AdminProfessions.js to /api/admin/professions
+  - Connected AdminBookings.js to /api/admin/bookings + status updates
+  - Connected AdminUsers.js to /api/admin/users
+  - Connected AdminAds.js to /api/admin/ads (full CRUD)
+  - Connected AdminBlog.js to /api/admin/blog (full CRUD)
+  - Connected AdminPages.js to /api/admin/pages (full CRUD)
+  - All testing passed: 14/14 backend tests (100%), all frontend pages load correctly
+  - Theme changed from dark to light using brand colors (#19B8BA, #1E4D5F, #4C6D7F)
 
 ### Feb 18, 2026 (Session 2)
 - **NEW: Professional Admin Dashboard System**
-  - Complete redesign with Dark Mode professional UI
+  - Complete redesign with Light theme using brand colors
   - Sidebar navigation with collapsible sections
   - Overview with stats, quick actions, recent activity
   - User management with search, filter, role changes
