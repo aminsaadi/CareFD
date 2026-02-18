@@ -1,0 +1,303 @@
+import React, { useState, useEffect } from 'react';
+import AdminLayout from '../../components/admin/AdminLayout';
+import api from '../../utils/api';
+import {
+  FiSearch, FiFilter, FiEdit2, FiTrash2, FiMoreVertical,
+  FiUser, FiMail, FiCalendar, FiShield, FiCheck, FiX,
+  FiUserPlus, FiDownload
+} from 'react-icons/fi';
+
+const AdminUsers = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRole, setSelectedRole] = useState('');
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(null);
+  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0 });
+
+  useEffect(() => {
+    fetchUsers();
+  }, [searchQuery, selectedRole, pagination.page]);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (searchQuery) params.append('search', searchQuery);
+      if (selectedRole) params.append('role', selectedRole);
+      params.append('skip', (pagination.page - 1) * pagination.limit);
+      params.append('limit', pagination.limit);
+      
+      const response = await api.get(`/admin/users?${params.toString()}`);
+      setUsers(response.data.users || []);
+      setPagination(prev => ({ ...prev, total: response.data.total || 0 }));
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateUserRole = async (userId, newRole) => {
+    try {
+      await api.put(`/admin/users/${userId}/role`, { role: newRole });
+      fetchUsers();
+    } catch (error) {
+      console.error('Failed to update user role:', error);
+    }
+  };
+
+  const deleteUser = async (userId) => {
+    try {
+      await api.delete(`/admin/users/${userId}`);
+      setShowDeleteModal(null);
+      fetchUsers();
+    } catch (error) {
+      console.error('Failed to delete user:', error);
+    }
+  };
+
+  const toggleSelectUser = (userId) => {
+    setSelectedUsers(prev => 
+      prev.includes(userId) 
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedUsers.length === users.length) {
+      setSelectedUsers([]);
+    } else {
+      setSelectedUsers(users.map(u => u.user_id));
+    }
+  };
+
+  const getRoleBadge = (role) => {
+    switch (role) {
+      case 'admin':
+        return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+      case 'provider':
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+      default:
+        return 'bg-slate-500/20 text-slate-400 border-slate-500/30';
+    }
+  };
+
+  const getRoleLabel = (role) => {
+    switch (role) {
+      case 'admin': return 'מנהל';
+      case 'provider': return 'ספק';
+      default: return 'משתמש';
+    }
+  };
+
+  return (
+    <AdminLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white">ניהול משתמשים</h1>
+            <p className="text-slate-400 mt-1">{pagination.total} משתמשים במערכת</p>
+          </div>
+          <div className="flex gap-3">
+            <button className="flex items-center gap-2 px-4 py-2 bg-slate-700 text-slate-300 rounded-lg hover:bg-slate-600 transition">
+              <FiDownload size={18} />
+              ייצוא
+            </button>
+            <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+              <FiUserPlus size={18} />
+              הוסף משתמש
+            </button>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <input
+                type="text"
+                placeholder="חפש לפי שם, אימייל..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-700 border border-slate-600 rounded-lg pr-10 pl-4 py-2.5 text-white placeholder-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none"
+              />
+            </div>
+            <select
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value)}
+              className="bg-slate-700 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none min-w-[150px]"
+            >
+              <option value="">כל התפקידים</option>
+              <option value="patient">משתמשים</option>
+              <option value="provider">ספקים</option>
+              <option value="admin">מנהלים</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-700">
+                  <th className="text-right py-4 px-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedUsers.length === users.length && users.length > 0}
+                      onChange={toggleSelectAll}
+                      className="w-4 h-4 rounded border-slate-600 text-indigo-600 focus:ring-indigo-500 bg-slate-700"
+                    />
+                  </th>
+                  <th className="text-right py-4 px-4 text-slate-400 font-medium text-sm">משתמש</th>
+                  <th className="text-right py-4 px-4 text-slate-400 font-medium text-sm">תפקיד</th>
+                  <th className="text-right py-4 px-4 text-slate-400 font-medium text-sm">תאריך הצטרפות</th>
+                  <th className="text-right py-4 px-4 text-slate-400 font-medium text-sm">סטטוס</th>
+                  <th className="text-right py-4 px-4 text-slate-400 font-medium text-sm">פעולות</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center">
+                      <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    </td>
+                  </tr>
+                ) : users.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-slate-400">
+                      לא נמצאו משתמשים
+                    </td>
+                  </tr>
+                ) : (
+                  users.map((user) => (
+                    <tr key={user.user_id} className="border-b border-slate-700/50 hover:bg-slate-700/30 transition">
+                      <td className="py-4 px-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedUsers.includes(user.user_id)}
+                          onChange={() => toggleSelectUser(user.user_id)}
+                          className="w-4 h-4 rounded border-slate-600 text-indigo-600 focus:ring-indigo-500 bg-slate-700"
+                        />
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-medium">
+                            {user.name?.[0] || 'U'}
+                          </div>
+                          <div>
+                            <p className="text-white font-medium">{user.name || 'ללא שם'}</p>
+                            <p className="text-slate-400 text-sm">{user.email}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        <select
+                          value={user.role}
+                          onChange={(e) => updateUserRole(user.user_id, e.target.value)}
+                          className={`px-3 py-1.5 rounded-lg text-sm border ${getRoleBadge(user.role)} bg-transparent focus:outline-none cursor-pointer`}
+                        >
+                          <option value="patient" className="bg-slate-800">משתמש</option>
+                          <option value="provider" className="bg-slate-800">ספק</option>
+                          <option value="admin" className="bg-slate-800">מנהל</option>
+                        </select>
+                      </td>
+                      <td className="py-4 px-4 text-slate-400 text-sm">
+                        {user.created_at ? new Date(user.created_at).toLocaleDateString('he-IL') : '-'}
+                      </td>
+                      <td className="py-4 px-4">
+                        {user.is_verified ? (
+                          <span className="inline-flex items-center gap-1 text-emerald-400 text-sm">
+                            <FiCheck size={14} />
+                            מאומת
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-slate-400 text-sm">
+                            <FiX size={14} />
+                            לא מאומת
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center gap-2">
+                          <button className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition">
+                            <FiEdit2 size={16} />
+                          </button>
+                          <button 
+                            onClick={() => setShowDeleteModal(user)}
+                            className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
+                          >
+                            <FiTrash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {pagination.total > pagination.limit && (
+            <div className="p-4 border-t border-slate-700 flex items-center justify-between">
+              <p className="text-slate-400 text-sm">
+                מציג {(pagination.page - 1) * pagination.limit + 1} - {Math.min(pagination.page * pagination.limit, pagination.total)} מתוך {pagination.total}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+                  disabled={pagination.page === 1}
+                  className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  הקודם
+                </button>
+                <button
+                  onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+                  disabled={pagination.page * pagination.limit >= pagination.total}
+                  className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  הבא
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Delete Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-xl w-full max-w-md p-6 border border-slate-700">
+            <h3 className="text-lg font-bold text-white mb-2">מחיקת משתמש</h3>
+            <p className="text-slate-400 mb-6">
+              האם אתה בטוח שברצונך למחוק את המשתמש "{showDeleteModal.name}"? 
+              פעולה זו לא ניתנת לביטול.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteModal(null)}
+                className="flex-1 px-4 py-2.5 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition"
+              >
+                ביטול
+              </button>
+              <button
+                onClick={() => deleteUser(showDeleteModal.user_id)}
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                מחק
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </AdminLayout>
+  );
+};
+
+export default AdminUsers;
