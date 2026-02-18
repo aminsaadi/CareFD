@@ -1498,10 +1498,6 @@ async def create_booking(
     client_phone = booking_data.client_phone or booking_data.guest_phone or ""
     client_email = booking_data.client_email or booking_data.guest_email or user_email
     
-    # Debug logging
-    logger.info(f"Creating booking with is_guest_booking={is_guest_booking} (type: {type(is_guest_booking)})")
-    logger.info(f"user_id={user_id}, client_phone={client_phone}")
-    
     booking = Booking(
         user_id=user_id,
         provider_id=service["provider_id"],
@@ -1518,7 +1514,7 @@ async def create_booking(
         service_name=service.get("name"),
         provider_name=provider.get("business_name"),
         user_name=user_name or client_name,
-        is_guest_booking=bool(is_guest_booking)  # Ensure it's a boolean
+        is_guest_booking=is_guest_booking
     )
     
     booking_dict = booking.model_dump()
