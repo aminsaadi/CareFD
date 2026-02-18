@@ -1528,11 +1528,12 @@ async def create_booking(
     await db.bookings.insert_one(booking_dict)
     
     # Create notification for provider
+    notification_client_name = user_name or client_name or "לקוח"
     await create_notification(
         provider["user_id"],
         NotificationType.BOOKING_NEW,
         "הזמנה חדשה!",
-        f"{user.get('name', 'לקוח')} הזמין {service.get('name', 'שירות')} לתאריך {booking_data.booking_date.strftime('%d/%m/%Y')}",
+        f"{notification_client_name} הזמין {service.get('name', 'שירות')} לתאריך {booking_data.booking_date.strftime('%d/%m/%Y')}",
         {"booking_id": booking.booking_id, "service_id": service["service_id"]}
     )
     
@@ -1544,26 +1545,28 @@ async def create_booking(
             "CareLink - הזמנה חדשה!",
             f"""
             <h1>יש לך הזמנה חדשה!</h1>
-            <p><strong>לקוח:</strong> {booking_data.client_name}</p>
+            <p><strong>לקוח:</strong> {client_name}</p>
             <p><strong>שירות:</strong> {service.get('name', 'שירות')}</p>
             <p><strong>תאריך:</strong> {booking_data.booking_date.strftime('%d/%m/%Y')}</p>
-            <p><strong>כתובת:</strong> {booking_data.service_address}, {booking_data.service_city}</p>
+            <p><strong>כתובת:</strong> {booking_data.service_address or booking_data.guest_address or 'לא צוין'}, {booking_data.service_city or ''}</p>
             <p>היכנס לדשבורד כדי לאשר את ההזמנה.</p>
             """
         )
     
     # Send confirmation email to client
-    await send_email_async(
-        booking_data.client_email or user["email"],
-        "CareLink - אישור הזמנה",
-        f"""
-        <h1>ההזמנה נשלחה בהצלחה!</h1>
-        <p><strong>שירות:</strong> {service.get('name', 'שירות')}</p>
-        <p><strong>ספק:</strong> {provider.get('business_name', 'ספק')}</p>
-        <p><strong>תאריך:</strong> {booking_data.booking_date.strftime('%d/%m/%Y')}</p>
-        <p>סטטוס: ממתין לאישור הספק</p>
-        """
-    )
+    client_email_to_send = client_email or (user.get("email") if user else None)
+    if client_email_to_send:
+        await send_email_async(
+            client_email_to_send,
+            "CareLink - אישור הזמנה",
+            f"""
+            <h1>ההזמנה נשלחה בהצלחה!</h1>
+            <p><strong>שירות:</strong> {service.get('name', 'שירות')}</p>
+            <p><strong>ספק:</strong> {provider.get('business_name', 'ספק')}</p>
+            <p><strong>תאריך:</strong> {booking_data.booking_date.strftime('%d/%m/%Y')}</p>
+            <p>סטטוס: ממתין לאישור הספק</p>
+            """
+        )
     
     return booking.model_dump()
 
