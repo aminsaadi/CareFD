@@ -1213,7 +1213,8 @@ async def get_filter_options():
         "provider_types": provider_type_options,
         "rating_options": rating_options,
         "experience_options": experience_options,
-        "radius_options": radius_options
+        "radius_options": radius_options,
+        "profession_titles": PROFESSION_TITLES
     }
 
 @api_router.put("/providers/{provider_id}")
