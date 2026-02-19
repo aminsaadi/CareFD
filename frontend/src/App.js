@@ -37,6 +37,7 @@ import AdminSettings from './pages/admin/AdminSettings';
 import AdminReports from './pages/admin/AdminReports';
 import AdminServices from './pages/admin/AdminServices';
 import AdminSubscriptions from './pages/admin/AdminSubscriptions';
+import AdminPushNotifications from './pages/admin/AdminPushNotifications';
 import './i18n';
 import './App.css';
 
@@ -273,6 +274,14 @@ function AppRouter() {
         element={
           <ProtectedRoute>
             <AdminSubscriptions />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/push-notifications"
+        element={
+          <ProtectedRoute>
+            <AdminPushNotifications />
           </ProtectedRoute>
         }
       />
