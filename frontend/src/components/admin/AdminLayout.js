@@ -80,6 +80,14 @@ const AdminLayout = ({ children }) => {
       ]
     },
     {
+      id: 'finance',
+      label: 'כספים',
+      icon: FiDollarSign,
+      submenu: [
+        { id: 'subscriptions', label: 'מנויים ותשלומים', icon: FiDollarSign, path: '/admin/subscriptions' },
+      ]
+    },
+    {
       id: 'settings',
       label: 'הגדרות',
       icon: FiSettings,
