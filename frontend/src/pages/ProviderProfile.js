@@ -691,6 +691,19 @@ const ProviderProfile = () => {
 
           {/* Right Column - Sidebar */}
           <div className="space-y-6">
+            {/* About Section */}
+            {provider.about && (
+              <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="about-section">
+                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
+                  <FaInfoCircle className="text-carelink-teal" />
+                  אודות
+                </h3>
+                <p className="text-carelink-slate leading-relaxed whitespace-pre-line">
+                  {provider.about}
+                </p>
+              </div>
+            )}
+
             {/* Specializations */}
             {provider.specializations && provider.specializations.length > 0 && (
               <div className="bg-white rounded-2xl shadow-lg p-6">
@@ -711,6 +724,79 @@ const ProviderProfile = () => {
               </div>
             )}
 
+            {/* Expertise */}
+            {provider.expertise && provider.expertise.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="expertise-section">
+                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
+                  <FaBriefcase className="text-carelink-teal" />
+                  מומחיויות
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {provider.expertise.map((exp, idx) => (
+                    <span
+                      key={idx}
+                      className="bg-carelink-navy/10 text-carelink-navy px-3 py-1.5 rounded-lg text-sm"
+                    >
+                      {exp}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Languages */}
+            {provider.languages && provider.languages.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="languages-section">
+                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
+                  <FaComments className="text-carelink-teal" />
+                  שפות
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {provider.languages.map((lang, idx) => {
+                    const langLabels = {
+                      hebrew: 'עברית', arabic: 'ערבית', english: 'אנגלית',
+                      russian: 'רוסית', french: 'צרפתית', spanish: 'ספרדית', amharic: 'אמהרית'
+                    };
+                    return (
+                      <span
+                        key={idx}
+                        className="bg-blue-100 text-blue-700 px-3 py-1.5 rounded-lg text-sm"
+                      >
+                        {langLabels[lang] || lang}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Target Audience */}
+            {provider.target_audience && provider.target_audience.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="target-audience-section">
+                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
+                  <FaUsers className="text-carelink-teal" />
+                  קהל יעד
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {provider.target_audience.map((audience, idx) => {
+                    const audienceLabels = {
+                      adults: 'מבוגרים', children: 'ילדים', youth: 'נוער',
+                      babies: 'תינוקות', women: 'נשים', elderly: 'קשישים',
+                      pregnant: 'נשים בהריון', postpartum: 'יולדות'
+                    };
+                    return (
+                      <span
+                        key={idx}
+                        className="bg-purple-100 text-purple-700 px-3 py-1.5 rounded-lg text-sm"
+                      >
+                        {audienceLabels[audience] || audience}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Location */}
             {provider.location && (
               <div className="bg-white rounded-2xl shadow-lg p-6">
@@ -722,13 +808,19 @@ const ProviderProfile = () => {
                   {provider.location.address && `${provider.location.address}, `}
                   {provider.location.city}
                 </p>
-                {/* Map placeholder */}
-                <div className="h-48 bg-carelink-teal-pale/30 rounded-xl flex items-center justify-center">
-                  <div className="text-center text-carelink-gray">
-                    <FaMapMarkerAlt className="text-3xl mx-auto mb-2 text-carelink-teal" />
-                    <p className="text-sm">מפה תוצג כאן</p>
+                {/* Service Areas */}
+                {provider.service_areas && provider.service_areas.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <p className="text-sm font-medium text-carelink-navy mb-2">אזורי שירות:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {provider.service_areas.map((area, idx) => (
+                        <span key={idx} className="bg-gray-100 text-carelink-gray text-xs px-2 py-1 rounded">
+                          {area}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
@@ -746,28 +838,69 @@ const ProviderProfile = () => {
               </button>
             </div>
 
-            {/* Working Hours */}
-            <div className="bg-white rounded-2xl shadow-lg p-6">
+            {/* Working Hours - Dynamic Availability */}
+            <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="availability-section">
               <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
                 <FaClock className="text-carelink-teal" />
-                שעות פעילות
+                זמינות
               </h3>
-              <div className="space-y-2 text-sm">
-                {['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי'].map((day) => (
-                  <div key={day} className="flex justify-between">
-                    <span className="text-carelink-gray">{day}</span>
-                    <span className="text-carelink-navy font-medium">09:00 - 18:00</span>
+              {provider.availability && provider.availability.length > 0 ? (
+                <div className="space-y-3">
+                  {['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].map((day) => {
+                    const dayLabels = {
+                      sunday: 'ראשון', monday: 'שני', tuesday: 'שלישי',
+                      wednesday: 'רביעי', thursday: 'חמישי', friday: 'שישי', saturday: 'שבת'
+                    };
+                    const shiftLabels = {
+                      morning: 'בוקר', afternoon: 'צהריים', evening: 'ערב', night: 'לילה'
+                    };
+                    const shiftColors = {
+                      morning: 'bg-amber-100 text-amber-700',
+                      afternoon: 'bg-orange-100 text-orange-700',
+                      evening: 'bg-purple-100 text-purple-700',
+                      night: 'bg-indigo-100 text-indigo-700'
+                    };
+                    const daySlots = provider.availability.filter(a => a.day === day && a.is_available);
+                    
+                    return (
+                      <div key={day} className="flex items-center justify-between text-sm">
+                        <span className="text-carelink-gray font-medium w-16">{dayLabels[day]}</span>
+                        <div className="flex gap-1 flex-1 justify-end">
+                          {daySlots.length > 0 ? (
+                            daySlots.map((slot, idx) => (
+                              <span 
+                                key={idx} 
+                                className={`px-2 py-0.5 rounded text-xs ${shiftColors[slot.shift] || 'bg-gray-100'}`}
+                              >
+                                {shiftLabels[slot.shift] || slot.shift}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="text-gray-400 text-xs">לא זמין</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="space-y-2 text-sm">
+                  {['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי'].map((day) => (
+                    <div key={day} className="flex justify-between">
+                      <span className="text-carelink-gray">{day}</span>
+                      <span className="text-carelink-navy font-medium">09:00 - 18:00</span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between">
+                    <span className="text-carelink-gray">שישי</span>
+                    <span className="text-carelink-navy font-medium">09:00 - 13:00</span>
                   </div>
-                ))}
-                <div className="flex justify-between">
-                  <span className="text-carelink-gray">שישי</span>
-                  <span className="text-carelink-navy font-medium">09:00 - 13:00</span>
+                  <div className="flex justify-between">
+                    <span className="text-carelink-gray">שבת</span>
+                    <span className="text-red-500 font-medium">סגור</span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-carelink-gray">שבת</span>
-                  <span className="text-red-500 font-medium">סגור</span>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
