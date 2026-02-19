@@ -256,7 +256,7 @@ const ProviderProfile = () => {
             
             {/* Provider Info */}
             <div className="flex-1">
-              <div className="flex flex-wrap items-center gap-3 mb-3">
+              <div className="flex flex-wrap items-center gap-3 mb-2">
                 <h1 className="text-3xl lg:text-4xl font-bold font-heading" data-testid="provider-name">
                   {provider.business_name || 'ספק שירותים'}
                 </h1>
@@ -271,6 +271,13 @@ const ProviderProfile = () => {
                   </span>
                 )}
               </div>
+              
+              {/* Profession Title - NEW */}
+              {provider.profession_title && (
+                <p className="text-xl text-carelink-teal-pale font-medium mb-3" data-testid="profession-title">
+                  {getProfessionLabel(provider.profession_title)}
+                </p>
+              )}
               
               <div className="flex flex-wrap items-center gap-4 mb-4">
                 <span className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
