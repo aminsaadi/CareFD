@@ -629,78 +629,89 @@ const ProviderEdit = () => {
             {/* Availability Tab */}
             {activeTab === 'availability' && (
               <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium text-carelink-navy">לוח זמינות</h3>
-                    <p className="text-sm text-carelink-gray">הגדר את שעות הפעילות שלך</p>
-                  </div>
-                  <button
-                    onClick={addAvailabilitySlot}
-                    className="px-4 py-2 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal/90 transition flex items-center gap-2"
-                  >
-                    <FaPlus size={12} /> הוסף משבצת
-                  </button>
+                <div>
+                  <h3 className="font-medium text-carelink-navy mb-2">לוח זמינות שבועי</h3>
+                  <p className="text-sm text-carelink-gray mb-4">סמן את המשמרות בהן אתה זמין לעבודה</p>
                 </div>
                 
-                {availability.length === 0 ? (
-                  <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                    <FaClock className="mx-auto text-gray-300 mb-3" size={40} />
-                    <p className="text-carelink-gray">לא הוגדרו שעות זמינות</p>
-                    <button
-                      onClick={addAvailabilitySlot}
-                      className="mt-3 text-carelink-teal hover:underline"
-                    >
-                      הוסף משבצת ראשונה
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {availability.map((slot, index) => (
-                      <div key={index} className="flex flex-wrap items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                        <select
-                          value={slot.day}
-                          onChange={(e) => updateAvailabilitySlot(index, 'day', e.target.value)}
-                          className="px-3 py-2 border border-gray-200 rounded-lg bg-white focus:border-carelink-teal outline-none"
-                        >
-                          {DAYS_OF_WEEK.map(day => (
-                            <option key={day.value} value={day.value}>{day.label}</option>
-                          ))}
-                        </select>
-                        
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="time"
-                            value={slot.start_time}
-                            onChange={(e) => updateAvailabilitySlot(index, 'start_time', e.target.value)}
-                            className="px-3 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
-                          />
-                          <span className="text-carelink-gray">עד</span>
-                          <input
-                            type="time"
-                            value={slot.end_time}
-                            onChange={(e) => updateAvailabilitySlot(index, 'end_time', e.target.value)}
-                            className="px-3 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
-                          />
-                        </div>
-                        
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={slot.is_available}
-                            onChange={(e) => updateAvailabilitySlot(index, 'is_available', e.target.checked)}
-                            className="w-4 h-4 text-carelink-teal focus:ring-carelink-teal rounded"
-                          />
-                          <span className="text-sm text-carelink-navy">זמין</span>
-                        </label>
-                        
-                        <button
-                          onClick={() => removeAvailabilitySlot(index)}
-                          className="p-2 text-red-500 hover:bg-red-100 rounded-lg transition mr-auto"
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
-                    ))}
+                {/* Weekly Schedule Grid */}
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr>
+                        <th className="p-3 text-right text-sm font-medium text-carelink-navy bg-gray-50 border border-gray-200 rounded-tr-lg">יום</th>
+                        {SHIFT_OPTIONS.map(shift => (
+                          <th key={shift.value} className="p-3 text-center text-sm font-medium text-carelink-navy bg-gray-50 border border-gray-200">
+                            <div>{shift.label}</div>
+                            <div className="text-xs text-carelink-gray font-normal">{shift.time}</div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {DAYS_OF_WEEK.map((day, dayIndex) => (
+                        <tr key={day.value}>
+                          <td className={`p-3 text-sm font-medium text-carelink-navy bg-gray-50 border border-gray-200 ${dayIndex === DAYS_OF_WEEK.length - 1 ? 'rounded-br-lg' : ''}`}>
+                            {day.label}
+                          </td>
+                          {SHIFT_OPTIONS.map(shift => {
+                            const isSelected = availability.some(
+                              a => a.day === day.value && a.shift === shift.value && a.is_available
+                            );
+                            return (
+                              <td key={`${day.value}-${shift.value}`} className="p-2 border border-gray-200 text-center">
+                                <button
+                                  onClick={() => {
+                                    if (isSelected) {
+                                      // Remove this availability
+                                      setAvailability(availability.filter(
+                                        a => !(a.day === day.value && a.shift === shift.value)
+                                      ));
+                                    } else {
+                                      // Add this availability
+                                      setAvailability([...availability, {
+                                        day: day.value,
+                                        shift: shift.value,
+                                        is_available: true
+                                      }]);
+                                    }
+                                  }}
+                                  className={`w-full h-10 rounded-lg transition-all duration-200 ${
+                                    isSelected 
+                                      ? `${shift.color} border-2 shadow-sm` 
+                                      : 'bg-gray-100 hover:bg-gray-200 border border-gray-200'
+                                  }`}
+                                  data-testid={`availability-${day.value}-${shift.value}`}
+                                >
+                                  {isSelected && <FaCheck className="mx-auto text-sm" />}
+                                </button>
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                
+                {/* Legend */}
+                <div className="flex flex-wrap gap-4 pt-4 border-t border-gray-200">
+                  <span className="text-sm text-carelink-gray">מקרא משמרות:</span>
+                  {SHIFT_OPTIONS.map(shift => (
+                    <div key={shift.value} className="flex items-center gap-2">
+                      <div className={`w-4 h-4 rounded ${shift.color.split(' ')[0]}`}></div>
+                      <span className="text-sm text-carelink-navy">{shift.label} ({shift.time})</span>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Summary */}
+                {availability.length > 0 && (
+                  <div className="bg-carelink-teal-pale/30 rounded-lg p-4">
+                    <h4 className="font-medium text-carelink-navy mb-2">סיכום זמינות</h4>
+                    <p className="text-sm text-carelink-gray">
+                      {availability.filter(a => a.is_available).length} משמרות זמינות בשבוע
+                    </p>
                   </div>
                 )}
               </div>
