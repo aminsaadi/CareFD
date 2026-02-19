@@ -23,6 +23,24 @@ const serviceTypeConfig = {
   phone_call: { icon: FaPhoneAlt, label: 'שיחה טלפונית', color: 'bg-orange-100 text-orange-600' }
 };
 
+// Profession titles mapping
+const professionTitles = {
+  doctor: 'רופא/ה',
+  nurse: 'אח/ות מוסמך/ת',
+  physiotherapist: 'פיזיותרפיסט/ית',
+  occupational_therapist: 'מרפא/ה בעיסוק',
+  student: 'סטודנט/ית',
+  caregiver: 'מטפל/ת',
+  psychologist: 'פסיכולוג/ית',
+  social_worker: 'עובד/ת סוציאלי/ת',
+  dietitian: 'דיאטן/ית',
+  speech_therapist: 'קלינאי/ת תקשורת'
+};
+
+const getProfessionLabel = (professionValue) => {
+  return professionTitles[professionValue] || professionValue;
+};
+
 // Demo reviews for display
 const demoReviews = [
   {
