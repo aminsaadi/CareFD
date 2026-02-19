@@ -36,6 +36,7 @@ import AdminFeatured from './pages/admin/AdminFeatured';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminReports from './pages/admin/AdminReports';
 import AdminServices from './pages/admin/AdminServices';
+import AdminSubscriptions from './pages/admin/AdminSubscriptions';
 import './i18n';
 import './App.css';
 
@@ -264,6 +265,14 @@ function AppRouter() {
         element={
           <ProtectedRoute>
             <AdminServices />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/subscriptions"
+        element={
+          <ProtectedRoute>
+            <AdminSubscriptions />
           </ProtectedRoute>
         }
       />
