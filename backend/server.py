@@ -1251,6 +1251,25 @@ async def get_filter_options():
         {"value": 100, "label": "100 ק\"מ"}
     ]
     
+    # Shift options for availability
+    shift_options = [
+        {"value": "morning", "label": "בוקר", "label_en": "Morning", "default_start": "06:00", "default_end": "12:00"},
+        {"value": "afternoon", "label": "צהריים", "label_en": "Afternoon", "default_start": "12:00", "default_end": "18:00"},
+        {"value": "evening", "label": "ערב", "label_en": "Evening", "default_start": "18:00", "default_end": "22:00"},
+        {"value": "night", "label": "לילה", "label_en": "Night", "default_start": "22:00", "default_end": "06:00"},
+    ]
+    
+    # Days of week
+    days_of_week = [
+        {"value": "sunday", "label": "ראשון", "label_en": "Sunday"},
+        {"value": "monday", "label": "שני", "label_en": "Monday"},
+        {"value": "tuesday", "label": "שלישי", "label_en": "Tuesday"},
+        {"value": "wednesday", "label": "רביעי", "label_en": "Wednesday"},
+        {"value": "thursday", "label": "חמישי", "label_en": "Thursday"},
+        {"value": "friday", "label": "שישי", "label_en": "Friday"},
+        {"value": "saturday", "label": "שבת", "label_en": "Saturday"},
+    ]
+    
     return {
         "cities": sorted(cities) if cities else ["תל אביב", "ירושלים", "חיפה", "באר שבע", "רמת גן", "הרצליה", "פתח תקווה"],
         "specializations": sorted(specializations) if specializations else [],
@@ -1263,7 +1282,9 @@ async def get_filter_options():
         "profession_titles": PROFESSION_TITLES,
         "gender_options": GENDER_OPTIONS,
         "language_options": LANGUAGE_OPTIONS,
-        "target_audience_options": TARGET_AUDIENCE_OPTIONS
+        "target_audience_options": TARGET_AUDIENCE_OPTIONS,
+        "shift_options": shift_options,
+        "days_of_week": days_of_week
     }
 
 @api_router.put("/providers/{provider_id}")
