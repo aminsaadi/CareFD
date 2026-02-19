@@ -1251,7 +1251,10 @@ async def get_filter_options():
         "rating_options": rating_options,
         "experience_options": experience_options,
         "radius_options": radius_options,
-        "profession_titles": PROFESSION_TITLES
+        "profession_titles": PROFESSION_TITLES,
+        "gender_options": GENDER_OPTIONS,
+        "language_options": LANGUAGE_OPTIONS,
+        "target_audience_options": TARGET_AUDIENCE_OPTIONS
     }
 
 @api_router.put("/providers/{provider_id}")
