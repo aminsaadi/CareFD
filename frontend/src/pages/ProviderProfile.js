@@ -266,10 +266,19 @@ const ProviderProfile = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col lg:flex-row gap-8 items-start">
             {/* Provider Avatar/Logo */}
-            <div className="w-32 h-32 lg:w-40 lg:h-40 bg-white rounded-2xl shadow-xl flex items-center justify-center flex-shrink-0">
-              <span className="text-5xl lg:text-6xl font-bold text-carelink-teal">
-                {(provider.business_name || 'ס')[0]}
-              </span>
+            <div className="w-32 h-32 lg:w-40 lg:h-40 bg-white rounded-2xl shadow-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+              {provider.profile_image ? (
+                <img 
+                  src={provider.profile_image} 
+                  alt={provider.business_name || 'Profile'} 
+                  className="w-full h-full object-cover"
+                  data-testid="provider-profile-image"
+                />
+              ) : (
+                <span className="text-5xl lg:text-6xl font-bold text-carelink-teal">
+                  {(provider.business_name || 'ס')[0]}
+                </span>
+              )}
             </div>
             
             {/* Provider Info */}
