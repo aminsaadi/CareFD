@@ -232,6 +232,21 @@ class Provider(BaseModel):
     years_experience: Optional[int] = None
     service_types: List[str] = []
     views_count: int = 0
+    profession_title: Optional[str] = None  # רופא, אח מוסמך, פיזיותרפיסט, מרפא בעיסוק, סטודנט, מטפל
+
+# Profession titles options
+PROFESSION_TITLES = [
+    {"value": "doctor", "label": "רופא", "label_en": "Doctor"},
+    {"value": "nurse", "label": "אח/ות מוסמך/ת", "label_en": "Registered Nurse"},
+    {"value": "physiotherapist", "label": "פיזיותרפיסט", "label_en": "Physiotherapist"},
+    {"value": "occupational_therapist", "label": "מרפא/ה בעיסוק", "label_en": "Occupational Therapist"},
+    {"value": "student", "label": "סטודנט/ית", "label_en": "Student"},
+    {"value": "caregiver", "label": "מטפל/ת", "label_en": "Caregiver"},
+    {"value": "psychologist", "label": "פסיכולוג/ית", "label_en": "Psychologist"},
+    {"value": "social_worker", "label": "עובד/ת סוציאלי/ת", "label_en": "Social Worker"},
+    {"value": "dietitian", "label": "דיאטן/ית", "label_en": "Dietitian"},
+    {"value": "speech_therapist", "label": "קלינאי/ת תקשורת", "label_en": "Speech Therapist"},
+]
 
 class ProviderRegister(BaseModel):
     user_id: str
