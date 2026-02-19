@@ -59,6 +59,7 @@ const ProviderEdit = () => {
         business_name: data.business_name || '',
         description: data.description || '',
         provider_type: data.provider_type || 'individual',
+        profession_title: data.profession_title || '',
         specializations: data.specializations && data.specializations.length > 0 ? data.specializations : ['']
       });
       setLocation(data.location || location);
