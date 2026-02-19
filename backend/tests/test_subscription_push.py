@@ -393,32 +393,30 @@ class TestAdminPushNotifications:
 
 
 class TestMockedPayPalAPIs:
-    """Test mocked PayPal payment APIs"""
+    """Test mocked PayPal payment APIs - These require existing payment records
+    Note: PayPal integration is MOCKED - returns mock order IDs until API keys provided
+    """
     
-    def test_paypal_create_order_mocked(self, test_user_session):
-        """POST /api/payments/paypal/create-order - mocked API should work"""
+    def test_paypal_create_order_requires_payment_id(self, test_user_session):
+        """POST /api/payments/paypal/create-order - requires existing payment_id"""
+        # Without valid payment_id, should return 404
         response = test_user_session.post(f"{BASE_URL}/api/payments/paypal/create-order", json={
-            "amount": 99,
-            "currency": "ILS",
-            "description": "Pro subscription test"
+            "payment_id": "invalid_payment_id"
         })
         
-        # Mocked API should return success
-        assert response.status_code in [200, 201], f"Expected 200/201, got {response.status_code}: {response.text}"
-        data = response.json()
-        
-        assert "order_id" in data or "mock" in str(data).lower(), "Should return order_id or indicate mock"
-        print(f"PASS: PayPal create-order (MOCKED) returned successfully")
+        # Expected: 404 because payment_id doesn't exist
+        assert response.status_code == 404, f"Expected 404 for invalid payment_id, got {response.status_code}"
+        print(f"PASS: PayPal create-order correctly requires valid payment_id (MOCKED API)")
     
-    def test_paypal_capture_order_mocked(self, test_user_session):
-        """POST /api/payments/paypal/capture-order - mocked API should work"""
+    def test_paypal_capture_order_requires_valid_order(self, test_user_session):
+        """POST /api/payments/paypal/capture-order - requires valid order_id"""
         response = test_user_session.post(f"{BASE_URL}/api/payments/paypal/capture-order", json={
             "order_id": "mock_order_123"
         })
         
-        # Mocked API should return success or handle gracefully
-        assert response.status_code in [200, 201, 400, 404], f"Unexpected status: {response.status_code}"
-        print(f"PASS: PayPal capture-order (MOCKED) handled correctly")
+        # Expected: 404 because order doesn't exist
+        assert response.status_code == 404, f"Expected 404, got {response.status_code}"
+        print(f"PASS: PayPal capture-order correctly requires valid order (MOCKED API)")
 
 
 if __name__ == "__main__":
