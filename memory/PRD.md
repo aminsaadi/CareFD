@@ -86,6 +86,20 @@ CareLink is a healthcare services platform in Israel connecting users with healt
 - **suspension_reason**: Reason for suspension
 - **suspended_at**: Suspension timestamp
 
+#### Subscription System (NEW)
+- **3 Subscription Tiers:**
+  - Free (₪0): 3 services, 10 bookings/month
+  - Pro (₪99/month): 10 services, unlimited bookings, priority support
+  - Premium (₪199/month): Unlimited, VIP support, featured listing
+- **PayPal Integration:** MOCKED - requires API keys to activate
+- **Admin Management:** View subscriptions, payments, revenue, modify tiers
+
+#### Push Notifications System (NEW)
+- **Send Notifications:** To all users, providers only, or users only
+- **Notification Preferences:** Users can toggle notification types
+- **Admin Panel:** Send broadcast notifications, view history
+- **In-App Notifications:** All push notifications also create in-app notifications
+
 ### Pending Features 🔄
 
 #### P2 - Email Notifications
