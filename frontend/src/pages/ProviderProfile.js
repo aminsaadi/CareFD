@@ -11,7 +11,7 @@ import {
   FaCheckCircle, FaUserMd, FaCalendarAlt, FaComments, FaShareAlt,
   FaHeart, FaBriefcase, FaUsers, FaAward, FaQuoteRight, FaWhatsapp,
   FaHome, FaVideo, FaClinicMedical, FaPhoneAlt, FaRegHeart, FaLink,
-  FaCopy, FaCheck
+  FaCopy, FaCheck, FaInfoCircle
 } from 'react-icons/fa';
 import { dummyProviders, dummyServices } from '../data/dummyData';
 
