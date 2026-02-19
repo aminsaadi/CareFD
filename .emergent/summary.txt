@@ -1,165 +1,190 @@
 <analysis>**original_problem_statement:**
-The user initially requested a Provider Verification System and an Enhanced Service Booking Flow. Subsequently, the user requested a wide range of features and bug fixes, including search enhancements, UI improvements, guest booking, and admin district management.
+The user initially requested a Provider Verification System and an Enhanced Service Booking Flow. This has since expanded into building a comprehensive full-stack application for connecting service providers with users.
 
-The most recent user requests from this session are:
-1.  Fix a critical bug preventing service bookings. (COMPLETED)
-2.  Build a comprehensive, professional admin dashboard, separate from the main site's design. This should include management for users, professions, categories, regions, bookings, user verification, subscriptions, ads, and general site content/settings (logo, footer links, blog, static pages).
-3.  The admin dashboard was initially built with a dark theme, but the user requested it be changed to a light theme using the brand's specific colors. (COMPLETED)
-4.  The user then approved the agent's suggestion to connect the newly built admin dashboard UI to backend APIs and to add a page for interactive reports.
+The project includes a full-featured admin dashboard for managing all aspects of the site. The most recent user requests from this session were:
+1.  Connect the admin dashboard UI to backend APIs to make it functional. (COMPLETED)
+2.  Add an interactive reports page to the admin dashboard. (COMPLETED)
+3.  Enhance admin user management with features like unique IDs, suspension, messaging, and a detailed user view. (COMPLETED)
+4.  Add a page for admins to manage all provider services. (COMPLETED)
+5.  Build the framework for a subscription system (with PayPal) and a push notification system. (COMPLETED, pending integration)
+6.  Add a profession title to the provider's profile. (COMPLETED)
+7.  **Current Request:** Significantly enhance the provider profile by adding fields for profile picture upload, gender, years of experience, expertise, an about section, an availability calendar, service area, languages, and target audience.
 
 **User's preferred language**: The user's primary language is **Hebrew**. The next agent MUST respond in Hebrew.
 
 **what currently exists?**
-A full-stack application with a React frontend, Python (FastAPI) backend, and MongoDB database. A critical bug preventing service bookings has been successfully debugged and fixed. A new, comprehensive admin dashboard has been built from scratch with a dedicated layout () and a light theme using the brand's colors. This dashboard includes placeholder pages for a general overview, user management, provider management, booking management, professions, blog, static pages, ads, featured providers, and site settings. Currently, all data displayed in this new admin dashboard is static mock data; the frontend components are built, but they are not yet connected to any backend APIs.
+A full-stack application using React, FastAPI, and MongoDB. A comprehensive admin dashboard has been built and is fully functional, connected to live backend APIs. It includes pages for a general overview, user management, provider management, service management, bookings, interactive reports (with graphs), settings, subscriptions, and push notifications. Core features like unique user/provider IDs (e.g., U1234567) and detailed management modals are implemented. The provider profile page currently displays the provider's name and their profession underneath it.
 
 **Last working item**:
--   **Last item agent was working:** The agent was beginning the task of connecting the newly created admin dashboard frontend pages to the backend. The user approved this work and also approved adding a new page for reports with interactive graphs. The agent has identified a list of necessary API endpoints to be created on the backend.
+-   **Last item agent was working:** The agent was starting the implementation of a major enhancement to the provider profile, as requested by the user. This involves adding numerous new fields and a profile picture upload functionality. The agent had planned the necessary changes and had just started creating a new, dedicated file for editing the provider profile: .
 -   **Status:** IN PROGRESS
 -   **Agent Testing Done:** N
--   **Which testing method agent to use?** both. The backend testing agent will be needed to verify the new API endpoints as they are created. The frontend testing agent will be needed to perform end-to-end tests to ensure data is correctly fetched and displayed on the various admin pages.
+-   **Which testing method agent to use?** both. The backend will need testing for the new model fields, file upload, and API updates. The frontend requires testing to ensure the new edit page works correctly and the provider's public profile displays all the new information. Screenshots will be needed for both the edit page and the final profile view.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1:** The new Admin Dashboard pages are populated with static mock data. (Priority: P0)
--   **Issue 2:** User dashboard statistics not updating in real-time. (Priority: P2)
+-   **Issue 1:** Enhance Provider Profile with new fields and image upload. (Priority: P0)
+-   **Issue 2:** PayPal integration for the subscription system is blocked. (Priority: P1)
+-   **Issue 3:** User dashboard statistics do not update in real-time. (Priority: P2)
 
 **Issues Detail:**
--   **Issue 1: Admin Dashboard uses mock data.**
-    -   **Attempted fixes:** None. This is the current task.
+-   **Issue 1: Enhance Provider Profile**
+    -   **Attempted fixes:** None yet, work has just begun.
     -   **Next debug checklist:**
-        1.  Implement the planned backend API endpoints in  for each admin section (e.g., , , ).
-        2.  Modify the corresponding React components in  to use  to fetch data from these new endpoints.
-        3.  Replace the static data objects in each component with the data fetched from the API.
-        4.  Implement state management (e.g., , ) to handle loading, data, and error states.
-    -   **Why fix this issue and what will be achieved with the fix?** This will make the admin dashboard functional, allowing administrators to manage the application's data and settings dynamically.
+        1.  Complete the creation of the new  component with form fields for all the new attributes (gender, experience, expertise, about, location, languages, etc.).
+        2.  Implement a file upload component for the profile picture within .
+        3.  Update the  Pydantic model in  to include all the new fields.
+        4.  Update the  endpoint to handle saving the new data and the uploaded profile picture URL.
+        5.  Update the main  to elegantly display all the new information.
+        6.  Update the  endpoint to return choice lists for new fields like  and .
+    -   **Why fix this issue and what will be achieved with the fix?** This will create a much richer and more useful provider profile, giving end-users more information to make decisions and allowing providers to market themselves effectively.
     -   **Status:** IN PROGRESS
     -   **Is recurring issue?** N
     -   **Should Test frontend/backend/both after fix?** both
     -   **Blocked on other issue:** None.
 
--   **Issue 2: User dashboard statistics not updating in real-time.**
-    -   **Attempted fixes:** None. This is a pre-existing issue.
+-   **Issue 2: PayPal Integration Blocked**
+    -   **Attempted fixes:** The agent correctly requested API keys. The user provided an email address, which is not sufficient. The agent has paused this task.
     -   **Next debug checklist:**
-        -   Investigate state management in .
-        -   Check if the API calls that fetch statistics are being re-triggered after relevant user actions.
-        -   Verify that the  dependency array is correctly configured.
-    -   **Why fix this issue and what will be achieved with the fix?** Ensures users see accurate, up-to-date information on their personal dashboards, improving trust and user experience.
-    -   **Status:** NOT STARTED
+        1.  Politely ask the user again for the **PayPal Client ID** and **PayPal Secret** for the sandbox environment. Explain that the email address is not what's needed for the integration.
+        2.  Once the keys are provided, implement the backend logic for creating and executing payments using the PayPal SDK, as per the playbook.
+    -   **Why fix this issue and what will be achieved with the fix?** Will enable the subscription system, a core requirement for monetizing the platform.
+    -   **Status:** BLOCKED (Waiting on user for correct API credentials).
     -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** both
+    -   **Blocked on other issue:** None.
+
+-   **Issue 3: User dashboard statistics not updating in real-time**
+    -   **Attempted fixes:** None. This is a pre-existing issue from a previous session.
+    -   **Next debug checklist:**
+        -   Investigate state management in the relevant user dashboard component.
+        -   Check if API calls that fetch statistics are re-triggered after relevant user actions (e.g., using a state management library or  with a proper dependency array).
+    -   **Why fix this issue and what will be achieved with the fix?** Ensures users see accurate, up-to-date information, improving user experience and trust.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** Y (Carried over from a previous fork)
     -   **Should Test frontend/backend/both after fix?** Frontend
 
 **In progress Task List**:
--   **Task 1: Connect Admin Dashboard to Backend APIs.** (Priority: P0)
-    -   **Where to resume:** The agent has listed the necessary new API endpoints. The next step is to start implementing these endpoints in  and then integrate them into the frontend components located in .
-    -   **What will be achieved with this?** A fully functional admin dashboard.
+-   **Task 1: Complete Provider Profile Enhancement** (Priority: P0)
+    -   **Where to resume:** Continue building the new component . The agent was in the middle of creating this file.
+    -   **What will be achieved with this?** A comprehensive provider profile with a profile picture, detailed personal and professional information, and a dedicated page for providers to edit this information.
     -   **Status:** IN PROGRESS
     -   **Should Test frontend/backend/both after fix?** both
     -   **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **P1: Implement Interactive Reports Page:** Create a new page in the admin dashboard for reports, featuring interactive graphs for visualizing data (e.g., bookings over time, top providers, revenue), as approved by the user.
-    -   **P2: Integrate SendGrid for Email Notifications:** Implement email sending for key application events (e.g., new booking, provider approval) using the SendGrid API.
+    -   **P1: Refactor Backend:** Break down the monolithic  file into multiple smaller router files (e.g., , , ) using FastAPI's . This is becoming critical for maintainability.
+    -   **P2: Complete Push Notification System:** The UI and placeholder APIs exist. The next step is to integrate a real push notification service (like Firebase Cloud Messaging) on the backend to send notifications.
 -   **Future Tasks:**
-    -   **P3: Refactor Backend Routes:** Move the API logic for Favorites and Districts from  into their own dedicated router files to improve modularity.
-    -   **P3: Implement Subscriptions Management:** Add functionality for managing user subscriptions and payments.
-    -   **P4: Add Database Model for Districts:** Create a proper MongoDB collection and schema for  to ensure data persistence, as the current implementation is not database-backed.
-    -   **P4: Implement Push Notification System.**
+    -   **P3: Add Database Model for Districts:** The Districts feature currently lacks a proper database collection. This needs to be created to ensure data persistence.
 
 **Completed work in this session**
--   **Critical Bug Fix (Booking Flow):**
-    -   Diagnosed and fixed the service booking functionality. The root cause was identified in  where a boolean check incorrectly returned a string value () instead of , causing a Pydantic validation error.
--   **Provider Availability Enhancement:**
-    -   Modified  to provide default availability slots if a provider has not configured their own, unblocking the booking process.
--   **Admin Dashboard Implementation:**
-    -   Created a complete, multi-page admin dashboard from scratch under the  route.
-    -   Created numerous new React components for the dashboard, including a main layout, sidebar, and pages for overview, settings, ads, professions, users, bookings, etc.
-    -   Initially styled with a dark theme.
--   **Admin Dashboard Theming:**
-    -   Refactored the entire admin dashboard UI to use a light theme based on the user-provided brand colors (, , ).
+-   **Admin Dashboard API Integration:** Connected all admin pages (Users, Settings, Bookings, etc.) to live backend APIs, replacing all mock data.
+-   **Interactive Reports Page:** Implemented a new reports page in the admin dashboard with various interactive charts (using Recharts) to visualize key business metrics.
+-   **Advanced User Management:** Enhanced the admin user list with unique IDs, status tags, and a modal for viewing details and performing actions like suspend, message, and verify.
+-   **Admin Services & Subscriptions UI:** Created new admin pages for managing all provider services, subscription plans, and push notification history.
+-   **Provider Profile Enhancement (Phase 1):** Added a Profession field to the provider's data model and displayed it on their profile card and page.
 
 **Earlier issues found/mentioned but not fixed**
--   **Issue:** User dashboard statistics not updating in real-time. This was identified in the previous fork and was not addressed.
+-   User dashboard statistics not updating in real-time.
 
 **Known issue recurrence from previous fork**
--   None.
+-   None in this session, but the real-time stats issue is a holdover.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend:** React, Axios, Tailwind CSS
+-   **Frontend:** React, Axios, Tailwind CSS, Recharts
 -   **Backend:** Python, FastAPI
 -   **Database:** MongoDB
--   **Authentication:** JSON Web Tokens (JWT)
+-   **Technical Debt:** The backend  file is over 3000 lines long and contains all application logic, making it difficult to maintain.
 
 **key DB schema**
--   **Bookings:** 
--   **Users:** 
+-   **Users:** added .
+-   **Providers:** added , .
+-   **In Progress for Providers:** , , , , , , , , , .
+-   **New (scaffolded):** , , , .
 
 **changes in tech stack**
--   **Correction from previous handoff:** The backend stack is **Python/FastAPI/MongoDB**, not Node.js/Express/PostgreSQL. This is a critical distinction for the next agent.
+-    library was added to the frontend for graphs.
 
 **All files of reference**
--   : Modified to fix the booking bug. Will be heavily modified to add admin APIs.
--   : Modified to add default provider availability.
--   : Modified to add the routing structure for the new admin section.
--   : All files in this new directory are new and constitute the admin dashboard UI.
--   : All files in this new directory are new and support the admin dashboard layout.
--   : New file containing CSS variables for the brand's color palette.
+-   : Heavily modified with numerous new endpoints and models. **Needs refactoring.**
+-   : New file for the reports page.
+-   : New file for managing services.
+-   : New file for managing subscriptions.
+-   : New file for managing push notifications.
+-   : New file being created for the profile edit form.
+-   : Updated and will be updated again.
+-   : Updated to show profession.
+-   : Updated with links to new admin pages.
 
 **Areas that need refactoring**:
--   The backend logic for features like Favorites and Districts (from previous forks) is in the main  file and should be moved to separate FastAPI routers for better organization.
--   The Districts feature still lacks a proper database collection for persistence.
+-   **CRITICAL:** The  file is now a monolith and must be broken down into separate files using FastAPI's  for better organization and maintainability. This should be a high-priority task after the current feature is complete.
 
 **key api endpoints**
--   : Fixed.
--   : Fixed.
--   : Used to create a new admin user for testing.
--   **To be created:**
-    -   , , , , , , , , , 
+-   **Created:**
+    -    (GET)
+    -    (GET)
+    -    (PUT)
+    -    (CRUD)
+    -    (POST, GET)
+    -    (GET)
+-   **Updated:**
+    -    (to add unique IDs)
+    -   The entire suite of  endpoints to serve real data.
 
 **Critical Info for New Agent**
--   Your immediate priority is to make the new admin dashboard functional by creating the necessary backend APIs and connecting the frontend components to them.
--   **Crucially, the backend tech stack is Python/FastAPI with MongoDB.** The previous handoff incorrectly stated it was Node.js/PostgreSQL. All backend work must be done in Python.
--   The UI for the admin dashboard is complete and styled. The task is now purely backend and integration work.
--   Start by implementing one set of endpoints (e.g., for ) and connecting the corresponding frontend page to verify the end-to-end flow before proceeding to the other pages.
+-   Your immediate priority is to continue the implementation of the enhanced provider profile. Resume by completing the new form at , then proceed to the backend changes.
+-   The PayPal integration is BLOCKED. If the user asks about it, you need to request the **Client ID** and **Secret** again, clarifying that an email address is not what is required.
+-   After completing the provider profile feature, the next most important task is to **refactor the backend**. The  file is unmanageably large. Propose this to the user as the next step for improving the health and scalability of the application.
+-   Note that the agent experienced a  error in the previous session (message 153). While the environment was upgraded, it indicates the app is resource-intensive. Be mindful of efficient coding practices.
 
 **documents and test reports created in this job**
--   
--    (updated)
+-   Multiple test reports in . The latest ones are  and .
+-    (updated multiple times)
 
 **Last 10 User Messages and any pending HUMAN messages**
-10. **User:** כן , לך על זה (Yes, go for it) - Approving the plan to connect APIs and add a reports page. **(PENDING)**
-9.  **Agent:** Finished updating the admin theme and proposed next steps: connecting APIs and adding reports.
-8.  **User:** לא רוצה DARK. שנה לעיצוב בהיר, עם הצבעים של המותג (Don't want DARK. Change to a light design, with the brand's colors).
-7.  **Agent:** Finished building the dark-themed admin panel and updated PRD.
-6.  **User:** עצב משהו מקצועי ושונה מהאתר... (Design something professional and different from the site...) - Detailing more requirements for the admin panel.
-5.  **Agent:** Asked for confirmation to proceed with the admin panel build.
-4.  **User:** עכשיו נשפר ונפתח מערכת דאשבורד אדמין מקצועית... (Now let's improve and develop a professional admin dashboard system...) - The initial request to build the admin panel.
-3.  **Agent:** Finished fixing the booking bug and updated PRD.
-2.  **User:** תמשיך (Continue).
-1.  **Agent:** Reported that the booking worked via API and explained the root cause of the bug.
+10. **User:** Wants to enhance the provider profile with picture, gender, experience, expertise, about, availability, location, area, languages, and target audience. **(CURRENT TASK)**
+9.  **Agent:** Asks to start work.
+8.  **User:** Let's do both (Subscriptions and Push Notifications), but payments with PayPal.
+7.  **Agent:** Asks for clarification on next task (Subscriptions or Push Notifications).
+6.  **User:** Requests to implement Subscriptions and a Push Notification system.
+5.  **Agent:** Finishes the user management enhancements and asks for the next task.
+4.  **User:** Go for it. (Approving user management enhancements)
+3.  **Agent:** Proposes a plan to enhance admin user management.
+2.  **User:** Requests features for admin user management (edit, suspend, message, verification view, unique IDs).
+1.  **Agent:** Finishes the interactive reports page and asks for the next task.
 
 **Project Health Check:**
 -   **Broken:** None.
--   **Mocked:** The entire new Admin Dashboard () is using static, hardcoded data. It is visually complete but not functional.
+-   **Mocked:**
+    -   The subscription payment flow (PayPal buttons do not trigger real payments).
+    -   The push notification system (notifications are saved to the DB but not sent to any external service).
+-   **Technical Debt:**
+    -   **High:** The monolithic  file.
+    -   **Low:** The Districts feature still has no database persistence.
 
 **3rd Party Integrations**
--   **Leaflet & OpenStreetMap:** Used for map displays.
--   **SendGrid:** Planned for email notifications. Requires a User API Key.
+-   **Leaflet & OpenStreetMap:** In use.
+-   **Recharts:** In use for admin reports.
+-   **PayPal:** Planned for subscriptions. Requires User API Key (Client ID & Secret). **Currently Blocked.**
+-   **Push Notification Service (e.g., Firebase):** Planned, not yet integrated. Requires User API Key/config.
+-   **SendGrid:** User decided to postpone email integration.
 
 **Testing status**
--   **Testing agent used after significant changes:** YES. Used to validate the booking flow fix. Report at .
+-   **Testing agent used after significant changes:** YES. The agent ran the testing agent after every major feature was completed, ensuring high test coverage.
 -   **Troubleshoot agent used after agent stuck in loop:** NO.
 -   **Test files created:** None.
 -   **Known regressions:** None.
 
 **Credentials to test flow:**
--   **Admin:**  /  (created in this session)
+-   **Admin:**  / 
 -   **User:**  / 
 
 **What agent forgot to execute**
--   Did not address the pre-existing issue: User dashboard statistics not updating in real-time.
--   Did not yet refactor backend logic for Favorites/Districts into separate routers.
--   Did not create a database model for the Districts feature.</analysis>
+-   The pre-existing issue of User dashboard statistics not updating in real-time has not been addressed.
+-   The backend refactoring (splitting ) has been identified as necessary but not yet started.
+-   The database model for the Districts feature has not been created.</analysis>
