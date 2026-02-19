@@ -47,18 +47,29 @@ CareLink is a healthcare services platform in Israel connecting users with healt
 - **Improved Chat UI** - Modern design with date dividers, status indicators
 
 #### Phase 4 - Admin Dashboard System (Current Session - Feb 2026)
-- **Professional Admin Dashboard** with Dark Mode design
+- **Professional Admin Dashboard** with Light theme using brand colors (#19B8BA, #1E4D5F, #4C6D7F)
 - **Dashboard Overview**: Stats, quick actions, recent activity, alerts
-- **User Management**: List, search, filter, role management, delete
-- **Provider Management**: List, verify, recommend, view profile
+- **User Management**: 
+  - List with user numbers (U...), search, filter, role management
+  - View user details modal with stats, provider info, verification documents
+  - Edit user (name, email, phone, verified status)
+  - Suspend/unsuspend users with reason
+  - Send private messages to users
+  - Delete users
+- **Provider Management**: List with provider numbers (P...), verify, recommend, view profile
 - **Provider Verification**: Queue with document review, approve/reject
 - **Booking Management**: All bookings, filter by status, status updates
+- **Services Management**: NEW - View all services, edit, delete with provider info
 - **Professions & Categories**: 3-level hierarchy (Profession → Sub-profession → Category)
 - **Regions Management**: Geographic regions with cities
 - **Static Pages (CMS)**: Create/edit/delete pages, publish/draft status
 - **Blog Management**: Posts with tags, featured images, publish status
 - **Advertisements**: Banner ads with position targeting, date ranges, CTR tracking
 - **Featured Providers**: Highlight providers for time periods
+- **Reports & Analytics**: 
+  - Interactive charts (Recharts): bookings timeline, status distribution, top providers, revenue
+  - Period selector (week/month/year)
+  - Summary cards with key metrics
 - **Site Settings**: 
   - General (name, tagline, registration settings)
   - Appearance (logo, favicon)
@@ -67,6 +78,13 @@ CareLink is a healthcare services platform in Israel connecting users with healt
   - Footer links
   - SEO (meta description, keywords, Google Analytics)
   - Advanced (maintenance mode, backup)
+
+#### New Data Fields
+- **user_number**: Unique user identifier (U + 7 digits, e.g., U5566889)
+- **provider_number**: Unique provider identifier (P + 7 digits, e.g., P7784569)
+- **is_suspended**: User suspension status
+- **suspension_reason**: Reason for suspension
+- **suspended_at**: Suspension timestamp
 
 ### Pending Features 🔄
 
