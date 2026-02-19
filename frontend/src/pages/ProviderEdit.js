@@ -229,6 +229,31 @@ const ProviderEdit = () => {
                   />
                 </div>
 
+                {/* Profession Title */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    מקצוע
+                  </label>
+                  <select
+                    value={basicInfo.profession_title}
+                    onChange={(e) => setBasicInfo({ ...basicInfo, profession_title: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white"
+                    data-testid="profession-title-select"
+                  >
+                    <option value="">בחר מקצוע</option>
+                    <option value="doctor">רופא/ה</option>
+                    <option value="nurse">אח/ות מוסמך/ת</option>
+                    <option value="physiotherapist">פיזיותרפיסט/ית</option>
+                    <option value="occupational_therapist">מרפא/ה בעיסוק</option>
+                    <option value="student">סטודנט/ית</option>
+                    <option value="caregiver">מטפל/ת</option>
+                    <option value="psychologist">פסיכולוג/ית</option>
+                    <option value="social_worker">עובד/ת סוציאלי/ת</option>
+                    <option value="dietitian">דיאטן/ית</option>
+                    <option value="speech_therapist">קלינאי/ת תקשורת</option>
+                  </select>
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {t('description')}
