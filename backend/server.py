@@ -110,6 +110,58 @@ class UserSession(BaseModel):
     expires_at: datetime
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+# Subscription Models
+class SubscriptionTier:
+    FREE = "free"
+    PRO = "pro"
+    PREMIUM = "premium"
+
+class SubscriptionPlan(BaseModel):
+    plan_id: str = Field(default_factory=lambda: f"plan_{uuid.uuid4().hex[:12]}")
+    name: str  # Free, Pro, Premium
+    name_he: str  # חינם, פרו, פרימיום
+    tier: str  # free, pro, premium
+    price_monthly: float  # 0, 99, 199
+    price_yearly: float  # 0, 990, 1990
+    currency: str = "ILS"
+    features: List[str] = []
+    max_services: int = 3  # -1 for unlimited
+    max_bookings_per_month: int = 10  # -1 for unlimited
+    priority_support: bool = False
+    featured_listing: bool = False
+    analytics_access: bool = False
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class Subscription(BaseModel):
+    subscription_id: str = Field(default_factory=lambda: f"sub_{uuid.uuid4().hex[:12]}")
+    user_id: str
+    provider_id: Optional[str] = None
+    plan_id: str
+    tier: str  # free, pro, premium
+    status: str = "active"  # active, cancelled, expired, pending
+    billing_cycle: str = "monthly"  # monthly, yearly
+    start_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    end_date: Optional[datetime] = None
+    next_billing_date: Optional[datetime] = None
+    cancelled_at: Optional[datetime] = None
+    paypal_subscription_id: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class Payment(BaseModel):
+    payment_id: str = Field(default_factory=lambda: f"pay_{uuid.uuid4().hex[:12]}")
+    user_id: str
+    subscription_id: Optional[str] = None
+    amount: float
+    currency: str = "ILS"
+    status: str = "pending"  # pending, completed, failed, refunded
+    payment_method: str = "paypal"  # paypal, credit_card
+    paypal_order_id: Optional[str] = None
+    paypal_capture_id: Optional[str] = None
+    description: str = ""
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    completed_at: Optional[datetime] = None
+
 # Provider Models
 class ProviderType:
     INDIVIDUAL = "individual"
