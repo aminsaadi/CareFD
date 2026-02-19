@@ -102,11 +102,9 @@ CareLink is a healthcare services platform in Israel connecting users with healt
 
 ### Pending Features 🔄
 
-#### P2 - Email Notifications
-- SendGrid/Gmail integration for:
-  - User verification emails
-  - Booking confirmations
-  - Provider notifications
+#### P2 - PayPal Live Integration
+- Waiting for PayPal API credentials (Client ID + Secret)
+- Once provided, payments will be fully functional
 
 #### P3 - Provider Clinic Management
 - Multiple clinic locations per provider
@@ -114,10 +112,9 @@ CareLink is a healthcare services platform in Israel connecting users with healt
 - Option for "No clinic" providers
 
 #### Backlog
-- Subscriptions and payments management
-- Push notification system
-- Enhanced chat features (file attachment, typing indicator)
+- Email notifications (SendGrid/Gmail)
 - Export reports to PDF/Excel
+- Enhanced chat features (file attachment, typing indicator)
 
 ## Technical Stack
 - **Frontend**: React, TailwindCSS, React Router
