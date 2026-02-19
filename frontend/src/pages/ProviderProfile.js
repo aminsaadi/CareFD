@@ -312,6 +312,13 @@ const ProviderProfile = () => {
                   {t(provider.provider_type)}
                 </span>
                 
+                {provider.years_experience && (
+                  <span className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full" data-testid="years-experience">
+                    <FaClock />
+                    {provider.years_experience} שנות ניסיון
+                  </span>
+                )}
+                
                 {provider.location && (
                   <span className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
                     <FaMapMarkerAlt />
