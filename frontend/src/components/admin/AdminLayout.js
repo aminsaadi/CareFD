@@ -76,6 +76,7 @@ const AdminLayout = ({ children }) => {
       icon: FiMessageSquare,
       submenu: [
         { id: 'notifications', label: 'הודעות מערכת', icon: FiBell, path: '/admin/notifications' },
+        { id: 'push', label: 'התראות Push', icon: FiBell, path: '/admin/push-notifications' },
         { id: 'messages', label: 'הודעות', icon: FiMessageSquare, path: '/admin/messages' },
       ]
     },
