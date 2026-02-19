@@ -68,6 +68,13 @@ const DAYS_OF_WEEK = [
   { value: 'saturday', label: 'שבת' },
 ];
 
+const SHIFT_OPTIONS = [
+  { value: 'morning', label: 'בוקר', time: '06:00-12:00', color: 'bg-amber-100 text-amber-700 border-amber-300' },
+  { value: 'afternoon', label: 'צהריים', time: '12:00-18:00', color: 'bg-orange-100 text-orange-700 border-orange-300' },
+  { value: 'evening', label: 'ערב', time: '18:00-22:00', color: 'bg-purple-100 text-purple-700 border-purple-300' },
+  { value: 'night', label: 'לילה', time: '22:00-06:00', color: 'bg-indigo-100 text-indigo-700 border-indigo-300' },
+];
+
 const ProviderEdit = () => {
   const { t } = useTranslation();
   const { providerId } = useParams();
