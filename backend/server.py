@@ -184,10 +184,19 @@ class Location(BaseModel):
     coverage_radius_km: Optional[float] = None
 
 class Availability(BaseModel):
-    day: str  # monday, tuesday, etc.
-    start_time: str  # "09:00"
-    end_time: str  # "17:00"
+    day: str  # sunday, monday, tuesday, etc.
+    shift: str  # morning, afternoon, evening, night
+    start_time: Optional[str] = None  # "09:00" - optional custom time
+    end_time: Optional[str] = None  # "17:00" - optional custom time
     is_available: bool = True
+
+# Shift definitions
+SHIFT_DEFINITIONS = {
+    "morning": {"label": "בוקר", "label_en": "Morning", "default_start": "06:00", "default_end": "12:00"},
+    "afternoon": {"label": "צהריים", "label_en": "Afternoon", "default_start": "12:00", "default_end": "18:00"},
+    "evening": {"label": "ערב", "label_en": "Evening", "default_start": "18:00", "default_end": "22:00"},
+    "night": {"label": "לילה", "label_en": "Night", "default_start": "22:00", "default_end": "06:00"},
+}
 
 class VerificationStatus:
     PENDING = "pending"
