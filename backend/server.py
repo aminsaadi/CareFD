@@ -4629,6 +4629,47 @@ async def upload_file(
         "size": len(content)
     }
 
+@api_router.post("/upload/image")
+async def upload_image(
+    file: UploadFile = File(...),
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Upload an image file (for profile pictures)"""
+    user = await get_current_user(authorization, request)
+    
+    # Validate file type - images only
+    allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+    content_type = file.content_type
+    if content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Only image files are allowed (JPEG, PNG, WebP, GIF)")
+    
+    # Validate file size (5MB max for images)
+    max_size = 5 * 1024 * 1024
+    content = await file.read()
+    if len(content) > max_size:
+        raise HTTPException(status_code=400, detail="Image too large (max 5MB)")
+    
+    # Generate unique filename
+    ext = file.filename.split('.')[-1] if '.' in file.filename else 'jpg'
+    unique_filename = f"img_{uuid.uuid4().hex}.{ext}"
+    file_path = UPLOAD_DIR / unique_filename
+    
+    # Save file
+    with open(file_path, "wb") as f:
+        f.write(content)
+    
+    # Generate URL
+    base_url = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')
+    file_url = f"{base_url}/api/files/{unique_filename}"
+    
+    return {
+        "url": file_url,
+        "filename": unique_filename,
+        "original_name": file.filename,
+        "size": len(content)
+    }
+
 @api_router.get("/files/{filename}")
 async def get_file(filename: str):
     """Serve uploaded files"""
