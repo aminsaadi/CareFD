@@ -213,10 +213,7 @@ const ProviderProfile = () => {
   };
 
   const handleBookService = (serviceId) => {
-    if (!isAuthenticated) {
-      navigate('/login');
-      return;
-    }
+    // Navigate directly to booking page - guests are handled there
     navigate(`/book/${serviceId}`);
   };
 
