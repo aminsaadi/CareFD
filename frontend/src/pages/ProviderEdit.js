@@ -23,6 +23,7 @@ const ProviderEdit = () => {
     business_name: '',
     description: '',
     provider_type: 'individual',
+    profession_title: '',
     specializations: ['']
   });
   const [location, setLocation] = useState({
