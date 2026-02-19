@@ -221,6 +221,38 @@ CareLink is a healthcare services platform in Israel connecting users with healt
   - Period selector (week/month/year) updates all charts dynamically
   - Testing: 92% backend (11/12), 100% frontend
 
+### Feb 19, 2026 (Current Session)
+- **ENHANCED PROVIDER PROFILE (P0 COMPLETE)**
+  - **New Profile Fields:**
+    * `profile_image` - Profile picture upload
+    * `gender` - Male/Female/Other
+    * `years_experience` - Years of experience (integer)
+    * `about` - Detailed about section (text)
+    * `expertise` - Specific expertise areas (array)
+    * `languages` - Languages spoken: Hebrew, Arabic, English, Russian, French, Spanish, Amharic
+    * `target_audience` - Adults, Children, Youth, Babies, Women, Elderly, Pregnant, Postpartum
+    * `service_areas` - Service coverage areas (cities)
+  
+  - **Shift-Based Availability System:**
+    * Replaced time-based availability with shift-based system
+    * 4 Shifts: Morning (06:00-12:00), Afternoon (12:00-18:00), Evening (18:00-22:00), Night (22:00-06:00)
+    * 7 Days: Sunday through Saturday
+    * Visual grid interface for selecting available shifts
+    * Dynamic display on provider profile page
+  
+  - **New API Endpoint:**
+    * `POST /api/upload/image` - Upload profile pictures (JPEG, PNG, WebP, GIF, max 5MB)
+  
+  - **Updated API Endpoints:**
+    * `GET /api/providers/filters/options` - Now returns: shift_options, days_of_week, gender_options, language_options, target_audience_options
+    * `PUT /api/providers/:id` - Accepts all new fields
+  
+  - **Frontend Updates:**
+    * `ProviderEdit.js` - New tabbed form with all fields + weekly shift grid
+    * `ProviderProfile.js` - Displays all new information: profile image, about, expertise, languages, target audience, dynamic availability
+  
+  - **Testing:** 100% backend (20/20 tests), 100% frontend verified
+
 ### Feb 18, 2026 (Session 2)
 - **NEW: Professional Admin Dashboard System**
   - Complete redesign with Light theme using brand colors
