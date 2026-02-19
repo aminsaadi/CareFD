@@ -212,11 +212,18 @@ class Provider(BaseModel):
     provider_type: str  # individual, company, clinic
     business_name: Optional[str] = None
     description: Optional[str] = None
+    about: Optional[str] = None  # תיאור מפורט אודות הספק
+    profile_image: Optional[str] = None  # URL לתמונת פרופיל
+    gender: Optional[str] = None  # male, female, other
     specializations: List[str] = []
+    expertise: List[str] = []  # מומחיויות ספציפיות
     services: List[str] = []  # List of service_ids
     team_members: List[TeamMember] = []
     location: Optional[Location] = None
+    service_areas: List[str] = []  # אזורי מתן שירות
     availability: List[Availability] = []
+    languages: List[str] = []  # שפות: hebrew, arabic, english, russian, etc
+    target_audience: List[str] = []  # קהל יעד: adults, children, youth, babies, women, elderly
     rating: float = 0.0
     total_reviews: int = 0
     subscription_tier: str = "free"  # free, pro, premium
@@ -246,6 +253,36 @@ PROFESSION_TITLES = [
     {"value": "social_worker", "label": "עובד/ת סוציאלי/ת", "label_en": "Social Worker"},
     {"value": "dietitian", "label": "דיאטן/ית", "label_en": "Dietitian"},
     {"value": "speech_therapist", "label": "קלינאי/ת תקשורת", "label_en": "Speech Therapist"},
+]
+
+# Gender options
+GENDER_OPTIONS = [
+    {"value": "male", "label": "זכר", "label_en": "Male"},
+    {"value": "female", "label": "נקבה", "label_en": "Female"},
+    {"value": "other", "label": "אחר", "label_en": "Other"},
+]
+
+# Language options
+LANGUAGE_OPTIONS = [
+    {"value": "hebrew", "label": "עברית", "label_en": "Hebrew"},
+    {"value": "arabic", "label": "ערבית", "label_en": "Arabic"},
+    {"value": "english", "label": "אנגלית", "label_en": "English"},
+    {"value": "russian", "label": "רוסית", "label_en": "Russian"},
+    {"value": "french", "label": "צרפתית", "label_en": "French"},
+    {"value": "spanish", "label": "ספרדית", "label_en": "Spanish"},
+    {"value": "amharic", "label": "אמהרית", "label_en": "Amharic"},
+]
+
+# Target audience options
+TARGET_AUDIENCE_OPTIONS = [
+    {"value": "adults", "label": "מבוגרים", "label_en": "Adults"},
+    {"value": "children", "label": "ילדים", "label_en": "Children"},
+    {"value": "youth", "label": "נוער", "label_en": "Youth"},
+    {"value": "babies", "label": "תינוקות", "label_en": "Babies"},
+    {"value": "women", "label": "נשים", "label_en": "Women"},
+    {"value": "elderly", "label": "קשישים", "label_en": "Elderly"},
+    {"value": "pregnant", "label": "נשים בהריון", "label_en": "Pregnant Women"},
+    {"value": "postpartum", "label": "יולדות", "label_en": "Postpartum"},
 ]
 
 class ProviderRegister(BaseModel):
