@@ -762,6 +762,53 @@ async def login(credentials: UserLogin, response: Response):
         "session_token": session_token
     }
 
+@api_router.post("/auth/setup-admin")
+async def setup_admin(body: dict):
+    """One-time setup endpoint to create initial admin user"""
+    setup_key = body.get("setup_key")
+    
+    # Security: require a setup key
+    if setup_key != "carelink_admin_setup_2026":
+        raise HTTPException(status_code=403, detail="Invalid setup key")
+    
+    email = body.get("email", "admin@carelink.co.il")
+    password = body.get("password", "Admin123!")
+    name = body.get("name", "מנהל המערכת")
+    
+    # Check if admin already exists
+    existing = await db.users.find_one({"email": email})
+    if existing:
+        # Update to admin role if not already
+        await db.users.update_one(
+            {"email": email},
+            {"$set": {"role": "admin", "password_hash": hash_password(password)}}
+        )
+        return {"message": "Admin user updated", "email": email}
+    
+    # Create admin user
+    user_number = f"U{uuid.uuid4().hex[:7].upper()}"
+    admin_user = {
+        "user_id": f"admin_{uuid.uuid4().hex[:12]}",
+        "user_number": user_number,
+        "email": email,
+        "name": name,
+        "password_hash": hash_password(password),
+        "role": "admin",
+        "phone": "",
+        "is_verified": True,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "language_preference": "he"
+    }
+    
+    await db.users.insert_one(admin_user)
+    
+    return {
+        "message": "Admin user created successfully",
+        "email": email,
+        "password": password,
+        "note": "Please change the password after first login"
+    }
+
 @api_router.get("/auth/session")
 async def google_auth_session(session_id: str = Header(None, alias="X-Session-ID"), response: Response = None):
     """Handle Google OAuth session - get user data from Emergent Auth"""
