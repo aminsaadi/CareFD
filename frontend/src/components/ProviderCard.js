@@ -180,42 +180,42 @@ const ProviderCard = ({ provider, showContact = true }) => {
         )}
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap sm:flex-nowrap">
           <Link
             to={`/providers/${provider.provider_id}`}
-            className="flex-1 text-center bg-carelink-teal text-white px-4 py-2.5 rounded-xl hover:bg-carelink-teal-medium transition-colors font-medium"
+            className="flex-1 min-w-[140px] text-center bg-carelink-teal text-white px-4 py-2.5 rounded-xl hover:bg-carelink-teal-medium transition-colors font-medium text-sm sm:text-base"
             data-testid={`view-provider-${provider.provider_id}`}
           >
             צפה בפרופיל
           </Link>
           
           {showContact && (
-            <>
+            <div className="flex gap-2">
               <button
                 onClick={handleCall}
-                className="w-11 h-11 flex items-center justify-center bg-carelink-navy text-white rounded-xl hover:bg-carelink-slate transition-colors"
+                className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-carelink-navy text-white rounded-xl hover:bg-carelink-slate transition-colors"
                 data-testid={`call-${provider.provider_id}`}
                 title="התקשר"
               >
-                <FaPhone />
+                <FaPhone className="text-sm sm:text-base" />
               </button>
               <button
                 onClick={handleWhatsApp}
-                className="w-11 h-11 flex items-center justify-center bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors"
+                className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors"
                 data-testid={`whatsapp-${provider.provider_id}`}
                 title="WhatsApp"
               >
-                <FaWhatsapp className="text-lg" />
+                <FaWhatsapp className="text-base sm:text-lg" />
               </button>
               <button
                 onClick={handleChat}
-                className="w-11 h-11 flex items-center justify-center bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors"
+                className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors"
                 data-testid={`chat-${provider.provider_id}`}
                 title="צ'אט"
               >
-                <FaComments />
+                <FaComments className="text-sm sm:text-base" />
               </button>
-            </>
+            </div>
           )}
         </div>
       </div>
