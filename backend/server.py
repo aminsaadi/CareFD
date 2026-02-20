@@ -3911,6 +3911,49 @@ async def admin_get_featured_providers(
     providers = await db.providers.find({"is_recommended": True}, {"_id": 0}).to_list(100)
     return {"providers": providers}
 
+@api_router.delete("/admin/providers/clear-all")
+async def admin_clear_all_providers(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Delete all providers (use with caution!)"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Delete all providers
+    result = await db.providers.delete_many({})
+    
+    # Delete all services
+    services_result = await db.services.delete_many({})
+    
+    return {
+        "message": "All providers cleared",
+        "providers_deleted": result.deleted_count,
+        "services_deleted": services_result.deleted_count
+    }
+
+@api_router.delete("/admin/providers/{provider_id}")
+async def admin_delete_provider(
+    provider_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Delete a specific provider"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Delete provider
+    result = await db.providers.delete_one({"provider_id": provider_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    # Delete provider's services
+    await db.services.delete_many({"provider_id": provider_id})
+    
+    return {"message": "Provider deleted", "provider_id": provider_id}
+
 # ==================== ADMIN REPORTS ====================
 
 @api_router.get("/admin/reports")
