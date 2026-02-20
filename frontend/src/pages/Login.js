@@ -41,7 +41,9 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    const redirectUrl = window.location.origin + '/auth/callback';
+    // Use custom domain if set, otherwise use current origin
+    const baseUrl = process.env.REACT_APP_SITE_URL || window.location.origin;
+    const redirectUrl = baseUrl + '/auth/callback';
     window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
