@@ -105,25 +105,6 @@ const Login = () => {
               </div>
             )}
 
-            {/* Google Login */}
-            <button
-              onClick={handleGoogleLogin}
-              className="w-full flex items-center justify-center gap-3 bg-white border-2 border-carelink-teal-pale text-carelink-navy px-4 py-4 rounded-xl hover:bg-carelink-teal-pale/20 font-semibold transition-all shadow-sm hover:shadow-md"
-              data-testid="google-login-btn"
-            >
-              <FcGoogle className="text-2xl" />
-              {t('loginWithGoogle')}
-            </button>
-
-            <div className="relative my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t-2 border-carelink-teal-pale"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-carelink-gray">{t('orContinueWith')}</span>
-              </div>
-            </div>
-
             {/* Email/Password Login */}
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
