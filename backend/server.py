@@ -4841,6 +4841,13 @@ async def admin_update_plan(
 
 # ==================== PUSH NOTIFICATIONS ====================
 
+@api_router.get("/push/vapid-public-key")
+async def get_vapid_public_key():
+    """Get VAPID public key for push notification subscription"""
+    if not VAPID_PUBLIC_KEY:
+        raise HTTPException(status_code=503, detail="Push notifications not configured")
+    return {"publicKey": VAPID_PUBLIC_KEY}
+
 @api_router.post("/push/subscribe")
 async def subscribe_push_notifications(
     subscription_data: dict,
