@@ -599,6 +599,45 @@ const AdminUsers = () => {
         />
       )}
 
+      {/* Reset Password Modal */}
+      {showResetPasswordModal && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-200 shadow-xl">
+            <h3 className="text-lg font-bold text-carelink-navy mb-2">איפוס סיסמה</h3>
+            <p className="text-carelink-slate mb-4">
+              הגדר סיסמה חדשה עבור המשתמש: <strong>{showResetPasswordModal.name}</strong>
+            </p>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-carelink-navy mb-2">סיסמה חדשה</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="הזן סיסמה חדשה (מינימום 6 תווים)"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowResetPasswordModal(null);
+                  setNewPassword('');
+                }}
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+              >
+                ביטול
+              </button>
+              <button
+                onClick={handleResetPassword}
+                className="flex-1 px-4 py-2.5 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
+              >
+                עדכן סיסמה
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Delete Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
