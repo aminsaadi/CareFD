@@ -51,6 +51,7 @@ const ProviderDashboard = () => {
   const [services, setServices] = useState([]);
   const [requests, setRequests] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   
