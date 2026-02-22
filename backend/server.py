@@ -658,6 +658,60 @@ async def send_email_async(recipient: str, subject: str, html_content: str):
     except Exception as e:
         logger.error(f"Failed to send email: {str(e)}")
 
+async def send_push_notification(subscription_info: dict, title: str, body: str, data: dict = None, icon: str = "/logo192.png"):
+    """Send a Web Push notification to a single subscription"""
+    if not VAPID_PRIVATE_KEY or not VAPID_PUBLIC_KEY:
+        logger.warning("VAPID keys not configured, skipping push notification")
+        return False
+    
+    payload = json.dumps({
+        "title": title,
+        "body": body,
+        "icon": icon,
+        "badge": "/logo192.png",
+        "data": data or {},
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    })
+    
+    try:
+        webpush(
+            subscription_info=subscription_info,
+            data=payload,
+            vapid_private_key=VAPID_PRIVATE_KEY,
+            vapid_claims={"sub": f"mailto:{VAPID_CLAIMS_EMAIL}"}
+        )
+        logger.info(f"Push notification sent to endpoint: {subscription_info.get('endpoint', 'unknown')[:50]}...")
+        return True
+    except WebPushException as ex:
+        logger.error(f"Push notification failed: {repr(ex)}")
+        # Handle subscription expiry (410 Gone or 404 Not Found)
+        if ex.response and ex.response.status_code in [404, 410]:
+            # Remove invalid subscription
+            await db.push_subscriptions.delete_one({"endpoint": subscription_info.get("endpoint")})
+            logger.info("Removed invalid push subscription")
+        return False
+    except Exception as e:
+        logger.error(f"Push notification error: {str(e)}")
+        return False
+
+async def send_push_to_user(user_id: str, title: str, body: str, data: dict = None):
+    """Send push notifications to all devices of a specific user"""
+    subscriptions = await db.push_subscriptions.find(
+        {"user_id": user_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    success_count = 0
+    for sub in subscriptions:
+        subscription_info = {
+            "endpoint": sub.get("endpoint"),
+            "keys": sub.get("keys")
+        }
+        if await send_push_notification(subscription_info, title, body, data):
+            success_count += 1
+    
+    return success_count
+
 # ==================== AUTH ROUTES ====================
 
 @api_router.post("/auth/register")
