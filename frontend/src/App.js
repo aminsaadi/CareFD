@@ -287,6 +287,22 @@ function AppRouter() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/admin/notifications"
+        element={
+          <ProtectedRoute>
+            <AdminNotifications />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/messages"
+        element={
+          <ProtectedRoute>
+            <AdminMessages />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
