@@ -545,11 +545,21 @@ const Landing = () => {
             </Link>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {dummyServices.slice(0, 6).map((service) => (
-              <ServiceCard key={service.service_id} service={service} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <FaSpinner className="animate-spin text-4xl text-carelink-teal" />
+            </div>
+          ) : popularServices.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {popularServices.slice(0, 6).map((service) => (
+                <ServiceCard key={service.service_id} service={service} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-carelink-teal-pale/20 rounded-2xl">
+              <p className="text-carelink-slate">בקרוב יתווספו שירותים...</p>
+            </div>
+          )}
           
           <div className="mt-8 text-center md:hidden">
             <Link
