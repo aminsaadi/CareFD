@@ -3152,9 +3152,13 @@ async def admin_update_provider(
         "business_name", "email", "phone", "address", "city", "bio",
         "experience_years", "years_experience", "specializations", "languages", "is_verified",
         "is_recommended", "provider_type", "license_number", "location",
-        # New fields for complete profile editing
-        "profession_title", "gender", "about", "description", "profile_image",
-        "expertise", "target_audience", "service_areas", "availability", "website"
+        # Complete profile editing fields
+        "profession_title", "gender", "about", "description", "profile_image", "profile_color",
+        "expertise", "target_audience", "service_areas", "availability", "website",
+        # New enhanced profile fields
+        "health_funds", "payment_methods", "cancellation_policy", "cancellation_notice_hours",
+        "show_phone", "show_email", "show_whatsapp", "whatsapp_number",
+        "education", "certifications"
     ]
     
     update_data = {}
