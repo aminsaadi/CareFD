@@ -27,7 +27,8 @@ const AdminProviders = () => {
       params.append('limit', pagination.limit);
       params.append('skip', (pagination.page - 1) * pagination.limit);
       
-      const response = await api.get(`/providers?${params.toString()}`);
+      // Use admin endpoint to get ALL providers (not just verified)
+      const response = await api.get(`/admin/providers?${params.toString()}`);
       setProviders(response.data.providers || []);
       setPagination(prev => ({ ...prev, total: response.data.total || 0 }));
     } catch (error) {
