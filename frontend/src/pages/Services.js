@@ -90,26 +90,126 @@ const Services = () => {
           {t('services')}
         </h1>
 
-        <SearchBar
-          onSearch={handleSearch}
-          placeholder="חפש שירותים..."
-        />
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Filters Sidebar */}
+          <div className={`lg:w-72 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+            <div className="bg-white rounded-xl shadow-lg p-5 sticky top-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-carelink-navy flex items-center gap-2">
+                  <FaFilter className="text-carelink-teal" />
+                  סינון
+                </h3>
+                <button 
+                  onClick={resetFilters}
+                  className="text-sm text-carelink-teal hover:underline"
+                >
+                  נקה הכל
+                </button>
+              </div>
 
-        {loading ? (
-          <div className="text-center py-12" data-testid="loading-indicator">
-            {t('loading')}
+              {/* Service Type */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-carelink-navy mb-2">סוג שירות</label>
+                <select
+                  value={filters.serviceType}
+                  onChange={(e) => setFilters({...filters, serviceType: e.target.value})}
+                  className="w-full p-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                >
+                  <option value="">הכל</option>
+                  <option value="home_visit">ביקור בית</option>
+                  <option value="clinic_visit">ביקור במרפאה</option>
+                  <option value="video_call">שיחת וידאו</option>
+                  <option value="phone_call">שיחה טלפונית</option>
+                </select>
+              </div>
+
+              {/* Price Range */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-carelink-navy mb-2">טווח מחירים</label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    placeholder="מ-"
+                    value={filters.priceMin}
+                    onChange={(e) => setFilters({...filters, priceMin: e.target.value})}
+                    className="w-1/2 p-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                  />
+                  <input
+                    type="number"
+                    placeholder="עד"
+                    value={filters.priceMax}
+                    onChange={(e) => setFilters({...filters, priceMax: e.target.value})}
+                    className="w-1/2 p-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* City */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-carelink-navy mb-2">עיר</label>
+                <input
+                  type="text"
+                  placeholder="הזן עיר..."
+                  value={filters.city}
+                  onChange={(e) => setFilters({...filters, city: e.target.value})}
+                  className="w-full p-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                />
+              </div>
+
+              {/* Close button on mobile */}
+              <button
+                onClick={() => setShowFilters(false)}
+                className="lg:hidden w-full mt-4 py-2 bg-carelink-teal text-white rounded-lg"
+              >
+                החל סינון
+              </button>
+            </div>
           </div>
-        ) : services.length === 0 ? (
-          <div className="text-center py-12 text-gray-600" data-testid="no-services">
-            לא נמצאו שירותים
+
+          {/* Main Content */}
+          <div className="flex-1">
+            {/* Mobile Filter Button */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="lg:hidden mb-4 flex items-center gap-2 px-4 py-2 bg-carelink-teal text-white rounded-lg"
+            >
+              <FaFilter />
+              {showFilters ? 'הסתר סינון' : 'סינון'}
+            </button>
+
+            <SearchBar
+              onSearch={handleSearch}
+              placeholder="חפש שירותים..."
+            />
+
+            <p className="text-carelink-gray my-4">
+              נמצאו <span className="font-bold text-carelink-navy">{filteredServices.length}</span> שירותים
+            </p>
+
+            {loading ? (
+              <div className="text-center py-12" data-testid="loading-indicator">
+                <div className="w-12 h-12 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
+              </div>
+            ) : filteredServices.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-xl shadow-lg">
+                <p className="text-xl text-carelink-navy mb-2">לא נמצאו שירותים</p>
+                <p className="text-carelink-gray">נסה לשנות את הסינון או מילות החיפוש</p>
+                <button
+                  onClick={resetFilters}
+                  className="mt-4 px-4 py-2 bg-carelink-teal text-white rounded-lg"
+                >
+                  נקה סינון
+                </button>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 gap-6">
+                {filteredServices.map((service) => (
+                  <ServiceCard key={service.service_id} service={service} />
+                ))}
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-            {services.map((service) => (
-              <ServiceCard key={service.service_id} service={service} />
-            ))}
-          </div>
-        )}
+        </div>
       </div>
 
       <Footer />
