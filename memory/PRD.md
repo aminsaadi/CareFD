@@ -434,6 +434,24 @@ CareLink is a healthcare services platform in Israel connecting users with healt
   - כפתור מחיקה בטאב הגדרות קשר
   - מוצג רק כשיש תמונה (conditional rendering)
 
+### Enhanced User Dashboard (Feb 22, 2026) - COMPLETE:
+- **User Number Display**: מספר יוזר מוצג בסיידבר במקום אימייל (e.g., U9382183)
+- **Profile Image with Initials**: תמונת פרופיל עם אותיות ראשוניות וצבע רקע גרדיאנט
+- **Extended Settings Tabs**:
+  - תמונת פרופיל: העלאה, מחיקה, בחירת צבע רקע
+  - פרטים אישיים: שם פרטי, שם משפחה
+  - פרטי התקשרות: אימייל (readonly), טלפון
+  - כתובת: עיר, כתובת מלאה
+  - שינוי סיסמה: סיסמה נוכחית, חדשה, אימות
+- **My Reviews Tab (הביקורות שלי)**: הצגת כל הביקורות שהמשתמש כתב עם פרטי הספק
+- **My Bookings Tab (ההזמנות שלי)**: 
+  - רשימת הזמנות עם סטטוסים צבעוניים
+  - חלון קופץ בלחיצה על הזמנה עם פרטים מלאים
+  - פרטי תשלום: מחיר, אמצעי תשלום, שולם ע"י
+  - כפתורים: "צפה בספק", "כתוב ביקורת"
+- **New API Endpoint**:
+  - GET /reviews/my - Returns user's reviews with provider info
+
 ### Feb 12, 2026
 - Added GPS-based search with radius
 - Added region quick-select buttons
