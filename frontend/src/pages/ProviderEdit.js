@@ -1257,6 +1257,17 @@ const ProviderEdit = () => {
                       )}
                     </div>
                     <div className="space-y-3">
+                      {formData.profile_image && (
+                        <button
+                          type="button"
+                          onClick={handleDeleteImage}
+                          className="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition text-sm font-medium"
+                          data-testid="delete-profile-image-contact-tab"
+                        >
+                          <FaTrash size={12} />
+                          מחק תמונת פרופיל
+                        </button>
+                      )}
                       <p className="text-sm text-carelink-gray">בחר צבע רקע (יוצג כאשר אין תמונה)</p>
                       <div className="flex gap-2">
                         {PROFILE_COLORS.map(color => (
