@@ -493,7 +493,7 @@ const Providers = () => {
               {/* Results Count */}
               <div className="flex items-center justify-between mb-4">
                 <p className="text-carelink-gray">
-                  נמצאו <span className="font-bold text-carelink-navy">{providers.length}</span> ספקים
+                  נמצאו <span className="font-bold text-carelink-navy">{totalProviders}</span> ספקים
                 </p>
               </div>
 
