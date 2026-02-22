@@ -301,6 +301,24 @@ const AdminProviders = () => {
                               >
                                 <FiAward size={16} />
                               </button>
+                              <button
+                                onClick={() => setShowToggleModal(provider)}
+                                className={`p-2 rounded-lg transition ${
+                                  provider.is_active === false
+                                    ? 'text-gray-400 hover:text-emerald-500 hover:bg-emerald-50'
+                                    : 'text-emerald-500 hover:text-gray-400 hover:bg-gray-50'
+                                }`}
+                                title={provider.is_active === false ? 'הפעל ספק' : 'השבת ספק'}
+                              >
+                                {provider.is_active === false ? <FiToggleLeft size={18} /> : <FiToggleRight size={18} />}
+                              </button>
+                              <button
+                                onClick={() => setShowDeleteModal(provider)}
+                                className="p-2 text-carelink-slate hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                                title="מחק ספק"
+                              >
+                                <FiTrash2 size={16} />
+                              </button>
                             </>
                           )}
                         </div>
@@ -313,6 +331,67 @@ const AdminProviders = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete Provider Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-200 shadow-xl">
+            <h3 className="text-lg font-bold text-carelink-navy mb-2">מחיקת ספק</h3>
+            <p className="text-carelink-slate mb-4">
+              האם אתה בטוח שברצונך למחוק את הספק "{showDeleteModal.business_name}"?
+              <br />
+              <span className="text-red-500 text-sm">פעולה זו תמחק גם את כל השירותים של הספק ולא ניתנת לביטול.</span>
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteModal(null)}
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+              >
+                ביטול
+              </button>
+              <button
+                onClick={() => deleteProvider(showDeleteModal.provider_id)}
+                className="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+              >
+                מחק
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toggle Status Modal */}
+      {showToggleModal && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-200 shadow-xl">
+            <h3 className="text-lg font-bold text-carelink-navy mb-2">
+              {showToggleModal.is_active === false ? 'הפעלת ספק' : 'השבתת ספק'}
+            </h3>
+            <p className="text-carelink-slate mb-4">
+              {showToggleModal.is_active === false 
+                ? `האם אתה בטוח שברצונך להפעיל את הספק "${showToggleModal.business_name}"? הספק יופיע שוב בתוצאות החיפוש.`
+                : `האם אתה בטוח שברצונך להשבית את הספק "${showToggleModal.business_name}"? הספק לא יופיע בתוצאות החיפוש.`
+              }
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowToggleModal(null)}
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+              >
+                ביטול
+              </button>
+              <button
+                onClick={() => toggleProviderStatus(showToggleModal.provider_id, showToggleModal.is_active !== false)}
+                className={`flex-1 px-4 py-2.5 text-white rounded-lg transition ${
+                  showToggleModal.is_active === false ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-amber-500 hover:bg-amber-600'
+                }`}
+              >
+                {showToggleModal.is_active === false ? 'הפעל' : 'השבת'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 };
