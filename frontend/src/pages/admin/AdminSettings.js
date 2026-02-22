@@ -63,12 +63,44 @@ const AdminSettings = () => {
     try {
       setSaving(true);
       await api.put('/admin/settings', settings);
-      alert('ההגדרות נשמרו בהצלחה!');
+      toast.success('ההגדרות נשמרו בהצלחה!');
     } catch (error) {
       console.error('Failed to save settings:', error);
-      alert('שגיאה בשמירת ההגדרות');
+      toast.error('שגיאה בשמירת ההגדרות');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const clearCache = async () => {
+    try {
+      await api.post('/admin/clear-cache');
+      // Clear local storage and session storage
+      localStorage.clear();
+      sessionStorage.clear();
+      toast.success('המטמון נוקה בהצלחה!');
+      // Reload the page
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (error) {
+      console.error('Failed to clear cache:', error);
+      // Still clear local cache even if API fails
+      localStorage.clear();
+      sessionStorage.clear();
+      toast.success('המטמון המקומי נוקה!');
+      setTimeout(() => window.location.reload(), 1000);
+    }
+  };
+
+  const clearAllProviders = async () => {
+    if (!window.confirm('האם אתה בטוח שברצונך למחוק את כל הספקים? פעולה זו בלתי הפיכה!')) {
+      return;
+    }
+    try {
+      const response = await api.delete('/admin/providers/clear-all');
+      toast.success(`נמחקו ${response.data.providers_deleted} ספקים ו-${response.data.services_deleted} שירותים`);
+    } catch (error) {
+      console.error('Failed to clear providers:', error);
+      toast.error('שגיאה במחיקת הספקים');
     }
   };
 
