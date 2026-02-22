@@ -38,6 +38,8 @@ import AdminReports from './pages/admin/AdminReports';
 import AdminServices from './pages/admin/AdminServices';
 import AdminSubscriptions from './pages/admin/AdminSubscriptions';
 import AdminPushNotifications from './pages/admin/AdminPushNotifications';
+import AdminNotifications from './pages/admin/AdminNotifications';
+import AdminMessages from './pages/admin/AdminMessages';
 import './i18n';
 import './App.css';
 
