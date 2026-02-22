@@ -421,9 +421,12 @@ const ProviderEdit = () => {
     { id: 'basic', label: 'פרטים בסיסיים', icon: FaUser },
     { id: 'about', label: 'אודות', icon: FaInfoCircle },
     { id: 'expertise', label: 'התמחויות', icon: FaGraduationCap },
+    { id: 'education', label: 'השכלה ותעודות', icon: FaAward },
     { id: 'location', label: 'מיקום ואזורים', icon: FaMapMarkerAlt },
     { id: 'availability', label: 'זמינות', icon: FaClock },
     { id: 'audience', label: 'קהל יעד ושפות', icon: FaUsers },
+    { id: 'business', label: 'תשלום וקופות', icon: FaCreditCard },
+    { id: 'contact', label: 'הגדרות קשר', icon: FaPhone },
   ];
 
   if (loading) {
