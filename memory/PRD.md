@@ -380,20 +380,30 @@ CareLink is a healthcare services platform in Israel connecting users with healt
   - Toast notifications for success/error
   - Green checkmark indicator after review submitted
 
-- **Full Profile Editing (Provider & Admin)**
-  - **Provider Dashboard**: Added "ערוך פרופיל" button linking to full edit page
-  - **Provider Edit Page** (`/provider/edit/:providerId`): Complete 6-tab form:
-    - פרטים בסיסיים: שם, מקצוע, מגדר, שנות ותק, טלפון, אימייל, אתר, תיאור קצר
-    - אודות: טקסט ארוך על הספק
-    - התמחויות: התמחויות + מומחיויות ספציפיות (dynamic array fields)
-    - מיקום ואזורים: כתובת, עיר, אזורי שירות (multi-select)
-    - זמינות: לוח זמינות שבועי עם 4 משמרות × 7 ימים (visual grid)
-    - קהל יעד ושפות: בחירת שפות וקהלי יעד (multi-select buttons)
-  - **Admin Provider Edit** (`/admin/providers/:providerId/edit`): Same 6-tab form
-    - Added all new fields to admin API: profession_title, gender, about, description, 
-      profile_image, expertise, target_audience, service_areas, availability, website
-    - Admin can upload provider profile images
-    - Quick actions: Verify provider, Toggle recommended status
+- **Enhanced Provider Profile (COMPLETE)**
+  - **Provider Edit Page** (`/provider/edit/:providerId`): Complete 9-tab form:
+    1. פרטים בסיסיים: שם, מקצוע, מגדר, שנות ותק, טלפון, אימייל, אתר, תיאור קצר
+    2. אודות: טקסט ארוך על הספק
+    3. התמחויות: התמחויות + מומחיויות ספציפיות (dynamic array fields)
+    4. **השכלה ותעודות**: רשימת תארים + תעודות/רישיונות עם אפשרות העלאת קבצים
+    5. מיקום ואזורים: כתובת, עיר, אזורי שירות (multi-select)
+    6. זמינות: לוח זמינות שבועי עם 4 משמרות × 7 ימים (visual grid)
+    7. קהל יעד ושפות: בחירת שפות וקהלי יעד (multi-select buttons)
+    8. **תשלום וקופות**: קופות חולים (כללית/מכבי/מאוחדת/לאומית/פרטי), אמצעי תשלום, מדיניות ביטולים
+    9. **הגדרות קשר**: הגדרות פרטיות - בחירה אילו פרטים להציג (טלפון/אימייל/WhatsApp), בחירת צבע רקע
+  - **Admin Provider Edit**: Same 9-tab form synced with admin API
+  - **Profile without Image**: Displays initials with gradient background color
+
+### New Profile Fields (Feb 22, 2026):
+- **education**: Array of {degree, institution, year, field}
+- **certifications**: Array of {name, issuer, year, license_number, document_url}
+- **health_funds**: Array of (clalit, maccabi, meuhedet, leumit, private)
+- **payment_methods**: Array of (cash, credit_card, bit, paybox, bank_transfer, check)
+- **cancellation_policy**: Text
+- **cancellation_notice_hours**: Number (0, 2, 6, 12, 24, 48, 72)
+- **show_phone**, **show_email**, **show_whatsapp**: Boolean
+- **whatsapp_number**: String
+- **profile_color**: Gradient color for profile without image
 
 ### Feb 12, 2026
 - Added GPS-based search with radius
