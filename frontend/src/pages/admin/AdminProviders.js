@@ -13,6 +13,7 @@ const AdminProviders = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0 });
+  const [creatingProfile, setCreatingProfile] = useState(null);
 
   useEffect(() => {
     fetchProviders();
@@ -57,6 +58,21 @@ const AdminProviders = () => {
       fetchProviders();
     } catch (error) {
       console.error('Failed to toggle recommended:', error);
+    }
+  };
+
+  const createProviderProfile = async (userId, userName) => {
+    try {
+      setCreatingProfile(userId);
+      await api.post(`/admin/providers/create-from-user/${userId}`, {
+        business_name: userName
+      });
+      fetchProviders();
+    } catch (error) {
+      console.error('Failed to create provider profile:', error);
+      alert('שגיאה ביצירת פרופיל ספק: ' + (error.response?.data?.detail || 'Unknown error'));
+    } finally {
+      setCreatingProfile(null);
     }
   };
 
