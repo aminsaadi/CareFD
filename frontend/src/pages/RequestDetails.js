@@ -25,6 +25,7 @@ const RequestDetails = () => {
     duration_days: '',
     message: ''
   });
+  const { confirmState, confirm, closeConfirm } = useConfirm();
 
   useEffect(() => {
     fetchRequestDetails();
@@ -55,23 +56,29 @@ const RequestDetails = () => {
         price: parseFloat(offerData.price),
         duration_days: offerData.duration_days ? parseInt(offerData.duration_days) : null
       });
-      alert('ההצעה נשלחה בהצלחה!');
+      toast.success('ההצעה נשלחה בהצלחה!');
       setShowOfferForm(false);
       fetchRequestDetails();
     } catch (error) {
-      alert(error.response?.data?.detail || t('errorOccurred'));
+      toast.error(error.response?.data?.detail || t('errorOccurred'));
     }
   };
 
   const handleAcceptOffer = async (offerId) => {
-    if (!window.confirm('האם אתה בטוח שברצונך לקבל הצעה זו?')) return;
+    await confirm({
+      title: 'קבלת הצעה',
+      message: 'האם אתה בטוח שברצונך לקבל הצעה זו?',
+      type: 'info',
+      confirmText: 'קבל הצעה',
+      cancelText: 'ביטול'
+    });
 
     try {
       await api.post(`/offers/${offerId}/accept`);
-      alert('ההצעה התקבלה! תוכל לתקשר עם הספק בצ\'אט');
+      toast.success('ההצעה התקבלה! תוכל לתקשר עם הספק בצ\'אט');
       navigate('/chats');
     } catch (error) {
-      alert(error.response?.data?.detail || t('errorOccurred'));
+      toast.error(error.response?.data?.detail || t('errorOccurred'));
     }
   };
 
@@ -313,4 +320,5 @@ const RequestDetails = () => {
   );
 };
 
+export { RequestDetails };
 export default RequestDetails;
