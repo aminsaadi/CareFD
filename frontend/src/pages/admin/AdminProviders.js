@@ -69,9 +69,10 @@ const AdminProviders = () => {
         business_name: userName
       });
       fetchProviders();
+      toast.success('פרופיל ספק נוצר בהצלחה!');
     } catch (error) {
       console.error('Failed to create provider profile:', error);
-      alert('שגיאה ביצירת פרופיל ספק: ' + (error.response?.data?.detail || 'Unknown error'));
+      toast.error('שגיאה ביצירת פרופיל ספק: ' + (error.response?.data?.detail || 'Unknown error'));
     } finally {
       setCreatingProfile(null);
     }
