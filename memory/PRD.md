@@ -288,6 +288,28 @@ CareLink is a healthcare services platform in Israel connecting users with healt
   - Confirmed: Services page fetches real data from /api/services (not dummy data)
   - Filter sidebar working: service type, price range, city
 
+- **Automatic Provider Welcome Email**
+  - New providers receive beautiful Hebrew email with profile completion link
+  - Email includes: steps to complete profile, tips for success, call-to-action button
+  - Regular users get a welcome email with link to search providers
+
+- **Push Notifications System (P2 COMPLETE)**
+  - **Backend Implementation:**
+    - pywebpush library integrated for Web Push protocol
+    - VAPID keys generated and configured in backend/.env
+    - New endpoint: GET /api/push/vapid-public-key - Returns public key for browser subscription
+    - Updated: POST /api/admin/push/send - Now sends real push notifications using webpush
+    - Notification preferences: GET/PUT /api/push/preferences - 7 notification types
+    - Push history: GET /api/admin/push/history - View sent notifications
+  - **Frontend Implementation:**
+    - Service Worker: /sw-push.js - Handles push events and notification clicks
+    - usePushNotifications hook: Manages subscription flow
+    - NotificationSettings component: Toggle switches for each notification type
+    - Dashboard settings tab: Includes notification settings UI
+  - **Notification Types:**
+    - new_booking, booking_confirmed, booking_cancelled
+    - new_message, provider_verified, system_updates, marketing
+
 ### Feb 12, 2026
 - Added GPS-based search with radius
 - Added region quick-select buttons
