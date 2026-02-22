@@ -3150,8 +3150,11 @@ async def admin_update_provider(
     # Fields that can be updated by admin
     allowed_fields = [
         "business_name", "email", "phone", "address", "city", "bio",
-        "experience_years", "specializations", "languages", "is_verified",
-        "is_recommended", "provider_type", "license_number", "location"
+        "experience_years", "years_experience", "specializations", "languages", "is_verified",
+        "is_recommended", "provider_type", "license_number", "location",
+        # New fields for complete profile editing
+        "profession_title", "gender", "about", "description", "profile_image",
+        "expertise", "target_audience", "service_areas", "availability", "website"
     ]
     
     update_data = {}
