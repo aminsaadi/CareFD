@@ -405,6 +405,23 @@ CareLink is a healthcare services platform in Israel connecting users with healt
 - **whatsapp_number**: String
 - **profile_color**: Gradient color for profile without image
 
+### Provider Dashboard Separation (Feb 22, 2026):
+- **פרטי משתמש** (User Info Tab): Personal details separate from business
+  - שם פרטי, שם משפחה
+  - טלפון אישי, אימייל (readonly)
+  - עיר וכתובת מגורים
+  - שינוי סיסמה (סיסמה נוכחית, חדשה, אימות)
+- **פרופיל ספק** (Provider Profile Tab): Business/professional profile
+  - פרטי העסק: שם, תיאור, סוג ספק, שנות ותק
+  - פרטי התקשרות עסקיים: טלפון, אימייל, אתר
+  - מיקום העסק
+  - התמחויות
+  - **סוגי שירות**: ביקור בית, ביקור במרפאה, טלרפואה
+  - קישור ל"עריכה מתקדמת" (9 טאבים מלאים)
+- New API endpoints:
+  - PUT /users/me - Update user personal info
+  - PUT /users/me/password - Change password
+
 ### Feb 12, 2026
 - Added GPS-based search with radius
 - Added region quick-select buttons
