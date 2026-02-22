@@ -81,6 +81,30 @@ const AdminProviders = () => {
     }
   };
 
+  const deleteProvider = async (providerId) => {
+    try {
+      await api.delete(`/admin/providers/${providerId}`);
+      setShowDeleteModal(null);
+      fetchProviders();
+      toast.success('הספק נמחק בהצלחה!');
+    } catch (error) {
+      console.error('Failed to delete provider:', error);
+      toast.error('שגיאה במחיקת הספק');
+    }
+  };
+
+  const toggleProviderStatus = async (providerId, isActive) => {
+    try {
+      await api.put(`/admin/providers/${providerId}`, { is_active: !isActive });
+      setShowToggleModal(null);
+      fetchProviders();
+      toast.success(isActive ? 'הספק הושבת' : 'הספק הופעל');
+    } catch (error) {
+      console.error('Failed to toggle provider status:', error);
+      toast.error('שגיאה בשינוי סטטוס הספק');
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
