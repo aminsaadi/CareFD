@@ -3,8 +3,6 @@ The user initially requested a Provider Verification System and an Enhanced Serv
 
 The project includes a comprehensive admin dashboard for managing users, providers, services, bookings, and site settings. The user's focus is on preparing the site for go-live at their domain (), which involves stabilizing the application, fixing core functionality bugs, and implementing a series of UI/UX improvements.
 
-Recent requests have involved fixing critical bugs in the provider registration and management flow, implementing push notifications, adding static content pages, enhancing the homepage, and improving the overall user experience by replacing native browser alerts with modern UI components.
-
 **PRODUCT REQUIREMENTS:**
 1.  A platform for service providers to register, create detailed profiles, and manage their availability.
 2.  A system for users to search, filter, and book services from providers.
@@ -19,171 +17,165 @@ Recent requests have involved fixing critical bugs in the provider registration 
 **User's preferred language**: The user's primary language is **Hebrew**. The next agent MUST respond in Hebrew.
 
 **what currently exists?**
-A full-stack application using React (frontend), FastAPI (backend), and MongoDB (database). The core features are largely implemented, including user/provider/admin roles, a booking system, a chat system, and an extensive admin dashboard.
+A full-stack application using React (frontend), FastAPI (backend), and MongoDB (database).
 
-In the last session, numerous critical bugs and feature requests were addressed:
-*   The broken provider registration flow was fixed. New providers now have a profile created automatically, and admins can manage orphaned accounts created before the fix.
-*   A complete Web Push Notification system was implemented using VAPID keys, allowing users to subscribe to and receive notifications.
-*   The homepage was updated to fetch and display real data (featured providers, popular services) instead of dummy data.
-*   Static pages (About, Contact Us, Privacy Policy, Terms) were created.
-*   A cookie consent banner was added.
-*   An admin feature to edit provider profiles was implemented.
-*   Several critical bugs were fixed, including an incorrect redirect on the homepage and broken links in the user/provider dashboards.
+In the last session, the agent performed a major enhancement of the provider profile and dashboard functionality.
+-   All native browser  and  dialogs were successfully replaced with modern UI components ( for toasts and a custom ).
+-   A feature for users to add reviews and ratings to providers after a booking is completed was implemented.
+-   The provider profile was significantly expanded with new sections: Education, Certifications, Health Funds, Payment Methods, Cancellation Policy, and Contact Visibility Settings.
+-   The Provider and Admin dashboards were updated to allow editing of all these new fields.
+-   The Provider Dashboard was refactored to separate personal User Details (name, password) from the professional Provider Profile, as requested by the user.
 
 **Last working item**:
--   **Last item agent was working:** Replacing all native browser  and  dialogs with modern, custom UI components. The agent implemented a generic  component with a  hook and used  for toast notifications. The changes were applied to the  and  pages.
--   **Status:** IN PROGRESS
--   **Agent Testing Done:** N (The last screenshot attempt failed, and no other testing was performed for this specific change).
--   **Which testing method agent to use?** frontend testing agent. The agent should be instructed to verify that the new confirmation dialogs and toasts appear and function correctly on the pages that were modified (, ) and to search for any remaining  or  instances in the codebase.
+-   **Last item agent was working:** The user requested to display all the newly added provider profile fields (Education, Certifications, Health Funds, Payment Methods, etc.) on the public-facing provider profile page. The agent acknowledged the request and was about to begin implementation.
+-   **Status:** NOT STARTED
+-   **Agent Testing Done:** N
+-   **Which testing method agent to use?** frontend testing agent. The agent should be instructed to:
+    1.  Modify  to fetch and render all the new data fields from the backend.
+    2.  Verify that all new sections (Education, Certifications, Health Funds, etc.) display correctly on the public profile page for a provider that has this data.
+    3.  Ensure the page layout remains clean and readable with the new information.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1:** Replace all native browser alerts and confirmations with modern UI components. (Priority: P0)
--   **Issue 2:** The user experiences data caching issues on the production site (). (Priority: P1)
+-   **Issue 1:** Display all new provider details on the public profile page. (Priority: P0)
+-   **Issue 2:** The user experiences data caching issues on the production site (). (Priority: P2)
 
 **Issues Detail:**
--   **Issue 1: Replace native alerts/confirms**
-    -   **Attempted fixes:** A reusable  component and  hook were created in .  was used for toasts. These were implemented in  and .
+-   **Issue 1: Display new provider details on public profile page**
+    -   **Attempted fixes:** None. This is a new task.
     -   **Next debug checklist:**
-        1.  Verify the implementation in  and  works as expected.
-        2.  Globally search the  directory for any remaining instances of  and .
-        3.  Replace all found instances with the new  hook or  from .
-    -   **Why fix this issue and what will be achieved with the fix?** To improve the application's UI/UX by providing a modern, consistent, and non-blocking notification and confirmation system, as requested by the user.
-    -   **Status:** IN PROGRESS
+        1.  View  to understand its current structure.
+        2.  View  to confirm the endpoint that serves the public provider data (likely ). Ensure it returns all the new fields.
+        3.  Update the frontend component to fetch and display the new fields: , , , , .
+        4.  Use appropriate UI elements (lists, cards, icons) to present the information clearly.
+    -   **Why fix this issue and what will be achieved with the fix?** To make the detailed provider information visible to potential customers, increasing transparency and trust, which is a core value proposition of the platform.
+    -   **Status:** NOT STARTED
     -   **Is recurring issue?** N
     -   **Should Test frontend/backend/both after fix?** Frontend
     -   **Blocked on other issue:** None.
 
 -   **Issue 2: Production Caching Issues**
-    -   **Attempted fixes:** The agent previously removed dummy data from several pages, which was a root cause. A Clear Cache button was also added to the admin panel.
-    -   **Next debug checklist:** This issue is likely external (Cloudflare). The agent should remind the user about best practices for clearing their Cloudflare cache after deployments. No further code changes are immediately necessary unless the user can point to a specific part of the app that is not sending correct cache headers.
-    -   **Why fix this issue and what will be achieved with the fix?** The user will see real-time data on the production site, increasing trust in the platform.
-    -   **Status:** NOT STARTED (in this context, as it's likely an external configuration issue)
+    -   **Attempted fixes:** A Clear Cache button was previously added to the admin panel. The root cause is believed to be external (Cloudflare).
+    -   **Next debug checklist:** This is an informational task. Remind the user about the need to clear their Cloudflare cache after deployments. No code changes are required unless a specific application endpoint is identified as sending incorrect cache-control headers.
+    -   **Why fix this issue and what will be achieved with the fix?** The user will see real-time data on the production site, preventing confusion and building trust.
+    -   **Status:** NOT STARTED
     -   **Is recurring issue?** Y
     -   **Should Test frontend/backend/both after fix?** None (informational)
     -   **Blocked on other issue:** None.
 
 **In progress Task List**:
 -   **Task 1: Backend Refactoring** (Priority: P1)
-    -   **Where to resume:** The agent created a new directory structure (, , etc.) and some empty files. The next step is to start migrating endpoints from the monolithic  into the new router files (e.g., , ).
-    -   **What will be achieved with this?** It will significantly improve the backend code's maintainability, scalability, and organization, reducing the risk of introducing bugs in the massive  file.
+    -   **Where to resume:** The directory structure (, etc.) exists. The next step is to migrate the first set of endpoints (e.g., , ) from the monolithic  into their respective router files and wire them up in .
+    -   **What will be achieved with this?** It will significantly improve the backend code's maintainability, scalability, and organization, making future development faster and safer.
     -   **Status:** IN PROGRESS
     -   **Should Test frontend/backend/both after fix?** Backend (Extensive regression testing will be required after each module is migrated).
     -   **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **P2: Add Database Model for Districts:** The footer now contains a hardcoded list of regions. This should be backed by a database collection manageable from the admin panel.
+    -   **P2: Add Database Model for Districts:** The footer contains a hardcoded list of regions. This should be backed by a database collection manageable from the admin panel.
 -   **Future Tasks:**
     -   **P3: Complete PayPal Integration:** This is blocked pending user-provided API keys.
     -   **P4: Add mail notifications:** The user requested adding an automatic email when a new provider registers.
 
 **Completed work in this session**
--   **Provider Registration Flow (FIXED):** Fixed the critical bug where new providers were not getting a profile created. The fix was applied to the backend registration endpoint, and the admin UI was updated to handle orphaned accounts created before the fix.
--   **Push Notifications (DONE):** A full web push notification system was implemented using . This includes backend logic, VAPID key generation, and frontend UI for users to subscribe and manage notification preferences in their dashboards.
--   **Homepage Dynamic Data (DONE):** Replaced  and  on the  page with live data fetched from the API.
--   **Static Pages (DONE):** Created and integrated About Us, Contact Us, Privacy Policy, and Terms of Service pages.
--   **Cookie Consent (DONE):** Implemented a cookie consent banner that appears for new visitors.
--   **Admin Provider Edit (DONE):** Admins can now edit provider profiles directly from the admin dashboard.
--   **Bug Fix - Homepage Redirect (FIXED):** Resolved an issue where unauthenticated users were automatically redirected to the login page.
--   **Bug Fix - Dashboard Links (FIXED):** Corrected the Dashboard link in the header to navigate users and providers to their respective dashboards ( vs. ).
--   **Bug Fix - Chat Visibility (FIXED):** Fixed a backend API error ( on a  cursor) that prevented chat conversations from appearing in dashboards.
--   **UI/UX Enhancements:**
-    -   Added a Messages (Chat) tab to the provider dashboard.
-    -   Synced the provider's Settings tab to match the user's dashboard, including notification settings.
-    -   Added an Areas/Cities column to the site footer.
+-   **Modern UI Alerts/Confirms (DONE):** Replaced all native  and  calls across the entire frontend with a custom  hook and  toasts.
+-   **Provider Review System (DONE):** Implemented functionality for users to write a review and give a rating for a provider after a booking status is Completed.
+-   **Provider Profile Expansion (DONE):** Added extensive new fields to the provider profile: , , , , , and . This was implemented in the frontend edit pages (, ) and the backend API.
+-   **Provider Dashboard Refactor (DONE):** Separated User Details (personal info, password) from Provider Profile (professional info) into distinct tabs within the provider dashboard for better organization.
+-   **Admin Edit Parity (DONE):** Ensured the Admin's Edit Provider page has all the same fields and tabs as the provider's own edit page.
+-   **Data Fix (DONE):** Manually updated a provider's profile in the database to fix missing data.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend:** React, Axios, Tailwind CSS, Sonner (for toasts)
--   **Backend:** Python, FastAPI, Web Push (py_vapid)
+-   **Frontend:** React, Axios, Tailwind CSS, Sonner (for toasts), 
+-   **Backend:** Python, FastAPI, MongoDB (Pymongo), Bcrypt
 -   **Database:** MongoDB
--   **Key Challenge:** The monolithic  file remains a major source of technical debt, although refactoring has begun.
+-   **Key Challenge:** The monolithic  file remains a major source of technical debt.
 
 **key DB schema**
--   **Users:** Contains user info, including . Stores push notification subscriptions.
--   **Providers:** Contains detailed provider profiles. Includes . The link between  and  is now correctly enforced upon registration.
--   **Settings:** Stores site-wide settings.
--   **Chats:** Stores conversations between users and providers.
--   **Notifications:** Stores notification records sent to users.
+-   **providers:** This collection was significantly expanded. In addition to existing fields, it now includes:
+    -   : 
+    -   : 
+    -   : 
+    -   : 
+    -   : 
+    -   :  (e.g., )
+    -   : 
+-   **reviews:** Stores ratings and comments from users for providers.
+
+**changes in tech stack**
+-   None.
 
 **All files of reference**
-*   : Heavily modified with new endpoints and bug fixes. **Refactoring is in progress.**
-*   : Updated with chat tab, settings, and new confirmation dialogs.
-*   : Updated to manage providers, create profiles for orphans, and use new confirmation dialogs.
-*   : Updated to use live data and fixed redirect bug.
-*   : Updated with dynamic dashboard links.
-*   : Updated with routes for new static pages.
-*   : New file for handling push notifications.
-*   , : New files for the custom confirmation UI.
+-   : This is the primary file for the next task.
+-   : Heavily refactored to separate user/provider concerns.
+-   : Heavily modified to add UI for all new profile fields.
+-   : Modified to mirror the changes in .
+-   : Modified to include the Add Review functionality.
+-   : Modified to add new API endpoints and expand existing ones to handle the new provider profile fields.
+-   The agent also edited over 10 other frontend files to replace  and .
 
 **Areas that need refactoring**:
--   **CRITICAL:** The  file is a 5000+ line monolith. The refactoring process has been started but is far from complete and should be a high priority to ensure future stability.
+-   **CRITICAL:** The  file is a monolith. The refactoring process that was started should be continued as a high-priority task to improve application health.
 
 **key api endpoints**
 -   **Created:**
-    -   : Creates a provider profile for an orphaned user.
-    -   : Allows admin to update a provider's profile.
-    -   : Endpoint for the Contact Us form.
-    -   : Provides the public key for push subscriptions.
-    -   : Saves a user's push subscription.
-    -   : A public endpoint for basic site statistics.
+    -   : Allows an authenticated user to update their own personal details (first name, last name).
+    -   : Allows an authenticated user to change their password.
 -   **Updated:**
-    -   : Now automatically creates a provider document if  is 'provider'.
-    -   : Fixed a database query bug.
-    -   Various endpoints now trigger push notifications.
+    -   : The request body was expanded to accept all the new provider fields (, , etc.).
+    -   : The request body was also expanded to match the provider profile update endpoint.
+    -   : The response from this endpoint will need to be checked to ensure it includes all the new data for the public profile page.
 
 **Critical Info for New Agent**
--   Your first task (P0) is to finish the user's request to replace all native  and  calls with the new, modern UI components. Search the entire frontend codebase for any remaining instances.
--   After completing the UI enhancement, the most important technical task is to continue the **refactoring of **. This was started but paused. Propose this to the user as the next logical step for improving the application's health.
--   Be mindful of caching. The user has previously reported data discrepancies on their live domain due to Cloudflare caching.
+-   Your immediate P0 task is to implement the user's request to display all the new provider profile fields (Education, Certifications, etc.) on the public .
+-   **You must respond and communicate in Hebrew.**
+-   After the P0 task, propose continuing the  refactoring (P1 task) as the next major step to improve the codebase's long-term health.
+-   The user is very engaged and often provides specific, multi-part feature requests. Pay close attention to their messages.
 
 **documents and test reports created in this job**
--   
--   
--   
 -    (updated multiple times)
 
 **Last 10 User Messages and any pending HUMAN messages**
-10. **User:** Asks to fix the Dashboard link in the header leading to the wrong page. (COMPLETED)
-9.  **User:** Requests to add a Chat feature to the user and provider dashboards. (COMPLETED)
-8.  **User:** Reports that a chat conversation was created but is not appearing in the dashboard. (COMPLETED)
-7.  **User:** Asks to update the settings page in the provider dashboard to match the user dashboard. (COMPLETED)
-6.  **User:** Asks to improve the site's confirmation messages to be more modern instead of using the browser's default . (IN PROGRESS)
-5.  **User:** After deploying, asks why the site automatically redirects to the login page. (COMPLETED)
-4.  **User:** Asks for the passwords for the  and user accounts. (COMPLETED)
-3.  **User:** Requests several new features: sync homepage with real data, add static pages, add a cookie banner, add a new footer column, and allow admins to edit provider profiles. (COMPLETED)
-2.  **User:** After being presented with a choice, confirms to proceed with implementing Push Notifications (P2). (COMPLETED)
-1.  **User:** Approves the plan to add automatic emails and complete tasks P1 (Refactor) and P2 (Push Notifications). (IN PROGRESS - Push done, Refactor started, Email not started).
+10. **User:** Show all the details in the provider profile on the profile page - e.g., education, certificates, health funds, payment methods, and everything - **PENDING**
+9.  **User:** Move service types to profile settings. Differentiate between user details and provider profile in the provider dashboard. - **COMPLETED**
+8.  **User:** Can I get an update on all the provider profile details through the provider dashboard and also the admin? - **COMPLETED**
+7.  **User:** Are there more recommendations for the provider profile? - (Agent provided suggestions)
+6.  **User:** Certificates and licenses, Education, Payment methods, Cancellation policy, Health funds... (User selects new features to add) - **COMPLETED**
+5.  **User:** Asked to add an avatar with a background color for profiles without a picture and allow contact details to be selectively hidden. - **COMPLETED**
+4.  **User:** Why is Dr. Israel Israelis profile not like Dr. Sara Cohens profile? - **COMPLETED**
+3.  **User:** Yes, data is missing... (Confirms missing fields in the profile) - **COMPLETED**
+2.  **User:** Asked about adding a rating and review system after service completion. - **COMPLETED**
+1.  **User:** Continue 1 and 2 (Approved the initial plan to replace alerts and start backend refactoring).
 
 **Project Health Check:**
 -   **Broken:** None.
 -   **Mocked:**
-    -   PayPal integration is awaiting credentials.
+    -   PayPal integration is awaiting user credentials.
 -   **Technical Debt:**
-    -   **High:** The monolithic  file. Refactoring is in progress.
+    -   **High:** The monolithic  file. Refactoring is in progress but was not worked on in this session.
 
 **3rd Party Integrations**
--   **Cloudflare:** Used by the user for their domain, a frequent source of caching discussions.
--   **PayPal:** Planned. **Currently Blocked** (needs user API keys).
+-   **Cloudflare:** Used by the user on their domain, mentioned as a possible source of caching issues.
+-   **PayPal:** Planned but **Blocked** pending user-provided API keys.
 -   **Web Push ():** Implemented for push notifications.
 
 **Testing status**
--   **Testing agent used after significant changes:** YES (used multiple times with >95% success rate).
+-   **Testing agent used after significant changes:** NO, the agent used the screenshot tool extensively to test UI changes after each step.
 -   **Troubleshoot agent used after agent stuck in loop:** NO
--   **Test files created:** None in this session, but previous test files exist.
--   **Known regressions:** None from this session. Many critical bugs were fixed.
+-   **Test files created:** None.
+-   **Known regressions:** None from this session.
 
 **Credentials to test flow:**
--   **Production Admin:**  / 
--   **Preview Users:**
-    -   Admin:  / 
-    -   User:  / 
-    -   Provider:  / 
+-   **Admin:**  / 
+-   **User:**  / 
+-   **Provider:**  / 
 
 **What agent forgot to execute**
--   The agent did not complete the full replacement of / across the entire application.
--   The user's request to add an automatic email for new providers was not implemented.
--   The backend refactoring was started but paused.</analysis>
+-   The backend refactoring was started in a previous session but paused and was not continued in this one.
+-   The user's previous request to add an automatic email for new providers has not yet been implemented.
+-   The task to make the footer's district list dynamic (from a DB model) has not been started.
+-   (All these are captured in the pending/future task lists).</analysis>
