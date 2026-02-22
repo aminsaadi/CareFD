@@ -35,7 +35,7 @@ api.interceptors.response.use(
       const url = error.config?.url || '';
       
       // Skip redirect for public endpoints being queried without auth
-      const publicEndpoints = ['/bookings', '/favorites/check'];
+      const publicEndpoints = ['/bookings', '/favorites/check', '/admin/stats', '/providers', '/services', '/regions', '/settings'];
       const isPublicQuery = publicEndpoints.some(ep => url.includes(ep));
       
       if (!skipRedirect && !isPublicQuery) {
