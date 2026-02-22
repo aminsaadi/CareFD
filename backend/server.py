@@ -2391,6 +2391,32 @@ async def get_provider_reviews(provider_id: str, skip: int = 0, limit: int = 20)
     
     return {"reviews": reviews}
 
+@api_router.get("/reviews/my")
+async def get_my_reviews(
+    authorization: Optional[str] = Header(None),
+    request: Request = None,
+    skip: int = 0,
+    limit: int = 50
+):
+    """Get current user's reviews"""
+    user = await get_current_user(authorization, request)
+    
+    reviews = await db.reviews.find(
+        {"user_id": user["user_id"]},
+        {"_id": 0}
+    ).skip(skip).limit(limit).sort("created_at", -1).to_list(limit)
+    
+    # Enhance with provider info
+    for review in reviews:
+        provider = await db.providers.find_one(
+            {"provider_id": review["provider_id"]},
+            {"_id": 0, "business_name": 1, "profile_image": 1, "profession_title": 1}
+        )
+        if provider:
+            review["provider"] = provider
+    
+    return {"reviews": reviews}
+
 # ==================== FAVORITES ROUTES ====================
 
 @api_router.post("/favorites/{provider_id}")
