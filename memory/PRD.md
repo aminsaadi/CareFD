@@ -310,6 +310,41 @@ CareLink is a healthcare services platform in Israel connecting users with healt
     - new_booking, booking_confirmed, booking_cancelled
     - new_message, provider_verified, system_updates, marketing
 
+- **Landing Page Data Sync**
+  - Featured Providers: Now fetches from /api/providers?recommended=true&limit=6
+  - Popular Services: Now fetches from /api/services?limit=6
+  - Regions: Fetches from /api/regions for location quick-select
+  - Loading states with spinner while fetching data
+
+- **Static Pages Added**
+  - **/about** - About CareLink page with mission, stats, values
+  - **/privacy** - Privacy Policy page with cookie policy, data handling info
+  - **/terms** - Terms of Service page with legal content
+  - **/contact** - Contact form page with:
+    - Contact info (phone, email, address, hours)
+    - Contact form with POST /api/contact endpoint
+    - Admin notifications on new messages
+    - Email confirmation to sender
+
+- **Cookie Consent Banner**
+  - Shows on first visit (uses localStorage to remember choice)
+  - 3 options: Accept All, Customize, Reject All
+  - Customize shows toggles for: necessary (always on), analytics, marketing
+  - Saves consent with timestamp to localStorage
+
+- **Footer Enhancement - Regions Column**
+  - Added "אזורים וערים" column
+  - Lists regions/cities from /api/regions
+  - Each city links to /providers?city=<city_name>
+
+- **Admin Provider Edit**
+  - New route: /admin/providers/:providerId/edit
+  - New endpoint: PUT /api/admin/providers/{provider_id}
+  - Form fields: business_name, email, phone, city, address, bio, experience_years, provider_type
+  - Quick actions: Verify, Recommend/Unrecommend
+  - Status badges: verified, recommended
+  - Edit button added to admin providers table
+
 ### Feb 12, 2026
 - Added GPS-based search with radius
 - Added region quick-select buttons
