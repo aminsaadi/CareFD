@@ -84,6 +84,40 @@ const MyBookings = () => {
     }
   };
 
+  const handleSubmitReview = async (booking) => {
+    if (reviewRating === 0) {
+      toast.error('נא לבחור דירוג');
+      return;
+    }
+    
+    if (reviewComment.trim().length < 10) {
+      toast.error('נא לכתוב ביקורת של לפחות 10 תווים');
+      return;
+    }
+
+    setIsSubmittingReview(true);
+
+    try {
+      await api.post('/reviews', {
+        provider_id: booking.provider?.provider_id || booking.service?.provider_id,
+        booking_id: booking.booking_id,
+        rating: reviewRating,
+        comment: reviewComment.trim()
+      });
+      
+      toast.success('הביקורת נשלחה בהצלחה! תודה על המשוב.');
+      setReviewedBookings([...reviewedBookings, booking.booking_id]);
+      setShowReviewModal(null);
+      setReviewRating(0);
+      setReviewComment('');
+    } catch (err) {
+      console.error('Failed to submit review:', err);
+      toast.error('שגיאה בשליחת הביקורת. נסה שוב.');
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
   const getStatusColor = (status) => {
     const colors = {
       pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
