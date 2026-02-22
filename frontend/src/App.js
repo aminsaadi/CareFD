@@ -316,6 +316,14 @@ function AppRouter() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/admin/providers/:providerId/edit"
+        element={
+          <ProtectedRoute>
+            <AdminProviderEdit />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
@@ -325,6 +333,7 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <AppRouter />
+        <CookieConsent />
       </BrowserRouter>
     </AuthProvider>
   );
