@@ -113,9 +113,28 @@ const AdminUsers = () => {
     try {
       await api.post(`/admin/users/${showMessageModal.user_id}/message`, messageData);
       setShowMessageModal(null);
-      alert('ההודעה נשלחה בהצלחה!');
+      toast.success('ההודעה נשלחה בהצלחה!');
     } catch (error) {
       console.error('Failed to send message:', error);
+      toast.error('שגיאה בשליחת ההודעה');
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!newPassword || newPassword.length < 6) {
+      toast.error('הסיסמה חייבת להכיל לפחות 6 תווים');
+      return;
+    }
+    try {
+      await api.put(`/admin/users/${showResetPasswordModal.user_id}/password`, { 
+        new_password: newPassword 
+      });
+      setShowResetPasswordModal(null);
+      setNewPassword('');
+      toast.success('הסיסמה עודכנה בהצלחה!');
+    } catch (error) {
+      console.error('Failed to reset password:', error);
+      toast.error('שגיאה בעדכון הסיסמה');
     }
   };
 
