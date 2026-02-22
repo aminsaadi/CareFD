@@ -2926,6 +2926,38 @@ async def admin_update_user(
     
     return {"message": "User updated successfully"}
 
+@api_router.put("/admin/users/{user_id}/password")
+async def admin_reset_user_password(
+    user_id: str,
+    password_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Reset user password"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    new_password = password_data.get("new_password")
+    if not new_password or len(new_password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+    
+    # Hash the new password
+    password_hash = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    
+    result = await db.users.update_one(
+        {"user_id": user_id},
+        {"$set": {
+            "password_hash": password_hash,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "Password updated successfully"}
+
 @api_router.put("/admin/users/{user_id}/suspend")
 async def admin_suspend_user(
     user_id: str,
