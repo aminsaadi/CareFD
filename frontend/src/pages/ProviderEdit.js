@@ -58,6 +58,41 @@ const SERVICE_AREAS = [
   'רעננה', 'כפר סבא', 'מודיעין', 'אשקלון', 'רחובות', 'בת ים'
 ];
 
+// New options for enhanced profile
+const HEALTH_FUNDS = [
+  { value: 'clalit', label: 'כללית' },
+  { value: 'maccabi', label: 'מכבי' },
+  { value: 'meuhedet', label: 'מאוחדת' },
+  { value: 'leumit', label: 'לאומית' },
+  { value: 'private', label: 'פרטי בלבד' },
+];
+
+const PAYMENT_METHODS = [
+  { value: 'cash', label: 'מזומן' },
+  { value: 'credit_card', label: 'כרטיס אשראי' },
+  { value: 'bit', label: 'ביט' },
+  { value: 'paybox', label: 'PayBox' },
+  { value: 'bank_transfer', label: 'העברה בנקאית' },
+  { value: 'check', label: 'צ\'ק' },
+];
+
+const EDUCATION_LEVELS = [
+  { value: 'diploma', label: 'תעודה מקצועית' },
+  { value: 'bachelor', label: 'תואר ראשון' },
+  { value: 'master', label: 'תואר שני' },
+  { value: 'phd', label: 'דוקטורט' },
+  { value: 'specialist', label: 'התמחות רפואית' },
+];
+
+const PROFILE_COLORS = [
+  'from-carelink-teal to-carelink-navy',
+  'from-blue-500 to-purple-600',
+  'from-emerald-500 to-teal-600',
+  'from-orange-500 to-red-500',
+  'from-pink-500 to-rose-500',
+  'from-indigo-500 to-blue-600',
+];
+
 const DAYS_OF_WEEK = [
   { value: 'sunday', label: 'ראשון' },
   { value: 'monday', label: 'שני' },
@@ -81,10 +116,12 @@ const ProviderEdit = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const certificateInputRef = useRef(null);
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingCertificate, setUploadingCertificate] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('basic');
@@ -98,6 +135,7 @@ const ProviderEdit = () => {
     about: '',
     description: '',
     profile_image: '',
+    profile_color: 'from-carelink-teal to-carelink-navy',
     provider_type: 'individual',
     specializations: [''],
     expertise: [''],
@@ -107,6 +145,31 @@ const ProviderEdit = () => {
     phone: '',
     email: '',
     website: '',
+    // New fields
+    health_funds: [],
+    payment_methods: [],
+    cancellation_policy: '',
+    cancellation_notice_hours: 24,
+    // Contact visibility settings
+    show_phone: true,
+    show_email: true,
+    show_whatsapp: true,
+    whatsapp_number: '',
+    // Education
+    education: [{
+      degree: '',
+      institution: '',
+      year: '',
+      field: ''
+    }],
+    // Certifications
+    certifications: [{
+      name: '',
+      issuer: '',
+      year: '',
+      license_number: '',
+      document_url: ''
+    }],
   });
 
   const [location, setLocation] = useState({
