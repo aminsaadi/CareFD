@@ -3323,6 +3323,32 @@ async def admin_broadcast_notification(
 
 # ==================== ADMIN SETTINGS ====================
 
+@api_router.get("/settings/public")
+async def get_public_settings():
+    """Get public site settings (no auth required)"""
+    settings = await db.site_settings.find_one({}, {"_id": 0})
+    if not settings:
+        settings = {
+            "contact_email": "info@carelink.co.il",
+            "contact_phone": "03-1234567",
+            "contact_address": "תל אביב, ישראל",
+            "footer_text": "© 2025 CareLink. All rights reserved.",
+            "social_facebook": "",
+            "social_instagram": "",
+            "social_twitter": "",
+            "social_linkedin": "",
+            "social_youtube": "",
+            "footer_links": []
+        }
+    # Only return public fields
+    public_fields = [
+        "contact_email", "contact_phone", "contact_address",
+        "footer_text", "social_facebook", "social_instagram",
+        "social_twitter", "social_linkedin", "social_youtube",
+        "footer_links", "site_name", "site_tagline"
+    ]
+    return {k: v for k, v in settings.items() if k in public_fields}
+
 @api_router.get("/admin/settings")
 async def admin_get_settings(
     authorization: Optional[str] = Header(None),
