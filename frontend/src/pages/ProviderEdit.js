@@ -924,6 +924,424 @@ const ProviderEdit = () => {
                 </div>
               </div>
             )}
+
+            {/* Education & Certifications Tab */}
+            {activeTab === 'education' && (
+              <div className="space-y-8">
+                {/* Education Section */}
+                <div>
+                  <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
+                    <FaGraduationCap className="text-carelink-teal" />
+                    השכלה
+                  </h3>
+                  <div className="space-y-4">
+                    {formData.education.map((edu, index) => (
+                      <div key={index} className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <div className="flex justify-between items-start mb-3">
+                          <span className="text-sm font-medium text-carelink-gray">השכלה {index + 1}</span>
+                          {formData.education.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeEducation(index)}
+                              className="text-red-500 hover:text-red-700 text-sm"
+                            >
+                              <FaTrash />
+                            </button>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm text-carelink-gray mb-1">תואר/תעודה</label>
+                            <select
+                              value={edu.degree}
+                              onChange={(e) => updateEducation(index, 'degree', e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none bg-white"
+                            >
+                              <option value="">בחר סוג</option>
+                              {EDUCATION_LEVELS.map(level => (
+                                <option key={level.value} value={level.value}>{level.label}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm text-carelink-gray mb-1">תחום</label>
+                            <input
+                              type="text"
+                              value={edu.field}
+                              onChange={(e) => updateEducation(index, 'field', e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                              placeholder="רפואה, סיעוד, פיזיותרפיה..."
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm text-carelink-gray mb-1">מוסד לימודים</label>
+                            <input
+                              type="text"
+                              value={edu.institution}
+                              onChange={(e) => updateEducation(index, 'institution', e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                              placeholder="אוניברסיטת תל אביב, טכניון..."
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm text-carelink-gray mb-1">שנת סיום</label>
+                            <input
+                              type="number"
+                              value={edu.year}
+                              onChange={(e) => updateEducation(index, 'year', e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                              placeholder="2020"
+                              min="1950"
+                              max={new Date().getFullYear()}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addEducation}
+                    className="mt-3 text-carelink-teal hover:text-carelink-teal-medium flex items-center gap-2 text-sm font-medium"
+                  >
+                    <FaPlus /> הוסף השכלה
+                  </button>
+                </div>
+
+                {/* Certifications Section */}
+                <div>
+                  <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
+                    <FaAward className="text-carelink-teal" />
+                    תעודות ורישיונות
+                  </h3>
+                  <div className="space-y-4">
+                    {formData.certifications.map((cert, index) => (
+                      <div key={index} className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                        <div className="flex justify-between items-start mb-3">
+                          <span className="text-sm font-medium text-carelink-gray">תעודה {index + 1}</span>
+                          {formData.certifications.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeCertification(index)}
+                              className="text-red-500 hover:text-red-700 text-sm"
+                            >
+                              <FaTrash />
+                            </button>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm text-carelink-gray mb-1">שם התעודה/רישיון</label>
+                            <input
+                              type="text"
+                              value={cert.name}
+                              onChange={(e) => updateCertification(index, 'name', e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                              placeholder="רישיון לעסוק ברפואה, הסמכה בפיזיותרפיה..."
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm text-carelink-gray mb-1">גוף מנפיק</label>
+                            <input
+                              type="text"
+                              value={cert.issuer}
+                              onChange={(e) => updateCertification(index, 'issuer', e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                              placeholder="משרד הבריאות, לשכת רופאים..."
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm text-carelink-gray mb-1">מספר רישיון</label>
+                            <input
+                              type="text"
+                              value={cert.license_number}
+                              onChange={(e) => updateCertification(index, 'license_number', e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                              placeholder="123456"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm text-carelink-gray mb-1">שנה</label>
+                            <input
+                              type="number"
+                              value={cert.year}
+                              onChange={(e) => updateCertification(index, 'year', e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                              placeholder="2020"
+                              min="1950"
+                              max={new Date().getFullYear()}
+                            />
+                          </div>
+                        </div>
+                        {/* Document Upload */}
+                        <div className="mt-4">
+                          <label className="block text-sm text-carelink-gray mb-2">העלאת תעודה (אופציונלי)</label>
+                          {cert.document_url ? (
+                            <div className="flex items-center gap-3">
+                              <a 
+                                href={cert.document_url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-carelink-teal hover:underline flex items-center gap-2"
+                              >
+                                <FaFileAlt /> צפה בתעודה
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() => updateCertification(index, 'document_url', '')}
+                                className="text-red-500 hover:text-red-700 text-sm"
+                              >
+                                הסר
+                              </button>
+                            </div>
+                          ) : (
+                            <label className="flex items-center gap-2 cursor-pointer text-carelink-teal hover:text-carelink-teal-medium">
+                              <FaUpload />
+                              <span className="text-sm">העלה קובץ</span>
+                              <input
+                                type="file"
+                                accept="image/*,.pdf"
+                                onChange={(e) => handleCertificateUpload(e, index)}
+                                className="hidden"
+                              />
+                            </label>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addCertification}
+                    className="mt-3 text-carelink-teal hover:text-carelink-teal-medium flex items-center gap-2 text-sm font-medium"
+                  >
+                    <FaPlus /> הוסף תעודה/רישיון
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Business Tab - Payment & Health Funds */}
+            {activeTab === 'business' && (
+              <div className="space-y-8">
+                {/* Health Funds */}
+                <div>
+                  <h3 className="text-lg font-bold text-carelink-navy mb-2">קופות חולים</h3>
+                  <p className="text-sm text-carelink-gray mb-4">בחר את קופות החולים איתן אתה עובד</p>
+                  <div className="flex flex-wrap gap-3">
+                    {HEALTH_FUNDS.map(fund => (
+                      <button
+                        key={fund.value}
+                        type="button"
+                        onClick={() => {
+                          const current = formData.health_funds || [];
+                          const newValue = current.includes(fund.value)
+                            ? current.filter(v => v !== fund.value)
+                            : [...current, fund.value];
+                          setFormData({ ...formData, health_funds: newValue });
+                        }}
+                        className={`px-5 py-3 rounded-xl font-medium transition ${
+                          formData.health_funds?.includes(fund.value)
+                            ? 'bg-emerald-500 text-white shadow-md'
+                            : 'bg-gray-100 text-carelink-gray hover:bg-gray-200'
+                        }`}
+                      >
+                        {fund.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Payment Methods */}
+                <div>
+                  <h3 className="text-lg font-bold text-carelink-navy mb-2">אמצעי תשלום</h3>
+                  <p className="text-sm text-carelink-gray mb-4">סמן את אמצעי התשלום שאתה מקבל</p>
+                  <div className="flex flex-wrap gap-3">
+                    {PAYMENT_METHODS.map(method => (
+                      <button
+                        key={method.value}
+                        type="button"
+                        onClick={() => {
+                          const current = formData.payment_methods || [];
+                          const newValue = current.includes(method.value)
+                            ? current.filter(v => v !== method.value)
+                            : [...current, method.value];
+                          setFormData({ ...formData, payment_methods: newValue });
+                        }}
+                        className={`px-5 py-3 rounded-xl font-medium transition flex items-center gap-2 ${
+                          formData.payment_methods?.includes(method.value)
+                            ? 'bg-blue-500 text-white shadow-md'
+                            : 'bg-gray-100 text-carelink-gray hover:bg-gray-200'
+                        }`}
+                      >
+                        <FaCreditCard size={14} />
+                        {method.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Cancellation Policy */}
+                <div>
+                  <h3 className="text-lg font-bold text-carelink-navy mb-2">מדיניות ביטולים</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm text-carelink-gray mb-2">זמן הודעה מראש לביטול (שעות)</label>
+                      <select
+                        value={formData.cancellation_notice_hours}
+                        onChange={(e) => setFormData({ ...formData, cancellation_notice_hours: parseInt(e.target.value) })}
+                        className="w-full max-w-xs px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none bg-white"
+                      >
+                        <option value={0}>ללא הגבלה</option>
+                        <option value={2}>2 שעות</option>
+                        <option value={6}>6 שעות</option>
+                        <option value={12}>12 שעות</option>
+                        <option value={24}>24 שעות (יום)</option>
+                        <option value={48}>48 שעות (יומיים)</option>
+                        <option value={72}>72 שעות (3 ימים)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm text-carelink-gray mb-2">פירוט מדיניות הביטולים</label>
+                      <textarea
+                        value={formData.cancellation_policy}
+                        onChange={(e) => setFormData({ ...formData, cancellation_policy: e.target.value })}
+                        rows={4}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none resize-none"
+                        placeholder="תאר את מדיניות הביטולים שלך. לדוגמה: ביטול עד 24 שעות לפני התור - ללא חיוב. ביטול פחות מ-24 שעות - חיוב של 50% מהמחיר..."
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Contact Settings Tab */}
+            {activeTab === 'contact' && (
+              <div className="space-y-8">
+                <div className="bg-blue-50 p-4 rounded-xl mb-6">
+                  <p className="text-blue-700 text-sm">
+                    <strong>הגדרות פרטיות:</strong> בחר אילו פרטי קשר יוצגו בפרופיל הציבורי שלך
+                  </p>
+                </div>
+
+                {/* Profile Image Settings */}
+                <div>
+                  <h3 className="text-lg font-bold text-carelink-navy mb-4">תמונת פרופיל</h3>
+                  <div className="flex items-center gap-6">
+                    {/* Preview */}
+                    <div className={`w-24 h-24 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br ${formData.profile_color}`}>
+                      {formData.profile_image ? (
+                        <img src={formData.profile_image} alt="Profile" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-white text-3xl font-bold">
+                          {formData.business_name?.split(' ').map(n => n[0]).join('').slice(0, 2) || 'NN'}
+                        </span>
+                      )}
+                    </div>
+                    <div className="space-y-3">
+                      <p className="text-sm text-carelink-gray">בחר צבע רקע (יוצג כאשר אין תמונה)</p>
+                      <div className="flex gap-2">
+                        {PROFILE_COLORS.map(color => (
+                          <button
+                            key={color}
+                            type="button"
+                            onClick={() => setFormData({ ...formData, profile_color: color })}
+                            className={`w-8 h-8 rounded-full bg-gradient-to-br ${color} ${
+                              formData.profile_color === color ? 'ring-2 ring-offset-2 ring-carelink-teal' : ''
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Phone Settings */}
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <FaPhone className="text-carelink-teal text-xl" />
+                    <div>
+                      <p className="font-medium text-carelink-navy">מספר טלפון</p>
+                      <p className="text-sm text-carelink-gray">{formData.phone || 'לא הוגדר'}</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, show_phone: !formData.show_phone })}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+                      formData.show_phone 
+                        ? 'bg-emerald-100 text-emerald-700' 
+                        : 'bg-gray-200 text-gray-600'
+                    }`}
+                  >
+                    {formData.show_phone ? <FaEye /> : <FaEyeSlash />}
+                    {formData.show_phone ? 'מוצג' : 'מוסתר'}
+                  </button>
+                </div>
+
+                {/* Email Settings */}
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <FaEnvelope className="text-carelink-teal text-xl" />
+                    <div>
+                      <p className="font-medium text-carelink-navy">אימייל</p>
+                      <p className="text-sm text-carelink-gray">{formData.email || 'לא הוגדר'}</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, show_email: !formData.show_email })}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+                      formData.show_email 
+                        ? 'bg-emerald-100 text-emerald-700' 
+                        : 'bg-gray-200 text-gray-600'
+                    }`}
+                  >
+                    {formData.show_email ? <FaEye /> : <FaEyeSlash />}
+                    {formData.show_email ? 'מוצג' : 'מוסתר'}
+                  </button>
+                </div>
+
+                {/* WhatsApp Settings */}
+                <div className="p-4 bg-gray-50 rounded-xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <FaWhatsapp className="text-green-500 text-xl" />
+                      <div>
+                        <p className="font-medium text-carelink-navy">WhatsApp</p>
+                        <p className="text-sm text-carelink-gray">אפשר ללקוחות ליצור קשר בוואטסאפ</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, show_whatsapp: !formData.show_whatsapp })}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+                        formData.show_whatsapp 
+                          ? 'bg-green-100 text-green-700' 
+                          : 'bg-gray-200 text-gray-600'
+                      }`}
+                    >
+                      {formData.show_whatsapp ? <FaEye /> : <FaEyeSlash />}
+                      {formData.show_whatsapp ? 'מופעל' : 'כבוי'}
+                    </button>
+                  </div>
+                  {formData.show_whatsapp && (
+                    <div>
+                      <label className="block text-sm text-carelink-gray mb-1">מספר WhatsApp</label>
+                      <input
+                        type="tel"
+                        value={formData.whatsapp_number}
+                        onChange={(e) => setFormData({ ...formData, whatsapp_number: e.target.value })}
+                        className="w-full max-w-xs px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                        placeholder="050-1234567"
+                      />
+                      <p className="text-xs text-carelink-gray mt-1">השאר ריק לשימוש במספר הטלפון הראשי</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
