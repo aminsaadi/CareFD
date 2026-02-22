@@ -1146,7 +1146,7 @@ async def change_password(
         raise HTTPException(status_code=404, detail="User not found")
     
     # Verify current password
-    if not verify_password(current_password, db_user.get("password", "")):
+    if not verify_password(current_password, db_user.get("password_hash", "")):
         raise HTTPException(status_code=400, detail="הסיסמה הנוכחית שגויה")
     
     # Hash and update new password
@@ -1154,7 +1154,7 @@ async def change_password(
     await db.users.update_one(
         {"user_id": user["user_id"]},
         {"$set": {
-            "password": hashed_password,
+            "password_hash": hashed_password,
             "updated_at": datetime.now(timezone.utc).isoformat()
         }}
     )
