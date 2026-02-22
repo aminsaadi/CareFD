@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AuthCallback from './components/AuthCallback';
+import CookieConsent from './components/CookieConsent';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -21,6 +22,11 @@ import ChatRoom from './pages/ChatRoom';
 import ChatList from './pages/ChatList';
 import ProviderDashboard from './pages/ProviderDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+// Static Pages
+import About from './pages/About';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import Contact from './pages/Contact';
 // New Admin Pages
 import AdminOverview from './pages/admin/AdminOverview';
 import AdminUsers from './pages/admin/AdminUsers';
@@ -40,6 +46,7 @@ import AdminSubscriptions from './pages/admin/AdminSubscriptions';
 import AdminPushNotifications from './pages/admin/AdminPushNotifications';
 import AdminNotifications from './pages/admin/AdminNotifications';
 import AdminMessages from './pages/admin/AdminMessages';
+import AdminProviderEdit from './pages/admin/AdminProviderEdit';
 import './i18n';
 import './App.css';
 
