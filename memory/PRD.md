@@ -452,6 +452,22 @@ CareLink is a healthcare services platform in Israel connecting users with healt
 - **New API Endpoint**:
   - GET /reviews/my - Returns user's reviews with provider info
 
+### Admin Panel Enhancement (Feb 22, 2026) - COMPLETE:
+- **AdminProviders.js**:
+  - כפתור מחיקת ספק עם modal אישור (כולל אזהרה על מחיקת שירותים)
+  - כפתור פעיל/לא פעיל עם modal לשינוי סטטוס
+  - אייקונים מעודכנים: FiToggleLeft/FiToggleRight, FiTrash2
+- **AdminLayout.js**:
+  - אייקון התראות מקושר ל-/admin/notifications
+  - אייקון הודעות מקושר ל-/admin/messages
+  - tooltips בעברית
+- **AdminUsers.js** (כבר קיים):
+  - צפייה, עריכה, הודעה, השעיה, מחיקה
+  - שינוי תפקיד משתמש
+- **AdminServices.js**:
+  - 4 שירותים מוצגים
+  - עריכה ומחיקה
+
 ### Feb 12, 2026
 - Added GPS-based search with radius
 - Added region quick-select buttons
