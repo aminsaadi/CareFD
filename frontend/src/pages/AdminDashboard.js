@@ -38,6 +38,7 @@ const AdminDashboard = () => {
   const [editingRegion, setEditingRegion] = useState(null);
   const [newRegionName, setNewRegionName] = useState('');
   const [newCity, setNewCity] = useState('');
+  const { confirmState, confirm, closeConfirm } = useConfirm();
 
   useEffect(() => {
     fetchAdminData();
@@ -115,7 +116,13 @@ const AdminDashboard = () => {
   };
 
   const deleteRegion = async (regionId) => {
-    if (!window.confirm('האם אתה בטוח שברצונך למחוק מחוז זה?')) return;
+    await confirm({
+      title: 'מחיקת מחוז',
+      message: 'האם אתה בטוח שברצונך למחוק מחוז זה?',
+      type: 'danger',
+      confirmText: 'מחק',
+      cancelText: 'ביטול'
+    });
     try {
       await api.delete(`/admin/regions/${regionId}`);
       fetchAdminData();
@@ -154,7 +161,13 @@ const AdminDashboard = () => {
   };
 
   const deleteUser = async (userId) => {
-    if (!window.confirm('האם אתה בטוח שברצונך למחוק משתמש זה?')) return;
+    await confirm({
+      title: 'מחיקת משתמש',
+      message: 'האם אתה בטוח שברצונך למחוק משתמש זה?',
+      type: 'danger',
+      confirmText: 'מחק',
+      cancelText: 'ביטול'
+    });
     try {
       await api.delete(`/admin/users/${userId}`);
       fetchAdminData();
@@ -167,10 +180,10 @@ const AdminDashboard = () => {
     try {
       await api.put(`/admin/providers/${providerId}/verify`);
       fetchAdminData();
-      alert('הספק אומת בהצלחה!');
+      toast.success('הספק אומת בהצלחה!');
     } catch (error) {
       console.error('Failed to verify provider:', error);
-      alert('שגיאה באימות הספק');
+      toast.error('שגיאה באימות הספק');
     }
   };
 
@@ -180,10 +193,10 @@ const AdminDashboard = () => {
       fetchAdminData();
       setShowRejectDialog(null);
       setRejectReason('');
-      alert('בקשת האימות נדחתה');
+      toast.success('בקשת האימות נדחתה');
     } catch (error) {
       console.error('Failed to reject provider:', error);
-      alert('שגיאה בדחיית הבקשה');
+      toast.error('שגיאה בדחיית הבקשה');
     }
   };
 
@@ -198,7 +211,7 @@ const AdminDashboard = () => {
 
   const sendBroadcast = async () => {
     if (!broadcastTitle || !broadcastMessage) {
-      alert('נא למלא כותרת והודעה');
+      toast.error('נא למלא כותרת והודעה');
       return;
     }
     try {
@@ -207,19 +220,19 @@ const AdminDashboard = () => {
         message: broadcastMessage,
         role: broadcastRole || undefined
       });
-      alert('ההודעה נשלחה בהצלחה!');
+      toast.success('ההודעה נשלחה בהצלחה!');
       setBroadcastTitle('');
       setBroadcastMessage('');
       setBroadcastRole('');
     } catch (error) {
       console.error('Failed to send broadcast:', error);
-      alert('שגיאה בשליחת ההודעה');
+      toast.error('שגיאה בשליחת ההודעה');
     }
   };
 
   const exportData = (type) => {
     // In real implementation, this would call an API endpoint to generate CSV/PDF
-    alert(`ייצוא ${type} - בקרוב!`);
+    toast.info(`ייצוא ${type} - בקרוב!`);
   };
 
   const tabs = [
