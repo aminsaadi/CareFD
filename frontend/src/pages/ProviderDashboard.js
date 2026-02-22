@@ -288,7 +288,7 @@ const ProviderDashboard = () => {
 
   const handleSaveProfile = async () => {
     if (!profileForm.business_name) {
-      alert('נא למלא שם עסק');
+      toast.error('נא למלא שם עסק');
       return;
     }
 
@@ -312,10 +312,10 @@ const ProviderDashboard = () => {
 
       await api.put(`/providers/${provider.provider_id}`, profileData);
       await fetchDashboardData();
-      alert('הפרופיל נשמר בהצלחה!');
+      toast.success('הפרופיל נשמר בהצלחה!');
     } catch (error) {
       console.error('Failed to save profile:', error);
-      alert('שגיאה בשמירת הפרופיל');
+      toast.error('שגיאה בשמירת הפרופיל');
     } finally {
       setSaving(false);
     }
