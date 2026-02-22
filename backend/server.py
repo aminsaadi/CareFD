@@ -3059,6 +3059,57 @@ async def admin_verify_provider(
     
     return {"message": "Provider verified"}
 
+
+@api_router.post("/admin/providers/create-from-user/{user_id}")
+async def admin_create_provider_from_user(
+    user_id: str,
+    body: dict = None,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Create a provider profile for an orphaned provider user"""
+    admin_user = await get_current_user(authorization, request)
+    if admin_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Check if user exists and has role=provider
+    target_user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if target_user.get("role") != "provider":
+        raise HTTPException(status_code=400, detail="User is not a provider")
+    
+    # Check if provider profile already exists
+    existing_provider = await db.providers.find_one({"user_id": user_id}, {"_id": 0})
+    if existing_provider:
+        raise HTTPException(status_code=400, detail="Provider profile already exists")
+    
+    # Create provider profile
+    provider = Provider(
+        user_id=user_id,
+        provider_type=body.get("provider_type", "individual") if body else "individual",
+        business_name=body.get("business_name", target_user.get("name", "ספק")) if body else target_user.get("name", "ספק"),
+        email=target_user.get("email"),
+        phone=target_user.get("phone"),
+        verification_status=VerificationStatus.PENDING,
+        is_verified=False
+    )
+    
+    provider_dict = provider.model_dump()
+    provider_dict['created_at'] = provider_dict['created_at'].isoformat()
+    provider_dict['verification_documents'] = []
+    
+    await db.providers.insert_one(provider_dict)
+    
+    return {
+        "message": "Provider profile created successfully",
+        "provider_id": provider.provider_id,
+        "provider_number": provider.provider_number
+    }
+
+
+
 @api_router.put("/admin/providers/{provider_id}/reject")
 async def admin_reject_provider(
     provider_id: str,
