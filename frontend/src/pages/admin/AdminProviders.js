@@ -114,7 +114,7 @@ const AdminProviders = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="bg-white rounded-xl p-4 border border-gray-100">
             <p className="text-carelink-slate text-sm">סה"כ ספקים</p>
             <p className="text-2xl font-bold text-carelink-navy mt-1">{providers.length}</p>
@@ -125,7 +125,11 @@ const AdminProviders = () => {
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
             <p className="text-carelink-slate text-sm">ממתינים לאימות</p>
-            <p className="text-2xl font-bold text-amber-400 mt-1">{providers.filter(p => !p.is_verified).length}</p>
+            <p className="text-2xl font-bold text-amber-400 mt-1">{providers.filter(p => !p.is_verified && !p.needs_profile).length}</p>
+          </div>
+          <div className="bg-white rounded-xl p-4 border border-gray-100">
+            <p className="text-carelink-slate text-sm">ללא פרופיל</p>
+            <p className="text-2xl font-bold text-red-400 mt-1">{providers.filter(p => p.needs_profile).length}</p>
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
             <p className="text-carelink-slate text-sm">מומלצים</p>
