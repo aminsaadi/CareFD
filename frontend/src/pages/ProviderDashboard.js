@@ -347,6 +347,62 @@ const ProviderDashboard = () => {
     }
   };
 
+  const handleSaveUserInfo = async () => {
+    setSaving(true);
+    try {
+      const userData = {
+        first_name: userInfoForm.first_name,
+        last_name: userInfoForm.last_name,
+        phone: userInfoForm.personal_phone,
+        address: userInfoForm.personal_address,
+        city: userInfoForm.personal_city
+      };
+
+      await api.put('/users/me', userData);
+      toast.success('פרטי המשתמש נשמרו בהצלחה!');
+    } catch (error) {
+      console.error('Failed to save user info:', error);
+      toast.error('שגיאה בשמירת פרטי המשתמש');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (!userInfoForm.current_password || !userInfoForm.new_password) {
+      toast.error('נא למלא את כל השדות');
+      return;
+    }
+    if (userInfoForm.new_password !== userInfoForm.confirm_password) {
+      toast.error('הסיסמאות אינן תואמות');
+      return;
+    }
+    if (userInfoForm.new_password.length < 6) {
+      toast.error('הסיסמה חייבת להכיל לפחות 6 תווים');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await api.put('/users/me/password', {
+        current_password: userInfoForm.current_password,
+        new_password: userInfoForm.new_password
+      });
+      toast.success('הסיסמה עודכנה בהצלחה!');
+      setUserInfoForm(prev => ({
+        ...prev,
+        current_password: '',
+        new_password: '',
+        confirm_password: ''
+      }));
+    } catch (error) {
+      console.error('Failed to change password:', error);
+      toast.error(error.response?.data?.detail || 'שגיאה בשינוי הסיסמה');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const tabs = [
     { id: 'overview', label: 'סקירה כללית', icon: FaChartBar },
     { id: 'bookings', label: 'תורים', icon: FaCalendarAlt },
