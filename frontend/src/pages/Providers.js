@@ -15,6 +15,7 @@ const Providers = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [providers, setProviders] = useState([]);
+  const [totalProviders, setTotalProviders] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // grid or list
