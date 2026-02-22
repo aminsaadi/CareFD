@@ -2476,12 +2476,13 @@ async def get_chat_rooms(
                 room["other_user"] = provider_info
         
         # Get last message
-        last_msg = await db.messages.find_one(
+        last_msg_cursor = db.messages.find(
             {"room_id": room["room_id"]},
             {"_id": 0}
-        ).sort("created_at", -1).limit(1).to_list(1)
-        if last_msg:
-            room["last_message"] = last_msg[0]
+        ).sort("created_at", -1).limit(1)
+        last_msg_list = await last_msg_cursor.to_list(1)
+        if last_msg_list:
+            room["last_message"] = last_msg_list[0]
     
     return {"rooms": rooms}
 
