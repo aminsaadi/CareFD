@@ -74,20 +74,45 @@ const AdminSettings = () => {
 
   const clearCache = async () => {
     try {
+      // 1. Clear API cache on server
       await api.post('/admin/clear-cache');
-      // Clear local storage and session storage
+      
+      // 2. Clear all local storage
       localStorage.clear();
+      
+      // 3. Clear session storage
       sessionStorage.clear();
-      toast.success('המטמון נוקה בהצלחה!');
-      // Reload the page
-      setTimeout(() => window.location.reload(), 1000);
+      
+      // 4. Clear browser cache using Cache API (Service Worker caches)
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(
+          cacheNames.map(cacheName => caches.delete(cacheName))
+        );
+      }
+      
+      // 5. Unregister service workers
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(
+          registrations.map(registration => registration.unregister())
+        );
+      }
+      
+      toast.success('כל המטמון נוקה בהצלחה! הדף יטען מחדש...');
+      
+      // 6. Hard reload - bypass cache
+      setTimeout(() => {
+        window.location.href = window.location.href.split('?')[0] + '?cleared=' + Date.now();
+      }, 1500);
+      
     } catch (error) {
       console.error('Failed to clear cache:', error);
       // Still clear local cache even if API fails
       localStorage.clear();
       sessionStorage.clear();
       toast.success('המטמון המקומי נוקה!');
-      setTimeout(() => window.location.reload(), 1000);
+      setTimeout(() => window.location.reload(true), 1000);
     }
   };
 
