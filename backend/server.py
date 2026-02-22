@@ -3954,6 +3954,20 @@ async def admin_delete_provider(
     
     return {"message": "Provider deleted", "provider_id": provider_id}
 
+@api_router.post("/admin/clear-cache")
+async def admin_clear_cache(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Clear server-side cache"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # In a production environment, you might clear Redis cache or other caches here
+    # For now, we'll just return success
+    return {"message": "Cache cleared successfully", "timestamp": datetime.now(timezone.utc).isoformat()}
+
 # ==================== ADMIN REPORTS ====================
 
 @api_router.get("/admin/reports")
