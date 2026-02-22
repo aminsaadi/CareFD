@@ -830,6 +830,123 @@ const ProviderProfile = () => {
               </div>
             )}
 
+            {/* Education */}
+            {provider.education && provider.education.length > 0 && provider.education.some(e => e.institution || e.degree) && (
+              <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="education-section">
+                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
+                  <FaGraduationCap className="text-carelink-teal" />
+                  השכלה
+                </h3>
+                <div className="space-y-4">
+                  {provider.education.filter(e => e.institution || e.degree).map((edu, idx) => (
+                    <div key={idx} className="border-r-4 border-carelink-teal pr-4">
+                      <p className="font-semibold text-carelink-navy">
+                        {educationLevelLabels[edu.degree] || edu.degree}
+                      </p>
+                      {edu.field && (
+                        <p className="text-sm text-carelink-slate">{edu.field}</p>
+                      )}
+                      {edu.institution && (
+                        <p className="text-sm text-carelink-gray">{edu.institution}</p>
+                      )}
+                      {edu.year && (
+                        <p className="text-xs text-carelink-gray mt-1">{edu.year}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Certifications */}
+            {provider.certifications && provider.certifications.length > 0 && provider.certifications.some(c => c.name || c.license_number) && (
+              <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="certifications-section">
+                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
+                  <FaCertificate className="text-carelink-teal" />
+                  תעודות ורישיונות
+                </h3>
+                <div className="space-y-4">
+                  {provider.certifications.filter(c => c.name || c.license_number).map((cert, idx) => (
+                    <div key={idx} className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200">
+                      <p className="font-semibold text-carelink-navy flex items-center gap-2">
+                        <FaAward className="text-amber-500" />
+                        {cert.name}
+                      </p>
+                      {cert.issuer && (
+                        <p className="text-sm text-carelink-slate mt-1">מנפיק: {cert.issuer}</p>
+                      )}
+                      {cert.license_number && (
+                        <p className="text-sm text-carelink-gray mt-1">מספר רישיון: {cert.license_number}</p>
+                      )}
+                      {cert.year && (
+                        <p className="text-xs text-carelink-gray mt-1">שנה: {cert.year}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Health Funds */}
+            {provider.health_funds && provider.health_funds.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="health-funds-section">
+                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
+                  <FaHospital className="text-carelink-teal" />
+                  קופות חולים
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {provider.health_funds.map((fund, idx) => (
+                    <span
+                      key={idx}
+                      className="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full text-sm font-medium"
+                    >
+                      {healthFundLabels[fund] || fund}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Payment Methods */}
+            {provider.payment_methods && provider.payment_methods.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="payment-methods-section">
+                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
+                  <FaCreditCard className="text-carelink-teal" />
+                  אמצעי תשלום
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {provider.payment_methods.map((method, idx) => (
+                    <span
+                      key={idx}
+                      className="bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium"
+                    >
+                      {paymentMethodLabels[method] || method}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Cancellation Policy */}
+            {provider.cancellation_policy && (
+              <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="cancellation-policy-section">
+                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
+                  <FaFileContract className="text-carelink-teal" />
+                  מדיניות ביטולים
+                </h3>
+                {provider.cancellation_notice_hours && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
+                    <p className="text-sm text-yellow-800 font-medium">
+                      נדרשת הודעה מראש: {provider.cancellation_notice_hours} שעות
+                    </p>
+                  </div>
+                )}
+                <p className="text-carelink-slate whitespace-pre-line text-sm leading-relaxed">
+                  {provider.cancellation_policy}
+                </p>
+              </div>
+            )}
+
             {/* Location */}
             {provider.location && (
               <div className="bg-white rounded-2xl shadow-lg p-6">
