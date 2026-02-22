@@ -2910,6 +2910,47 @@ async def admin_get_bookings(
     
     return {"bookings": bookings, "total": total, "skip": skip, "limit": limit}
 
+@api_router.get("/admin/providers")
+async def admin_get_all_providers(
+    search: Optional[str] = None,
+    status: Optional[str] = None,
+    limit: int = 50,
+    skip: int = 0,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get ALL providers (including unverified)"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    query = {}
+    
+    if search:
+        query["$or"] = [
+            {"business_name": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}},
+            {"phone": {"$regex": search, "$options": "i"}}
+        ]
+    
+    if status:
+        if status == "verified":
+            query["is_verified"] = True
+        elif status == "pending":
+            query["verification_status"] = "pending"
+        elif status == "rejected":
+            query["verification_status"] = "rejected"
+    
+    total = await db.providers.count_documents(query)
+    providers = await db.providers.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    return {
+        "providers": providers,
+        "total": total,
+        "page": skip // limit + 1,
+        "limit": limit
+    }
+
 @api_router.put("/admin/providers/{provider_id}/verify")
 async def admin_verify_provider(
     provider_id: str,
