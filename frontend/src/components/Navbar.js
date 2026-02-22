@@ -86,7 +86,7 @@ const Navbar = () => {
               {isAuthenticated ? (
                 <>
                   <Link
-                    to="/dashboard"
+                    to={user?.role === 'admin' ? '/admin/overview' : user?.role === 'provider' ? '/provider/dashboard' : '/dashboard'}
                     className="text-carelink-slate hover:text-carelink-teal transition-colors font-medium"
                     data-testid="nav-dashboard"
                   >
