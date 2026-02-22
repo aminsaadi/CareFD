@@ -376,6 +376,12 @@ const ProviderEdit = () => {
     }
   };
 
+  const handleDeleteImage = () => {
+    setFormData({ ...formData, profile_image: '' });
+    setSuccess('התמונה הוסרה. לחץ "שמור שינויים" לעדכון הפרופיל.');
+    setTimeout(() => setSuccess(''), 3000);
+  };
+
   const handleArrayFieldChange = (field, index, value) => {
     const newArray = [...formData[field]];
     newArray[index] = value;
