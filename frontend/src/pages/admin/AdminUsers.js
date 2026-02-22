@@ -361,6 +361,16 @@ const AdminUsers = () => {
                             <FiMessageSquare size={16} />
                           </button>
                           <button 
+                            onClick={() => {
+                              setShowResetPasswordModal(user);
+                              setNewPassword('');
+                            }}
+                            className="p-2 text-carelink-slate hover:text-purple-500 hover:bg-purple-50 rounded-lg transition"
+                            title="איפוס סיסמה"
+                          >
+                            <FiKey size={16} />
+                          </button>
+                          <button 
                             onClick={() => setShowSuspendModal(user)}
                             className={`p-2 rounded-lg transition ${user.is_suspended ? 'text-emerald-500 hover:bg-emerald-50' : 'text-amber-500 hover:bg-amber-50'}`}
                             title={user.is_suspended ? 'בטל השעיה' : 'השעה'}
