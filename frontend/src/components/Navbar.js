@@ -181,7 +181,7 @@ const Navbar = () => {
                     {t('requests')}
                   </Link>
                   <Link
-                    to="/dashboard"
+                    to={user?.role === 'admin' ? '/admin/overview' : user?.role === 'provider' ? '/provider/dashboard' : '/dashboard'}
                     className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium"
                     onClick={() => setMobileMenuOpen(false)}
                   >
