@@ -1131,11 +1131,11 @@ async def change_password(
         raise HTTPException(status_code=404, detail="User not found")
     
     # Verify current password
-    if not pwd_context.verify(current_password, db_user.get("password", "")):
+    if not verify_password(current_password, db_user.get("password", "")):
         raise HTTPException(status_code=400, detail="הסיסמה הנוכחית שגויה")
     
     # Hash and update new password
-    hashed_password = pwd_context.hash(new_password)
+    hashed_password = hash_password(new_password)
     await db.users.update_one(
         {"user_id": user["user_id"]},
         {"$set": {
