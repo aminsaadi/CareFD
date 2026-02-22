@@ -1079,6 +1079,73 @@ async def logout(authorization: Optional[str] = Header(None), request: Request =
     
     return {"message": "Logged out successfully"}
 
+@api_router.put("/users/me")
+async def update_user_info(
+    user_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Update current user's personal info"""
+    user = await get_current_user(authorization, request)
+    
+    allowed_fields = ["first_name", "last_name", "phone", "address", "city"]
+    update_data = {}
+    
+    for field in allowed_fields:
+        if field in user_data:
+            update_data[field] = user_data[field]
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No valid fields to update")
+    
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.users.update_one(
+        {"user_id": user["user_id"]},
+        {"$set": update_data}
+    )
+    
+    return {"message": "User info updated successfully"}
+
+@api_router.put("/users/me/password")
+async def change_password(
+    password_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Change current user's password"""
+    user = await get_current_user(authorization, request)
+    
+    current_password = password_data.get("current_password")
+    new_password = password_data.get("new_password")
+    
+    if not current_password or not new_password:
+        raise HTTPException(status_code=400, detail="נא למלא את כל השדות")
+    
+    if len(new_password) < 6:
+        raise HTTPException(status_code=400, detail="הסיסמה חייבת להכיל לפחות 6 תווים")
+    
+    # Get user with password
+    db_user = await db.users.find_one({"user_id": user["user_id"]})
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Verify current password
+    if not pwd_context.verify(current_password, db_user.get("password", "")):
+        raise HTTPException(status_code=400, detail="הסיסמה הנוכחית שגויה")
+    
+    # Hash and update new password
+    hashed_password = pwd_context.hash(new_password)
+    await db.users.update_one(
+        {"user_id": user["user_id"]},
+        {"$set": {
+            "password": hashed_password,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"message": "Password changed successfully"}
+
 # ==================== PROVIDER ROUTES ====================
 
 @api_router.post("/providers")
