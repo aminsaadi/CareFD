@@ -704,19 +704,87 @@ async def register(user_data: UserRegister):
                 f"ספק חדש נרשם למערכת: {user.name}. נדרש אימות.",
                 {"provider_id": provider.provider_id, "user_id": user.user_id}
             )
-    
-    # Send verification email
-    verification_link = f"https://carelink.example.com/verify?user_id={user.user_id}"
-    await send_email_async(
-        user.email,
-        "Welcome to CareLink - Verify Your Email",
-        f"""
-        <h1>Welcome to CareLink!</h1>
-        <p>Hi {user.name},</p>
-        <p>Thank you for registering. Please verify your email by clicking the link below:</p>
-        <a href="{verification_link}">Verify Email</a>
-        """
-    )
+        
+        # Send welcome email to new provider with profile completion link
+        profile_link = f"https://carelink.co.il/provider/edit"
+        await send_email_async(
+            user.email,
+            "ברוכים הבאים ל-CareLink - השלימו את הפרופיל שלכם! 🎉",
+            f"""
+            <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #19B8BA;">ברוכים הבאים ל-CareLink!</h1>
+                </div>
+                
+                <p style="font-size: 16px; color: #1E4D5F;">שלום {user.name},</p>
+                
+                <p style="font-size: 16px; color: #4C6D7F;">
+                    תודה שנרשמת כספק שירותים בפלטפורמה שלנו! 
+                    אנחנו שמחים לקבל אותך למשפחת CareLink.
+                </p>
+                
+                <div style="background: linear-gradient(135deg, #19B8BA 0%, #1E4D5F 100%); padding: 25px; border-radius: 15px; margin: 25px 0;">
+                    <h2 style="color: white; margin-top: 0;">📋 הצעדים הבאים:</h2>
+                    <ol style="color: white; font-size: 15px; line-height: 2;">
+                        <li>השלימו את פרטי הפרופיל שלכם</li>
+                        <li>הוסיפו תמונת פרופיל מקצועית</li>
+                        <li>הגדירו את שעות הזמינות שלכם</li>
+                        <li>העלו מסמכי אימות (תעודות, רישיונות)</li>
+                        <li>הוסיפו את השירותים שאתם מציעים</li>
+                    </ol>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{profile_link}" style="background-color: #19B8BA; color: white; padding: 15px 40px; text-decoration: none; border-radius: 30px; font-size: 18px; font-weight: bold; display: inline-block;">
+                        השלימו את הפרופיל עכשיו ➜
+                    </a>
+                </div>
+                
+                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 25px;">
+                    <h3 style="color: #1E4D5F; margin-top: 0;">💡 טיפ חשוב:</h3>
+                    <p style="color: #4C6D7F; margin-bottom: 0;">
+                        ספקים עם פרופיל מלא ומאומת מקבלים יותר הזמנות! 
+                        השלימו את כל הפרטים כדי להגדיל את החשיפה שלכם.
+                    </p>
+                </div>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">
+                    <p>צוות CareLink</p>
+                    <p style="font-size: 12px;">אם יש לכם שאלות, אנחנו כאן לעזור!</p>
+                </div>
+            </div>
+            """
+        )
+    else:
+        # Send regular welcome email to users
+        await send_email_async(
+            user.email,
+            "ברוכים הבאים ל-CareLink! 🎉",
+            f"""
+            <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #19B8BA;">ברוכים הבאים ל-CareLink!</h1>
+                </div>
+                
+                <p style="font-size: 16px; color: #1E4D5F;">שלום {user.name},</p>
+                
+                <p style="font-size: 16px; color: #4C6D7F;">
+                    תודה שנרשמת לפלטפורמה שלנו! 
+                    כעת תוכלו לחפש ולהזמין שירותי בריאות מהספקים המובילים.
+                </p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="https://carelink.co.il/providers" style="background-color: #19B8BA; color: white; padding: 15px 40px; text-decoration: none; border-radius: 30px; font-size: 18px; font-weight: bold; display: inline-block;">
+                        חפשו ספקים עכשיו ➜
+                    </a>
+                </div>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">
+                    <p>צוות CareLink</p>
+                </div>
+            </div>
+            """
+        )
     
     # Create session
     session_token = create_jwt_token(user.user_id, user.email)
