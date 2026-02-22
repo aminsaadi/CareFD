@@ -17,9 +17,11 @@ const Footer = () => {
     social_youtube: '',
     footer_links: []
   });
+  const [regions, setRegions] = useState([]);
 
   useEffect(() => {
     fetchSettings();
+    fetchRegions();
   }, []);
 
   const fetchSettings = async () => {
@@ -33,11 +35,26 @@ const Footer = () => {
     }
   };
 
+  const fetchRegions = async () => {
+    try {
+      const response = await api.get('/regions');
+      setRegions(response.data.regions || []);
+    } catch (error) {
+      // Use default regions
+      setRegions([
+        { name: 'תל אביב', cities: ['רמת גן', 'גבעתיים', 'הרצליה'] },
+        { name: 'ירושלים', cities: ['בית שמש', 'מודיעין'] },
+        { name: 'חיפה', cities: ['כרמיאל', 'עכו', 'נהריה'] },
+        { name: 'באר שבע', cities: ['אשדוד', 'אשקלון'] }
+      ]);
+    }
+  };
+
   return (
     <footer className="bg-carelink-navy text-white mt-auto">
       {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-5 gap-8">
           {/* Company Info */}
           <div className="md:col-span-1">
             <div className="bg-white px-4 py-2 rounded-lg inline-block mb-4">
@@ -71,8 +88,30 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/requests" className="text-carelink-light-gray hover:text-carelink-teal transition">
-                  בקשות
+                <Link to="/about" className="text-carelink-light-gray hover:text-carelink-teal transition">
+                  אודות
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Regions/Cities */}
+          <div>
+            <h3 className="text-lg font-bold mb-4 text-carelink-teal">אזורים וערים</h3>
+            <ul className="space-y-2">
+              {regions.slice(0, 6).map((region, index) => (
+                <li key={index}>
+                  <Link 
+                    to={`/providers?city=${encodeURIComponent(region.name || region)}`} 
+                    className="text-carelink-light-gray hover:text-carelink-teal transition"
+                  >
+                    {region.name || region}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link to="/providers" className="text-carelink-teal hover:text-carelink-teal-light transition text-sm">
+                  כל האזורים →
                 </Link>
               </li>
             </ul>
@@ -177,6 +216,9 @@ const Footer = () => {
               {settings.footer_text}
             </p>
             <div className="flex gap-6 text-sm">
+              <Link to="/about" className="text-carelink-light-gray hover:text-carelink-teal transition">
+                אודות
+              </Link>
               <Link to="/privacy" className="text-carelink-light-gray hover:text-carelink-teal transition">
                 מדיניות פרטיות
               </Link>
