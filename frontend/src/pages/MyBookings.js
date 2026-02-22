@@ -15,6 +15,7 @@ const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const { confirmState, confirm, closeConfirm } = useConfirm();
 
   useEffect(() => {
     fetchBookings();
@@ -59,16 +60,20 @@ const MyBookings = () => {
   };
 
   const handleCancelBooking = async (bookingId) => {
-    if (!window.confirm('האם אתה בטוח שברצונך לבטל הזמנה זו?')) {
-      return;
-    }
+    await confirm({
+      title: 'ביטול הזמנה',
+      message: 'האם אתה בטוח שברצונך לבטל הזמנה זו?',
+      type: 'danger',
+      confirmText: 'בטל הזמנה',
+      cancelText: 'השאר'
+    });
 
     try {
       await api.put(`/bookings/${bookingId}/cancel`);
-      alert('ההזמנה בוטלה בהצלחה');
+      toast.success('ההזמנה בוטלה בהצלחה');
       fetchBookings();
     } catch (error) {
-      alert(error.response?.data?.detail || 'שגיאה בביטול ההזמנה');
+      toast.error(error.response?.data?.detail || 'שגיאה בביטול ההזמנה');
     }
   };
 
