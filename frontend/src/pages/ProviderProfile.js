@@ -38,6 +38,34 @@ const professionTitles = {
   speech_therapist: 'קלינאי/ת תקשורת'
 };
 
+// Health funds labels
+const healthFundLabels = {
+  clalit: 'כללית',
+  maccabi: 'מכבי',
+  meuhedet: 'מאוחדת',
+  leumit: 'לאומית',
+  private: 'פרטי בלבד'
+};
+
+// Payment methods labels
+const paymentMethodLabels = {
+  cash: 'מזומן',
+  credit_card: 'כרטיס אשראי',
+  bit: 'ביט',
+  paybox: 'PayBox',
+  bank_transfer: 'העברה בנקאית',
+  check: 'צ\'ק'
+};
+
+// Education level labels
+const educationLevelLabels = {
+  diploma: 'תעודה מקצועית',
+  bachelor: 'תואר ראשון',
+  master: 'תואר שני',
+  phd: 'דוקטורט',
+  specialist: 'התמחות רפואית'
+};
+
 const getProfessionLabel = (professionValue) => {
   return professionTitles[professionValue] || professionValue;
 };
