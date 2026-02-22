@@ -92,13 +92,15 @@ const Landing = () => {
     }
   };
 
-  // Israeli regions for quick selection (fallback)
-  const regions = [
+  // Fallback regions if API returns nothing
+  const defaultRegions = [
     { id: 'north', name: 'צפון', cities: ['חיפה', 'נהריה', 'עכו', 'כרמיאל', 'צפת'] },
     { id: 'center', name: 'מרכז', cities: ['תל אביב', 'רמת גן', 'פתח תקווה', 'הרצליה', 'רעננה'] },
     { id: 'south', name: 'דרום', cities: ['באר שבע', 'אשדוד', 'אשקלון', 'אילת'] },
     { id: 'jerusalem', name: 'ירושלים', cities: ['ירושלים', 'בית שמש', 'מודיעין'] }
   ];
+
+  const displayRegions = regions.length > 0 ? regions : defaultRegions;
 
   const radiusOptions = [
     { value: '5', label: '5 ק"מ' },
