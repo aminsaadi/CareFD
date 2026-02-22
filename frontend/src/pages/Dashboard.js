@@ -453,37 +453,43 @@ const Dashboard = () => {
 
                   {/* Settings Tab */}
                   {activeTab === 'settings' && (
-                    <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <h3 className="text-xl font-bold text-carelink-navy mb-6">הגדרות חשבון</h3>
-                      <div className="space-y-6">
-                        <div>
-                          <label className="block text-sm font-medium text-carelink-navy mb-2">שם מלא</label>
-                          <input
-                            type="text"
-                            defaultValue={user?.name}
-                            className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
-                          />
+                    <div className="space-y-6">
+                      {/* Notification Settings */}
+                      <NotificationSettings />
+                      
+                      {/* Account Settings */}
+                      <div className="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 className="text-xl font-bold text-carelink-navy mb-6">הגדרות חשבון</h3>
+                        <div className="space-y-6">
+                          <div>
+                            <label className="block text-sm font-medium text-carelink-navy mb-2">שם מלא</label>
+                            <input
+                              type="text"
+                              defaultValue={user?.name}
+                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-carelink-navy mb-2">אימייל</label>
+                            <input
+                              type="email"
+                              defaultValue={user?.email}
+                              disabled
+                              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-carelink-navy mb-2">טלפון</label>
+                            <input
+                              type="tel"
+                              placeholder="050-0000000"
+                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                            />
+                          </div>
+                          <button className="bg-carelink-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carelink-teal-medium transition">
+                            שמור שינויים
+                          </button>
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium text-carelink-navy mb-2">אימייל</label>
-                          <input
-                            type="email"
-                            defaultValue={user?.email}
-                            disabled
-                            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-carelink-navy mb-2">טלפון</label>
-                          <input
-                            type="tel"
-                            placeholder="050-0000000"
-                            className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
-                          />
-                        </div>
-                        <button className="bg-carelink-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carelink-teal-medium transition">
-                          שמור שינויים
-                        </button>
                       </div>
                     </div>
                   )}
