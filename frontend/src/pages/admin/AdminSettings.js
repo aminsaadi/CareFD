@@ -531,18 +531,6 @@ const AdminSettings = () => {
                     נקה מטמון
                   </button>
                 </div>
-
-                <div className="p-4 bg-red-50 rounded-lg border border-red-200">
-                  <h3 className="text-red-700 font-medium mb-2">מחק את כל הספקים</h3>
-                  <p className="text-red-600 text-sm mb-3">מחק את כל הספקים והשירותים מהמערכת (פעולה בלתי הפיכה!)</p>
-                  <button 
-                    onClick={clearAllProviders}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center gap-2"
-                  >
-                    <FiTrash2 />
-                    מחק הכל
-                  </button>
-                </div>
               </div>
             )}
           </div>
