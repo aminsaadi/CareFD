@@ -245,6 +245,13 @@ const AdminProviders = () => {
                               >
                                 <FiEye size={16} />
                               </Link>
+                              <Link
+                                to={`/admin/providers/${provider.provider_id}/edit`}
+                                className="p-2 text-carelink-slate hover:text-carelink-teal hover:bg-carelink-teal/10 rounded-lg transition"
+                                title="ערוך פרופיל"
+                              >
+                                <FiEdit size={16} />
+                              </Link>
                               {!provider.is_verified && (
                                 <button
                                   onClick={() => verifyProvider(provider.provider_id)}
