@@ -112,16 +112,14 @@ const Providers = () => {
       const response = await api.get(`/providers?${params.toString()}`);
       let apiProviders = response.data.providers || [];
       
-      // Use dummy data if no providers from API
-      if (apiProviders.length === 0) {
-        apiProviders = filterDummyProviders(dummyProviders);
-      }
-      
+      // Show actual providers from API (no dummy data fallback)
       setProviders(apiProviders);
+      setTotalProviders(response.data.total || 0);
     } catch (error) {
       console.error('Failed to fetch providers:', error);
-      // Fallback to dummy data
-      setProviders(filterDummyProviders(dummyProviders));
+      // Show empty on error - no dummy data
+      setProviders([]);
+      setTotalProviders(0);
     } finally {
       setLoading(false);
     }
