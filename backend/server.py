@@ -4951,6 +4951,7 @@ async def admin_send_push_notification(
     body = notification_data.get("body", "")
     target = notification_data.get("target", "all")  # all, providers, users, specific
     user_ids = notification_data.get("user_ids", [])
+    icon = notification_data.get("icon", "/logo192.png")
     
     # Build query for target users
     query = {}
@@ -4971,6 +4972,30 @@ async def admin_send_push_notification(
         {"_id": 0}
     ).to_list(10000)
     
+    # Send actual push notifications
+    success_count = 0
+    failed_count = 0
+    
+    for sub in subscriptions:
+        subscription_info = {
+            "endpoint": sub.get("endpoint"),
+            "keys": sub.get("keys")
+        }
+        try:
+            if await send_push_notification(
+                subscription_info, 
+                title, 
+                body, 
+                {"from_admin": True, "target": target},
+                icon
+            ):
+                success_count += 1
+            else:
+                failed_count += 1
+        except Exception as e:
+            logger.error(f"Error sending push to subscription: {e}")
+            failed_count += 1
+    
     # Create notification record
     notification_record = {
         "notification_id": f"push_{uuid.uuid4().hex[:12]}",
@@ -4978,13 +5003,12 @@ async def admin_send_push_notification(
         "body": body,
         "target": target,
         "recipients_count": len(subscriptions),
+        "success_count": success_count,
+        "failed_count": failed_count,
         "sent_by": admin["user_id"],
         "sent_at": datetime.now(timezone.utc).isoformat()
     }
     await db.push_notifications_sent.insert_one(notification_record)
-    
-    # TODO: Implement actual push notification sending with web-push library
-    # For now, we store the notification and it can be polled
     
     # Also create in-app notifications for these users
     for user_id in user_ids_to_notify:
@@ -4997,8 +5021,11 @@ async def admin_send_push_notification(
         )
     
     return {
-        "message": f"Notification sent to {len(subscriptions)} devices",
-        "notification_id": notification_record["notification_id"]
+        "message": f"Notification sent: {success_count} success, {failed_count} failed",
+        "notification_id": notification_record["notification_id"],
+        "success_count": success_count,
+        "failed_count": failed_count,
+        "total_subscriptions": len(subscriptions)
     }
 
 @api_router.get("/admin/push/history")
