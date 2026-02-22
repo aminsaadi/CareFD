@@ -217,7 +217,7 @@ const ProviderDashboard = () => {
 
   const handleSaveService = async () => {
     if (!serviceForm.name || !serviceForm.price) {
-      alert('נא למלא שם שירות ומחיר');
+      toast.error('נא למלא שם שירות ומחיר');
       return;
     }
 
@@ -232,30 +232,39 @@ const ProviderDashboard = () => {
 
       if (editingService) {
         await api.put(`/services/${editingService.service_id}`, serviceData);
+        toast.success('השירות עודכן בהצלחה!');
       } else {
         await api.post('/services', serviceData);
+        toast.success('השירות נוסף בהצלחה!');
       }
       
       await fetchDashboardData();
       resetServiceForm();
     } catch (error) {
       console.error('Failed to save service:', error);
-      alert('שגיאה בשמירת השירות');
+      toast.error('שגיאה בשמירת השירות');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDeleteService = async (serviceId) => {
-    if (!window.confirm('האם אתה בטוח שברצונך למחוק שירות זה?')) return;
-    
-    try {
-      await api.delete(`/services/${serviceId}`);
-      await fetchDashboardData();
-    } catch (error) {
-      console.error('Failed to delete service:', error);
-      alert('שגיאה במחיקת השירות');
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'מחיקת שירות',
+      message: 'האם אתה בטוח שברצונך למחוק שירות זה? פעולה זו לא ניתנת לביטול.',
+      type: 'danger',
+      onConfirm: async () => {
+        try {
+          await api.delete(`/services/${serviceId}`);
+          await fetchDashboardData();
+          toast.success('השירות נמחק בהצלחה');
+        } catch (error) {
+          console.error('Failed to delete service:', error);
+          toast.error('שגיאה במחיקת השירות');
+        }
+      }
+    });
   };
 
   // Profile Management Functions
