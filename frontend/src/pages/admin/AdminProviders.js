@@ -165,7 +165,7 @@ const AdminProviders = () => {
                   </tr>
                 ) : (
                   providers.map((provider) => (
-                    <tr key={provider.provider_id} className="border-b border-gray-100/50 hover:bg-gray-50/30 transition">
+                    <tr key={provider.provider_id || `orphan_${provider.user_id}`} className="border-b border-gray-100/50 hover:bg-gray-50/30 transition">
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 bg-gradient-to-br from-carelink-teal to-carelink-navy rounded-full flex items-center justify-center text-carelink-navy font-medium text-lg">
