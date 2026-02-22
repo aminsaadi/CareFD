@@ -331,6 +331,13 @@ const ProviderProfile = () => {
                   {getProfessionLabel(provider.profession_title)}
                 </p>
               )}
+
+              {/* Provider Number */}
+              {provider.provider_number && (
+                <p className="text-sm text-white/70 mb-3 font-mono" data-testid="provider-number">
+                  מספר ספק: {provider.provider_number}
+                </p>
+              )}
               
               <div className="flex flex-wrap items-center gap-4 mb-4">
                 <span className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
