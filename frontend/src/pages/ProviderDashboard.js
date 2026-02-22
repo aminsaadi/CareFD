@@ -1218,6 +1218,18 @@ const ProviderDashboard = () => {
       </div>
 
       <Footer />
+      
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmDialog.onConfirm}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        type={confirmDialog.type}
+        confirmText="אישור"
+        cancelText="ביטול"
+      />
     </div>
   );
 };
