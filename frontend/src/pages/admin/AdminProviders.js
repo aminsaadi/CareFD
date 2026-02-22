@@ -16,6 +16,8 @@ const AdminProviders = () => {
   const [filterStatus, setFilterStatus] = useState('');
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0 });
   const [creatingProfile, setCreatingProfile] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(null);
+  const [showToggleModal, setShowToggleModal] = useState(null);
 
   useEffect(() => {
     fetchProviders();
