@@ -6,7 +6,6 @@ import Footer from '../components/Footer';
 import ProviderCard from '../components/ProviderCard';
 import AdvancedFilters from '../components/AdvancedFilters';
 import api from '../utils/api';
-import { dummyProviders } from '../data/dummyData';
 import { 
   FaSearch, FaFilter, FaTimes, FaSortAmountDown, FaMapMarkerAlt,
   FaThLarge, FaList, FaCrosshairs, FaSpinner
