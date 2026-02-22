@@ -21,6 +21,7 @@ const AdminPages = () => {
     meta_description: '',
     is_published: true
   });
+  const { confirmState, confirm, closeConfirm } = useConfirm();
 
   useEffect(() => {
     fetchPages();
@@ -70,7 +71,13 @@ const AdminPages = () => {
   };
 
   const deletePage = async (pageId) => {
-    if (!window.confirm('האם אתה בטוח שברצונך למחוק דף זה?')) return;
+    await confirm({
+      title: 'מחיקת דף',
+      message: 'האם אתה בטוח שברצונך למחוק דף זה?',
+      type: 'danger',
+      confirmText: 'מחק',
+      cancelText: 'ביטול'
+    });
     try {
       await api.delete(`/admin/pages/${pageId}`);
       fetchPages();

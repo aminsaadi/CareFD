@@ -17,6 +17,7 @@ const AdminRegions = () => {
   const [editingRegion, setEditingRegion] = useState(null);
   const [newCityName, setNewCityName] = useState('');
   const [addingCityTo, setAddingCityTo] = useState(null);
+  const { confirmState, confirm, closeConfirm } = useConfirm();
 
   useEffect(() => {
     fetchRegions();
@@ -57,7 +58,13 @@ const AdminRegions = () => {
   };
 
   const deleteRegion = async (regionId) => {
-    if (!window.confirm('האם אתה בטוח שברצונך למחוק אזור זה?')) return;
+    await confirm({
+      title: 'מחיקת אזור',
+      message: 'האם אתה בטוח שברצונך למחוק אזור זה?',
+      type: 'danger',
+      confirmText: 'מחק',
+      cancelText: 'ביטול'
+    });
     try {
       await api.delete(`/admin/regions/${regionId}`);
       fetchRegions();

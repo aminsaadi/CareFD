@@ -23,6 +23,7 @@ const AdminAds = () => {
     end_date: '',
     is_active: true
   });
+  const { confirmState, confirm, closeConfirm } = useConfirm();
 
   const positions = [
     { value: 'homepage_top', label: 'דף הבית - עליון' },
@@ -114,7 +115,13 @@ const AdminAds = () => {
   };
 
   const deleteAd = async (adId) => {
-    if (!window.confirm('האם אתה בטוח שברצונך למחוק פרסומת זו?')) return;
+    await confirm({
+      title: 'מחיקת פרסומת',
+      message: 'האם אתה בטוח שברצונך למחוק פרסומת זו?',
+      type: 'danger',
+      confirmText: 'מחק',
+      cancelText: 'ביטול'
+    });
     try {
       await api.delete(`/admin/ads/${adId}`);
       fetchAds();

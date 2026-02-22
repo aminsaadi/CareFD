@@ -24,6 +24,7 @@ const AdminBlog = () => {
     is_published: false
   });
   const [newTag, setNewTag] = useState('');
+  const { confirmState, confirm, closeConfirm } = useConfirm();
 
   useEffect(() => {
     fetchPosts();
@@ -100,7 +101,13 @@ const AdminBlog = () => {
   };
 
   const deletePost = async (postId) => {
-    if (!window.confirm('האם אתה בטוח שברצונך למחוק פוסט זה?')) return;
+    await confirm({
+      title: 'מחיקת פוסט',
+      message: 'האם אתה בטוח שברצונך למחוק פוסט זה?',
+      type: 'danger',
+      confirmText: 'מחק',
+      cancelText: 'ביטול'
+    });
     try {
       await api.delete(`/admin/blog/${postId}`);
       fetchPosts();

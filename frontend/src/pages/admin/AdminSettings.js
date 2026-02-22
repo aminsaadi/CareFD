@@ -40,6 +40,7 @@ const AdminSettings = () => {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
   const [newFooterLink, setNewFooterLink] = useState({ label: '', url: '' });
+  const { confirmState, confirm, closeConfirm } = useConfirm();
 
   useEffect(() => {
     fetchSettings();
@@ -117,9 +118,13 @@ const AdminSettings = () => {
   };
 
   const clearAllProviders = async () => {
-    if (!window.confirm('האם אתה בטוח שברצונך למחוק את כל הספקים? פעולה זו בלתי הפיכה!')) {
-      return;
-    }
+    await confirm({
+      title: 'מחיקת כל הספקים',
+      message: 'האם אתה בטוח שברצונך למחוק את כל הספקים? פעולה זו בלתי הפיכה!',
+      type: 'danger',
+      confirmText: 'מחק הכל',
+      cancelText: 'ביטול'
+    });
     try {
       const response = await api.delete('/admin/providers/clear-all');
       toast.success(`נמחקו ${response.data.providers_deleted} ספקים ו-${response.data.services_deleted} שירותים`);

@@ -18,6 +18,7 @@ const AdminFeatured = () => {
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [featuredDuration, setFeaturedDuration] = useState(30);
   const [searchQuery, setSearchQuery] = useState('');
+  const { confirmState, confirm, closeConfirm } = useConfirm();
 
   useEffect(() => {
     fetchData();
@@ -97,7 +98,13 @@ const AdminFeatured = () => {
   };
 
   const removeFeatured = async (featuredId) => {
-    if (!window.confirm('האם אתה בטוח שברצונך להסיר את ההבלטה?')) return;
+    await confirm({
+      title: 'הסרת הבלטה',
+      message: 'האם אתה בטוח שברצונך להסיר את ההבלטה?',
+      type: 'warning',
+      confirmText: 'הסר',
+      cancelText: 'ביטול'
+    });
     
     try {
       await api.delete(`/admin/featured-providers/${featuredId}`);

@@ -20,6 +20,7 @@ const AdminProfessions = () => {
   const [newItemNameEn, setNewItemNameEn] = useState('');
   const [selectedParent, setSelectedParent] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const { confirmState, confirm, closeConfirm } = useConfirm();
 
   useEffect(() => {
     fetchProfessions();
@@ -112,7 +113,13 @@ const AdminProfessions = () => {
   };
 
   const deleteItem = async (type, id) => {
-    if (!window.confirm('האם אתה בטוח שברצונך למחוק?')) return;
+    await confirm({
+      title: 'מחיקה',
+      message: 'האם אתה בטוח שברצונך למחוק?',
+      type: 'danger',
+      confirmText: 'מחק',
+      cancelText: 'ביטול'
+    });
     
     try {
       await api.delete(`/admin/${type}/${id}`);
