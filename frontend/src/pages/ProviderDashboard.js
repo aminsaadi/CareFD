@@ -79,7 +79,7 @@ const ProviderDashboard = () => {
     pricing_type: 'per_session'
   });
 
-  // Profile form state
+  // Profile form state - Provider business profile
   const [profileForm, setProfileForm] = useState({
     business_name: '',
     description: '',
@@ -92,6 +92,19 @@ const ProviderDashboard = () => {
     specializations: [],
     service_types: [],
     years_experience: ''
+  });
+
+  // User info form state - Personal user details
+  const [userInfoForm, setUserInfoForm] = useState({
+    first_name: '',
+    last_name: '',
+    personal_phone: '',
+    personal_email: '',
+    personal_address: '',
+    personal_city: '',
+    current_password: '',
+    new_password: '',
+    confirm_password: ''
   });
 
   const [stats, setStats] = useState({
