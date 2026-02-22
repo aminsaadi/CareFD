@@ -380,6 +380,21 @@ CareLink is a healthcare services platform in Israel connecting users with healt
   - Toast notifications for success/error
   - Green checkmark indicator after review submitted
 
+- **Full Profile Editing (Provider & Admin)**
+  - **Provider Dashboard**: Added "ערוך פרופיל" button linking to full edit page
+  - **Provider Edit Page** (`/provider/edit/:providerId`): Complete 6-tab form:
+    - פרטים בסיסיים: שם, מקצוע, מגדר, שנות ותק, טלפון, אימייל, אתר, תיאור קצר
+    - אודות: טקסט ארוך על הספק
+    - התמחויות: התמחויות + מומחיויות ספציפיות (dynamic array fields)
+    - מיקום ואזורים: כתובת, עיר, אזורי שירות (multi-select)
+    - זמינות: לוח זמינות שבועי עם 4 משמרות × 7 ימים (visual grid)
+    - קהל יעד ושפות: בחירת שפות וקהלי יעד (multi-select buttons)
+  - **Admin Provider Edit** (`/admin/providers/:providerId/edit`): Same 6-tab form
+    - Added all new fields to admin API: profession_title, gender, about, description, 
+      profile_image, expertise, target_audience, service_areas, availability, website
+    - Admin can upload provider profile images
+    - Quick actions: Verify provider, Toggle recommended status
+
 ### Feb 12, 2026
 - Added GPS-based search with radius
 - Added region quick-select buttons
