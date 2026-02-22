@@ -2944,6 +2944,28 @@ async def admin_get_all_providers(
     total = await db.providers.count_documents(query)
     providers = await db.providers.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
     
+    # Also get users with role=provider that don't have a provider record
+    provider_user_ids = [p.get("user_id") for p in providers if p.get("user_id")]
+    orphan_provider_users = await db.users.find(
+        {"role": "provider", "user_id": {"$nin": provider_user_ids}},
+        {"_id": 0, "password_hash": 0}
+    ).to_list(100)
+    
+    # Convert orphan users to provider-like format
+    for user in orphan_provider_users:
+        providers.append({
+            "provider_id": None,
+            "user_id": user.get("user_id"),
+            "business_name": user.get("name", "ספק ללא פרופיל"),
+            "email": user.get("email"),
+            "phone": user.get("phone", ""),
+            "is_verified": False,
+            "verification_status": "incomplete",
+            "provider_number": user.get("user_number"),
+            "needs_profile": True
+        })
+        total += 1
+    
     return {
         "providers": providers,
         "total": total,
