@@ -304,6 +304,89 @@ const MyBookings = () => {
         confirmText={confirmState.confirmText}
         cancelText={confirmState.cancelText}
       />
+      
+      {/* Review Modal */}
+      {showReviewModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowReviewModal(null)}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-xl font-bold text-carelink-navy mb-2">כתוב ביקורת</h3>
+            <p className="text-carelink-gray mb-6">
+              ספר לנו על החוויה שלך עם {showReviewModal.provider?.business_name || 'הספק'}
+            </p>
+            
+            {/* Star Rating */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-carelink-navy mb-2">דירוג</label>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setReviewRating(star)}
+                    onMouseEnter={() => setReviewHoverRating(star)}
+                    onMouseLeave={() => setReviewHoverRating(0)}
+                    className="text-3xl transition-transform hover:scale-110"
+                    data-testid={`review-star-${star}`}
+                  >
+                    <FaStar 
+                      className={`${
+                        star <= (reviewHoverRating || reviewRating) 
+                          ? 'text-yellow-500' 
+                          : 'text-gray-300'
+                      }`}
+                    />
+                  </button>
+                ))}
+                <span className="mr-3 text-sm text-carelink-gray self-center">
+                  {reviewRating > 0 && `${reviewRating} מתוך 5`}
+                </span>
+              </div>
+            </div>
+
+            {/* Comment */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-carelink-navy mb-2">הביקורת שלך</label>
+              <textarea
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                placeholder="ספר/י על החוויה שלך עם הספק..."
+                rows={4}
+                className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal resize-none"
+                data-testid="review-modal-comment"
+              />
+              <p className="text-xs text-carelink-gray mt-1">{reviewComment.length}/500 תווים</p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowReviewModal(null);
+                  setReviewRating(0);
+                  setReviewComment('');
+                }}
+                className="flex-1 bg-gray-100 text-carelink-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
+              >
+                ביטול
+              </button>
+              <button
+                onClick={() => handleSubmitReview(showReviewModal)}
+                disabled={isSubmittingReview}
+                className="flex-1 bg-carelink-teal text-white py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition disabled:opacity-50 flex items-center justify-center gap-2"
+                data-testid="submit-review-modal-btn"
+              >
+                {isSubmittingReview ? (
+                  <>
+                    <FaSpinner className="animate-spin" />
+                    שולח...
+                  </>
+                ) : (
+                  'שלח ביקורת'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
