@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../utils/api';
+import { toast } from 'sonner';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import { useConfirm } from '../../hooks/useConfirm';
 import {
   FiStar, FiPlus, FiTrash2, FiCalendar, FiUser, FiSearch,
   FiCheck, FiClock, FiAward

@@ -6,6 +6,9 @@ import Navbar from '../components/Navbar';
 import api from '../utils/api';
 import { format } from 'date-fns';
 import { FaStar, FaEnvelope } from 'react-icons/fa';
+import { toast } from 'sonner';
+import ConfirmDialog from '../components/ConfirmDialog';
+import { useConfirm } from '../hooks/useConfirm';
 
 const RequestDetails = () => {
   const { t } = useTranslation();

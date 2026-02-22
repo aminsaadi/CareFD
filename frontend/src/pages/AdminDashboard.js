@@ -5,6 +5,9 @@ import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
+import { toast } from 'sonner';
+import ConfirmDialog from '../components/ConfirmDialog';
+import { useConfirm } from '../hooks/useConfirm';
 import { 
   FaUsers, FaUserMd, FaCalendarAlt, FaChartBar, FaFileAlt,
   FaStar, FaComments, FaCog, FaBell, FaCheckCircle, FaTimes,
