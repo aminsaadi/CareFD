@@ -437,11 +437,24 @@ const Landing = () => {
             </Link>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {dummyProviders.slice(0, 3).map((provider) => (
-              <ProviderCard key={provider.provider_id} provider={provider} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <FaSpinner className="animate-spin text-4xl text-carelink-teal" />
+            </div>
+          ) : featuredProviders.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredProviders.slice(0, 3).map((provider) => (
+                <ProviderCard key={provider.provider_id} provider={provider} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-carelink-teal-pale/20 rounded-2xl">
+              <p className="text-carelink-slate">בקרוב יתווספו ספקים מומלצים...</p>
+              <Link to="/register/provider" className="text-carelink-teal font-semibold hover:underline mt-2 inline-block">
+                הצטרפו כספק
+              </Link>
+            </div>
+          )}
           
           <div className="mt-8 text-center md:hidden">
             <Link
