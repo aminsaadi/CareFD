@@ -6,7 +6,9 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import VerificationDocuments from '../components/VerificationDocuments';
 import NotificationSettings from '../components/NotificationSettings';
+import ConfirmDialog from '../components/ConfirmDialog';
 import api from '../utils/api';
+import { toast } from 'sonner';
 import { 
   FaCalendarAlt, FaComments, FaFileAlt, FaStar, FaUser, FaCog,
   FaChevronLeft, FaPlus, FaMapMarkerAlt, FaClock, FaCheckCircle,
