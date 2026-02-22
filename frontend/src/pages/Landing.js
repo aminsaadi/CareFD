@@ -67,9 +67,9 @@ const Landing = () => {
       const regionsRes = await api.get('/regions');
       setRegions(regionsRes.data.regions || []);
 
-      // Fetch statistics
+      // Fetch statistics from public endpoint
       try {
-        const statsRes = await api.get('/admin/stats');
+        const statsRes = await api.get('/stats/public');
         setStatistics({
           providers: statsRes.data.total_providers || 50,
           services: statsRes.data.total_services || 100,
@@ -77,7 +77,7 @@ const Landing = () => {
           cities: statsRes.data.total_cities || 20
         });
       } catch {
-        // Use defaults for non-admin users
+        // Use defaults if public stats fail
         setStatistics({
           providers: 50,
           services: 100,
