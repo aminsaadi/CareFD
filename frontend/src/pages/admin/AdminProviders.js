@@ -284,10 +284,11 @@ const AdminProviders = () => {
                               {!provider.is_verified && (
                                 <button
                                   onClick={() => verifyProvider(provider.provider_id)}
-                                  className="p-2 text-carelink-slate hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition"
+                                  className="px-3 py-1.5 bg-emerald-100 text-emerald-600 rounded-lg hover:bg-emerald-200 transition flex items-center gap-1.5 text-sm font-medium"
                                   title="אמת ספק"
                                 >
-                                  <FiShield size={16} />
+                                  <FiShield size={14} />
+                                  אמת
                                 </button>
                               )}
                               <button
