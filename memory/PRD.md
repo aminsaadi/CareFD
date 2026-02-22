@@ -277,6 +277,17 @@ CareLink is a healthcare services platform in Israel connecting users with healt
 - Fixed notification emails for guest bookings (was accessing `user` which is None for guests)
 - Verified both guest and authenticated booking flows work correctly
 
+### Feb 22, 2026 (Current Session)
+- **CRITICAL BUG FIX: Provider Registration Flow**
+  - Fixed: Providers registering now automatically get a provider document created
+  - New endpoint: POST /api/admin/providers/create-from-user/{user_id} - Admin can create provider profile for orphaned users
+  - Admin providers page now shows orphaned providers with "ללא פרופיל" badge and "צור פרופיל" button
+  - Stats updated to show: סה"כ ספקים, מאומתים, ממתינים לאימות, ללא פרופיל, מומלצים
+  
+- **Services Page Verified**
+  - Confirmed: Services page fetches real data from /api/services (not dummy data)
+  - Filter sidebar working: service type, price range, city
+
 ### Feb 12, 2026
 - Added GPS-based search with radius
 - Added region quick-select buttons
