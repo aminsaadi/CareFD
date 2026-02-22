@@ -8,7 +8,8 @@ import api from '../utils/api';
 import { 
   FaPlus, FaTrash, FaSave, FaCamera, FaUser, FaMapMarkerAlt,
   FaClock, FaLanguage, FaUsers, FaBriefcase, FaGraduationCap,
-  FaInfoCircle, FaCheck, FaTimes
+  FaInfoCircle, FaCheck, FaTimes, FaAward, FaCreditCard, FaPhone,
+  FaWhatsapp, FaEnvelope, FaFileAlt, FaUpload, FaEye, FaEyeSlash
 } from 'react-icons/fa';
 
 // Options data
