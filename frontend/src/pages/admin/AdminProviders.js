@@ -200,7 +200,12 @@ const AdminProviders = () => {
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex flex-col gap-1">
-                          {provider.is_verified ? (
+                          {provider.needs_profile ? (
+                            <span className="inline-flex items-center gap-1 text-red-400 text-sm">
+                              <FiAlertCircle size={14} />
+                              ללא פרופיל
+                            </span>
+                          ) : provider.is_verified ? (
                             <span className="inline-flex items-center gap-1 text-emerald-400 text-sm">
                               <FiCheck size={14} />
                               מאומת
@@ -215,33 +220,53 @@ const AdminProviders = () => {
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-2">
-                          <Link
-                            to={`/providers/${provider.provider_id}`}
-                            className="p-2 text-carelink-slate hover:text-carelink-navy hover:bg-gray-50 rounded-lg transition"
-                            title="צפה בפרופיל"
-                          >
-                            <FiEye size={16} />
-                          </Link>
-                          {!provider.is_verified && (
+                          {provider.needs_profile ? (
                             <button
-                              onClick={() => verifyProvider(provider.provider_id)}
-                              className="p-2 text-carelink-slate hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition"
-                              title="אמת ספק"
+                              onClick={() => createProviderProfile(provider.user_id, provider.business_name)}
+                              disabled={creatingProfile === provider.user_id}
+                              className="flex items-center gap-1 px-3 py-1.5 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal-medium transition text-sm disabled:opacity-50"
+                              title="צור פרופיל ספק"
                             >
-                              <FiShield size={16} />
+                              {creatingProfile === provider.user_id ? (
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              ) : (
+                                <>
+                                  <FiUserPlus size={14} />
+                                  צור פרופיל
+                                </>
+                              )}
                             </button>
+                          ) : (
+                            <>
+                              <Link
+                                to={`/providers/${provider.provider_id}`}
+                                className="p-2 text-carelink-slate hover:text-carelink-navy hover:bg-gray-50 rounded-lg transition"
+                                title="צפה בפרופיל"
+                              >
+                                <FiEye size={16} />
+                              </Link>
+                              {!provider.is_verified && (
+                                <button
+                                  onClick={() => verifyProvider(provider.provider_id)}
+                                  className="p-2 text-carelink-slate hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition"
+                                  title="אמת ספק"
+                                >
+                                  <FiShield size={16} />
+                                </button>
+                              )}
+                              <button
+                                onClick={() => toggleRecommended(provider.provider_id, provider.is_recommended)}
+                                className={`p-2 rounded-lg transition ${
+                                  provider.is_recommended
+                                    ? 'text-amber-400 hover:bg-amber-500/10'
+                                    : 'text-carelink-slate hover:text-amber-400 hover:bg-amber-500/10'
+                                }`}
+                                title={provider.is_recommended ? 'הסר המלצה' : 'המלץ'}
+                              >
+                                <FiAward size={16} />
+                              </button>
+                            </>
                           )}
-                          <button
-                            onClick={() => toggleRecommended(provider.provider_id, provider.is_recommended)}
-                            className={`p-2 rounded-lg transition ${
-                              provider.is_recommended
-                                ? 'text-amber-400 hover:bg-amber-500/10'
-                                : 'text-carelink-slate hover:text-amber-400 hover:bg-amber-500/10'
-                            }`}
-                            title={provider.is_recommended ? 'הסר המלצה' : 'המלץ'}
-                          >
-                            <FiAward size={16} />
-                          </button>
                         </div>
                       </td>
                     </tr>
