@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { useConfirm } from '../hooks/useConfirm';
+import { FaStar, FaSpinner } from 'react-icons/fa';
 
 const MyBookings = () => {
   const { t } = useTranslation();
