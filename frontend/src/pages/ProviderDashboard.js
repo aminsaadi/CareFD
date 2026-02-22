@@ -793,6 +793,57 @@ const ProviderDashboard = () => {
                     </div>
                   )}
 
+                  {/* Messages Tab */}
+                  {activeTab === 'messages' && (
+                    <div className="bg-white p-6 rounded-2xl shadow-lg">
+                      <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
+                        <FaComments className="text-carelink-teal" />
+                        שיחות צ'אט
+                      </h3>
+                      {chats.length === 0 ? (
+                        <div className="text-center py-12">
+                          <FaComments className="text-5xl text-carelink-teal-pale mx-auto mb-4" />
+                          <p className="text-carelink-gray">אין שיחות עדיין</p>
+                          <p className="text-sm text-carelink-gray mt-2">כאשר לקוחות יפנו אליכם, השיחות יופיעו כאן</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {chats.map((chat) => (
+                            <Link
+                              key={chat.room_id}
+                              to={`/chat/${chat.room_id}`}
+                              className="flex items-center gap-4 p-4 bg-gray-50 hover:bg-carelink-teal-pale/30 rounded-xl transition group"
+                            >
+                              <div className="w-12 h-12 bg-carelink-navy rounded-full flex items-center justify-center text-white font-bold text-lg">
+                                {(chat.other_user?.name || chat.provider?.business_name || 'M')[0]}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between">
+                                  <p className="font-semibold text-carelink-navy group-hover:text-carelink-teal transition">
+                                    {chat.other_user?.name || chat.provider?.business_name || 'משתמש'}
+                                  </p>
+                                  <span className="text-xs text-carelink-gray">
+                                    {chat.last_message?.created_at 
+                                      ? new Date(chat.last_message.created_at).toLocaleDateString('he-IL')
+                                      : ''}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-carelink-gray truncate">
+                                  {chat.last_message?.content || 'לחצו כדי להתחיל שיחה'}
+                                </p>
+                              </div>
+                              {chat.unread_count > 0 && (
+                                <span className="bg-carelink-teal text-white text-xs font-bold px-2 py-1 rounded-full">
+                                  {chat.unread_count}
+                                </span>
+                              )}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Reviews Tab */}
                   {activeTab === 'reviews' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
