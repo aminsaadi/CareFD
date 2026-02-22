@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CompletionConfirmDialog from '../components/CompletionConfirmDialog';
+import NotificationSettings from '../components/NotificationSettings';
 import api from '../utils/api';
 import { 
   FaCalendarAlt, FaComments, FaFileAlt, FaStar, FaUser, FaCog,
