@@ -474,6 +474,7 @@ const ProviderEdit = () => {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingImage}
                 className="absolute bottom-0 right-0 w-8 h-8 bg-carelink-teal text-white rounded-full flex items-center justify-center shadow-lg hover:bg-carelink-teal/90 transition"
+                title="העלה תמונה"
               >
                 {uploadingImage ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -481,6 +482,16 @@ const ProviderEdit = () => {
                   <FaCamera size={14} />
                 )}
               </button>
+              {formData.profile_image && (
+                <button
+                  onClick={handleDeleteImage}
+                  className="absolute bottom-0 left-0 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-red-600 transition"
+                  title="מחק תמונה"
+                  data-testid="delete-profile-image-btn"
+                >
+                  <FaTrash size={12} />
+                </button>
+              )}
               <input
                 ref={fileInputRef}
                 type="file"
