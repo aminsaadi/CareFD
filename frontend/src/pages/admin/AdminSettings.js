@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../utils/api';
+import { toast } from 'sonner';
 import {
   FiSave, FiGlobe, FiImage, FiLink, FiMail, FiPhone,
   FiMapPin, FiFacebook, FiInstagram, FiTwitter, FiLinkedin,
-  FiYoutube, FiSettings, FiDatabase, FiUpload
+  FiYoutube, FiSettings, FiDatabase, FiUpload, FiTrash2
 } from 'react-icons/fi';
 
 const AdminSettings = () => {
