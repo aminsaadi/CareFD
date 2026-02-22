@@ -20,6 +20,8 @@ const AdminUsers = () => {
   const [showEditModal, setShowEditModal] = useState(null);
   const [showSuspendModal, setShowSuspendModal] = useState(null);
   const [showMessageModal, setShowMessageModal] = useState(null);
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
   const [userDetails, setUserDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0 });
