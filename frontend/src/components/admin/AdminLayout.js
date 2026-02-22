@@ -249,13 +249,21 @@ const AdminLayout = ({ children }) => {
             <h1 className="text-carelink-navy font-semibold">פאנל ניהול</h1>
           </div>
           <div className="flex items-center gap-4">
-            <button className="relative p-2 text-carelink-slate hover:text-carelink-navy hover:bg-carelink-teal/10 rounded-lg transition">
+            <Link 
+              to="/admin/notifications"
+              className="relative p-2 text-carelink-slate hover:text-carelink-navy hover:bg-carelink-teal/10 rounded-lg transition"
+              title="הודעות מערכת"
+            >
               <FiBell size={20} />
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-            <button className="relative p-2 text-carelink-slate hover:text-carelink-navy hover:bg-carelink-teal/10 rounded-lg transition">
+            </Link>
+            <Link 
+              to="/admin/messages"
+              className="relative p-2 text-carelink-slate hover:text-carelink-navy hover:bg-carelink-teal/10 rounded-lg transition"
+              title="הודעות"
+            >
               <FiMessageSquare size={20} />
-            </button>
+            </Link>
           </div>
         </header>
 
