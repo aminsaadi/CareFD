@@ -3133,6 +3133,48 @@ async def admin_get_all_providers(
         "limit": limit
     }
 
+
+@api_router.put("/admin/providers/{provider_id}")
+async def admin_update_provider(
+    provider_id: str,
+    provider_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update provider profile"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Fields that can be updated by admin
+    allowed_fields = [
+        "business_name", "email", "phone", "address", "city", "bio",
+        "experience_years", "specializations", "languages", "is_verified",
+        "is_recommended", "provider_type", "license_number", "location"
+    ]
+    
+    update_data = {}
+    for field in allowed_fields:
+        if field in provider_data:
+            update_data[field] = provider_data[field]
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No valid fields to update")
+    
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.providers.update_one(
+        {"provider_id": provider_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    return {"message": "Provider updated successfully"}
+
+
+
 @api_router.put("/admin/providers/{provider_id}/verify")
 async def admin_verify_provider(
     provider_id: str,
