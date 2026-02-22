@@ -5,38 +5,80 @@ import Footer from '../components/Footer';
 import ServiceCard from '../components/ServiceCard';
 import SearchBar from '../components/SearchBar';
 import api from '../utils/api';
-import { dummyServices } from '../data/dummyData';
+import { FaFilter, FaTimes } from 'react-icons/fa';
 
 const Services = () => {
   const { t } = useTranslation();
   const [services, setServices] = useState([]);
+  const [filteredServices, setFilteredServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    serviceType: '',
+    priceMin: '',
+    priceMax: '',
+    city: ''
+  });
 
   useEffect(() => {
     fetchServices();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [services, filters]);
 
   const fetchServices = async () => {
     try {
       setLoading(true);
       const response = await api.get('/services');
       const apiServices = response.data.services || [];
-      // Use dummy data if no services from API
-      setServices(apiServices.length > 0 ? apiServices : dummyServices);
+      setServices(apiServices);
+      setFilteredServices(apiServices);
     } catch (error) {
       console.error('Failed to fetch services:', error);
-      // Fallback to dummy data on error
-      setServices(dummyServices);
+      setServices([]);
+      setFilteredServices([]);
     } finally {
       setLoading(false);
     }
   };
 
+  const applyFilters = () => {
+    let result = [...services];
+    
+    if (filters.serviceType) {
+      result = result.filter(s => s.service_type === filters.serviceType);
+    }
+    if (filters.priceMin) {
+      result = result.filter(s => s.price >= parseInt(filters.priceMin));
+    }
+    if (filters.priceMax) {
+      result = result.filter(s => s.price <= parseInt(filters.priceMax));
+    }
+    if (filters.city) {
+      result = result.filter(s => s.provider?.location?.city?.includes(filters.city));
+    }
+    
+    setFilteredServices(result);
+  };
+
   const handleSearch = (searchTerm) => {
-    console.log('Searching for:', searchTerm);
-    // Filter services by search term
-    fetchServices();
+    if (!searchTerm) {
+      setFilteredServices(services);
+      return;
+    }
+    const term = searchTerm.toLowerCase();
+    const filtered = services.filter(s => 
+      s.name?.toLowerCase().includes(term) ||
+      s.description?.toLowerCase().includes(term) ||
+      s.provider?.business_name?.toLowerCase().includes(term)
+    );
+    setFilteredServices(filtered);
+  };
+
+  const resetFilters = () => {
+    setFilters({ serviceType: '', priceMin: '', priceMax: '', city: '' });
   };
 
   return (
