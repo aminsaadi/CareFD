@@ -1107,38 +1107,80 @@ const ProviderDashboard = () => {
 
                   {/* Settings Tab */}
                   {activeTab === 'settings' && (
-                    <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <h3 className="text-xl font-bold text-carelink-navy mb-6">הגדרות</h3>
-                      <div className="space-y-6">
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                          <div>
-                            <p className="font-medium text-carelink-navy">התראות במייל</p>
-                            <p className="text-sm text-carelink-gray">קבל התראות על תורים חדשים</p>
+                    <div className="space-y-6">
+                      {/* Push Notification Settings */}
+                      <NotificationSettings />
+                      
+                      {/* Provider-specific Settings */}
+                      <div className="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 className="text-xl font-bold text-carelink-navy mb-6">הגדרות ספק</h3>
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <div>
+                              <p className="font-medium text-carelink-navy">פרופיל פעיל</p>
+                              <p className="text-sm text-carelink-gray">הצג את הפרופיל שלי בחיפוש</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input type="checkbox" className="sr-only peer" defaultChecked />
+                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
+                            </label>
                           </div>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" className="sr-only peer" defaultChecked />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
-                          </label>
+                          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <div>
+                              <p className="font-medium text-carelink-navy">קבלת הזמנות אורחים</p>
+                              <p className="text-sm text-carelink-gray">אפשר הזמנות ממשתמשים לא רשומים</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input type="checkbox" className="sr-only peer" defaultChecked />
+                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
+                            </label>
+                          </div>
+                          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                            <div>
+                              <p className="font-medium text-carelink-navy">אישור אוטומטי</p>
+                              <p className="text-sm text-carelink-gray">אשר הזמנות אוטומטית (ללא אישור ידני)</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input type="checkbox" className="sr-only peer" />
+                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
+                            </label>
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                      </div>
+
+                      {/* Account Settings */}
+                      <div className="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 className="text-xl font-bold text-carelink-navy mb-6">הגדרות חשבון</h3>
+                        <div className="space-y-6">
                           <div>
-                            <p className="font-medium text-carelink-navy">התראות SMS</p>
-                            <p className="text-sm text-carelink-gray">קבל SMS על תורים חדשים</p>
+                            <label className="block text-sm font-medium text-carelink-navy mb-2">שם העסק</label>
+                            <input
+                              type="text"
+                              defaultValue={provider?.business_name}
+                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                            />
                           </div>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" className="sr-only peer" />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
-                          </label>
-                        </div>
-                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                           <div>
-                            <p className="font-medium text-carelink-navy">פרופיל פעיל</p>
-                            <p className="text-sm text-carelink-gray">הצג את הפרופיל שלי בחיפוש</p>
+                            <label className="block text-sm font-medium text-carelink-navy mb-2">אימייל</label>
+                            <input
+                              type="email"
+                              defaultValue={user?.email}
+                              disabled
+                              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-500"
+                            />
                           </div>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" className="sr-only peer" defaultChecked />
-                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
-                          </label>
+                          <div>
+                            <label className="block text-sm font-medium text-carelink-navy mb-2">טלפון</label>
+                            <input
+                              type="tel"
+                              defaultValue={provider?.phone}
+                              placeholder="050-0000000"
+                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                            />
+                          </div>
+                          <button className="bg-carelink-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carelink-teal-medium transition">
+                            שמור שינויים
+                          </button>
                         </div>
                       </div>
                     </div>
