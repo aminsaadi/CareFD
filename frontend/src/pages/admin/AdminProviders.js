@@ -4,7 +4,7 @@ import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../utils/api';
 import {
   FiSearch, FiFilter, FiEye, FiCheck, FiX, FiStar,
-  FiMapPin, FiPhone, FiMail, FiAward, FiShield, FiUserPlus, FiAlertCircle
+  FiMapPin, FiPhone, FiMail, FiAward, FiShield, FiUserPlus, FiAlertCircle, FiEdit
 } from 'react-icons/fi';
 
 const AdminProviders = () => {
