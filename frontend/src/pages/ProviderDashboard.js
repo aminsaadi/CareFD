@@ -1010,7 +1010,7 @@ const ProviderDashboard = () => {
                   )}
 
                   {/* Profile Tab - Enhanced */}
-                  {activeTab === 'profile' && (
+                  {activeTab === 'provider_profile' && (
                     <div className="space-y-6">
                       {/* Basic Info */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
