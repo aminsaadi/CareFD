@@ -17,6 +17,12 @@ const MyBookings = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const { confirmState, confirm, closeConfirm } = useConfirm();
+  const [showReviewModal, setShowReviewModal] = useState(null);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewHoverRating, setReviewHoverRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [reviewedBookings, setReviewedBookings] = useState([]);
 
   useEffect(() => {
     fetchBookings();
