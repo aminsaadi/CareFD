@@ -70,6 +70,12 @@ function AppRouter() {
       <Route path="/providers/:providerId" element={<ProviderProfile />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       
+      {/* Static Pages */}
+      <Route path="/about" element={<About />} />
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/contact" element={<Contact />} />
+      
       <Route
         path="/dashboard"
         element={
