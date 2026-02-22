@@ -137,6 +137,19 @@ const ProviderDashboard = () => {
         years_experience: provider.years_experience || ''
       });
     }
+    
+    // Load user info
+    if (user) {
+      setUserInfoForm(prev => ({
+        ...prev,
+        first_name: user.first_name || '',
+        last_name: user.last_name || '',
+        personal_phone: user.phone || '',
+        personal_email: user.email || '',
+        personal_address: user.address || '',
+        personal_city: user.city || ''
+      }));
+    }
   }, [provider, user]);
 
   const fetchDashboardData = async () => {
