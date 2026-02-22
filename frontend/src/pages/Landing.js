@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import Logo from '../components/Logo';
 import ProviderCard from '../components/ProviderCard';
 import ServiceCard from '../components/ServiceCard';
+import api from '../utils/api';
 import { 
   FaUserNurse, FaWalking, FaUserMd, FaHeart, 
   FaHandHoldingHeart, FaSpa, FaStar, FaSearch,
@@ -13,10 +14,7 @@ import {
   FaCrosshairs, FaSpinner
 } from 'react-icons/fa';
 import { 
-  dummyProviders, 
-  dummyServices, 
   serviceCategories, 
-  statistics, 
   testimonials 
 } from '../data/dummyData';
 
@@ -38,8 +36,63 @@ const Landing = () => {
   const [isLocating, setIsLocating] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
   const [selectedRadius, setSelectedRadius] = useState('');
+  
+  // Real data from API
+  const [featuredProviders, setFeaturedProviders] = useState([]);
+  const [popularServices, setPopularServices] = useState([]);
+  const [statistics, setStatistics] = useState({
+    providers: 0,
+    services: 0,
+    happyClients: 0,
+    cities: 0
+  });
+  const [regions, setRegions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Israeli regions for quick selection
+  useEffect(() => {
+    fetchHomeData();
+  }, []);
+
+  const fetchHomeData = async () => {
+    try {
+      // Fetch featured/recommended providers
+      const providersRes = await api.get('/providers?recommended=true&limit=6');
+      setFeaturedProviders(providersRes.data.providers || []);
+
+      // Fetch popular services
+      const servicesRes = await api.get('/services?limit=6');
+      setPopularServices(servicesRes.data.services || []);
+
+      // Fetch regions
+      const regionsRes = await api.get('/regions');
+      setRegions(regionsRes.data.regions || []);
+
+      // Fetch statistics
+      try {
+        const statsRes = await api.get('/admin/stats');
+        setStatistics({
+          providers: statsRes.data.total_providers || 50,
+          services: statsRes.data.total_services || 100,
+          happyClients: statsRes.data.total_users || 500,
+          cities: statsRes.data.total_cities || 20
+        });
+      } catch {
+        // Use defaults for non-admin users
+        setStatistics({
+          providers: 50,
+          services: 100,
+          happyClients: 500,
+          cities: 20
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch home data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Israeli regions for quick selection (fallback)
   const regions = [
     { id: 'north', name: 'צפון', cities: ['חיפה', 'נהריה', 'עכו', 'כרמיאל', 'צפת'] },
     { id: 'center', name: 'מרכז', cities: ['תל אביב', 'רמת גן', 'פתח תקווה', 'הרצליה', 'רעננה'] },
