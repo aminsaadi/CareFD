@@ -1202,6 +1202,25 @@ const ProviderDashboard = () => {
                         </div>
                       </div>
 
+                      {/* Advanced Profile Link */}
+                      <div className="bg-gradient-to-r from-carelink-teal-pale/50 to-blue-50 p-6 rounded-2xl border border-carelink-teal/20">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="text-lg font-bold text-carelink-navy mb-1">עריכת פרופיל מתקדמת</h3>
+                            <p className="text-sm text-carelink-gray">
+                              עדכן השכלה, תעודות, קופות חולים, אמצעי תשלום, מדיניות ביטולים והגדרות פרטיות
+                            </p>
+                          </div>
+                          <Link
+                            to={`/provider/edit/${provider?.provider_id}`}
+                            className="bg-carelink-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carelink-teal-medium transition flex items-center gap-2"
+                          >
+                            <FaEdit />
+                            עריכה מתקדמת
+                          </Link>
+                        </div>
+                      </div>
+
                       {/* Save Button */}
                       <div className="flex justify-end">
                         <button
