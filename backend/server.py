@@ -3606,6 +3606,20 @@ async def admin_get_stats(
     
     return stats
 
+
+@api_router.get("/stats/public")
+async def get_public_stats():
+    """Public: Get basic platform statistics for landing page"""
+    stats = {
+        "total_providers": await db.providers.count_documents({"is_verified": True}),
+        "total_services": await db.services.count_documents({"is_active": True}),
+        "total_users": await db.users.count_documents({"role": {"$in": ["patient", "user"]}}),
+        "total_cities": len(await db.providers.distinct("city", {"is_verified": True, "city": {"$ne": None}}))
+    }
+    return stats
+
+
+
 @api_router.post("/admin/notifications/broadcast")
 async def admin_broadcast_notification(
     notif_data: dict,
