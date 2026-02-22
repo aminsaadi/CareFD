@@ -6,8 +6,10 @@ import { toast } from 'sonner';
 import {
   FiUser, FiMail, FiPhone, FiMapPin, FiCalendar, FiSave, FiArrowRight,
   FiCheck, FiX, FiStar, FiShield, FiAward, FiImage, FiFileText,
-  FiClock, FiGlobe, FiUsers, FiBriefcase, FiCamera, FiPlus, FiTrash2
+  FiClock, FiGlobe, FiUsers, FiBriefcase, FiCamera, FiPlus, FiTrash2,
+  FiCreditCard, FiEye, FiEyeOff, FiUpload
 } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 
 // Options data
 const PROFESSION_OPTIONS = [
@@ -55,6 +57,41 @@ const SERVICE_AREAS = [
   'תל אביב', 'ירושלים', 'חיפה', 'באר שבע', 'רמת גן', 'הרצליה', 
   'פתח תקווה', 'ראשון לציון', 'נתניה', 'אשדוד', 'חולון', 'בני ברק',
   'רעננה', 'כפר סבא', 'מודיעין', 'אשקלון', 'רחובות', 'בת ים'
+];
+
+// New options
+const HEALTH_FUNDS = [
+  { value: 'clalit', label: 'כללית' },
+  { value: 'maccabi', label: 'מכבי' },
+  { value: 'meuhedet', label: 'מאוחדת' },
+  { value: 'leumit', label: 'לאומית' },
+  { value: 'private', label: 'פרטי בלבד' },
+];
+
+const PAYMENT_METHODS = [
+  { value: 'cash', label: 'מזומן' },
+  { value: 'credit_card', label: 'כרטיס אשראי' },
+  { value: 'bit', label: 'ביט' },
+  { value: 'paybox', label: 'PayBox' },
+  { value: 'bank_transfer', label: 'העברה בנקאית' },
+  { value: 'check', label: 'צ\'ק' },
+];
+
+const EDUCATION_LEVELS = [
+  { value: 'diploma', label: 'תעודה מקצועית' },
+  { value: 'bachelor', label: 'תואר ראשון' },
+  { value: 'master', label: 'תואר שני' },
+  { value: 'phd', label: 'דוקטורט' },
+  { value: 'specialist', label: 'התמחות רפואית' },
+];
+
+const PROFILE_COLORS = [
+  'from-carelink-teal to-carelink-navy',
+  'from-blue-500 to-purple-600',
+  'from-emerald-500 to-teal-600',
+  'from-orange-500 to-red-500',
+  'from-pink-500 to-rose-500',
+  'from-indigo-500 to-blue-600',
 ];
 
 const DAYS_OF_WEEK = [
