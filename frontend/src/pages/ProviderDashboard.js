@@ -372,6 +372,14 @@ const ProviderDashboard = () => {
                   </span>
                 )}
                 <Link
+                  to={`/provider/edit/${provider.provider_id}`}
+                  className="bg-carelink-teal text-white px-4 py-2 rounded-xl font-medium hover:bg-carelink-teal-medium transition flex items-center gap-2"
+                  data-testid="edit-profile-btn"
+                >
+                  <FaEdit />
+                  ערוך פרופיל
+                </Link>
+                <Link
                   to={`/providers/${provider.provider_id}`}
                   className="bg-carelink-navy text-white px-4 py-2 rounded-xl font-medium hover:bg-carelink-slate transition flex items-center gap-2"
                 >
