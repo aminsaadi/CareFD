@@ -5,7 +5,8 @@ import api from '../../utils/api';
 import { toast } from 'sonner';
 import {
   FiSearch, FiFilter, FiEye, FiCheck, FiX, FiStar,
-  FiMapPin, FiPhone, FiMail, FiAward, FiShield, FiUserPlus, FiAlertCircle, FiEdit
+  FiMapPin, FiPhone, FiMail, FiAward, FiShield, FiUserPlus, 
+  FiAlertCircle, FiEdit, FiTrash2, FiToggleLeft, FiToggleRight
 } from 'react-icons/fi';
 
 const AdminProviders = () => {
