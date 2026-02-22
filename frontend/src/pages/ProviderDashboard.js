@@ -1297,6 +1297,160 @@ const ProviderDashboard = () => {
                     </div>
                   )}
 
+                  {/* User Info Tab - Personal Details */}
+                  {activeTab === 'user_info' && (
+                    <div className="space-y-6">
+                      {/* Personal Info */}
+                      <div className="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
+                          <FaUser className="text-carelink-teal" />
+                          פרטים אישיים
+                        </h3>
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-sm font-medium text-carelink-navy mb-2">שם פרטי</label>
+                            <input
+                              type="text"
+                              value={userInfoForm.first_name}
+                              onChange={(e) => setUserInfoForm({ ...userInfoForm, first_name: e.target.value })}
+                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              placeholder="שם פרטי"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-carelink-navy mb-2">שם משפחה</label>
+                            <input
+                              type="text"
+                              value={userInfoForm.last_name}
+                              onChange={(e) => setUserInfoForm({ ...userInfoForm, last_name: e.target.value })}
+                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              placeholder="שם משפחה"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Contact Info */}
+                      <div className="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
+                          <FaPhone className="text-carelink-teal" />
+                          פרטי התקשרות
+                        </h3>
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-sm font-medium text-carelink-navy mb-2">טלפון אישי</label>
+                            <input
+                              type="tel"
+                              value={userInfoForm.personal_phone}
+                              onChange={(e) => setUserInfoForm({ ...userInfoForm, personal_phone: e.target.value })}
+                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              placeholder="050-0000000"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-carelink-navy mb-2">אימייל</label>
+                            <input
+                              type="email"
+                              value={userInfoForm.personal_email}
+                              disabled
+                              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-500"
+                            />
+                            <p className="text-xs text-carelink-gray mt-1">לא ניתן לשנות את כתובת האימייל</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Address */}
+                      <div className="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
+                          <FaHome className="text-carelink-teal" />
+                          כתובת מגורים
+                        </h3>
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-sm font-medium text-carelink-navy mb-2">עיר</label>
+                            <input
+                              type="text"
+                              value={userInfoForm.personal_city}
+                              onChange={(e) => setUserInfoForm({ ...userInfoForm, personal_city: e.target.value })}
+                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              placeholder="תל אביב"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-carelink-navy mb-2">כתובת</label>
+                            <input
+                              type="text"
+                              value={userInfoForm.personal_address}
+                              onChange={(e) => setUserInfoForm({ ...userInfoForm, personal_address: e.target.value })}
+                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              placeholder="רחוב, מספר בית"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Save Personal Info Button */}
+                      <div className="flex justify-end">
+                        <button
+                          onClick={handleSaveUserInfo}
+                          disabled={saving}
+                          className="bg-carelink-teal text-white px-8 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition flex items-center gap-2 disabled:opacity-50"
+                        >
+                          <FaSave />
+                          {saving ? 'שומר...' : 'שמור פרטים אישיים'}
+                        </button>
+                      </div>
+
+                      {/* Password Change */}
+                      <div className="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
+                          <FaCog className="text-carelink-teal" />
+                          שינוי סיסמה
+                        </h3>
+                        <div className="space-y-4 max-w-md">
+                          <div>
+                            <label className="block text-sm font-medium text-carelink-navy mb-2">סיסמה נוכחית</label>
+                            <input
+                              type="password"
+                              value={userInfoForm.current_password}
+                              onChange={(e) => setUserInfoForm({ ...userInfoForm, current_password: e.target.value })}
+                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              placeholder="הזן סיסמה נוכחית"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-carelink-navy mb-2">סיסמה חדשה</label>
+                            <input
+                              type="password"
+                              value={userInfoForm.new_password}
+                              onChange={(e) => setUserInfoForm({ ...userInfoForm, new_password: e.target.value })}
+                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              placeholder="הזן סיסמה חדשה (לפחות 6 תווים)"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-carelink-navy mb-2">אימות סיסמה חדשה</label>
+                            <input
+                              type="password"
+                              value={userInfoForm.confirm_password}
+                              onChange={(e) => setUserInfoForm({ ...userInfoForm, confirm_password: e.target.value })}
+                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              placeholder="הזן שוב את הסיסמה החדשה"
+                            />
+                          </div>
+                          <button
+                            onClick={handleChangePassword}
+                            disabled={saving}
+                            className="bg-amber-500 text-white px-6 py-3 rounded-xl font-medium hover:bg-amber-600 transition flex items-center gap-2 disabled:opacity-50"
+                          >
+                            {saving ? 'מעדכן...' : 'עדכן סיסמה'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Verification Tab */}
                   {activeTab === 'verification' && (
                     <VerificationDocuments />
