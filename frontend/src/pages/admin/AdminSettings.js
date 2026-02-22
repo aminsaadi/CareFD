@@ -499,8 +499,23 @@ const AdminSettings = () => {
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                   <h3 className="text-carelink-navy font-medium mb-2">נקה מטמון</h3>
                   <p className="text-carelink-slate text-sm mb-3">נקה את כל הנתונים השמורים במטמון</p>
-                  <button className="px-4 py-2 bg-white border border-gray-200 text-carelink-navy rounded-lg hover:bg-gray-100 transition">
+                  <button 
+                    onClick={clearCache}
+                    className="px-4 py-2 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal-medium transition"
+                  >
                     נקה מטמון
+                  </button>
+                </div>
+
+                <div className="p-4 bg-red-50 rounded-lg border border-red-200">
+                  <h3 className="text-red-700 font-medium mb-2">מחק את כל הספקים</h3>
+                  <p className="text-red-600 text-sm mb-3">מחק את כל הספקים והשירותים מהמערכת (פעולה בלתי הפיכה!)</p>
+                  <button 
+                    onClick={clearAllProviders}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center gap-2"
+                  >
+                    <FiTrash2 />
+                    מחק הכל
                   </button>
                 </div>
               </div>
