@@ -422,6 +422,18 @@ CareLink is a healthcare services platform in Israel connecting users with healt
   - PUT /users/me - Update user personal info
   - PUT /users/me/password - Change password
 
+### Public Provider Profile Enhancement (Feb 22, 2026) - COMPLETE:
+- **Provider Number Display**: מספר ספק מוצג בהדר הפרופיל (e.g., P3994147)
+- **השכלה Section**: מציג תארים עם מוסד לימודים, תחום ושנה
+- **תעודות ורישיונות Section**: מציג תעודות עם גוף מנפיק, מספר רישיון ושנה
+- **קופות חולים Section**: מציג קופות בעברית (כללית, מכבי, מאוחדת, לאומית, פרטי בלבד)
+- **אמצעי תשלום Section**: מציג אמצעי תשלום בעברית (מזומן, כרטיס אשראי, ביט, PayBox, העברה בנקאית, צ'ק)
+- **מדיניות ביטולים Section**: מציג זמן הודעה מראש + טקסט מדיניות
+- **Delete Profile Image Feature**: 
+  - כפתור מחיקה בהדר עריכת פרופיל (אדום)
+  - כפתור מחיקה בטאב הגדרות קשר
+  - מוצג רק כשיש תמונה (conditional rendering)
+
 ### Feb 12, 2026
 - Added GPS-based search with radius
 - Added region quick-select buttons
