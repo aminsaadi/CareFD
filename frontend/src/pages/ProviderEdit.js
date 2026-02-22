@@ -205,6 +205,7 @@ const ProviderEdit = () => {
         about: data.about || '',
         description: data.description || '',
         profile_image: data.profile_image || '',
+        profile_color: data.profile_color || 'from-carelink-teal to-carelink-navy',
         provider_type: data.provider_type || 'individual',
         specializations: data.specializations?.length > 0 ? data.specializations : [''],
         expertise: data.expertise?.length > 0 ? data.expertise : [''],
@@ -214,6 +215,28 @@ const ProviderEdit = () => {
         phone: data.phone || '',
         email: data.email || '',
         website: data.website || '',
+        // New fields
+        health_funds: data.health_funds || [],
+        payment_methods: data.payment_methods || [],
+        cancellation_policy: data.cancellation_policy || '',
+        cancellation_notice_hours: data.cancellation_notice_hours || 24,
+        show_phone: data.show_phone !== false,
+        show_email: data.show_email !== false,
+        show_whatsapp: data.show_whatsapp !== false,
+        whatsapp_number: data.whatsapp_number || data.phone || '',
+        education: data.education?.length > 0 ? data.education : [{
+          degree: '',
+          institution: '',
+          year: '',
+          field: ''
+        }],
+        certifications: data.certifications?.length > 0 ? data.certifications : [{
+          name: '',
+          issuer: '',
+          year: '',
+          license_number: '',
+          document_url: ''
+        }],
       });
       
       setLocation(data.location || location);
