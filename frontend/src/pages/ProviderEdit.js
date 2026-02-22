@@ -260,6 +260,8 @@ const ProviderEdit = () => {
         years_experience: formData.years_experience ? parseInt(formData.years_experience) : null,
         specializations: formData.specializations.filter(s => s.trim() !== ''),
         expertise: formData.expertise.filter(e => e.trim() !== ''),
+        education: formData.education.filter(e => e.institution || e.degree),
+        certifications: formData.certifications.filter(c => c.name || c.license_number),
         location,
         availability
       };
@@ -272,6 +274,73 @@ const ProviderEdit = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleCertificateUpload = async (e, index) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      setError('גודל הקובץ חייב להיות עד 10MB');
+      return;
+    }
+
+    setUploadingCertificate(true);
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append('file', file);
+      
+      const response = await api.post('/upload/image', formDataUpload, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      const newCertifications = [...formData.certifications];
+      newCertifications[index] = { ...newCertifications[index], document_url: response.data.url };
+      setFormData({ ...formData, certifications: newCertifications });
+      setSuccess('התעודה הועלתה בהצלחה!');
+    } catch (err) {
+      setError('שגיאה בהעלאת התעודה');
+    } finally {
+      setUploadingCertificate(false);
+    }
+  };
+
+  // Education management functions
+  const addEducation = () => {
+    setFormData({
+      ...formData,
+      education: [...formData.education, { degree: '', institution: '', year: '', field: '' }]
+    });
+  };
+
+  const updateEducation = (index, field, value) => {
+    const newEducation = [...formData.education];
+    newEducation[index] = { ...newEducation[index], [field]: value };
+    setFormData({ ...formData, education: newEducation });
+  };
+
+  const removeEducation = (index) => {
+    const newEducation = formData.education.filter((_, i) => i !== index);
+    setFormData({ ...formData, education: newEducation.length > 0 ? newEducation : [{ degree: '', institution: '', year: '', field: '' }] });
+  };
+
+  // Certification management functions
+  const addCertification = () => {
+    setFormData({
+      ...formData,
+      certifications: [...formData.certifications, { name: '', issuer: '', year: '', license_number: '', document_url: '' }]
+    });
+  };
+
+  const updateCertification = (index, field, value) => {
+    const newCertifications = [...formData.certifications];
+    newCertifications[index] = { ...newCertifications[index], [field]: value };
+    setFormData({ ...formData, certifications: newCertifications });
+  };
+
+  const removeCertification = (index) => {
+    const newCertifications = formData.certifications.filter((_, i) => i !== index);
+    setFormData({ ...formData, certifications: newCertifications.length > 0 ? newCertifications : [{ name: '', issuer: '', year: '', license_number: '', document_url: '' }] });
   };
 
   const handleImageUpload = async (e) => {
