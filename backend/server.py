@@ -1088,12 +1088,21 @@ async def update_user_info(
     """Update current user's personal info"""
     user = await get_current_user(authorization, request)
     
-    allowed_fields = ["first_name", "last_name", "phone", "address", "city"]
+    allowed_fields = [
+        "first_name", "last_name", "phone", "address", "city", 
+        "profile_image", "date_of_birth", "gender"
+    ]
     update_data = {}
     
     for field in allowed_fields:
         if field in user_data:
             update_data[field] = user_data[field]
+    
+    # Handle full name update
+    if "first_name" in update_data or "last_name" in update_data:
+        first = update_data.get("first_name") or user.get("first_name", "")
+        last = update_data.get("last_name") or user.get("last_name", "")
+        update_data["name"] = f"{first} {last}".strip()
     
     if not update_data:
         raise HTTPException(status_code=400, detail="No valid fields to update")
@@ -1105,7 +1114,13 @@ async def update_user_info(
         {"$set": update_data}
     )
     
-    return {"message": "User info updated successfully"}
+    # Get updated user
+    updated_user = await db.users.find_one(
+        {"user_id": user["user_id"]},
+        {"_id": 0, "password": 0}
+    )
+    
+    return {"message": "User info updated successfully", "user": updated_user}
 
 @api_router.put("/users/me/password")
 async def change_password(
