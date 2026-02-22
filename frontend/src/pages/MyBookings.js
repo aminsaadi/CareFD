@@ -261,6 +261,33 @@ const MyBookings = () => {
                     </button>
                   </div>
                 )}
+                
+                {/* Review button for completed bookings */}
+                {booking.status === 'completed' && !reviewedBookings.includes(booking.booking_id) && (
+                  <div className="flex gap-2 mt-4 pt-4 border-t border-carelink-teal-pale">
+                    <button
+                      onClick={() => setShowReviewModal(booking)}
+                      className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors flex items-center gap-2"
+                      data-testid={`review-booking-${booking.booking_id}`}
+                    >
+                      <FaStar />
+                      כתוב ביקורת
+                    </button>
+                    <Link
+                      to={`/providers/${booking.provider?.provider_id || booking.service?.provider_id}`}
+                      className="bg-carelink-teal text-white px-4 py-2 rounded-lg hover:bg-carelink-teal-medium transition-colors"
+                    >
+                      צפה בפרופיל הספק
+                    </Link>
+                  </div>
+                )}
+                
+                {booking.status === 'completed' && reviewedBookings.includes(booking.booking_id) && (
+                  <div className="flex items-center gap-2 mt-4 pt-4 border-t border-carelink-teal-pale text-green-600">
+                    <FaStar className="text-yellow-500" />
+                    <span>ביקורת נשלחה - תודה!</span>
+                  </div>
+                )}
               </div>
             ))}
           </div>
