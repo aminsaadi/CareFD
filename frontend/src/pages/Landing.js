@@ -307,16 +307,16 @@ const Landing = () => {
                 {/* Quick Location Tags */}
                 <div className="flex flex-wrap gap-2 mt-4">
                   <span className="text-sm text-carelink-teal-pale">אזורים:</span>
-                  {regions.map((region) => (
+                  {displayRegions.map((region) => (
                     <button
-                      key={region.id}
+                      key={region.id || region.name}
                       type="button"
                       onClick={() => {
                         setLocationQuery(region.name);
                         setUserLocation(null);
                       }}
                       className="text-sm bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors"
-                      data-testid={`region-${region.id}`}
+                      data-testid={`region-${region.id || region.name}`}
                     >
                       {region.name}
                     </button>
