@@ -141,6 +141,14 @@ const ProviderDashboard = () => {
         setReviews(reviewsRes.data.reviews || []);
       }
 
+      // Fetch chats
+      try {
+        const chatsRes = await api.get('/chat/rooms');
+        setChats(chatsRes.data.rooms || []);
+      } catch (chatError) {
+        console.error('Failed to fetch chats:', chatError);
+      }
+
       // Calculate stats
       const completed = providerBookings.filter(b => b.status === 'completed');
       setStats({
