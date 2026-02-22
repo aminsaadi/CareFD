@@ -675,6 +675,36 @@ async def register(user_data: UserRegister):
     
     await db.users.insert_one(user_dict)
     
+    # If registering as a provider, create the provider profile automatically
+    provider_id = None
+    if user_data.role == UserRole.PROVIDER:
+        provider = Provider(
+            user_id=user.user_id,
+            provider_type="individual",  # Default type
+            business_name=user.name,  # Use user's name as initial business name
+            email=user.email,
+            verification_status=VerificationStatus.PENDING,
+            is_verified=False
+        )
+        
+        provider_dict = provider.model_dump()
+        provider_dict['created_at'] = provider_dict['created_at'].isoformat()
+        provider_dict['verification_documents'] = []
+        
+        await db.providers.insert_one(provider_dict)
+        provider_id = provider.provider_id
+        
+        # Notify all admins about new provider registration
+        admins = await db.users.find({"role": "admin"}, {"user_id": 1}).to_list(100)
+        for admin in admins:
+            await create_notification(
+                admin["user_id"],
+                NotificationType.PROVIDER_NEW_REGISTRATION,
+                "ספק חדש נרשם!",
+                f"ספק חדש נרשם למערכת: {user.name}. נדרש אימות.",
+                {"provider_id": provider.provider_id, "user_id": user.user_id}
+            )
+    
     # Send verification email
     verification_link = f"https://carelink.example.com/verify?user_id={user.user_id}"
     await send_email_async(
@@ -708,7 +738,8 @@ async def register(user_data: UserRegister):
             "user_id": user.user_id,
             "email": user.email,
             "name": user.name,
-            "role": user.role
+            "role": user.role,
+            "provider_id": provider_id
         },
         "session_token": session_token
     }
