@@ -328,7 +328,8 @@ const ProviderDashboard = () => {
     { id: 'requests', label: 'בקשות פתוחות', icon: FaFileAlt },
     { id: 'messages', label: 'הודעות', icon: FaComments },
     { id: 'reviews', label: 'ביקורות', icon: FaStar },
-    { id: 'profile', label: 'פרופיל', icon: FaUser },
+    { id: 'user_info', label: 'פרטי משתמש', icon: FaUser },
+    { id: 'provider_profile', label: 'פרופיל ספק', icon: FaUserTie },
     { id: 'verification', label: 'אימות', icon: FaAward },
     { id: 'settings', label: 'הגדרות', icon: FaCog }
   ];
