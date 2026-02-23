@@ -84,6 +84,18 @@ const testimonials = [
   { id: 3, name: 'רחל אברהם', role: 'ספקית שירות', content: 'הפלטפורמה עזרה לי להגיע ללקוחות חדשים ולפתח את העסק שלי בצורה משמעותית.', rating: 5, avatar: 'ר' },
 ];
 
+// Popular searches data
+const popularSearches = {
+  providers: [
+    'אחות', 'רופא משפחה', 'פיזיותרפיסט', 'מטפל סיעודי', 
+    'פסיכולוג', 'דיאטנית', 'רופא ילדים', 'מעסה'
+  ],
+  services: [
+    'ביקור בית', 'טיפול סיעודי', 'פיזיותרפיה', 'ייעוץ רפואי',
+    'טיפול פסיכולוגי', 'עיסוי רפואי', 'בדיקות דם', 'חיסונים'
+  ]
+};
+
 const Landing = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -92,6 +104,15 @@ const Landing = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [selectedRadius, setSelectedRadius] = useState('');
   const [searchTab, setSearchTab] = useState('providers'); // 'providers' or 'services'
+  
+  // Dropdown states
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [cities, setCities] = useState([]);
+  const searchInputRef = useRef(null);
+  const locationInputRef = useRef(null);
+  const searchDropdownRef = useRef(null);
+  const locationDropdownRef = useRef(null);
   
   // Real data from API
   const [featuredProviders, setFeaturedProviders] = useState([]);
