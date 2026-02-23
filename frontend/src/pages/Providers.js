@@ -80,7 +80,7 @@ const Providers = () => {
       setLocationQuery('המיקום שלי');
     }
     // Use local cities list
-    setCities(israeliCities);
+    setCities(israeliLocalities);
   }, []);
 
   // Close dropdowns when clicking outside
