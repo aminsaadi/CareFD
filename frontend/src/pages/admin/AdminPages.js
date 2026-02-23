@@ -4,8 +4,8 @@ import api from '../../utils/api';
 import { toast } from 'sonner';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { useConfirm } from '../../hooks/useConfirm';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import {
   FiPlus, FiEdit2, FiTrash2, FiEye, FiFileText, FiSave,
   FiX, FiCheckCircle, FiLoader
