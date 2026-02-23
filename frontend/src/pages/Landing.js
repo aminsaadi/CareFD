@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -13,14 +13,58 @@ import {
   FaBrain, FaHeartbeat, FaHome, FaHospital
 } from 'react-icons/fa';
 
+// Custom hook for scroll animation
+const useScrollAnimation = () => {
+  const ref = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1, rootMargin: '50px' }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  return [ref, isVisible];
+};
+
+// Animated Section Component
+const AnimatedSection = ({ children, className = '', delay = 0 }) => {
+  const [ref, isVisible] = useScrollAnimation();
+  
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+        transition: `opacity 0.6s ease-out ${delay}ms, transform 0.6s ease-out ${delay}ms`
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
 // Professions data
 const professions = [
-  { id: 'nurse', name: 'אחות/אח', icon: FaUserNurse, color: 'bg-pink-100 text-pink-600' },
-  { id: 'doctor', name: 'רופא/ה', icon: FaStethoscope, color: 'bg-blue-100 text-blue-600' },
-  { id: 'physiotherapist', name: 'פיזיותרפיסט/ית', icon: FaWalking, color: 'bg-green-100 text-green-600' },
-  { id: 'caregiver', name: 'מטפל/ת', icon: FaHeart, color: 'bg-red-100 text-red-600' },
-  { id: 'psychologist', name: 'פסיכולוג/ית', icon: FaBrain, color: 'bg-purple-100 text-purple-600' },
-  { id: 'dietitian', name: 'דיאטן/ית', icon: FaHeartbeat, color: 'bg-orange-100 text-orange-600' },
+  { id: 'nurse', name: 'אחות/אח', icon: FaUserNurse, color: 'bg-pink-50 text-pink-600 shadow-soft hover:shadow-soft-md' },
+  { id: 'doctor', name: 'רופא/ה', icon: FaStethoscope, color: 'bg-blue-50 text-blue-600 shadow-soft hover:shadow-soft-md' },
+  { id: 'physiotherapist', name: 'פיזיותרפיסט/ית', icon: FaWalking, color: 'bg-green-50 text-green-600 shadow-soft hover:shadow-soft-md' },
+  { id: 'caregiver', name: 'מטפל/ת', icon: FaHeart, color: 'bg-red-50 text-red-600 shadow-soft hover:shadow-soft-md' },
+  { id: 'psychologist', name: 'פסיכולוג/ית', icon: FaBrain, color: 'bg-purple-50 text-purple-600 shadow-soft hover:shadow-soft-md' },
+  { id: 'dietitian', name: 'דיאטן/ית', icon: FaHeartbeat, color: 'bg-orange-50 text-orange-600 shadow-soft hover:shadow-soft-md' },
 ];
 
 // Categories data
