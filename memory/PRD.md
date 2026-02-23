@@ -165,3 +165,31 @@ DELETE /api/admin/categories/{id}                        # Delete category
 - Iteration 16: Static Pages - 100% backend, 100% frontend
 - Iteration 17: Professions - 100% backend (17/17), 100% frontend  
 - Iteration 18: Regions & Map - 100% backend (11/11), 100% frontend
+- Iteration 19: Service Types - 88% backend (15/17), 100% frontend
+
+## Service Model (Enhanced - Feb 23, 2026)
+
+### Service Categories (סוגי שירות)
+1. **שירות ביקור (Visit)** - שירות הניתן בביקור אחד
+2. **שירות שעתי (Hourly)** - שירות לפי שעות עם מינימום שעות
+3. **שירות ייעוץ (Consultation)** - שירות ייעוץ מקצועי
+4. **מוצר (Product)** - מוצר למכירה עם משלוח
+
+### Delivery Types (אופני מתן שירות)
+1. **בבית (Home Visit)** - דורש כתובת מלאה
+2. **בבית חולים / מוסד (Hospital)** - דורש כתובת
+3. **בקליניקה (Clinic)** - לא דורש כתובת
+4. **וירטואלי (Virtual)** - טלפון/וידאו
+
+### Pricing Options
+- **Base Price** - מחיר בסיס
+- **Weekend Pricing** - תעריף שבת/שישי (אחוזים או קבוע)
+- **Travel Cost** - עלות נסיעה
+- **Shipping Cost** - עלות משלוח (למוצרים)
+- **Free Shipping Above** - משלוח חינם מעל סכום
+
+### Booking Enhancements
+- **Contact Person** - פרטי איש קשר (יכול להיות שונה מהמזמין)
+- **Service Location** - כתובת מלאה עם קואורדינטות
+- **Shipping Address** - כתובת משלוח (למוצרים)
+- **Price Breakdown** - פירוט מחיר (בסיס, נסיעה, שבת, משלוח)
