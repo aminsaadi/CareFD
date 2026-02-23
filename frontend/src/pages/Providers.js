@@ -1,5 +1,5 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -8,11 +8,17 @@ import AdvancedFilters from '../components/AdvancedFilters';
 import api from '../utils/api';
 import { 
   FaSearch, FaFilter, FaTimes, FaSortAmountDown, FaMapMarkerAlt,
-  FaThLarge, FaList, FaCrosshairs, FaSpinner, FaMap
+  FaThLarge, FaList, FaCrosshairs, FaSpinner, FaMap, FaUserMd, FaHospital
 } from 'react-icons/fa';
 
 // Lazy load map component
 const ProvidersMap = lazy(() => import('../components/ProvidersMap'));
+
+// Popular searches data
+const popularSearches = [
+  'אחות', 'רופא משפחה', 'פיזיותרפיסט', 'מטפל סיעודי', 
+  'פסיכולוג', 'דיאטנית', 'רופא ילדים', 'מעסה'
+];
 
 const Providers = () => {
   const { t } = useTranslation();
