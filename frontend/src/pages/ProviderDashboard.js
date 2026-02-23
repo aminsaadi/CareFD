@@ -252,8 +252,18 @@ const ProviderDashboard = () => {
       description: '',
       price: '',
       duration_minutes: '',
-      service_type: 'home_visit',
-      pricing_type: 'per_session'
+      service_category: 'visit',
+      delivery_types: [],
+      pricing_type: 'fixed',
+      minimum_hours: '',
+      weekend_pricing_type: 'none',
+      weekend_price_addition: '',
+      has_travel_cost: false,
+      travel_cost: '',
+      has_shipping: false,
+      shipping_cost: '',
+      free_shipping_above: '',
+      stock_quantity: ''
     });
     setEditingService(null);
     setShowServiceForm(false);
@@ -265,8 +275,18 @@ const ProviderDashboard = () => {
       description: service.description || '',
       price: service.price || '',
       duration_minutes: service.duration_minutes || '',
-      service_type: service.service_type || 'home_visit',
-      pricing_type: service.pricing_type || 'per_session'
+      service_category: service.service_category || 'visit',
+      delivery_types: service.delivery_types || [],
+      pricing_type: service.pricing_type || 'fixed',
+      minimum_hours: service.minimum_hours || '',
+      weekend_pricing_type: service.weekend_pricing_type || 'none',
+      weekend_price_addition: service.weekend_price_addition || '',
+      has_travel_cost: service.has_travel_cost || false,
+      travel_cost: service.travel_cost || '',
+      has_shipping: service.has_shipping || false,
+      shipping_cost: service.shipping_cost || '',
+      free_shipping_above: service.free_shipping_above || '',
+      stock_quantity: service.stock_quantity || ''
     });
     setEditingService(service);
     setShowServiceForm(true);
