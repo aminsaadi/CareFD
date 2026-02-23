@@ -697,12 +697,13 @@ const Landing = () => {
               </ul>
               <Link
                 to="/register"
-                className="inline-flex items-center gap-2 bg-carelink-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition-all"
+                className="inline-flex items-center gap-2 bg-carelink-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition-all btn-press shadow-soft"
               >
                 הרשם כספק
                 <FaArrowLeft className="rtl:rotate-180" />
               </Link>
             </div>
+            </AnimatedSection>
           </div>
         </div>
       </section>
@@ -710,29 +711,31 @@ const Landing = () => {
       {/* ==================== CTA SECTION ==================== */}
       <section className="py-16 bg-gradient-to-br from-carelink-teal via-carelink-teal-medium to-carelink-navy" data-testid="cta-section">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            מוכנים להתחיל?
-          </h2>
-          <p className="text-xl text-carelink-teal-pale mb-10 max-w-2xl mx-auto">
-            הצטרפו לאלפי משתמשים שכבר מצאו את הטיפול המושלם עבורם
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/register"
-              className="inline-flex items-center justify-center gap-2 bg-white text-carelink-teal px-10 py-4 rounded-xl font-bold text-lg hover:bg-carelink-teal-pale transition-all shadow-lg"
-              data-testid="cta-register-btn"
-            >
-              הרשמה
-              <FaArrowLeft className="rtl:rotate-180" />
-            </Link>
-            <Link
-              to="/login"
-              className="inline-flex items-center justify-center gap-2 bg-transparent text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-white/10 transition-all border-2 border-white/30"
-              data-testid="cta-login-btn"
-            >
-              התחברות
-            </Link>
-          </div>
+          <AnimatedSection>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+              מוכנים להתחיל?
+            </h2>
+            <p className="text-xl text-carelink-teal-pale mb-10 max-w-2xl mx-auto">
+              הצטרפו לאלפי משתמשים שכבר מצאו את הטיפול המושלם עבורם
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/register"
+                className="inline-flex items-center justify-center gap-2 bg-white text-carelink-teal px-10 py-4 rounded-xl font-bold text-lg hover:bg-carelink-teal-pale transition-all shadow-soft-lg btn-press hover-scale"
+                data-testid="cta-register-btn"
+              >
+                הרשמה
+                <FaArrowLeft className="rtl:rotate-180" />
+              </Link>
+              <Link
+                to="/login"
+                className="inline-flex items-center justify-center gap-2 bg-transparent text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-white/10 transition-all border-2 border-white/30 btn-press"
+                data-testid="cta-login-btn"
+              >
+                התחברות
+              </Link>
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
