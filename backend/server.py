@@ -2306,6 +2306,8 @@ async def create_booking(
         booking_dict['contact_person'] = dict(booking_dict['contact_person'])
     if booking_dict.get('service_location'):
         booking_dict['service_location'] = dict(booking_dict['service_location'])
+    if booking_dict.get('shipping_address'):
+        booking_dict['shipping_address'] = dict(booking_dict['shipping_address'])
     
     await db.bookings.insert_one(booking_dict)
     
