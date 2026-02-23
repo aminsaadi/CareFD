@@ -2221,20 +2221,79 @@ async def create_booking(
     client_phone = booking_data.client_phone or booking_data.guest_phone or ""
     client_email = booking_data.client_email or booking_data.guest_email or user_email
     
+    # Calculate pricing
+    base_price = service.get("price", 0)
+    hours_booked = booking_data.hours_booked
+    travel_cost = 0
+    weekend_addition = 0
+    shipping_cost = 0
+    
+    # For hourly services, multiply by hours
+    if service.get("service_category") == "hourly" and hours_booked:
+        min_hours = service.get("minimum_hours", 1) or 1
+        actual_hours = max(hours_booked, min_hours)
+        base_price = base_price * actual_hours
+    
+    # Check if booking is on weekend (Friday after 14:00 or Saturday)
+    booking_day = booking_data.booking_date.weekday()  # 4 = Friday, 5 = Saturday
+    is_weekend = booking_day == 5 or (booking_day == 4 and booking_data.booking_time and booking_data.booking_time >= "14:00")
+    
+    if is_weekend and service.get("weekend_pricing_type", "none") != "none":
+        weekend_pricing_type = service.get("weekend_pricing_type")
+        weekend_price_addition = service.get("weekend_price_addition", 0) or 0
+        
+        if weekend_pricing_type == "percentage":
+            weekend_addition = base_price * (weekend_price_addition / 100)
+        elif weekend_pricing_type == "fixed":
+            weekend_addition = weekend_price_addition
+    
+    # Travel cost
+    if service.get("has_travel_cost") and booking_data.delivery_type == "home_visit":
+        travel_cost = service.get("travel_cost", 0) or 0
+    
+    # Shipping cost (for products)
+    if service.get("service_category") == "product" and service.get("has_shipping"):
+        free_shipping_above = service.get("free_shipping_above", 0)
+        if free_shipping_above and base_price >= free_shipping_above:
+            shipping_cost = 0
+        else:
+            shipping_cost = service.get("shipping_cost", 0) or 0
+    
+    final_price = base_price + travel_cost + weekend_addition + shipping_cost
+    
+    # Build shipping address (for products)
+    shipping_address = None
+    if booking_data.shipping_address:
+        shipping_address = ServiceLocation(
+            address=booking_data.shipping_address,
+            city=booking_data.shipping_city or "",
+            notes=booking_data.shipping_postal_code
+        )
+    
     booking = Booking(
         user_id=user_id,
         provider_id=service["provider_id"],
         service_id=booking_data.service_id,
         booking_date=booking_data.booking_date,
         booking_time=booking_data.booking_time,
+        service_name=service.get("name"),
+        service_category=service.get("service_category"),
+        delivery_type=booking_data.delivery_type,
         client_name=client_name,
         client_phone=client_phone,
         client_email=client_email,
         contact_person=contact_person,
+        is_contact_same_as_requester=booking_data.is_contact_same_as_requester,
         service_location=service_location,
+        shipping_address=shipping_address,
+        hours_booked=hours_booked,
         notes=booking_data.notes,
         special_requirements=booking_data.special_requirements,
-        service_name=service.get("name"),
+        base_price=service.get("price", 0),
+        travel_cost=travel_cost if travel_cost > 0 else None,
+        weekend_addition=weekend_addition if weekend_addition > 0 else None,
+        shipping_cost=shipping_cost if shipping_cost > 0 else None,
+        final_price=final_price,
         provider_name=provider.get("business_name"),
         user_name=user_name or client_name,
         is_guest_booking=is_guest_booking
