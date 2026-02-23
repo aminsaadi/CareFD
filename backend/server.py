@@ -312,42 +312,92 @@ class ProviderRegister(BaseModel):
 
 # Service Models
 class ServiceType:
-    HOME_VISIT = "home_visit"
-    CLINIC_VISIT = "clinic_visit"
-    HOSPITAL = "hospital"
-    VIDEO_CALL = "video_call"
-    PHONE_CALL = "phone_call"
-    PRODUCT = "product"
+    """Service delivery type - where is the service provided"""
+    HOME_VISIT = "home_visit"       # בבית
+    HOSPITAL = "hospital"           # בבית חולים / מוסד
+    CLINIC = "clinic"               # בקליניקה
+    VIRTUAL = "virtual"             # וירטואלי - טלפון/וידיאו
+
+class ServiceCategory:
+    """Service category - what kind of service"""
+    VISIT = "visit"                 # שירות ביקור
+    HOURLY = "hourly"               # שירות שעתי
+    CONSULTATION = "consultation"   # שירות ייעוץ
+    PRODUCT = "product"             # שירות מוצר
 
 class PricingType:
-    CONSULTATION = "consultation"
-    PER_HOUR = "per_hour"
-    HOME_VISIT = "home_visit"
-    CLINIC_VISIT = "clinic_visit"
+    FIXED = "fixed"                 # מחיר קבוע
+    PER_HOUR = "per_hour"           # לפי שעה
+    PER_VISIT = "per_visit"         # לפי ביקור
+    PER_UNIT = "per_unit"           # לפי יחידה (מוצר)
+
+class WeekendPricingType:
+    NONE = "none"                   # אין תוספת
+    PERCENTAGE = "percentage"       # תוספת באחוזים
+    FIXED = "fixed"                 # תוספת קבועה
 
 class Service(BaseModel):
     model_config = ConfigDict(extra="ignore")
     service_id: str = Field(default_factory=lambda: f"service_{uuid.uuid4().hex[:12]}")
+    service_number: str = Field(default_factory=lambda: f"S{uuid.uuid4().hex[:8].upper()}")  # מספר שירות
     provider_id: str
     name: str
     description: str
-    service_type: str  # home_visit, clinic_visit, etc.
-    pricing_type: str  # consultation, per_hour, etc.
+    
+    # Service classification
+    service_category: str = ServiceCategory.VISIT  # visit, hourly, consultation, product
+    delivery_types: List[str] = []  # home_visit, hospital, clinic, virtual
+    
+    # Pricing
+    pricing_type: str = PricingType.FIXED
     price: float
     currency: str = "ILS"
+    
+    # Hourly service specific
+    minimum_hours: Optional[float] = None
+    
+    # Duration
     duration_minutes: Optional[int] = None
-    minimum_hours: Optional[int] = None
+    
+    # Weekend/Shabbat pricing
+    weekend_pricing_type: str = WeekendPricingType.NONE
+    weekend_price_addition: Optional[float] = None  # percentage or fixed amount
+    
+    # Travel cost
+    has_travel_cost: bool = False
+    travel_cost: Optional[float] = None
+    travel_cost_per_km: Optional[float] = None  # Or per km
+    
+    # Product specific
+    has_shipping: bool = False
+    shipping_cost: Optional[float] = None
+    free_shipping_above: Optional[float] = None  # Free shipping for orders above this amount
+    
+    # Stock (for products)
+    stock_quantity: Optional[int] = None
+    
     is_active: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class ServiceCreate(BaseModel):
     name: str
     description: str
-    service_type: str
-    pricing_type: str
+    service_category: str = ServiceCategory.VISIT
+    delivery_types: List[str] = []
+    pricing_type: str = PricingType.FIXED
     price: float
+    minimum_hours: Optional[float] = None
     duration_minutes: Optional[int] = None
-    minimum_hours: Optional[int] = None
+    weekend_pricing_type: str = WeekendPricingType.NONE
+    weekend_price_addition: Optional[float] = None
+    has_travel_cost: bool = False
+    travel_cost: Optional[float] = None
+    travel_cost_per_km: Optional[float] = None
+    has_shipping: bool = False
+    shipping_cost: Optional[float] = None
+    free_shipping_above: Optional[float] = None
+    stock_quantity: Optional[int] = None
 
 # Request & Offer Models
 class RequestStatus:
