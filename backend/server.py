@@ -3871,6 +3871,10 @@ async def get_regions():
         ]
         # Insert defaults
         await db.regions.insert_many(default_regions)
+        # Remove MongoDB _id from each region for JSON serialization
+        for region in default_regions:
+            if "_id" in region:
+                del region["_id"]
         return {"regions": default_regions}
     
     return {"regions": regions}
