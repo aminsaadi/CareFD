@@ -179,9 +179,17 @@ const Login = () => {
                   <input type="checkbox" className="w-4 h-4 text-carelink-teal rounded" />
                   <span className="text-carelink-gray">זכור אותי</span>
                 </label>
-                <a href="#" className="text-carelink-teal hover:text-carelink-teal-medium font-medium">
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setShowForgotPassword(true);
+                    setForgotEmail('');
+                    setResetSent(false);
+                  }}
+                  className="text-carelink-teal hover:text-carelink-teal-medium font-medium"
+                >
                   שכחת סיסמה?
-                </a>
+                </button>
               </div>
 
               <button
