@@ -16,11 +16,13 @@ from datetime import datetime, timezone, timedelta
 import bcrypt
 from jose import jwt
 import httpx
-import resend
 import asyncio
 import shutil
 import json
 from pywebpush import webpush, WebPushException
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 ROOT_DIR = Path(__file__).parent
 UPLOAD_DIR = ROOT_DIR / "uploads"
