@@ -787,89 +787,261 @@ const ProviderDashboard = () => {
                         {/* Service Form */}
                         {showServiceForm && (
                           <div className="mb-6 p-6 bg-carelink-teal-pale/20 rounded-xl border-2 border-carelink-teal">
-                            <h4 className="font-bold text-carelink-navy mb-4">
+                            <h4 className="font-bold text-carelink-navy mb-4 text-lg">
                               {editingService ? 'עריכת שירות' : 'שירות חדש'}
                             </h4>
-                            <div className="grid md:grid-cols-2 gap-4">
-                              <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-carelink-navy mb-2">שם השירות *</label>
-                                <input
-                                  type="text"
-                                  value={serviceForm.name}
-                                  onChange={(e) => setServiceForm({ ...serviceForm, name: e.target.value })}
-                                  className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
-                                  placeholder="לדוגמה: טיפול פיזיותרפיה"
-                                />
+                            <div className="space-y-6">
+                              {/* Basic Info */}
+                              <div className="grid md:grid-cols-2 gap-4">
+                                <div className="md:col-span-2">
+                                  <label className="block text-sm font-medium text-carelink-navy mb-2">שם השירות *</label>
+                                  <input
+                                    type="text"
+                                    value={serviceForm.name}
+                                    onChange={(e) => setServiceForm({ ...serviceForm, name: e.target.value })}
+                                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                    placeholder="לדוגמה: טיפול פיזיותרפיה / שמירה פרטית"
+                                  />
+                                </div>
+                                <div className="md:col-span-2">
+                                  <label className="block text-sm font-medium text-carelink-navy mb-2">תיאור השירות</label>
+                                  <textarea
+                                    value={serviceForm.description}
+                                    onChange={(e) => setServiceForm({ ...serviceForm, description: e.target.value })}
+                                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none h-24 resize-none"
+                                    placeholder="תאר את השירות..."
+                                  />
+                                </div>
                               </div>
-                              <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-carelink-navy mb-2">תיאור השירות</label>
-                                <textarea
-                                  value={serviceForm.description}
-                                  onChange={(e) => setServiceForm({ ...serviceForm, description: e.target.value })}
-                                  className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none h-24 resize-none"
-                                  placeholder="תאר את השירות..."
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-carelink-navy mb-2">מחיר (₪) *</label>
-                                <input
-                                  type="number"
-                                  value={serviceForm.price}
-                                  onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
-                                  className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
-                                  placeholder="0"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-carelink-navy mb-2">משך (דקות)</label>
-                                <input
-                                  type="number"
-                                  value={serviceForm.duration_minutes}
-                                  onChange={(e) => setServiceForm({ ...serviceForm, duration_minutes: e.target.value })}
-                                  className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
-                                  placeholder="45"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-carelink-navy mb-2">סוג שירות</label>
-                                <select
-                                  value={serviceForm.service_type}
-                                  onChange={(e) => setServiceForm({ ...serviceForm, service_type: e.target.value })}
-                                  className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
-                                >
-                                  {serviceTypeOptions.map((opt) => (
-                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+
+                              {/* Service Category */}
+                              <div className="bg-white p-4 rounded-xl">
+                                <label className="block text-sm font-bold text-carelink-navy mb-3">קטגוריית שירות *</label>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                  {[
+                                    { id: 'visit', name: 'שירות ביקור', icon: '🏠', desc: 'ביקור חד פעמי' },
+                                    { id: 'hourly', name: 'שירות שעתי', icon: '⏰', desc: 'חיוב לפי שעות' },
+                                    { id: 'consultation', name: 'ייעוץ', icon: '💬', desc: 'ייעוץ מקצועי' },
+                                    { id: 'product', name: 'מוצר', icon: '📦', desc: 'מוצר למכירה' }
+                                  ].map((cat) => (
+                                    <button
+                                      key={cat.id}
+                                      type="button"
+                                      onClick={() => setServiceForm({ 
+                                        ...serviceForm, 
+                                        service_category: cat.id,
+                                        pricing_type: cat.id === 'hourly' ? 'per_hour' : cat.id === 'product' ? 'per_unit' : 'fixed'
+                                      })}
+                                      className={`p-4 rounded-xl border-2 text-center transition ${
+                                        serviceForm.service_category === cat.id
+                                          ? 'border-carelink-teal bg-carelink-teal/10'
+                                          : 'border-gray-200 hover:border-carelink-teal/50'
+                                      }`}
+                                    >
+                                      <span className="text-2xl">{cat.icon}</span>
+                                      <p className="font-medium text-carelink-navy mt-1">{cat.name}</p>
+                                      <p className="text-xs text-carelink-gray">{cat.desc}</p>
+                                    </button>
                                   ))}
-                                </select>
+                                </div>
                               </div>
-                              <div>
-                                <label className="block text-sm font-medium text-carelink-navy mb-2">סוג תמחור</label>
-                                <select
-                                  value={serviceForm.pricing_type}
-                                  onChange={(e) => setServiceForm({ ...serviceForm, pricing_type: e.target.value })}
-                                  className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
-                                >
-                                  {pricingTypeOptions.map((opt) => (
-                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+
+                              {/* Delivery Types */}
+                              <div className="bg-white p-4 rounded-xl">
+                                <label className="block text-sm font-bold text-carelink-navy mb-3">היכן יינתן השירות?</label>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                  {[
+                                    { id: 'home_visit', name: 'בבית', icon: '🏠' },
+                                    { id: 'hospital', name: 'בי"ח/מוסד', icon: '🏥' },
+                                    { id: 'clinic', name: 'בקליניקה', icon: '🏢' },
+                                    { id: 'virtual', name: 'וירטואלי', icon: '💻' }
+                                  ].map((dt) => (
+                                    <button
+                                      key={dt.id}
+                                      type="button"
+                                      onClick={() => {
+                                        const current = serviceForm.delivery_types || [];
+                                        const updated = current.includes(dt.id)
+                                          ? current.filter(x => x !== dt.id)
+                                          : [...current, dt.id];
+                                        setServiceForm({ ...serviceForm, delivery_types: updated });
+                                      }}
+                                      className={`p-3 rounded-xl border-2 text-center transition ${
+                                        (serviceForm.delivery_types || []).includes(dt.id)
+                                          ? 'border-carelink-teal bg-carelink-teal/10'
+                                          : 'border-gray-200 hover:border-carelink-teal/50'
+                                      }`}
+                                    >
+                                      <span className="text-xl">{dt.icon}</span>
+                                      <p className="font-medium text-carelink-navy text-sm mt-1">{dt.name}</p>
+                                    </button>
                                   ))}
-                                </select>
+                                </div>
                               </div>
-                            </div>
-                            <div className="flex gap-3 mt-4">
-                              <button
-                                onClick={handleSaveService}
-                                disabled={saving}
-                                className="bg-carelink-teal text-white px-6 py-2 rounded-xl font-medium hover:bg-carelink-teal-medium transition flex items-center gap-2 disabled:opacity-50"
-                              >
-                                <FaSave />
-                                {saving ? 'שומר...' : 'שמור'}
-                              </button>
-                              <button
-                                onClick={resetServiceForm}
-                                className="bg-gray-200 text-carelink-navy px-6 py-2 rounded-xl font-medium hover:bg-gray-300 transition"
-                              >
-                                ביטול
-                              </button>
+
+                              {/* Pricing */}
+                              <div className="grid md:grid-cols-3 gap-4">
+                                <div>
+                                  <label className="block text-sm font-medium text-carelink-navy mb-2">
+                                    מחיר (₪) * {serviceForm.service_category === 'hourly' && '(לשעה)'}
+                                  </label>
+                                  <input
+                                    type="number"
+                                    value={serviceForm.price}
+                                    onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
+                                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                    placeholder="0"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-medium text-carelink-navy mb-2">משך (דקות)</label>
+                                  <input
+                                    type="number"
+                                    value={serviceForm.duration_minutes}
+                                    onChange={(e) => setServiceForm({ ...serviceForm, duration_minutes: e.target.value })}
+                                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                    placeholder="45"
+                                  />
+                                </div>
+                                {serviceForm.service_category === 'hourly' && (
+                                  <div>
+                                    <label className="block text-sm font-medium text-carelink-navy mb-2">מינימום שעות *</label>
+                                    <input
+                                      type="number"
+                                      step="0.5"
+                                      value={serviceForm.minimum_hours}
+                                      onChange={(e) => setServiceForm({ ...serviceForm, minimum_hours: e.target.value })}
+                                      className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                      placeholder="לדוגמה: 8"
+                                    />
+                                    <p className="text-xs text-carelink-gray mt-1">למשל: שמירה פרטית - מינימום 8 שעות</p>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Weekend Pricing */}
+                              <div className="bg-amber-50 p-4 rounded-xl">
+                                <div className="flex items-center justify-between mb-3">
+                                  <label className="text-sm font-bold text-carelink-navy">תעריף שישי/שבת</label>
+                                  <select
+                                    value={serviceForm.weekend_pricing_type}
+                                    onChange={(e) => setServiceForm({ ...serviceForm, weekend_pricing_type: e.target.value })}
+                                    className="px-3 py-2 border border-amber-200 rounded-lg focus:outline-none focus:border-amber-400 bg-white"
+                                  >
+                                    <option value="none">ללא תוספת</option>
+                                    <option value="percentage">תוספת באחוזים</option>
+                                    <option value="fixed">תוספת קבועה</option>
+                                  </select>
+                                </div>
+                                {serviceForm.weekend_pricing_type !== 'none' && (
+                                  <div className="flex items-center gap-3">
+                                    <input
+                                      type="number"
+                                      value={serviceForm.weekend_price_addition}
+                                      onChange={(e) => setServiceForm({ ...serviceForm, weekend_price_addition: e.target.value })}
+                                      className="flex-1 px-4 py-2 border border-amber-200 rounded-lg focus:outline-none focus:border-amber-400"
+                                      placeholder={serviceForm.weekend_pricing_type === 'percentage' ? '25' : '50'}
+                                    />
+                                    <span className="text-amber-700 font-medium">
+                                      {serviceForm.weekend_pricing_type === 'percentage' ? '%' : '₪'}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Travel Cost */}
+                              {serviceForm.service_category !== 'product' && (
+                                <div className="bg-blue-50 p-4 rounded-xl">
+                                  <label className="flex items-center gap-3 cursor-pointer">
+                                    <input
+                                      type="checkbox"
+                                      checked={serviceForm.has_travel_cost}
+                                      onChange={(e) => setServiceForm({ ...serviceForm, has_travel_cost: e.target.checked })}
+                                      className="w-5 h-5 text-blue-500 rounded border-gray-300 focus:ring-blue-500"
+                                    />
+                                    <span className="text-sm font-bold text-carelink-navy">עלות נסיעה</span>
+                                  </label>
+                                  {serviceForm.has_travel_cost && (
+                                    <div className="mt-3 flex items-center gap-3">
+                                      <input
+                                        type="number"
+                                        value={serviceForm.travel_cost}
+                                        onChange={(e) => setServiceForm({ ...serviceForm, travel_cost: e.target.value })}
+                                        className="flex-1 px-4 py-2 border border-blue-200 rounded-lg focus:outline-none focus:border-blue-400"
+                                        placeholder="עלות נסיעה"
+                                      />
+                                      <span className="text-blue-700 font-medium">₪</span>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Shipping (for products) */}
+                              {serviceForm.service_category === 'product' && (
+                                <div className="bg-purple-50 p-4 rounded-xl space-y-3">
+                                  <label className="flex items-center gap-3 cursor-pointer">
+                                    <input
+                                      type="checkbox"
+                                      checked={serviceForm.has_shipping}
+                                      onChange={(e) => setServiceForm({ ...serviceForm, has_shipping: e.target.checked })}
+                                      className="w-5 h-5 text-purple-500 rounded border-gray-300 focus:ring-purple-500"
+                                    />
+                                    <span className="text-sm font-bold text-carelink-navy">אפשרות משלוח</span>
+                                  </label>
+                                  {serviceForm.has_shipping && (
+                                    <div className="grid grid-cols-2 gap-3">
+                                      <div>
+                                        <label className="block text-xs text-purple-700 mb-1">עלות משלוח (₪)</label>
+                                        <input
+                                          type="number"
+                                          value={serviceForm.shipping_cost}
+                                          onChange={(e) => setServiceForm({ ...serviceForm, shipping_cost: e.target.value })}
+                                          className="w-full px-3 py-2 border border-purple-200 rounded-lg focus:outline-none focus:border-purple-400"
+                                          placeholder="30"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-xs text-purple-700 mb-1">משלוח חינם מעל (₪)</label>
+                                        <input
+                                          type="number"
+                                          value={serviceForm.free_shipping_above}
+                                          onChange={(e) => setServiceForm({ ...serviceForm, free_shipping_above: e.target.value })}
+                                          className="w-full px-3 py-2 border border-purple-200 rounded-lg focus:outline-none focus:border-purple-400"
+                                          placeholder="200"
+                                        />
+                                      </div>
+                                    </div>
+                                  )}
+                                  <div>
+                                    <label className="block text-xs text-purple-700 mb-1">כמות במלאי</label>
+                                    <input
+                                      type="number"
+                                      value={serviceForm.stock_quantity}
+                                      onChange={(e) => setServiceForm({ ...serviceForm, stock_quantity: e.target.value })}
+                                      className="w-full px-3 py-2 border border-purple-200 rounded-lg focus:outline-none focus:border-purple-400"
+                                      placeholder="100"
+                                    />
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Actions */}
+                              <div className="flex gap-3 pt-2">
+                                <button
+                                  onClick={handleSaveService}
+                                  disabled={saving}
+                                  className="bg-carelink-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carelink-teal-medium transition flex items-center gap-2 disabled:opacity-50"
+                                >
+                                  <FaSave />
+                                  {saving ? 'שומר...' : 'שמור שירות'}
+                                </button>
+                                <button
+                                  onClick={resetServiceForm}
+                                  className="bg-gray-200 text-carelink-navy px-6 py-3 rounded-xl font-medium hover:bg-gray-300 transition"
+                                >
+                                  ביטול
+                                </button>
+                              </div>
                             </div>
                           </div>
                         )}
