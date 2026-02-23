@@ -45,8 +45,13 @@ db = client[os.environ['DB_NAME']]
 
 # Configuration
 SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production')
-RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
-SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'onboarding@resend.dev')
+SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'carelink.co.il@gmail.com')
+
+# SMTP Configuration
+SMTP_HOST = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
+SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
+SMTP_USER = os.environ.get('SMTP_USER', '')
+SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
 
 # VAPID Configuration for Push Notifications
 VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', '')
