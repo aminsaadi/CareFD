@@ -3002,6 +3002,29 @@ async def send_message(
         {"$set": {"last_message_at": datetime.now(timezone.utc).isoformat()}}
     )
     
+    # Send notification to the other participant
+    recipient_id = None
+    sender_name = user.get("name", "משתמש")
+    
+    if sender_role == "provider":
+        # Provider sent message -> notify user
+        recipient_id = room["user_id"]
+    else:
+        # User sent message -> notify provider
+        provider_doc = await db.providers.find_one({"provider_id": room["provider_id"]}, {"_id": 0})
+        if provider_doc:
+            recipient_id = provider_doc.get("user_id")
+            sender_name = user.get("name", "לקוח")
+    
+    if recipient_id:
+        await create_notification(
+            recipient_id,
+            "chat_message",
+            "הודעה חדשה בצ'אט",
+            f"{sender_name}: {message_data.content[:50]}{'...' if len(message_data.content) > 50 else ''}",
+            {"room_id": message_data.room_id}
+        )
+    
     return message.model_dump()
 
 @api_router.get("/chat/messages/{room_id}")
