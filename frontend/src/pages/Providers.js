@@ -526,6 +526,57 @@ const Providers = () => {
                     נקה סינון
                   </button>
                 </div>
+              ) : viewMode === 'map' ? (
+                /* Map View */
+                <div className="space-y-6">
+                  <Suspense fallback={
+                    <div className="h-[500px] bg-gray-100 rounded-xl flex items-center justify-center">
+                      <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  }>
+                    <ProvidersMap
+                      providers={providers}
+                      userLocation={filters.latitude && filters.longitude ? { lat: filters.latitude, lng: filters.longitude } : null}
+                      height="500px"
+                    />
+                  </Suspense>
+                  
+                  {/* Provider list below map */}
+                  <div className="bg-white rounded-xl p-4 shadow-lg">
+                    <h3 className="font-bold text-carelink-navy mb-4">ספקים באזור ({providers.length})</h3>
+                    <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                      {providers.map((provider) => (
+                        <a
+                          key={provider.provider_id}
+                          href={`/providers/${provider.provider_id}`}
+                          className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition border border-gray-100"
+                        >
+                          {provider.profile_image ? (
+                            <img src={provider.profile_image} alt={provider.name} className="w-12 h-12 rounded-full object-cover" />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-carelink-teal/20 flex items-center justify-center text-carelink-teal font-bold">
+                              {provider.name?.charAt(0)}
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-carelink-navy truncate">{provider.name}</p>
+                            <p className="text-sm text-carelink-gray truncate">{provider.profession} • {provider.location?.city}</p>
+                          </div>
+                          {provider.distance_km != null && (
+                            <div className="text-sm text-blue-600 font-medium whitespace-nowrap">
+                              {provider.distance_km} ק״מ
+                            </div>
+                          )}
+                          {provider.rating > 0 && (
+                            <div className="text-sm text-amber-500 whitespace-nowrap">
+                              ⭐ {provider.rating.toFixed(1)}
+                            </div>
+                          )}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <div className={viewMode === 'grid' 
                   ? 'grid md:grid-cols-2 gap-6' 
