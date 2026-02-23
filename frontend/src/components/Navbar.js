@@ -1,19 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
-import LanguageSwitcher from './LanguageSwitcher';
-import NotificationBell from './NotificationBell';
 import Logo from './Logo';
-import { FaSearch, FaBars, FaTimes } from 'react-icons/fa';
+import NotificationBell from './NotificationBell';
+import { FaSearch, FaBars, FaTimes, FaComments } from 'react-icons/fa';
+import api from '../utils/api';
 
 const Navbar = () => {
-  const { t } = useTranslation();
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [unreadChats, setUnreadChats] = useState(0);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchUnreadChats();
+    }
+  }, [isAuthenticated]);
+
+  const fetchUnreadChats = async () => {
+    try {
+      const response = await api.get('/chat/rooms');
+      // Count rooms with unread messages (simplified - in real app would track read status)
+      const rooms = response.data.rooms || [];
+      setUnreadChats(rooms.length > 0 ? Math.min(rooms.length, 9) : 0);
+    } catch (error) {
+      console.error('Failed to fetch chat rooms:', error);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -39,82 +55,96 @@ const Navbar = () => {
             </Link>
             
             {/* Desktop navigation links */}
-            <div className="hidden md:flex ml-10 space-x-6 rtl:space-x-reverse">
+            <div className="hidden md:flex mr-10 gap-1">
               <Link
                 to="/providers"
-                className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium"
+                className="text-carelink-slate hover:text-carelink-teal px-4 py-2 rounded-lg transition-colors font-medium hover:bg-carelink-teal-pale/20"
                 data-testid="nav-providers"
               >
-                {t('providers')}
+                ספקים
               </Link>
               <Link
                 to="/services"
-                className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium"
+                className="text-carelink-slate hover:text-carelink-teal px-4 py-2 rounded-lg transition-colors font-medium hover:bg-carelink-teal-pale/20"
                 data-testid="nav-services"
               >
-                {t('services')}
+                שירותים
               </Link>
               {isAuthenticated && (
                 <Link
                   to="/requests"
-                  className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium"
+                  className="text-carelink-slate hover:text-carelink-teal px-4 py-2 rounded-lg transition-colors font-medium hover:bg-carelink-teal-pale/20"
                   data-testid="nav-requests"
                 >
-                  {t('requests')}
+                  בקשות
                 </Link>
               )}
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {/* Search Icon */}
             <button
               onClick={() => setShowSearch(!showSearch)}
-              className="p-2 rounded-lg hover:bg-carelink-teal-pale/30 text-carelink-slate hover:text-carelink-teal transition-colors"
+              className="p-2.5 rounded-lg hover:bg-carelink-teal-pale/30 text-carelink-slate hover:text-carelink-teal transition-colors"
               data-testid="search-icon-btn"
             >
               <FaSearch className="text-lg" />
             </button>
 
+            {/* Chat Messages Icon - Only when authenticated */}
+            {isAuthenticated && (
+              <Link
+                to="/chats"
+                className="relative p-2.5 rounded-lg hover:bg-carelink-teal-pale/30 text-carelink-slate hover:text-carelink-teal transition-colors"
+                data-testid="chat-icon"
+              >
+                <FaComments className="text-lg" />
+                {unreadChats > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                    {unreadChats}
+                  </span>
+                )}
+              </Link>
+            )}
+
             {/* Notifications */}
             {isAuthenticated && <NotificationBell />}
-
-            <LanguageSwitcher />
             
             {/* Desktop Auth Buttons */}
-            <div className="hidden md:flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-3 mr-2">
               {isAuthenticated ? (
                 <>
                   <Link
                     to={user?.role === 'admin' ? '/admin/overview' : user?.role === 'provider' ? '/provider/dashboard' : '/dashboard'}
-                    className="text-carelink-slate hover:text-carelink-teal transition-colors font-medium"
+                    className="text-carelink-slate hover:text-carelink-teal transition-colors font-medium px-3 py-2"
                     data-testid="nav-dashboard"
                   >
-                    {t('dashboard')}
+                    לוח בקרה
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="bg-carelink-navy text-white px-4 py-2 rounded-lg hover:bg-carelink-slate transition-colors font-medium"
+                    className="bg-carelink-navy text-white px-5 py-2 rounded-lg hover:bg-carelink-slate transition-colors font-medium"
                     data-testid="logout-btn"
                   >
-                    {t('logout')}
+                    התנתקות
                   </button>
                 </>
               ) : (
                 <>
                   <Link
                     to="/login"
-                    className="text-carelink-slate hover:text-carelink-teal transition-colors font-medium"
+                    className="text-carelink-slate hover:text-carelink-teal transition-colors font-medium px-3 py-2"
                     data-testid="nav-login"
                   >
-                    {t('login')}
+                    התחברות
                   </Link>
                   <Link
                     to="/register"
-                    className="bg-carelink-teal text-white px-5 py-2 rounded-lg hover:bg-carelink-teal-medium transition-colors font-medium"
+                    className="bg-carelink-teal text-white px-5 py-2.5 rounded-lg hover:bg-carelink-teal-medium transition-colors font-medium"
                     data-testid="nav-register"
                   >
-                    {t('register')}
+                    הרשמה
                   </Link>
                 </>
               )}
@@ -123,7 +153,7 @@ const Navbar = () => {
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-carelink-teal-pale/30 text-carelink-slate"
+              className="md:hidden p-2.5 rounded-lg hover:bg-carelink-teal-pale/30 text-carelink-slate"
             >
               {mobileMenuOpen ? <FaTimes /> : <FaBars />}
             </button>
@@ -162,14 +192,14 @@ const Navbar = () => {
                 className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                {t('providers')}
+                ספקים
               </Link>
               <Link
                 to="/services"
                 className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                {t('services')}
+                שירותים
               </Link>
               {isAuthenticated ? (
                 <>
@@ -178,20 +208,31 @@ const Navbar = () => {
                     className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    {t('requests')}
+                    בקשות
+                  </Link>
+                  <Link
+                    to="/chats"
+                    className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium flex items-center gap-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <FaComments />
+                    הודעות
+                    {unreadChats > 0 && (
+                      <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{unreadChats}</span>
+                    )}
                   </Link>
                   <Link
                     to={user?.role === 'admin' ? '/admin/overview' : user?.role === 'provider' ? '/provider/dashboard' : '/dashboard'}
                     className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    {t('dashboard')}
+                    לוח בקרה
                   </Link>
                   <button
                     onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
-                    className="text-left text-red-600 hover:text-red-700 px-3 py-2 transition-colors font-medium"
+                    className="text-right text-red-600 hover:text-red-700 px-3 py-2 transition-colors font-medium"
                   >
-                    {t('logout')}
+                    התנתקות
                   </button>
                 </>
               ) : (
@@ -201,14 +242,14 @@ const Navbar = () => {
                     className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    {t('login')}
+                    התחברות
                   </Link>
                   <Link
                     to="/register"
                     className="bg-carelink-teal text-white px-3 py-2 rounded-lg text-center font-medium"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    {t('register')}
+                    הרשמה
                   </Link>
                 </>
               )}
