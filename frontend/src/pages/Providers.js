@@ -82,6 +82,46 @@ const Providers = () => {
     }
   }, []);
 
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchDropdownRef.current && !searchDropdownRef.current.contains(event.target) &&
+          searchInputRef.current && !searchInputRef.current.contains(event.target)) {
+        setShowSearchDropdown(false);
+      }
+      if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target) &&
+          locationInputRef.current && !locationInputRef.current.contains(event.target)) {
+        setShowLocationDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Fetch cities for location dropdown
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const response = await api.get('/cities');
+        setCities(response.data.cities || []);
+      } catch {
+        setCities([]);
+      }
+    };
+    fetchCities();
+  }, []);
+
+  // Filter cities based on input
+  const filteredCities = cities.filter(city => 
+    city.name?.toLowerCase().includes(locationQuery.toLowerCase()) ||
+    city.name_he?.includes(locationQuery)
+  ).slice(0, 8);
+
+  // Filter popular searches based on input
+  const filteredSearches = searchQuery.trim() 
+    ? popularSearches.filter(s => s.includes(searchQuery))
+    : popularSearches;
+
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
 
   useEffect(() => {
