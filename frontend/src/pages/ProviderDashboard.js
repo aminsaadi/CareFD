@@ -298,13 +298,31 @@ const ProviderDashboard = () => {
       return;
     }
 
+    // Validate minimum hours for hourly services
+    if (serviceForm.service_category === 'hourly' && !serviceForm.minimum_hours) {
+      toast.error('נא להגדיר מינימום שעות לשירות שעתי');
+      return;
+    }
+
     setSaving(true);
     try {
       const serviceData = {
-        ...serviceForm,
+        name: serviceForm.name,
+        description: serviceForm.description,
         price: parseFloat(serviceForm.price),
         duration_minutes: serviceForm.duration_minutes ? parseInt(serviceForm.duration_minutes) : null,
-        provider_id: provider.provider_id
+        service_category: serviceForm.service_category,
+        delivery_types: serviceForm.delivery_types,
+        pricing_type: serviceForm.pricing_type,
+        minimum_hours: serviceForm.minimum_hours ? parseFloat(serviceForm.minimum_hours) : null,
+        weekend_pricing_type: serviceForm.weekend_pricing_type,
+        weekend_price_addition: serviceForm.weekend_price_addition ? parseFloat(serviceForm.weekend_price_addition) : null,
+        has_travel_cost: serviceForm.has_travel_cost,
+        travel_cost: serviceForm.travel_cost ? parseFloat(serviceForm.travel_cost) : null,
+        has_shipping: serviceForm.has_shipping,
+        shipping_cost: serviceForm.shipping_cost ? parseFloat(serviceForm.shipping_cost) : null,
+        free_shipping_above: serviceForm.free_shipping_above ? parseFloat(serviceForm.free_shipping_above) : null,
+        stock_quantity: serviceForm.stock_quantity ? parseInt(serviceForm.stock_quantity) : null
       };
 
       if (editingService) {
