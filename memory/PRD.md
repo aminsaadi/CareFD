@@ -149,13 +149,24 @@ DELETE /api/admin/categories/{id}                        # Delete category
 ## Change Log
 
 ### Dec 2025 (Current Session)
-- **Landing Page Search Tabs (P0 COMPLETE)** ✅ NEW
+- **Landing Page Search Tabs (P0 COMPLETE)** ✅
   - Restored tabbed search interface in Hero section
   - **Tab 1: "נותני שירות"** - Searches providers, navigates to /providers
   - **Tab 2: "שירותים"** - Searches services, navigates to /services
   - Dynamic placeholder and button text based on selected tab
   - Tabs styled with Glassmorphism effect (white active, transparent inactive)
   - Icons for each tab (FaUserMd for providers, FaHospital for services)
+
+- **Search Dropdowns & Autocomplete (P0 COMPLETE)** ✅ NEW
+  - **Popular Searches Dropdown**: Shows predefined popular searches when clicking search input
+    - Different searches for providers: אחות, רופא משפחה, פיזיותרפיסט, etc.
+    - Different searches for services: ביקור בית, טיפול סיעודי, פיזיותרפיה, etc.
+  - **Location Dropdown**: Shows options when clicking location input
+    - "השתמש במיקום שלי" with GPS icon at top
+    - List of regions (אזורים) when no text entered
+    - Filtered cities when typing
+  - **Reverse Geocoding**: GPS button now fetches actual city name from coordinates using Nominatim API
+  - Click outside to close dropdowns
 
 - **Landing Page Redesign (P1 COMPLETE)** ✅
   - Improved Hero section with cleaner white search box
