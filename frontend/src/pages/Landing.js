@@ -631,6 +631,7 @@ const Landing = () => {
                   </div>
                 </div>
               </div>
+            </AnimatedSection>
             ))}
           </div>
         </div>
@@ -641,43 +642,46 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8">
             {/* For Patients */}
-            <div className="bg-gradient-to-br from-carelink-teal to-carelink-teal-medium p-8 rounded-2xl text-white">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                  <FaUsers className="text-xl" />
+            <AnimatedSection delay={0}>
+              <div className="bg-gradient-to-br from-carelink-teal to-carelink-teal-medium p-8 rounded-2xl text-white shadow-soft-lg hover-lift">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                    <FaUsers className="text-xl" />
+                  </div>
+                  <h3 className="text-2xl font-bold">למטופלים</h3>
                 </div>
-                <h3 className="text-2xl font-bold">למטופלים</h3>
+                <ul className="space-y-4 mb-8">
+                  {[
+                    'חפש ספקי שירותי בריאות לפי מיקום והתמחות',
+                    'קרא ביקורות מאומתות וקבל החלטות מושכלות',
+                    'הזמן שירותים ישירות דרך הפלטפורמה',
+                    'נהל את התורים וההזמנות שלך במקום אחד'
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <FaCheckCircle className="text-carelink-teal-pale mt-1 flex-shrink-0" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to="/register"
+                  className="inline-flex items-center gap-2 bg-white text-carelink-teal px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-pale transition-all btn-press shadow-soft"
+                >
+                  הרשם כמטופל
+                  <FaArrowLeft className="rtl:rotate-180" />
+                </Link>
               </div>
-              <ul className="space-y-4 mb-8">
-                {[
-                  'חפש ספקי שירותי בריאות לפי מיקום והתמחות',
-                  'קרא ביקורות מאומתות וקבל החלטות מושכלות',
-                  'הזמן שירותים ישירות דרך הפלטפורמה',
-                  'נהל את התורים וההזמנות שלך במקום אחד'
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <FaCheckCircle className="text-carelink-teal-pale mt-1 flex-shrink-0" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                to="/register"
-                className="inline-flex items-center gap-2 bg-white text-carelink-teal px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-pale transition-all"
-              >
-                הרשם כמטופל
-                <FaArrowLeft className="rtl:rotate-180" />
-              </Link>
-            </div>
+            </AnimatedSection>
 
             {/* For Providers */}
-            <div className="bg-gradient-to-br from-carelink-navy to-carelink-slate p-8 rounded-2xl text-white">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                  <FaUserMd className="text-xl" />
+            <AnimatedSection delay={200}>
+              <div className="bg-gradient-to-br from-carelink-navy to-carelink-slate p-8 rounded-2xl text-white shadow-soft-lg hover-lift">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                    <FaUserMd className="text-xl" />
+                  </div>
+                  <h3 className="text-2xl font-bold">לספקי שירות</h3>
                 </div>
-                <h3 className="text-2xl font-bold">לספקי שירות</h3>
-              </div>
               <ul className="space-y-4 mb-8">
                 {[
                   'צור פרופיל מקצועי והצג את השירותים שלך',
