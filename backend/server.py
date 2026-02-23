@@ -4512,6 +4512,10 @@ async def get_delivery_types():
             }
         ]
         await db.delivery_types.insert_many(default_types)
+        # Remove _id from response
+        for t in default_types:
+            if "_id" in t:
+                del t["_id"]
         return {"delivery_types": default_types}
     
     return {"delivery_types": delivery_types}
