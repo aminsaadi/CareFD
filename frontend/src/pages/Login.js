@@ -239,6 +239,77 @@ const Login = () => {
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md p-6 relative">
+            <button
+              onClick={() => setShowForgotPassword(false)}
+              className="absolute top-4 left-4 text-carelink-gray hover:text-carelink-navy transition"
+            >
+              <FaTimes size={20} />
+            </button>
+            
+            <h2 className="text-xl font-bold text-carelink-navy mb-2">איפוס סיסמה</h2>
+            
+            {!resetSent ? (
+              <>
+                <p className="text-carelink-gray mb-6">
+                  הזן את כתובת האימייל שלך ונשלח לך קישור לאיפוס הסיסמה
+                </p>
+                
+                <form onSubmit={handleForgotPassword}>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-carelink-navy mb-2">אימייל</label>
+                    <div className="relative">
+                      <FaEnvelope className="absolute top-1/2 -translate-y-1/2 right-4 text-carelink-gray" />
+                      <input
+                        type="email"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        className="w-full px-4 py-3 pr-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
+                        placeholder="your@email.com"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <button
+                    type="submit"
+                    disabled={sendingReset}
+                    className="w-full bg-carelink-teal text-white py-3 rounded-xl hover:bg-carelink-teal-medium font-semibold transition disabled:opacity-50"
+                  >
+                    {sendingReset ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
+                    ) : (
+                      'שלח קישור איפוס'
+                    )}
+                  </button>
+                </form>
+              </>
+            ) : (
+              <div className="text-center py-6">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <FaEnvelope className="text-green-600 text-2xl" />
+                </div>
+                <h3 className="text-lg font-bold text-carelink-navy mb-2">בדוק את האימייל שלך</h3>
+                <p className="text-carelink-gray mb-6">
+                  אם האימייל קיים במערכת, שלחנו לך קישור לאיפוס הסיסמה.
+                  <br />
+                  <span className="text-sm">הקישור תקף ל-1 שעה</span>
+                </p>
+                <button
+                  onClick={() => setShowForgotPassword(false)}
+                  className="text-carelink-teal font-medium hover:underline"
+                >
+                  חזור להתחברות
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
