@@ -137,6 +137,14 @@ function AppRouter() {
         }
       />
       <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <Notifications />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/requests/:requestId"
         element={
           <ProtectedRoute>
