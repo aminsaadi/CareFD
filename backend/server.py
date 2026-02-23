@@ -1276,6 +1276,40 @@ async def forgot_password(data: dict):
     reset_url = f"{frontend_url}/reset-password?token={reset_token}"
     print(f"Password reset link for {email}: {reset_url}")
     
+    # Send password reset email
+    await send_email_async(
+        email,
+        "איפוס סיסמה - CareLink",
+        f"""
+        <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #19B8BA;">איפוס סיסמה</h1>
+            </div>
+            
+            <p style="font-size: 16px; color: #1E4D5F;">שלום {user.get('name', 'משתמש')},</p>
+            
+            <p style="font-size: 16px; color: #4C6D7F;">
+                קיבלנו בקשה לאיפוס הסיסמה שלך. לחץ על הכפתור למטה כדי לבחור סיסמה חדשה:
+            </p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{reset_url}" style="background-color: #19B8BA; color: white; padding: 15px 40px; text-decoration: none; border-radius: 30px; font-size: 18px; font-weight: bold; display: inline-block;">
+                    איפוס סיסמה ➜
+                </a>
+            </div>
+            
+            <p style="font-size: 14px; color: #888;">
+                הקישור תקף לשעה אחת בלבד.<br>
+                אם לא ביקשת לאפס את הסיסמה, ניתן להתעלם מהודעה זו.
+            </p>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">
+                <p>צוות CareLink</p>
+            </div>
+        </div>
+        """
+    )
+    
     return {"message": "If the email exists, a reset link has been sent"}
 
 @api_router.get("/auth/reset-password/validate")
