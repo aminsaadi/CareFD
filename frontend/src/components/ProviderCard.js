@@ -10,10 +10,10 @@ import api from '../utils/api';
 
 // Service type icons and labels
 const serviceTypeConfig = {
-  home_visit: { icon: FaHome, label: 'ביקור בית', color: 'bg-blue-100 text-blue-600' },
-  video_call: { icon: FaVideo, label: 'טלרפואה', color: 'bg-purple-100 text-purple-600' },
-  clinic_visit: { icon: FaClinicMedical, label: 'ביקור במרפאה', color: 'bg-green-100 text-green-600' },
-  phone_call: { icon: FaPhoneAlt, label: 'שיחה טלפונית', color: 'bg-orange-100 text-orange-600' }
+  home_visit: { icon: FaHome, label: 'ביקור בית', color: 'bg-blue-50 text-blue-600' },
+  video_call: { icon: FaVideo, label: 'טלרפואה', color: 'bg-purple-50 text-purple-600' },
+  clinic_visit: { icon: FaClinicMedical, label: 'ביקור במרפאה', color: 'bg-green-50 text-green-600' },
+  phone_call: { icon: FaPhoneAlt, label: 'שיחה טלפונית', color: 'bg-orange-50 text-orange-600' }
 };
 
 // Profession titles mapping
@@ -87,33 +87,33 @@ const ProviderCard = ({ provider, showContact = true }) => {
   return (
     <>
       <div
-        className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition-all border-2 border-carelink-teal-pale hover:border-carelink-teal relative group"
+        className="card-soft p-8 relative group"
         data-testid={`provider-card-${provider.provider_id}`}
       >
         {/* Badges */}
-        <div className="absolute -top-3 right-4 flex gap-2">
+        <div className="absolute -top-3 right-6 flex gap-2">
           {provider.is_verified && (
-            <span className="inline-flex items-center gap-1 bg-carelink-teal text-white text-xs px-3 py-1 rounded-full font-medium shadow-md" data-testid="verified-badge">
+            <span className="inline-flex items-center gap-1.5 bg-carelink-teal text-white text-xs px-4 py-1.5 rounded-full font-medium shadow-soft" data-testid="verified-badge">
               <FaCheckCircle />
               מאומת
             </span>
           )}
           {provider.is_recommended && (
-            <span className="inline-flex items-center gap-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs px-3 py-1 rounded-full font-medium shadow-md" data-testid="recommended-badge">
+            <span className="inline-flex items-center gap-1.5 bg-carelink-gold text-carelink-deep text-xs px-4 py-1.5 rounded-full font-medium shadow-soft" data-testid="recommended-badge">
               <FaAward />
               מומלץ
             </span>
           )}
         </div>
 
-        <div className="flex items-start justify-between mb-4 mt-2">
+        <div className="flex items-start justify-between mb-5 mt-3">
           <div className="flex-1">
-            <h3 className="text-xl font-bold text-carelink-navy mb-1">
+            <h3 className="text-xl font-serif font-bold text-carelink-deep mb-2">
               {provider.business_name || 'ספק שירותים'}
             </h3>
             {/* Profession Title */}
             {provider.profession_title && (
-              <p className="text-carelink-teal font-medium text-sm mb-1" data-testid="profession-title">
+              <p className="text-carelink-teal font-medium text-sm mb-2" data-testid="profession-title">
                 {getProfessionLabel(provider.profession_title)}
               </p>
             )}
@@ -122,19 +122,19 @@ const ProviderCard = ({ provider, showContact = true }) => {
               <span>{t(provider.provider_type)}</span>
             </div>
           </div>
-          <div className="flex items-center gap-1 bg-carelink-teal-pale px-3 py-1.5 rounded-full">
-            <FaStar className="text-yellow-500" />
-            <span className="font-bold text-carelink-navy">{(provider.rating || 0).toFixed(1)}</span>
+          <div className="flex items-center gap-1.5 bg-carelink-stone px-4 py-2 rounded-2xl">
+            <FaStar className="text-carelink-gold" />
+            <span className="font-bold text-carelink-deep">{(provider.rating || 0).toFixed(1)}</span>
             <span className="text-xs text-carelink-gray">({provider.total_reviews || 0})</span>
           </div>
         </div>
 
         {provider.description && (
-          <p className="text-carelink-slate mb-4 line-clamp-2">{provider.description}</p>
+          <p className="text-carelink-slate mb-5 line-clamp-2 leading-relaxed">{provider.description}</p>
         )}
 
         {/* Service Types */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2 mb-5">
           {serviceTypes.map((type) => {
             const config = serviceTypeConfig[type];
             if (!config) return null;
@@ -142,7 +142,7 @@ const ProviderCard = ({ provider, showContact = true }) => {
             return (
               <span
                 key={type}
-                className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg font-medium ${config.color}`}
+                className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-xl font-medium ${config.color}`}
                 data-testid={`service-type-${type}`}
               >
                 <Icon className="text-xs" />
@@ -153,18 +153,18 @@ const ProviderCard = ({ provider, showContact = true }) => {
         </div>
 
         {provider.specializations && provider.specializations.length > 0 && (
-          <div className="mb-4">
+          <div className="mb-5">
             <div className="flex flex-wrap gap-2">
               {provider.specializations.slice(0, 3).map((spec, idx) => (
                 <span
                   key={idx}
-                  className="bg-carelink-navy text-white text-xs px-3 py-1 rounded-full font-medium"
+                  className="bg-carelink-deep text-white text-xs px-4 py-1.5 rounded-full font-medium"
                 >
                   {spec}
                 </span>
               ))}
               {provider.specializations.length > 3 && (
-                <span className="text-xs text-carelink-gray py-1">
+                <span className="text-xs text-carelink-gray py-1.5">
                   +{provider.specializations.length - 3} עוד
                 </span>
               )}
@@ -173,17 +173,22 @@ const ProviderCard = ({ provider, showContact = true }) => {
         )}
 
         {provider.location && (
-          <div className="flex items-center text-sm text-carelink-gray mb-4">
-            <FaMapMarkerAlt className="text-carelink-teal ml-1" />
+          <div className="flex items-center text-sm text-carelink-gray mb-6">
+            <FaMapMarkerAlt className="text-carelink-teal ml-2" />
             <span>{provider.location.city}</span>
+            {provider.distance_km && (
+              <span className="mr-3 text-carelink-teal font-medium">
+                ({provider.distance_km.toFixed(1)} ק"מ)
+              </span>
+            )}
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex gap-2 flex-wrap sm:flex-nowrap">
+        <div className="flex gap-3 flex-wrap sm:flex-nowrap pt-5 border-t border-carelink-stone">
           <Link
             to={`/providers/${provider.provider_id}`}
-            className="flex-1 min-w-[140px] text-center bg-carelink-teal text-white px-4 py-2.5 rounded-xl hover:bg-carelink-teal-medium transition-colors font-medium text-sm sm:text-base"
+            className="flex-1 min-w-[140px] text-center bg-carelink-deep text-white px-5 py-3 rounded-2xl hover:bg-carelink-charcoal transition-all duration-300 font-medium shadow-soft hover:shadow-soft-md"
             data-testid={`view-provider-${provider.provider_id}`}
           >
             צפה בפרופיל
@@ -193,62 +198,62 @@ const ProviderCard = ({ provider, showContact = true }) => {
             <div className="flex gap-2">
               <button
                 onClick={handleCall}
-                className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-carelink-navy text-white rounded-xl hover:bg-carelink-slate transition-colors"
+                className="w-12 h-12 flex items-center justify-center bg-carelink-stone text-carelink-deep rounded-2xl hover:bg-carelink-teal hover:text-white transition-all duration-300"
                 data-testid={`call-${provider.provider_id}`}
                 title="התקשר"
               >
-                <FaPhone className="text-sm sm:text-base" />
+                <FaPhone />
               </button>
               <button
                 onClick={handleWhatsApp}
-                className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors"
+                className="w-12 h-12 flex items-center justify-center bg-green-50 text-green-600 rounded-2xl hover:bg-green-500 hover:text-white transition-all duration-300"
                 data-testid={`whatsapp-${provider.provider_id}`}
                 title="WhatsApp"
               >
-                <FaWhatsapp className="text-base sm:text-lg" />
+                <FaWhatsapp className="text-lg" />
               </button>
               <button
                 onClick={handleChat}
-                className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors"
+                className="w-12 h-12 flex items-center justify-center bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-500 hover:text-white transition-all duration-300"
                 data-testid={`chat-${provider.provider_id}`}
                 title="צ'אט"
               >
-                <FaComments className="text-sm sm:text-base" />
+                <FaComments />
               </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Phone Modal (Desktop) */}
+      {/* Phone Modal (Desktop) - Premium Style */}
       {showPhoneModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowPhoneModal(false)}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center" onClick={(e) => e.stopPropagation()}>
-            <div className="w-16 h-16 bg-carelink-teal rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="fixed inset-0 bg-carelink-deep/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowPhoneModal(false)}>
+          <div className="glass-card-premium rounded-3xl shadow-premium max-w-sm w-full p-8 text-center animate-scale-in" onClick={(e) => e.stopPropagation()}>
+            <div className="w-18 h-18 bg-carelink-teal rounded-2xl flex items-center justify-center mx-auto mb-6">
               <FaPhone className="text-2xl text-white" />
             </div>
-            <h3 className="text-xl font-bold text-carelink-navy mb-2">מספר טלפון</h3>
-            <p className="text-carelink-gray mb-4">{provider.business_name || 'ספק שירותים'}</p>
+            <h3 className="text-xl font-serif font-bold text-carelink-deep mb-2">מספר טלפון</h3>
+            <p className="text-carelink-gray mb-6">{provider.business_name || 'ספק שירותים'}</p>
             
-            <div className="bg-carelink-teal-pale/30 px-6 py-4 rounded-xl mb-4">
-              <p className="text-2xl font-bold text-carelink-navy direction-ltr">
+            <div className="bg-carelink-stone px-6 py-5 rounded-2xl mb-6">
+              <p className="text-2xl font-bold text-carelink-deep direction-ltr">
                 {provider.phone || '050-0000000'}
               </p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex gap-4">
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(provider.phone || '050-0000000');
                   setShowPhoneModal(false);
                 }}
-                className="flex-1 bg-carelink-teal text-white py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition"
+                className="flex-1 bg-carelink-deep text-white py-3.5 rounded-2xl font-semibold hover:bg-carelink-charcoal transition-all duration-300 shadow-soft"
               >
                 העתק
               </button>
               <button
                 onClick={() => setShowPhoneModal(false)}
-                className="flex-1 bg-gray-100 text-carelink-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
+                className="flex-1 bg-carelink-stone text-carelink-charcoal py-3.5 rounded-2xl font-semibold hover:bg-carelink-light-gray/30 transition-all duration-300"
               >
                 סגור
               </button>
