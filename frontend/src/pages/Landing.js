@@ -207,13 +207,30 @@ const Landing = () => {
       return;
     }
     setIsLocating(true);
+    setShowLocationDropdown(false);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        
         setUserLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
+          latitude: lat,
+          longitude: lng
         });
-        setLocationQuery('המיקום שלי');
+        
+        // Reverse geocoding to get city name
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=he`
+          );
+          const data = await response.json();
+          const cityName = data.address?.city || data.address?.town || data.address?.village || data.address?.municipality || 'המיקום שלי';
+          setLocationQuery(cityName);
+        } catch (error) {
+          console.error('Reverse geocoding error:', error);
+          setLocationQuery('המיקום שלי');
+        }
+        
         setIsLocating(false);
       },
       (error) => {
@@ -224,6 +241,20 @@ const Landing = () => {
       { enableHighAccuracy: true, timeout: 10000 }
     );
   };
+  
+  // Filter cities based on input
+  const filteredCities = cities.filter(city => 
+    city.name?.toLowerCase().includes(locationQuery.toLowerCase()) ||
+    city.name_he?.includes(locationQuery)
+  ).slice(0, 8);
+  
+  // Get current popular searches based on tab
+  const currentPopularSearches = popularSearches[searchTab] || popularSearches.providers;
+  
+  // Filter popular searches based on input
+  const filteredSearches = searchQuery.trim() 
+    ? currentPopularSearches.filter(s => s.includes(searchQuery))
+    : currentPopularSearches;
 
   const handleSearch = (e) => {
     e.preventDefault();
