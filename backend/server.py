@@ -742,25 +742,43 @@ async def get_current_user(authorization: Optional[str] = Header(None), request:
     
     return user_doc
 
-async def send_email_async(recipient: str, subject: str, html_content: str):
-    """Send email using Resend (async)"""
-    if not RESEND_API_KEY:
-        logger.warning("RESEND_API_KEY not set, skipping email")
-        return
-    
-    params = {
-        "from": SENDER_EMAIL,
-        "to": [recipient],
-        "subject": subject,
-        "html": html_content
-    }
+def send_email_smtp(recipient: str, subject: str, html_content: str):
+    """Send email using SMTP (synchronous)"""
+    if not SMTP_USER or not SMTP_PASSWORD:
+        logger.warning("SMTP not configured, skipping email")
+        return None
     
     try:
-        email = await asyncio.to_thread(resend.Emails.send, params)
-        logger.info(f"Email sent to {recipient}: {email.get('id')}")
-        return email
+        # Create message
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From'] = SENDER_EMAIL
+        msg['To'] = recipient
+        
+        # Attach HTML content
+        html_part = MIMEText(html_content, 'html', 'utf-8')
+        msg.attach(html_part)
+        
+        # Connect and send
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.sendmail(SENDER_EMAIL, recipient, msg.as_string())
+        
+        logger.info(f"Email sent successfully to {recipient}")
+        return {"success": True, "recipient": recipient}
+    except Exception as e:
+        logger.error(f"Failed to send email to {recipient}: {str(e)}")
+        return None
+
+async def send_email_async(recipient: str, subject: str, html_content: str):
+    """Send email using SMTP (async wrapper)"""
+    try:
+        result = await asyncio.to_thread(send_email_smtp, recipient, subject, html_content)
+        return result
     except Exception as e:
         logger.error(f"Failed to send email: {str(e)}")
+        return None
 
 async def send_push_notification(subscription_info: dict, title: str, body: str, data: dict = None, icon: str = "/logo192.png"):
     """Send a Web Push notification to a single subscription"""
