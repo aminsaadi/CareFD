@@ -140,6 +140,8 @@ const Providers = () => {
     if (searchParams.has('latitude') && searchParams.has('longitude')) {
       setLocationQuery('המיקום שלי');
     }
+    // Use local cities list
+    setCities(israeliCities);
   }, []);
 
   // Close dropdowns when clicking outside
@@ -156,19 +158,6 @@ const Providers = () => {
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Fetch cities for location dropdown
-  useEffect(() => {
-    const fetchCities = async () => {
-      try {
-        const response = await api.get('/cities');
-        setCities(response.data.cities || []);
-      } catch {
-        setCities([]);
-      }
-    };
-    fetchCities();
   }, []);
 
   // Filter cities based on input
