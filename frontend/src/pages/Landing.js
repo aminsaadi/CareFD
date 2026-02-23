@@ -349,24 +349,56 @@ const Landing = () => {
                   
                   {/* Search Inputs */}
                   <div className="grid sm:grid-cols-2 gap-3 mb-3">
-                    {/* Search Input */}
+                    {/* Search Input with Dropdown */}
                     <div className="relative">
-                      <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
+                      <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray z-10" />
                       <input
+                        ref={searchInputRef}
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        onFocus={() => setShowSearchDropdown(true)}
                         placeholder={searchTab === 'providers' ? 'מקצוע, התמחות, שם ספק...' : 'סוג שירות, טיפול, התמחות...'}
                         className="w-full input-soft text-carelink-navy px-5 py-3.5 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-carelink-teal placeholder-carelink-gray transition-all"
                         data-testid="hero-search-input"
                       />
+                      
+                      {/* Search Dropdown */}
+                      {showSearchDropdown && (
+                        <div 
+                          ref={searchDropdownRef}
+                          className="absolute top-full right-0 left-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 z-50 max-h-64 overflow-y-auto"
+                          data-testid="search-dropdown"
+                        >
+                          <div className="p-3 border-b border-gray-100">
+                            <span className="text-xs font-semibold text-carelink-gray">חיפושים נפוצים</span>
+                          </div>
+                          <div className="p-2">
+                            {filteredSearches.map((search, index) => (
+                              <button
+                                key={index}
+                                type="button"
+                                onClick={() => {
+                                  setSearchQuery(search);
+                                  setShowSearchDropdown(false);
+                                }}
+                                className="w-full text-right px-3 py-2.5 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carelink-navy"
+                              >
+                                <FaSearch className="text-carelink-gray text-sm" />
+                                <span>{search}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     
-                    {/* Location Input */}
+                    {/* Location Input with Dropdown */}
                     <div className="relative flex gap-2">
                       <div className="flex-1 relative">
-                        <FaMapMarkerAlt className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
+                        <FaMapMarkerAlt className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray z-10" />
                         <input
+                          ref={locationInputRef}
                           type="text"
                           value={locationQuery}
                           onChange={(e) => {
@@ -374,11 +406,87 @@ const Landing = () => {
                             if (e.target.value !== 'המיקום שלי') {
                               setUserLocation(null);
                             }
+                            setShowLocationDropdown(true);
                           }}
+                          onFocus={() => setShowLocationDropdown(true)}
                           placeholder="עיר או אזור"
                           className="w-full input-soft text-carelink-navy px-5 py-3.5 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-carelink-teal placeholder-carelink-gray transition-all"
                           data-testid="hero-location-input"
                         />
+                        
+                        {/* Location Dropdown */}
+                        {showLocationDropdown && (
+                          <div 
+                            ref={locationDropdownRef}
+                            className="absolute top-full right-0 left-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 z-50 max-h-64 overflow-y-auto"
+                            data-testid="location-dropdown"
+                          >
+                            {/* GPS Option */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                handleGetLocation();
+                              }}
+                              className="w-full text-right px-4 py-3 hover:bg-carelink-teal-pale/30 transition-colors flex items-center gap-3 text-carelink-teal border-b border-gray-100"
+                            >
+                              <FaCrosshairs className="text-lg" />
+                              <span className="font-medium">השתמש במיקום שלי</span>
+                              {isLocating && <FaSpinner className="animate-spin mr-auto" />}
+                            </button>
+                            
+                            {/* Regions */}
+                            {!locationQuery && (
+                              <>
+                                <div className="p-3 border-b border-gray-100">
+                                  <span className="text-xs font-semibold text-carelink-gray">אזורים</span>
+                                </div>
+                                <div className="p-2">
+                                  {displayRegions.map((region) => (
+                                    <button
+                                      key={region.id || region.name}
+                                      type="button"
+                                      onClick={() => {
+                                        setLocationQuery(region.name || region.name_he);
+                                        setUserLocation(null);
+                                        setShowLocationDropdown(false);
+                                      }}
+                                      className="w-full text-right px-3 py-2.5 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carelink-navy"
+                                    >
+                                      <FaMapMarkerAlt className="text-carelink-gray text-sm" />
+                                      <span>{region.name || region.name_he}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </>
+                            )}
+                            
+                            {/* Cities (filtered) */}
+                            {locationQuery && filteredCities.length > 0 && (
+                              <>
+                                <div className="p-3 border-b border-gray-100">
+                                  <span className="text-xs font-semibold text-carelink-gray">ערים</span>
+                                </div>
+                                <div className="p-2">
+                                  {filteredCities.map((city) => (
+                                    <button
+                                      key={city.city_id || city.name}
+                                      type="button"
+                                      onClick={() => {
+                                        setLocationQuery(city.name || city.name_he);
+                                        setUserLocation(null);
+                                        setShowLocationDropdown(false);
+                                      }}
+                                      className="w-full text-right px-3 py-2.5 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carelink-navy"
+                                    >
+                                      <FaMapMarkerAlt className="text-carelink-gray text-sm" />
+                                      <span>{city.name || city.name_he}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
                       </div>
                       
                       {/* GPS Button */}
