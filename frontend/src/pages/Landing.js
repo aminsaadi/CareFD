@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import ProviderCard from '../components/ProviderCard';
 import ServiceCard from '../components/ServiceCard';
 import api from '../utils/api';
+import { israeliLocalities } from '../data/israeliLocalities';
 import { 
   FaUserNurse, FaWalking, FaUserMd, FaHeart, 
   FaHandHoldingHeart, FaSpa, FaStar, FaSearch,
