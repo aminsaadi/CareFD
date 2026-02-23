@@ -527,14 +527,6 @@ const Providers = () => {
                   </button>
                 </div>
               </div>
-                    className="px-6 py-3 bg-carelink-teal text-white rounded-xl font-semibold hover:bg-carelink-teal-medium transition-colors flex items-center gap-2"
-                    data-testid="search-btn"
-                  >
-                    <FaSearch />
-                    <span className="hidden sm:inline">חפש</span>
-                  </button>
-                </div>
-              </div>
 
               {/* Radius selector (appears when using GPS) */}
               {filters.useMyLocation && (
