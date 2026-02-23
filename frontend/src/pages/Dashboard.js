@@ -262,6 +262,7 @@ const Dashboard = () => {
   const tabs = [
     { id: 'overview', label: 'סקירה כללית', icon: FaUser },
     { id: 'bookings', label: 'ההזמנות שלי', icon: FaCalendarAlt },
+    { id: 'notifications', label: 'התראות', icon: FaBell, link: '/notifications' },
     { id: 'reviews', label: 'הביקורות שלי', icon: FaStar },
     { id: 'messages', label: 'הודעות', icon: FaComments },
     { id: 'favorites', label: 'מועדפים', icon: FaHeart },
