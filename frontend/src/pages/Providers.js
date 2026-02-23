@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
@@ -8,8 +8,11 @@ import AdvancedFilters from '../components/AdvancedFilters';
 import api from '../utils/api';
 import { 
   FaSearch, FaFilter, FaTimes, FaSortAmountDown, FaMapMarkerAlt,
-  FaThLarge, FaList, FaCrosshairs, FaSpinner
+  FaThLarge, FaList, FaCrosshairs, FaSpinner, FaMap
 } from 'react-icons/fa';
+
+// Lazy load map component
+const ProvidersMap = lazy(() => import('../components/ProvidersMap'));
 
 const Providers = () => {
   const { t } = useTranslation();
