@@ -43,6 +43,7 @@ import AdminFeatured from './pages/admin/AdminFeatured';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminReports from './pages/admin/AdminReports';
 import AdminServices from './pages/admin/AdminServices';
+import AdminServiceTypes from './pages/admin/AdminServiceTypes';
 import AdminSubscriptions from './pages/admin/AdminSubscriptions';
 import AdminPushNotifications from './pages/admin/AdminPushNotifications';
 import AdminNotifications from './pages/admin/AdminNotifications';
