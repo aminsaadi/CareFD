@@ -85,26 +85,6 @@ const testimonials = [
 ];
 
 // Popular searches data
-  { name: 'אילת', region: 'דרום' },
-  { name: 'דימונה', region: 'דרום' },
-  { name: 'קריית גת', region: 'דרום' },
-  { name: 'שדרות', region: 'דרום' },
-  { name: 'נתיבות', region: 'דרום' },
-  { name: 'אופקים', region: 'דרום' },
-  { name: 'ערד', region: 'דרום' },
-  // ירושלים והסביבה
-  { name: 'ירושלים', region: 'ירושלים' },
-  { name: 'בית שמש', region: 'ירושלים' },
-  { name: 'מעלה אדומים', region: 'ירושלים' },
-  { name: 'גבעת זאב', region: 'ירושלים' },
-  // השרון
-  { name: 'רחובות', region: 'השרון' },
-  { name: 'נס ציונה', region: 'השרון' },
-  { name: 'יבנה', region: 'השרון' },
-  { name: 'גדרה', region: 'השרון' },
-];
-
-// Popular searches data
 const popularSearches = {
   providers: [
     'אחות', 'רופא משפחה', 'פיזיותרפיסט', 'מטפל סיעודי', 
