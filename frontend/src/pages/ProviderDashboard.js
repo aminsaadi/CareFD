@@ -549,18 +549,29 @@ const ProviderDashboard = () => {
               <div className="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-24">
                 <nav className="p-2">
                   {tabs.map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right transition ${
-                        activeTab === tab.id
-                          ? 'bg-carelink-teal text-white'
-                          : 'text-carelink-gray hover:bg-carelink-teal-pale/30'
-                      }`}
-                    >
-                      <tab.icon />
-                      {tab.label}
-                    </button>
+                    tab.link ? (
+                      <Link
+                        key={tab.id}
+                        to={tab.link}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right transition text-carelink-gray hover:bg-carelink-teal-pale/30"
+                      >
+                        <tab.icon />
+                        {tab.label}
+                      </Link>
+                    ) : (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right transition ${
+                          activeTab === tab.id
+                            ? 'bg-carelink-teal text-white'
+                            : 'text-carelink-gray hover:bg-carelink-teal-pale/30'
+                        }`}
+                      >
+                        <tab.icon />
+                        {tab.label}
+                      </button>
+                    )
                   ))}
                 </nav>
               </div>
