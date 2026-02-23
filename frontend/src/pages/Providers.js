@@ -162,9 +162,8 @@ const Providers = () => {
 
   // Filter cities based on input
   const filteredCities = cities.filter(city => 
-    city.name?.toLowerCase().includes(locationQuery.toLowerCase()) ||
-    city.name_he?.includes(locationQuery)
-  ).slice(0, 8);
+    city.name?.includes(locationQuery)
+  ).slice(0, 10);
 
   // Filter popular searches based on input
   const filteredSearches = searchQuery.trim() 
