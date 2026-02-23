@@ -4457,6 +4457,10 @@ async def get_service_types():
             }
         ]
         await db.service_types.insert_many(default_types)
+        # Remove _id from response
+        for t in default_types:
+            if "_id" in t:
+                del t["_id"]
         return {"service_types": default_types}
     
     return {"service_types": service_types}
