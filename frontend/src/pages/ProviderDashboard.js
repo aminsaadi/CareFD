@@ -477,6 +477,7 @@ const ProviderDashboard = () => {
     { id: 'bookings', label: 'תורים', icon: FaCalendarAlt },
     { id: 'services', label: 'שירותים', icon: FaBriefcase },
     { id: 'requests', label: 'בקשות פתוחות', icon: FaFileAlt },
+    { id: 'notifications', label: 'התראות', icon: FaBell, link: '/notifications' },
     { id: 'messages', label: 'הודעות', icon: FaComments },
     { id: 'reviews', label: 'ביקורות', icon: FaStar },
     { id: 'user_info', label: 'פרטי משתמש', icon: FaUser },
