@@ -4031,6 +4031,43 @@ async def admin_update_settings(
     
     return {"message": "Settings updated successfully"}
 
+# ==================== PUBLIC PROFESSIONS ====================
+
+@api_router.get("/professions")
+async def get_public_professions():
+    """Get all professions for public use (dropdowns, filters, etc.)"""
+    professions = await db.professions.find({}, {"_id": 0}).to_list(100)
+    
+    if not professions:
+        # Return empty list if not initialized
+        return {"professions": []}
+    
+    # Return simplified structure for public use
+    public_professions = []
+    for prof in professions:
+        public_prof = {
+            "profession_id": prof.get("profession_id"),
+            "name": prof.get("name"),
+            "name_en": prof.get("name_en"),
+            "icon": prof.get("icon"),
+            "specializations": prof.get("specializations", []),
+            "sub_professions": [
+                {
+                    "sub_profession_id": sp.get("sub_profession_id"),
+                    "name": sp.get("name"),
+                    "name_en": sp.get("name_en"),
+                    "categories": [
+                        {"category_id": c.get("category_id"), "name": c.get("name"), "name_en": c.get("name_en")}
+                        for c in sp.get("categories", [])
+                    ]
+                }
+                for sp in prof.get("sub_professions", [])
+            ]
+        }
+        public_professions.append(public_prof)
+    
+    return {"professions": public_professions}
+
 # ==================== ADMIN PROFESSIONS ====================
 
 @api_router.get("/admin/professions")
