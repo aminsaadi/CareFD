@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../components/Logo';
-import { FaEnvelope, FaLock, FaArrowLeft, FaUserMd, FaUsers } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaArrowLeft, FaUserMd, FaUsers, FaTimes } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
+import api from '../utils/api';
+import { toast } from 'sonner';
 
 const Login = () => {
   const { t } = useTranslation();
@@ -13,6 +15,10 @@ const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [sendingReset, setSendingReset] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
