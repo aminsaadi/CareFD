@@ -70,13 +70,30 @@ const ProviderDashboard = () => {
   // Service form states
   const [showServiceForm, setShowServiceForm] = useState(false);
   const [editingService, setEditingService] = useState(null);
+  const [serviceTypes, setServiceTypes] = useState([]);
+  const [deliveryTypes, setDeliveryTypes] = useState([]);
   const [serviceForm, setServiceForm] = useState({
     name: '',
     description: '',
     price: '',
     duration_minutes: '',
-    service_type: 'home_visit',
-    pricing_type: 'per_session'
+    // New fields
+    service_category: 'visit',
+    delivery_types: [],
+    pricing_type: 'fixed',
+    minimum_hours: '',
+    // Weekend pricing
+    weekend_pricing_type: 'none',
+    weekend_price_addition: '',
+    // Travel cost
+    has_travel_cost: false,
+    travel_cost: '',
+    // Shipping (for products)
+    has_shipping: false,
+    shipping_cost: '',
+    free_shipping_above: '',
+    // Stock
+    stock_quantity: ''
   });
 
   // Profile form state - Provider business profile
