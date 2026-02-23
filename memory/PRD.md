@@ -117,16 +117,25 @@ DELETE /api/admin/categories/{id}                        # Delete category
 }
 ```
 
+### Completed Features ✅ (Dec 2025)
+- Provider Service Form with all 4 categories (visit/hourly/consultation/product)
+- Booking price calculation with weekend/travel/shipping fees
+- Service CRUD with DELETE endpoint fix
+
 ### Pending Features 🔄
 
-#### P1 - Backend Refactoring
-- The monolithic server.py file (4800+ lines) needs splitting into router modules
+#### P1 - Backend Refactoring (HIGH PRIORITY)
+- The monolithic server.py file (5000+ lines) needs splitting into router modules
+- Target structure: /backend/app/routers/ (auth.py, providers.py, bookings.py, admin.py, etc.)
 
-#### P2 - Admin Notifications/Messages Pages
+#### P1 - Admin Notifications/Messages Pages
 - /admin/notifications and /admin/messages pages return 404
 
 #### P2 - PayPal Live Integration
 - Waiting for PayPal API credentials
+
+#### P2 - Email Integration
+- Waiting for RESEND_API_KEY (currently mocked)
 
 ### Testing Credentials
 - Admin: admin@carelink.co.il / password
