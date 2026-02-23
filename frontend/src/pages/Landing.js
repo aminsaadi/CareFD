@@ -158,8 +158,8 @@ const Landing = () => {
       const regionsRes = await api.get('/regions');
       setRegions(regionsRes.data.regions || []);
       
-      // Use local cities list instead of API
-      setCities(israeliCities);
+      // Use comprehensive localities list
+      setCities(israeliLocalities);
 
       try {
         const statsRes = await api.get('/stats/public');
