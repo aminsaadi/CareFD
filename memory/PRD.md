@@ -149,7 +149,18 @@ DELETE /api/admin/categories/{id}                        # Delete category
 ## Change Log
 
 ### Dec 2025 (Current Session)
-- **Provider Service Form & Booking Price Calculation (P0 COMPLETE)** ✅ NEW
+- **Notifications System (P1 COMPLETE)** ✅ NEW
+  - Created `/notifications` page for all users with filtering (read/unread, type)
+  - Added "התראות" tab to User Dashboard and Provider Dashboard
+  - Updated Admin Notifications page to use real API data
+  - Updated Admin Messages page to show real chat rooms
+  - Chat messages now trigger notifications to the recipient
+  - Clicking notification navigates to relevant page (booking, chat, etc.)
+  
+- **Unified Font (P1 COMPLETE)** ✅ NEW
+  - Changed entire site to use Outfit font consistently (like header)
+
+- **Provider Service Form & Booking Price Calculation (P0 COMPLETE)** ✅
   - Full service CRUD with 4 categories: Visit, Hourly, Consultation, Product
   - Weekend pricing (percentage or fixed surcharge)
   - Travel cost for home visits
