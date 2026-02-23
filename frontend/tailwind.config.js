@@ -77,34 +77,11 @@ module.exports = {
                                 '3': 'hsl(var(--chart-3))',
                                 '4': 'hsl(var(--chart-4))',
                                 '5': 'hsl(var(--chart-5))'
-                        }
+                }
                 },
                 fontFamily: {
-                        sans: ['Manrope', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
-                        heading: ['Playfair Display', 'Georgia', 'serif'],
-                        serif: ['Playfair Display', 'Georgia', 'serif'],
-                },
-                lineHeight: {
-                        'relaxed': '1.8',
-                        'loose': '2',
-                },
-                spacing: {
-                        '18': '4.5rem',
-                        '22': '5.5rem',
-                        '26': '6.5rem',
-                        '30': '7.5rem',
-                },
-                boxShadow: {
-                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.06)',
-                        'soft-md': '0 8px 30px -4px rgba(0, 0, 0, 0.08)',
-                        'soft-lg': '0 12px 40px -6px rgba(0, 0, 0, 0.1)',
-                        'soft-xl': '0 20px 50px -10px rgba(0, 0, 0, 0.12)',
-                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
-                        'premium': '0 25px 60px -12px rgba(0, 0, 0, 0.15)',
-                },
-                backdropBlur: {
-                        'xs': '2px',
-                        'glass': '12px',
+                        sans: ['Outfit', 'system-ui', '-apple-system', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
                 },
                 keyframes: {
                         'accordion-down': {
