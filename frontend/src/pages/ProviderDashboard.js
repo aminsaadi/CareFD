@@ -1056,42 +1056,93 @@ const ProviderDashboard = () => {
                         ) : (
                           <div className="grid md:grid-cols-2 gap-4">
                             {services.map((service) => {
-                              const typeConfig = serviceTypeOptions.find(t => t.value === service.service_type);
-                              const TypeIcon = typeConfig?.icon || FaBriefcase;
+                              const categoryIcons = {
+                                visit: '🏠',
+                                hourly: '⏰',
+                                consultation: '💬',
+                                product: '📦'
+                              };
+                              const categoryNames = {
+                                visit: 'שירות ביקור',
+                                hourly: 'שירות שעתי',
+                                consultation: 'ייעוץ',
+                                product: 'מוצר'
+                              };
+                              const deliveryNames = {
+                                home_visit: 'בבית',
+                                hospital: 'בי"ח',
+                                clinic: 'קליניקה',
+                                virtual: 'וירטואלי'
+                              };
                               return (
                                 <div key={service.service_id} className="border-2 border-carelink-teal-pale rounded-xl p-5 hover:border-carelink-teal transition">
                                   <div className="flex items-start justify-between mb-3">
                                     <div className="flex items-center gap-3">
-                                      <div className="w-10 h-10 bg-carelink-teal-pale rounded-lg flex items-center justify-center">
-                                        <TypeIcon className="text-carelink-teal" />
+                                      <div className="w-12 h-12 bg-carelink-teal-pale rounded-xl flex items-center justify-center text-2xl">
+                                        {categoryIcons[service.service_category] || '📋'}
                                       </div>
                                       <div>
                                         <h4 className="font-bold text-carelink-navy">{service.name}</h4>
                                         <span className="text-xs bg-carelink-navy text-white px-2 py-0.5 rounded-full">
-                                          {typeConfig?.label || service.service_type}
+                                          {categoryNames[service.service_category] || service.service_category}
                                         </span>
                                       </div>
                                     </div>
-                                    <span className="text-2xl font-bold text-carelink-teal">₪{service.price}</span>
+                                    <div className="text-left">
+                                      <span className="text-2xl font-bold text-carelink-teal">₪{service.price}</span>
+                                      {service.service_category === 'hourly' && (
+                                        <span className="block text-xs text-carelink-gray">/שעה</span>
+                                      )}
+                                    </div>
                                   </div>
                                   <p className="text-sm text-carelink-gray mb-3 line-clamp-2">{service.description || 'ללא תיאור'}</p>
-                                  <div className="flex items-center justify-between">
-                                    {service.duration_minutes && (
+                                  
+                                  {/* Service details badges */}
+                                  <div className="flex flex-wrap gap-2 mb-3">
+                                    {service.delivery_types?.length > 0 && service.delivery_types.map((dt) => (
+                                      <span key={dt} className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">
+                                        {deliveryNames[dt] || dt}
+                                      </span>
+                                    ))}
+                                    {service.minimum_hours && (
+                                      <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded">
+                                        מינ׳ {service.minimum_hours} שעות
+                                      </span>
+                                    )}
+                                    {service.weekend_pricing_type !== 'none' && service.weekend_price_addition && (
+                                      <span className="text-xs bg-amber-100 text-amber-600 px-2 py-1 rounded">
+                                        שבת: +{service.weekend_price_addition}{service.weekend_pricing_type === 'percentage' ? '%' : '₪'}
+                                      </span>
+                                    )}
+                                    {service.has_travel_cost && (
+                                      <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">
+                                        נסיעה: ₪{service.travel_cost}
+                                      </span>
+                                    )}
+                                    {service.has_shipping && (
+                                      <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded">
+                                        משלוח: ₪{service.shipping_cost}
+                                      </span>
+                                    )}
+                                  </div>
+                                  
+                                  <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                                    {service.duration_minutes ? (
                                       <span className="text-xs text-carelink-gray flex items-center gap-1">
                                         <FaClock />
                                         {service.duration_minutes} דקות
                                       </span>
-                                    )}
+                                    ) : <span></span>}
                                     <div className="flex items-center gap-2">
                                       <button
                                         onClick={() => handleEditService(service)}
-                                        className="text-carelink-teal hover:text-carelink-teal-medium p-2"
+                                        className="text-carelink-teal hover:text-carelink-teal-medium p-2 hover:bg-carelink-teal/10 rounded-lg transition"
                                       >
                                         <FaEdit />
                                       </button>
                                       <button
                                         onClick={() => handleDeleteService(service.service_id)}
-                                        className="text-red-500 hover:text-red-600 p-2"
+                                        className="text-red-500 hover:text-red-600 p-2 hover:bg-red-50 rounded-lg transition"
                                       >
                                         <FaTrash />
                                       </button>
