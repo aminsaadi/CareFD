@@ -15,7 +15,7 @@ import {
   FaHourglass, FaTimes, FaEdit, FaChartBar, FaMoneyBillWave,
   FaUsers, FaEye, FaBriefcase, FaPhone, FaEnvelope, FaTrash,
   FaHome, FaVideo, FaClinicMedical, FaPhoneAlt, FaSave, FaAward,
-  FaWhatsapp, FaGlobe, FaUserTie
+  FaWhatsapp, FaGlobe, FaUserTie, FaBell
 } from 'react-icons/fa';
 
 // Service type config
