@@ -22,6 +22,7 @@ const popularSearches = [
 
 const Providers = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [providers, setProviders] = useState([]);
   const [totalProviders, setTotalProviders] = useState(0);
@@ -32,6 +33,15 @@ const Providers = () => {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [locationQuery, setLocationQuery] = useState(searchParams.get('city') || '');
   const [isLocating, setIsLocating] = useState(false);
+  
+  // Dropdown states
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [cities, setCities] = useState([]);
+  const searchInputRef = useRef(null);
+  const locationInputRef = useRef(null);
+  const searchDropdownRef = useRef(null);
+  const locationDropdownRef = useRef(null);
   
   // Israeli regions for quick selection
   const regions = [
