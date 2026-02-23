@@ -199,7 +199,9 @@ const Landing = () => {
     }
 
     const queryString = params.toString();
-    navigate(`/providers${queryString ? `?${queryString}` : ''}`);
+    // Navigate based on selected tab
+    const targetPage = searchTab === 'services' ? '/services' : '/providers';
+    navigate(`${targetPage}${queryString ? `?${queryString}` : ''}`);
   };
 
   return (
