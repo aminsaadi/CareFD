@@ -300,9 +300,8 @@ const Landing = () => {
   
   // Filter cities based on input
   const filteredCities = cities.filter(city => 
-    city.name?.toLowerCase().includes(locationQuery.toLowerCase()) ||
-    city.name_he?.includes(locationQuery)
-  ).slice(0, 8);
+    city.name?.includes(locationQuery)
+  ).slice(0, 10);
   
   // Get current popular searches based on tab
   const currentPopularSearches = popularSearches[searchTab] || popularSearches.providers;
