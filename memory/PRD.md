@@ -149,7 +149,17 @@ DELETE /api/admin/categories/{id}                        # Delete category
 ## Change Log
 
 ### Dec 2025 (Current Session)
-- **Notifications System (P1 COMPLETE)** ✅ NEW
+- **Landing Page Redesign (P1 COMPLETE)** ✅ NEW
+  - Improved Hero section with cleaner white search box
+  - Added **Professions Row** - clickable profession tags (nurse, doctor, physiotherapist, etc.)
+  - Added **Categories Section** - 6 service categories with hover gradients
+  - Added **Featured Providers** section
+  - Added **Popular Services** section
+  - Removed multi-language support - Hebrew only
+  - Added **Chat Icon** in Navbar next to notifications (shows unread count)
+  - Cleaner navigation without language switcher
+
+- **Notifications System (P1 COMPLETE)** ✅
   - Created `/notifications` page for all users with filtering (read/unread, type)
   - Added "התראות" tab to User Dashboard and Provider Dashboard
   - Updated Admin Notifications page to use real API data
@@ -157,7 +167,7 @@ DELETE /api/admin/categories/{id}                        # Delete category
   - Chat messages now trigger notifications to the recipient
   - Clicking notification navigates to relevant page (booking, chat, etc.)
   
-- **Unified Font (P1 COMPLETE)** ✅ NEW
+- **Unified Font (P1 COMPLETE)** ✅
   - Changed entire site to use Outfit font consistently (like header)
 
 - **Provider Service Form & Booking Price Calculation (P0 COMPLETE)** ✅
