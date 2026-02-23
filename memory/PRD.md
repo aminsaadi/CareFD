@@ -143,4 +143,25 @@ DELETE /api/admin/categories/{id}                        # Delete category
 - **Static Pages Editor (P0 COMPLETE)** - ReactQuill rich text editor
 - **Admin Email Notifications (P2 COMPLETE)** - Email to admins on provider registration
 - **Professions Management (P0 COMPLETE)** - Full CRUD with 3-level hierarchy + specializations
-- Testing: 100% backend (17/17), 100% frontend
+- **Regions & Cities Management (P0 COMPLETE)** - NEW
+  - 8 regions of Israel: צפון, חיפה והקריות, השרון, מרכז, ירושלים והסביבה, דרום, שפלה, יהודה ושומרון
+  - 102 cities with GPS coordinates (lat/lng)
+  - Admin can add/edit/delete regions and cities
+  - Each city has Hebrew name, English name, and coordinates
+- **Map View for Providers (P0 COMPLETE)** - NEW
+  - Leaflet + OpenStreetMap integration (free, no API key needed)
+  - Toggle between Grid / List / Map views
+  - Provider markers on map with popup details
+  - Click marker to see: name, profession, city, distance, rating
+  - Link to provider profile from popup
+- **Distance Display in Search (P0 COMPLETE)** - NEW
+  - GPS button to use user's location
+  - Radius selector (5km, 10km, 25km, 50km)
+  - Distance badge on each provider card
+  - Sort by distance option
+  - Backend returns distance_km when coordinates provided
+
+### Testing Results
+- Iteration 16: Static Pages - 100% backend, 100% frontend
+- Iteration 17: Professions - 100% backend (17/17), 100% frontend  
+- Iteration 18: Regions & Map - 100% backend (11/11), 100% frontend
