@@ -3705,16 +3705,169 @@ async def admin_reject_document(
 
 @api_router.get("/regions")
 async def get_regions():
-    """Get all regions"""
+    """Get all regions with cities"""
     regions = await db.regions.find({}, {"_id": 0}).to_list(100)
     
-    # Return default regions if none exist
+    # Return default regions if none exist - all cities in Israel
     if not regions:
         default_regions = [
-            {"region_id": "north", "name": "צפון", "cities": ["חיפה", "נהריה", "עכו", "כרמיאל", "צפת", "טבריה", "קריות", "נצרת"]},
-            {"region_id": "center", "name": "מרכז", "cities": ["תל אביב", "רמת גן", "פתח תקווה", "הרצליה", "רעננה", "נתניה", "ראשון לציון", "חולון"]},
-            {"region_id": "south", "name": "דרום", "cities": ["באר שבע", "אשדוד", "אשקלון", "אילת", "דימונה", "קריית גת"]},
-            {"region_id": "jerusalem", "name": "ירושלים והסביבה", "cities": ["ירושלים", "בית שמש", "מודיעין", "מעלה אדומים"]}
+            {
+                "region_id": "north",
+                "name": "צפון",
+                "name_en": "North",
+                "cities": [
+                    {"name": "חיפה", "name_en": "Haifa", "lat": 32.7940, "lng": 34.9896},
+                    {"name": "נהריה", "name_en": "Nahariya", "lat": 33.0072, "lng": 35.0942},
+                    {"name": "עכו", "name_en": "Acre", "lat": 32.9279, "lng": 35.0756},
+                    {"name": "כרמיאל", "name_en": "Karmiel", "lat": 32.9136, "lng": 35.2961},
+                    {"name": "צפת", "name_en": "Safed", "lat": 32.9646, "lng": 35.4960},
+                    {"name": "טבריה", "name_en": "Tiberias", "lat": 32.7922, "lng": 35.5312},
+                    {"name": "קריית שמונה", "name_en": "Kiryat Shmona", "lat": 33.2075, "lng": 35.5697},
+                    {"name": "נצרת", "name_en": "Nazareth", "lat": 32.6996, "lng": 35.3035},
+                    {"name": "נצרת עילית", "name_en": "Nazareth Illit", "lat": 32.7260, "lng": 35.3280},
+                    {"name": "עפולה", "name_en": "Afula", "lat": 32.6074, "lng": 35.2893},
+                    {"name": "בית שאן", "name_en": "Beit She'an", "lat": 32.4975, "lng": 35.4965},
+                    {"name": "קריית ביאליק", "name_en": "Kiryat Bialik", "lat": 32.8333, "lng": 35.0833},
+                    {"name": "קריית מוצקין", "name_en": "Kiryat Motzkin", "lat": 32.8389, "lng": 35.0750},
+                    {"name": "קריית ים", "name_en": "Kiryat Yam", "lat": 32.8500, "lng": 35.0667},
+                    {"name": "קריית אתא", "name_en": "Kiryat Ata", "lat": 32.8000, "lng": 35.1000},
+                    {"name": "יקנעם", "name_en": "Yokneam", "lat": 32.6594, "lng": 35.1086},
+                    {"name": "מגדל העמק", "name_en": "Migdal HaEmek", "lat": 32.6744, "lng": 35.2406},
+                    {"name": "מעלות-תרשיחא", "name_en": "Ma'alot-Tarshiha", "lat": 33.0167, "lng": 35.2667},
+                    {"name": "שלומי", "name_en": "Shlomi", "lat": 33.0747, "lng": 35.1428}
+                ]
+            },
+            {
+                "region_id": "haifa",
+                "name": "חיפה והקריות",
+                "name_en": "Haifa Area",
+                "cities": [
+                    {"name": "חיפה", "name_en": "Haifa", "lat": 32.7940, "lng": 34.9896},
+                    {"name": "קריית ביאליק", "name_en": "Kiryat Bialik", "lat": 32.8333, "lng": 35.0833},
+                    {"name": "קריית מוצקין", "name_en": "Kiryat Motzkin", "lat": 32.8389, "lng": 35.0750},
+                    {"name": "קריית ים", "name_en": "Kiryat Yam", "lat": 32.8500, "lng": 35.0667},
+                    {"name": "קריית אתא", "name_en": "Kiryat Ata", "lat": 32.8000, "lng": 35.1000},
+                    {"name": "נשר", "name_en": "Nesher", "lat": 32.7700, "lng": 35.0400},
+                    {"name": "טירת כרמל", "name_en": "Tirat Carmel", "lat": 32.7589, "lng": 34.9714}
+                ]
+            },
+            {
+                "region_id": "sharon",
+                "name": "השרון",
+                "name_en": "Sharon",
+                "cities": [
+                    {"name": "נתניה", "name_en": "Netanya", "lat": 32.3286, "lng": 34.8567},
+                    {"name": "הרצליה", "name_en": "Herzliya", "lat": 32.1663, "lng": 34.8463},
+                    {"name": "רעננה", "name_en": "Ra'anana", "lat": 32.1836, "lng": 34.8708},
+                    {"name": "כפר סבא", "name_en": "Kfar Saba", "lat": 32.1753, "lng": 34.9065},
+                    {"name": "הוד השרון", "name_en": "Hod HaSharon", "lat": 32.1500, "lng": 34.8833},
+                    {"name": "רמת השרון", "name_en": "Ramat HaSharon", "lat": 32.1464, "lng": 34.8397},
+                    {"name": "חדרה", "name_en": "Hadera", "lat": 32.4340, "lng": 34.9196},
+                    {"name": "כפר יונה", "name_en": "Kfar Yona", "lat": 32.3167, "lng": 34.9333},
+                    {"name": "פרדס חנה-כרכור", "name_en": "Pardes Hanna-Karkur", "lat": 32.4700, "lng": 34.9700},
+                    {"name": "זכרון יעקב", "name_en": "Zikhron Ya'akov", "lat": 32.5714, "lng": 34.9522},
+                    {"name": "בנימינה", "name_en": "Binyamina", "lat": 32.5167, "lng": 34.9500},
+                    {"name": "אור עקיבא", "name_en": "Or Akiva", "lat": 32.5081, "lng": 34.9181},
+                    {"name": "קיסריה", "name_en": "Caesarea", "lat": 32.5000, "lng": 34.9000}
+                ]
+            },
+            {
+                "region_id": "center",
+                "name": "מרכז",
+                "name_en": "Center",
+                "cities": [
+                    {"name": "תל אביב-יפו", "name_en": "Tel Aviv-Yafo", "lat": 32.0853, "lng": 34.7818},
+                    {"name": "רמת גן", "name_en": "Ramat Gan", "lat": 32.0700, "lng": 34.8236},
+                    {"name": "גבעתיים", "name_en": "Givatayim", "lat": 32.0714, "lng": 34.8122},
+                    {"name": "בני ברק", "name_en": "Bnei Brak", "lat": 32.0833, "lng": 34.8333},
+                    {"name": "פתח תקווה", "name_en": "Petah Tikva", "lat": 32.0841, "lng": 34.8878},
+                    {"name": "חולון", "name_en": "Holon", "lat": 32.0158, "lng": 34.7875},
+                    {"name": "בת ים", "name_en": "Bat Yam", "lat": 32.0231, "lng": 34.7503},
+                    {"name": "ראשון לציון", "name_en": "Rishon LeZion", "lat": 31.9730, "lng": 34.7925},
+                    {"name": "רחובות", "name_en": "Rehovot", "lat": 31.8928, "lng": 34.8113},
+                    {"name": "נס ציונה", "name_en": "Ness Ziona", "lat": 31.9314, "lng": 34.7989},
+                    {"name": "לוד", "name_en": "Lod", "lat": 31.9514, "lng": 34.8953},
+                    {"name": "רמלה", "name_en": "Ramla", "lat": 31.9275, "lng": 34.8622},
+                    {"name": "יבנה", "name_en": "Yavne", "lat": 31.8767, "lng": 34.7394},
+                    {"name": "ראש העין", "name_en": "Rosh HaAyin", "lat": 32.0956, "lng": 34.9567},
+                    {"name": "אלעד", "name_en": "Elad", "lat": 32.0522, "lng": 34.9508},
+                    {"name": "גני תקווה", "name_en": "Ganei Tikva", "lat": 32.0597, "lng": 34.8714},
+                    {"name": "קריית אונו", "name_en": "Kiryat Ono", "lat": 32.0633, "lng": 34.8556},
+                    {"name": "אור יהודה", "name_en": "Or Yehuda", "lat": 32.0300, "lng": 34.8536},
+                    {"name": "יהוד-מונוסון", "name_en": "Yehud-Monosson", "lat": 32.0333, "lng": 34.8833},
+                    {"name": "כפר קאסם", "name_en": "Kafr Qasim", "lat": 32.1142, "lng": 34.9778},
+                    {"name": "טייבה", "name_en": "Tayibe", "lat": 32.2667, "lng": 35.0000},
+                    {"name": "קלנסווה", "name_en": "Qalansawe", "lat": 32.2833, "lng": 34.9833},
+                    {"name": "טירה", "name_en": "Tira", "lat": 32.2333, "lng": 34.9500}
+                ]
+            },
+            {
+                "region_id": "jerusalem",
+                "name": "ירושלים והסביבה",
+                "name_en": "Jerusalem Area",
+                "cities": [
+                    {"name": "ירושלים", "name_en": "Jerusalem", "lat": 31.7683, "lng": 35.2137},
+                    {"name": "בית שמש", "name_en": "Beit Shemesh", "lat": 31.7514, "lng": 34.9886},
+                    {"name": "מודיעין-מכבים-רעות", "name_en": "Modi'in-Maccabim-Re'ut", "lat": 31.8978, "lng": 35.0100},
+                    {"name": "מעלה אדומים", "name_en": "Ma'ale Adumim", "lat": 31.7781, "lng": 35.3031},
+                    {"name": "גבעת זאב", "name_en": "Giv'at Ze'ev", "lat": 31.8622, "lng": 35.1706},
+                    {"name": "ביתר עילית", "name_en": "Beitar Illit", "lat": 31.6953, "lng": 35.1128},
+                    {"name": "מבשרת ציון", "name_en": "Mevaseret Zion", "lat": 31.8028, "lng": 35.1525},
+                    {"name": "אבו גוש", "name_en": "Abu Ghosh", "lat": 31.8081, "lng": 35.1108},
+                    {"name": "צור הדסה", "name_en": "Tzur Hadassa", "lat": 31.7231, "lng": 35.0717}
+                ]
+            },
+            {
+                "region_id": "south",
+                "name": "דרום",
+                "name_en": "South",
+                "cities": [
+                    {"name": "באר שבע", "name_en": "Be'er Sheva", "lat": 31.2518, "lng": 34.7913},
+                    {"name": "אשדוד", "name_en": "Ashdod", "lat": 31.8044, "lng": 34.6553},
+                    {"name": "אשקלון", "name_en": "Ashkelon", "lat": 31.6688, "lng": 34.5743},
+                    {"name": "אילת", "name_en": "Eilat", "lat": 29.5577, "lng": 34.9519},
+                    {"name": "דימונה", "name_en": "Dimona", "lat": 31.0697, "lng": 35.0333},
+                    {"name": "קריית גת", "name_en": "Kiryat Gat", "lat": 31.6061, "lng": 34.7717},
+                    {"name": "שדרות", "name_en": "Sderot", "lat": 31.5247, "lng": 34.5967},
+                    {"name": "אופקים", "name_en": "Ofakim", "lat": 31.3142, "lng": 34.6183},
+                    {"name": "נתיבות", "name_en": "Netivot", "lat": 31.4222, "lng": 34.5892},
+                    {"name": "ערד", "name_en": "Arad", "lat": 31.2614, "lng": 35.2128},
+                    {"name": "ירוחם", "name_en": "Yeruham", "lat": 30.9897, "lng": 34.9300},
+                    {"name": "מצפה רמון", "name_en": "Mitzpe Ramon", "lat": 30.6100, "lng": 34.8017},
+                    {"name": "רהט", "name_en": "Rahat", "lat": 31.3928, "lng": 34.7542}
+                ]
+            },
+            {
+                "region_id": "shfela",
+                "name": "שפלה",
+                "name_en": "Shfela",
+                "cities": [
+                    {"name": "אשדוד", "name_en": "Ashdod", "lat": 31.8044, "lng": 34.6553},
+                    {"name": "אשקלון", "name_en": "Ashkelon", "lat": 31.6688, "lng": 34.5743},
+                    {"name": "קריית מלאכי", "name_en": "Kiryat Malakhi", "lat": 31.7308, "lng": 34.7472},
+                    {"name": "גדרה", "name_en": "Gedera", "lat": 31.8147, "lng": 34.7783},
+                    {"name": "קריית עקרון", "name_en": "Kiryat Ekron", "lat": 31.8589, "lng": 34.8247},
+                    {"name": "מזכרת בתיה", "name_en": "Mazkeret Batya", "lat": 31.8500, "lng": 34.8500},
+                    {"name": "גן יבנה", "name_en": "Gan Yavne", "lat": 31.7833, "lng": 34.7000}
+                ]
+            },
+            {
+                "region_id": "judea_samaria",
+                "name": "יהודה ושומרון",
+                "name_en": "Judea and Samaria",
+                "cities": [
+                    {"name": "אריאל", "name_en": "Ariel", "lat": 32.1064, "lng": 35.1731},
+                    {"name": "מעלה אדומים", "name_en": "Ma'ale Adumim", "lat": 31.7781, "lng": 35.3031},
+                    {"name": "ביתר עילית", "name_en": "Beitar Illit", "lat": 31.6953, "lng": 35.1128},
+                    {"name": "מודיעין עילית", "name_en": "Modi'in Illit", "lat": 31.9333, "lng": 35.0439},
+                    {"name": "גבעת זאב", "name_en": "Giv'at Ze'ev", "lat": 31.8622, "lng": 35.1706},
+                    {"name": "אלפי מנשה", "name_en": "Alfei Menashe", "lat": 32.1667, "lng": 35.0333},
+                    {"name": "קרני שומרון", "name_en": "Karnei Shomron", "lat": 32.1667, "lng": 35.0833},
+                    {"name": "עמנואל", "name_en": "Immanuel", "lat": 32.1556, "lng": 35.1589},
+                    {"name": "קדומים", "name_en": "Kedumim", "lat": 32.1833, "lng": 35.1833},
+                    {"name": "אפרת", "name_en": "Efrat", "lat": 31.6547, "lng": 35.1422}
+                ]
+            }
         ]
         # Insert defaults
         await db.regions.insert_many(default_regions)
