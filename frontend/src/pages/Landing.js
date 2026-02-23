@@ -237,7 +237,7 @@ const Landing = () => {
 
               {/* ==================== SEARCH BOX ==================== */}
               <form onSubmit={handleSearch} className="mb-6" data-testid="hero-search-form">
-                <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-2xl">
+                <div className="glass-card p-4 sm:p-5 rounded-2xl shadow-soft-xl">
                   {/* Search Inputs */}
                   <div className="grid sm:grid-cols-2 gap-3 mb-3">
                     {/* Search Input */}
@@ -248,7 +248,7 @@ const Landing = () => {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="מקצוע, התמחות, שירות..."
-                        className="w-full bg-gray-50 text-carelink-navy px-5 py-3.5 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-carelink-teal focus:bg-white border border-gray-100 placeholder-carelink-gray transition-all"
+                        className="w-full input-soft text-carelink-navy px-5 py-3.5 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-carelink-teal placeholder-carelink-gray transition-all"
                         data-testid="hero-search-input"
                       />
                     </div>
@@ -267,7 +267,7 @@ const Landing = () => {
                             }
                           }}
                           placeholder="עיר או אזור"
-                          className="w-full bg-gray-50 text-carelink-navy px-5 py-3.5 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-carelink-teal focus:bg-white border border-gray-100 placeholder-carelink-gray transition-all"
+                          className="w-full input-soft text-carelink-navy px-5 py-3.5 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-carelink-teal placeholder-carelink-gray transition-all"
                           data-testid="hero-location-input"
                         />
                       </div>
@@ -277,7 +277,7 @@ const Landing = () => {
                         type="button"
                         onClick={handleGetLocation}
                         disabled={isLocating}
-                        className="bg-carelink-teal-pale text-carelink-teal px-4 rounded-xl hover:bg-carelink-teal hover:text-white transition-all disabled:opacity-50 flex items-center justify-center"
+                        className="btn-soft bg-carelink-teal-pale text-carelink-teal px-4 rounded-xl hover:bg-carelink-teal hover:text-white transition-all disabled:opacity-50 flex items-center justify-center btn-press"
                         title="השתמש במיקום שלי"
                         data-testid="gps-btn"
                       >
