@@ -7,6 +7,7 @@ import CookieConsent from './components/CookieConsent';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ResetPassword from './pages/ResetPassword';
 import ProviderRegister from './pages/ProviderRegister';
 import Dashboard from './pages/Dashboard';
 import Providers from './pages/Providers';
