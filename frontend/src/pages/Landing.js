@@ -280,7 +280,7 @@ const Landing = () => {
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="מקצוע, התמחות, שירות..."
+                        placeholder={searchTab === 'providers' ? 'מקצוע, התמחות, שם ספק...' : 'סוג שירות, טיפול, התמחות...'}
                         className="w-full input-soft text-carelink-navy px-5 py-3.5 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-carelink-teal placeholder-carelink-gray transition-all"
                         data-testid="hero-search-input"
                       />
