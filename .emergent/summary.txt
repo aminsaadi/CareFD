@@ -6,165 +6,172 @@ The project includes a comprehensive admin dashboard for managing users, provide
 **PRODUCT REQUIREMENTS:**
 1.  A platform for service providers to register, create detailed profiles, and manage their availability.
 2.  A system for users to search, filter, and book services from providers.
-3.  A guest booking flow that doesn't require users to create an account.
-4.  A full-featured admin dashboard to manage all aspects of the platform, including provider verification and profile editing.
-5.  Provider profiles must include a profile picture, availability, experience, expertise, languages, etc.
-6.  A chat system for communication between users and providers, accessible from their respective dashboards.
-7.  Newly registered providers must be approved by an admin before appearing in public search results.
-8.  A modern UI/UX, including push notifications, a cookie consent banner, and custom confirmation dialogs.
-9.  Static pages (About, Contact, Policy) and a dynamic homepage.
+3.  A full-featured admin dashboard to manage all aspects of the platform, including provider verification, user management, and content editing.
+4.  Provider profiles must include a profile picture, availability, experience, expertise, languages, etc.
+5.  A chat system for communication between users and providers, accessible from their respective dashboards.
+6.  A Forgot Password flow for users.
+7.  Admin ability to reset user passwords.
+8.  Admin ability to edit static pages (About, Contact, Policy) through a rich-text editor.
+9.  A modern UI/UX, including push notifications, a cookie consent banner, and custom confirmation dialogs.
 
 **User's preferred language**: The user's primary language is **Hebrew**. The next agent MUST respond in Hebrew.
 
 **what currently exists?**
-A full-stack application using React (frontend), FastAPI (backend), and MongoDB (database).
+A full-stack application using React (frontend), FastAPI (backend), and MongoDB (database). The last session focused on a major overhaul of the user dashboard and admin panel functionalities.
 
-In the last session, the agent performed a major enhancement of the provider profile and dashboard functionality.
--   All native browser  and  dialogs were successfully replaced with modern UI components ( for toasts and a custom ).
--   A feature for users to add reviews and ratings to providers after a booking is completed was implemented.
--   The provider profile was significantly expanded with new sections: Education, Certifications, Health Funds, Payment Methods, Cancellation Policy, and Contact Visibility Settings.
--   The Provider and Admin dashboards were updated to allow editing of all these new fields.
--   The Provider Dashboard was refactored to separate personal User Details (name, password) from the professional Provider Profile, as requested by the user.
+-   The user dashboard was completely redesigned to show a user ID instead of an email, display booking/review statistics, and include new tabs for managing bookings, viewing past reviews, and updating profile settings (including profile picture).
+-   The admin dashboard was significantly enhanced with capabilities to suspend/delete users, activate/deactivate/delete providers, reset user passwords, and view/manage services. The icons for notifications and messages were also fixed.
+-   The public provider profile page was updated to display all the recently added provider details (Education, Certifications, Health Funds, etc.).
+-   A complete Forgot Password flow was implemented, from the user requesting a reset link via email to setting a new password on a dedicated page.
+-   The agent began work on a feature to allow admins to edit static pages.
 
 **Last working item**:
--   **Last item agent was working:** The user requested to display all the newly added provider profile fields (Education, Certifications, Health Funds, Payment Methods, etc.) on the public-facing provider profile page. The agent acknowledged the request and was about to begin implementation.
--   **Status:** NOT STARTED
+-   **Last item agent was working:** Implementing a feature for administrators to edit static pages (e.g., 'About Us', 'Contact', 'Policy') directly from the admin dashboard using a rich-text editor. The agent had installed , identified the relevant backend APIs, and started creating the  component.
+-   **Status:** IN PROGRESS
 -   **Agent Testing Done:** N
--   **Which testing method agent to use?** frontend testing agent. The agent should be instructed to:
-    1.  Modify  to fetch and render all the new data fields from the backend.
-    2.  Verify that all new sections (Education, Certifications, Health Funds, etc.) display correctly on the public profile page for a provider that has this data.
-    3.  Ensure the page layout remains clean and readable with the new information.
+-   **Which testing method agent to use?** Frontend testing agent. The agent should be instructed to:
+    1.  Complete the implementation of the  component, ensuring  is properly integrated.
+    2.  Add a link to the new page in the admin navigation menu ().
+    3.  Test saving content from the editor to the backend via the  endpoint.
+    4.  Verify that the public-facing static pages (, , etc.) correctly display the content fetched from the database.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1:** Display all new provider details on the public profile page. (Priority: P0)
+-   **Issue 1:** Complete the static page editor for the admin panel. (Priority: P0)
 -   **Issue 2:** The user experiences data caching issues on the production site (). (Priority: P2)
 
 **Issues Detail:**
--   **Issue 1: Display new provider details on public profile page**
-    -   **Attempted fixes:** None. This is a new task.
+-   **Issue 1: Complete the static page editor for the admin panel**
+    -   **Attempted fixes:** The agent installed  and began scaffolding the  component. The work was interrupted before completion.
     -   **Next debug checklist:**
-        1.  View  to understand its current structure.
-        2.  View  to confirm the endpoint that serves the public provider data (likely ). Ensure it returns all the new fields.
-        3.  Update the frontend component to fetch and display the new fields: , , , , .
-        4.  Use appropriate UI elements (lists, cards, icons) to present the information clearly.
-    -   **Why fix this issue and what will be achieved with the fix?** To make the detailed provider information visible to potential customers, increasing transparency and trust, which is a core value proposition of the platform.
-    -   **Status:** NOT STARTED
+        1.  Review . It may be incomplete or a placeholder.
+        2.  Create or complete the component, integrating the  editor.
+        3.  Implement  to fetch the list of pages from  and the content of a selected page from .
+        4.  Implement a save function that sends a  request to  with the editor's HTML content.
+        5.  Add a route for  in  and a link in .
+    -   **Why fix this issue and what will be achieved with the fix?** To allow the admin to easily manage the content of static pages like About Us and Privacy Policy without needing developer intervention.
+    -   **Status:** IN PROGRESS
     -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Frontend
+    -   **Should Test frontend/backend/both after fix?** Both
     -   **Blocked on other issue:** None.
 
 -   **Issue 2: Production Caching Issues**
-    -   **Attempted fixes:** A Clear Cache button was previously added to the admin panel. The root cause is believed to be external (Cloudflare).
-    -   **Next debug checklist:** This is an informational task. Remind the user about the need to clear their Cloudflare cache after deployments. No code changes are required unless a specific application endpoint is identified as sending incorrect cache-control headers.
-    -   **Why fix this issue and what will be achieved with the fix?** The user will see real-time data on the production site, preventing confusion and building trust.
+    -   **Attempted fixes:** A Clear Cache button was previously added. The root cause is suspected to be external (Cloudflare).
+    -   **Next debug checklist:** Informational task. Remind the user to clear their Cloudflare cache after deployments. No code changes are needed unless a specific app endpoint is found to be sending incorrect cache-control headers.
+    -   **Why fix this issue and what will be achieved with the fix?** To ensure the user sees the latest data on the live site.
     -   **Status:** NOT STARTED
     -   **Is recurring issue?** Y
-    -   **Should Test frontend/backend/both after fix?** None (informational)
+    -   **Should Test frontend/backend/both after fix?** None
     -   **Blocked on other issue:** None.
 
 **In progress Task List**:
 -   **Task 1: Backend Refactoring** (Priority: P1)
-    -   **Where to resume:** The directory structure (, etc.) exists. The next step is to migrate the first set of endpoints (e.g., , ) from the monolithic  into their respective router files and wire them up in .
-    -   **What will be achieved with this?** It will significantly improve the backend code's maintainability, scalability, and organization, making future development faster and safer.
-    -   **Status:** IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?** Backend (Extensive regression testing will be required after each module is migrated).
+    -   **Where to resume:** The directory structure () is in place. The next step is to migrate endpoints from the monolithic  into their respective router files (e.g., , , ) and include them in .
+    -   **What will be achieved with this?** A more maintainable, scalable, and organized backend codebase, reducing technical debt and simplifying future development.
+    -   **Status:** IN PROGRESS (paused)
+    -   **Should Test frontend/backend/both after fix?** Backend (extensive regression testing is critical after each module migration).
     -   **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **P2: Add Database Model for Districts:** The footer contains a hardcoded list of regions. This should be backed by a database collection manageable from the admin panel.
+    -   **P1: Implement Admin Notification/Message Pages:** The icons in the admin header now link to  and , but these pages currently return a 404. They need to be created.
+    -   **P2: Add Database Model for Districts:** The footer's list of regions is hardcoded. This needs to be managed from a database collection via the admin panel.
+    -   **P2: Add mail notifications:** Implement an automatic email notification when a new provider registers.
 -   **Future Tasks:**
-    -   **P3: Complete PayPal Integration:** This is blocked pending user-provided API keys.
-    -   **P4: Add mail notifications:** The user requested adding an automatic email when a new provider registers.
+    -   **P3: Complete PayPal Integration:** Blocked, awaiting user-provided API keys.
+    -   **P3: Advanced Search Filters:** Add filters for health funds, payment methods, and provider availability to the main search.
+    -   **P3: Provider Image Gallery:** Allow providers to upload multiple photos for their profile.
+    -   **P4: SMS/Email Reminders:** Send automated reminders to users before their appointments.
 
 **Completed work in this session**
--   **Modern UI Alerts/Confirms (DONE):** Replaced all native  and  calls across the entire frontend with a custom  hook and  toasts.
--   **Provider Review System (DONE):** Implemented functionality for users to write a review and give a rating for a provider after a booking status is Completed.
--   **Provider Profile Expansion (DONE):** Added extensive new fields to the provider profile: , , , , , and . This was implemented in the frontend edit pages (, ) and the backend API.
--   **Provider Dashboard Refactor (DONE):** Separated User Details (personal info, password) from Provider Profile (professional info) into distinct tabs within the provider dashboard for better organization.
--   **Admin Edit Parity (DONE):** Ensured the Admin's Edit Provider page has all the same fields and tabs as the provider's own edit page.
--   **Data Fix (DONE):** Manually updated a provider's profile in the database to fix missing data.
+-   **User Forgot Password Flow (DONE):** A complete reset password functionality was implemented, including a modal to request the reset link, a backend API to generate a secure token and send an email (mocked in logs), and a dedicated page to set a new password.
+-   **Admin User Management (DONE):** Admins can now reset a user's password directly from the user list in the admin panel.
+-   **Admin Provider Management (DONE):** Added functionality for admins to activate/deactivate and delete provider profiles. The Verify Provider button was made more prominent.
+-   **User Dashboard Overhaul (DONE):** The user dashboard () was completely redesigned with a new layout, statistics, and tabs for My Bookings, My Reviews, and Settings. Users can now update their profile information and picture.
+-   **Provider Profile Public View (DONE):** The public-facing provider profile page () now correctly displays all the new extended profile fields (Education, Certifications, Health Funds, Payment Methods, Cancellation Policy).
+-   **Admin Panel Sync & UI Fixes (DONE):** Ensured the admin panel correctly displays lists of users, providers, and services. Fixed broken links for the notification and chat icons in the admin header.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend:** React, Axios, Tailwind CSS, Sonner (for toasts), 
--   **Backend:** Python, FastAPI, MongoDB (Pymongo), Bcrypt
+-   **Frontend:** React, Axios, Tailwind CSS, Sonner, , **** (new)
+-   **Backend:** Python, FastAPI, MongoDB (Pymongo), Bcrypt,  (for JWT)
 -   **Database:** MongoDB
--   **Key Challenge:** The monolithic  file remains a major source of technical debt.
+-   **Key Challenge:** The monolithic  file is a significant source of technical debt.
 
 **key DB schema**
--   **providers:** This collection was significantly expanded. In addition to existing fields, it now includes:
-    -   : 
-    -   : 
-    -   : 
-    -   : 
-    -   : 
-    -   :  (e.g., )
-    -   : 
--   **reviews:** Stores ratings and comments from users for providers.
+-   **users:** Added  (String) and  (DateTime) fields to support the forgot password feature.
+-   **static_pages:** Contains documents with  (e.g., about) and  (HTML string) fields. Used for the new static page editor feature.
 
 **changes in tech stack**
--   None.
+-   Added  and its types () to the frontend dependencies for the rich-text editor.
 
 **All files of reference**
--   : This is the primary file for the next task.
--   : Heavily refactored to separate user/provider concerns.
--   : Heavily modified to add UI for all new profile fields.
--   : Modified to mirror the changes in .
--   : Modified to include the Add Review functionality.
--   : Modified to add new API endpoints and expand existing ones to handle the new provider profile fields.
--   The agent also edited over 10 other frontend files to replace  and .
+-   : The file being created for the last working item.
+-   : Modified to add password reset and forgot password endpoints. Still needs major refactoring.
+-   : Modified to add the Forgot Password modal.
+-   : New file for the password reset form.
+-   : New, completely redesigned user dashboard.
+-   : Modified to add the admin password reset functionality.
+-   : Modified to add delete and status toggle functionality.
+-   : Modified to fix icon links.
+-   : Modified to add the  route.
 
 **Areas that need refactoring**:
--   **CRITICAL:** The  file is a monolith. The refactoring process that was started should be continued as a high-priority task to improve application health.
+-   **CRITICAL:** The  file remains a monolith of over 4500 lines. Continuing the refactoring into smaller, manageable router files is the highest technical priority.
 
 **key api endpoints**
 -   **Created:**
-    -   : Allows an authenticated user to update their own personal details (first name, last name).
-    -   : Allows an authenticated user to change their password.
+    -   : Sends a password reset link to a user's email.
+    -   : Validates the reset token and updates the user's password.
+    -   : Allows an admin to set a new password for a user.
+    -   : Fetches all reviews written by the currently logged-in user.
 -   **Updated:**
-    -   : The request body was expanded to accept all the new provider fields (, , etc.).
-    -   : The request body was also expanded to match the provider profile update endpoint.
-    -   : The response from this endpoint will need to be checked to ensure it includes all the new data for the public profile page.
+    -   : Updated to handle profile picture uploads/updates.
+    -   : Now functional for deleting providers.
+    -   : New functionality to toggle a provider's  status.
 
 **Critical Info for New Agent**
--   Your immediate P0 task is to implement the user's request to display all the new provider profile fields (Education, Certifications, etc.) on the public .
 -   **You must respond and communicate in Hebrew.**
--   After the P0 task, propose continuing the  refactoring (P1 task) as the next major step to improve the codebase's long-term health.
--   The user is very engaged and often provides specific, multi-part feature requests. Pay close attention to their messages.
+-   Your immediate task (P0) is to complete the implementation of the static page editor for the admin panel as detailed in the Last working item section.
+-   After completing the P0 task, the next highest priority is to continue the  refactoring (P1). Propose this to the user as the next logical step for improving the application's health.
+-   The user is highly engaged and provides clear, multi-step requests. Review their messages carefully.
 
 **documents and test reports created in this job**
--    (updated multiple times)
+-    (updated)
+-   
+-   
+-   
 
 **Last 10 User Messages and any pending HUMAN messages**
-10. **User:** Show all the details in the provider profile on the profile page - e.g., education, certificates, health funds, payment methods, and everything - **PENDING**
-9.  **User:** Move service types to profile settings. Differentiate between user details and provider profile in the provider dashboard. - **COMPLETED**
-8.  **User:** Can I get an update on all the provider profile details through the provider dashboard and also the admin? - **COMPLETED**
-7.  **User:** Are there more recommendations for the provider profile? - (Agent provided suggestions)
-6.  **User:** Certificates and licenses, Education, Payment methods, Cancellation policy, Health funds... (User selects new features to add) - **COMPLETED**
-5.  **User:** Asked to add an avatar with a background color for profiles without a picture and allow contact details to be selectively hidden. - **COMPLETED**
-4.  **User:** Why is Dr. Israel Israelis profile not like Dr. Sara Cohens profile? - **COMPLETED**
-3.  **User:** Yes, data is missing... (Confirms missing fields in the profile) - **COMPLETED**
-2.  **User:** Asked about adding a rating and review system after service completion. - **COMPLETED**
-1.  **User:** Continue 1 and 2 (Approved the initial plan to replace alerts and start backend refactoring).
+10. **User:** Allow editing of static pages from the admin dashboard with an editor. - **IN PROGRESS**
+9.  **User:** Forgot password - not working. - **COMPLETED**
+8.  **User:** Whats left and what do you recommend to improve?" - **COMPLETED** (Agent provided a detailed summary)
+7.  **User:** "Allow admin to update/reset a users password. Add a verify provider button in the providers tab. - **COMPLETED**
+6.  **User:** Check that the admin is synced with all data... allow user/provider deletion/suspension... fix notification icons. - **COMPLETED**
+5.  **User:** Requested a complete overhaul of the user dashboard, including adding a user ID, profile picture management, My Reviews tab, and improved booking management. - **COMPLETED**
+4.  **User:** Now lets focus on the user dashboard..." (Initiated the dashboard overhaul). - **COMPLETED**
+3.  **User:** Acknowledged completion of previous tasks. - **N/A**
+2.  **User:** Acknowledged completion of previous tasks. - **N/A**
+1.  **User:** "Lets check the provider profile, show all features on the profile page, add a provider number, and allow image deletion. - **COMPLETED**
 
 **Project Health Check:**
 -   **Broken:** None.
 -   **Mocked:**
     -   PayPal integration is awaiting user credentials.
+    -   Email sending for password resets is mocked (link is printed to server logs).
 -   **Technical Debt:**
-    -   **High:** The monolithic  file. Refactoring is in progress but was not worked on in this session.
+    -   **High:** The monolithic  file is the most significant technical debt.
 
 **3rd Party Integrations**
--   **Cloudflare:** Used by the user on their domain, mentioned as a possible source of caching issues.
+-   **Cloudflare:** Used by the user on their domain; suspected source of caching issues.
 -   **PayPal:** Planned but **Blocked** pending user-provided API keys.
 -   **Web Push ():** Implemented for push notifications.
+-   **React Quill:** Newly added for the rich-text editor.
 
 **Testing status**
--   **Testing agent used after significant changes:** NO, the agent used the screenshot tool extensively to test UI changes after each step.
+-   **Testing agent used after significant changes:** YES. The testing agent was used successfully multiple times to validate major feature additions and bug fixes in the user dashboard and admin panel. It found and fixed a bug in the password hashing logic.
 -   **Troubleshoot agent used after agent stuck in loop:** NO
 -   **Test files created:** None.
 -   **Known regressions:** None from this session.
@@ -175,7 +182,5 @@ In the last session, the agent performed a major enhancement of the provider pro
 -   **Provider:**  / 
 
 **What agent forgot to execute**
--   The backend refactoring was started in a previous session but paused and was not continued in this one.
--   The user's previous request to add an automatic email for new providers has not yet been implemented.
--   The task to make the footer's district list dynamic (from a DB model) has not been started.
--   (All these are captured in the pending/future task lists).</analysis>
+-   The backend refactoring task was not progressed in this session.
+-   The tasks for creating dynamic footer regions and sending email notifications for new provider registrations are still in the backlog.</analysis>
