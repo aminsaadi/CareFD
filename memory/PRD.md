@@ -456,17 +456,32 @@ CareLink is a healthcare services platform in Israel connecting users with healt
 - **AdminProviders.js**:
   - כפתור מחיקת ספק עם modal אישור (כולל אזהרה על מחיקת שירותים)
   - כפתור פעיל/לא פעיל עם modal לשינוי סטטוס
+  - כפתור "אמת" ירוק בולט לספקים לא מאומתים
   - אייקונים מעודכנים: FiToggleLeft/FiToggleRight, FiTrash2
+- **AdminUsers.js**:
+  - כפתור איפוס סיסמה (אייקון מפתח FiKey)
+  - Modal להגדרת סיסמה חדשה למשתמש
+  - API: PUT /admin/users/{user_id}/password
 - **AdminLayout.js**:
   - אייקון התראות מקושר ל-/admin/notifications
   - אייקון הודעות מקושר ל-/admin/messages
   - tooltips בעברית
-- **AdminUsers.js** (כבר קיים):
-  - צפייה, עריכה, הודעה, השעיה, מחיקה
-  - שינוי תפקיד משתמש
-- **AdminServices.js**:
-  - 4 שירותים מוצגים
-  - עריכה ומחיקה
+
+### Password Reset Feature (Feb 22, 2026) - COMPLETE:
+- **Login.js**:
+  - כפתור "שכחת סיסמה?" פותח modal
+  - Modal לשליחת בקשת איפוס עם שדה אימייל
+  - מסך אישור עם הודעה "בדוק את האימייל שלך"
+- **ResetPassword.js** (דף חדש):
+  - בדיקת תוקף טוקן איפוס
+  - טופס להגדרת סיסמה חדשה
+  - מסכי שגיאה (טוקן לא תקף) והצלחה
+- **Backend APIs**:
+  - POST /auth/forgot-password - יוצר טוקן איפוס (תקף שעה)
+  - GET /auth/reset-password/validate - בודק תוקף טוקן
+  - POST /auth/reset-password - מאפס סיסמה ומנתק sessions
+- **Database**: 
+  - Collection: password_resets (user_id, token, expires_at)
 
 ### Feb 12, 2026
 - Added GPS-based search with radius
