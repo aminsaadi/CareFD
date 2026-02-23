@@ -218,13 +218,8 @@ const Landing = () => {
       const regionsRes = await api.get('/regions');
       setRegions(regionsRes.data.regions || []);
       
-      // Fetch cities for location dropdown
-      try {
-        const citiesRes = await api.get('/cities');
-        setCities(citiesRes.data.cities || []);
-      } catch {
-        setCities([]);
-      }
+      // Use local cities list instead of API
+      setCities(israeliCities);
 
       try {
         const statsRes = await api.get('/stats/public');
