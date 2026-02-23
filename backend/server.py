@@ -1910,6 +1910,33 @@ async def update_service(
     
     return {"message": "Service updated successfully"}
 
+@api_router.delete("/services/{service_id}")
+async def delete_service(
+    service_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Delete a service (provider-level)"""
+    user = await get_current_user(authorization, request)
+    
+    # Get service
+    service = await db.services.find_one({"service_id": service_id}, {"_id": 0})
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    # Get provider and verify ownership
+    provider = await db.providers.find_one({"provider_id": service["provider_id"]}, {"_id": 0})
+    if not provider or provider["user_id"] != user["user_id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Delete the service
+    result = await db.services.delete_one({"service_id": service_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    return {"message": "Service deleted successfully"}
+
 @api_router.get("/services")
 async def search_services(
     service_type: Optional[str] = None,
