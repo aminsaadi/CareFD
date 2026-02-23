@@ -53,6 +53,27 @@ const Login = () => {
     window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!forgotEmail) {
+      toast.error('נא להזין כתובת אימייל');
+      return;
+    }
+    
+    setSendingReset(true);
+    try {
+      await api.post('/auth/forgot-password', { email: forgotEmail });
+      setResetSent(true);
+      toast.success('קישור לאיפוס סיסמה נשלח לאימייל שלך');
+    } catch (err) {
+      // Don't reveal if email exists or not for security
+      setResetSent(true);
+      toast.success('אם האימייל קיים במערכת, קישור לאיפוס סיסמה נשלח אליו');
+    } finally {
+      setSendingReset(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-carelink-navy via-carelink-slate to-carelink-teal flex">
       {/* Left Side - Branding */}
