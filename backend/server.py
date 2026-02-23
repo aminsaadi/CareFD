@@ -58,12 +58,6 @@ VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', '')
 VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY', '')
 VAPID_CLAIMS_EMAIL = os.environ.get('VAPID_CLAIMS_EMAIL', 'admin@carelink.co.il')
 
-# Log SMTP configuration status
-if SMTP_USER and SMTP_PASSWORD:
-    logger.info(f"SMTP configured with user: {SMTP_USER}")
-else:
-    logger.warning("SMTP not fully configured - emails will not be sent")
-
 # Create the main app without a prefix
 app = FastAPI()
 
@@ -76,6 +70,12 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Log SMTP configuration status
+if SMTP_USER and SMTP_PASSWORD:
+    logger.info(f"SMTP configured with user: {SMTP_USER}")
+else:
+    logger.warning("SMTP not fully configured - emails will not be sent")
 
 # ==================== MODELS ====================
 
