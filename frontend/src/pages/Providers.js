@@ -22,7 +22,6 @@ const popularSearches = [
 
 const Providers = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [providers, setProviders] = useState([]);
   const [totalProviders, setTotalProviders] = useState(0);
