@@ -565,14 +565,16 @@ const Landing = () => {
       {/* ==================== HOW IT WORKS ==================== */}
       <section className="py-16 bg-white" data-testid="how-it-works-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-carelink-navy font-heading mb-4">
-              איך זה עובד?
-            </h2>
-            <p className="text-carelink-slate max-w-2xl mx-auto">
-              שלושה צעדים פשוטים למציאת השירות המושלם
-            </p>
-          </div>
+          <AnimatedSection>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-carelink-navy font-heading mb-4">
+                איך זה עובד?
+              </h2>
+              <p className="text-carelink-slate max-w-2xl mx-auto">
+                שלושה צעדים פשוטים למציאת השירות המושלם
+              </p>
+            </div>
+          </AnimatedSection>
           
           <div className="grid md:grid-cols-3 gap-8">
             {[
@@ -580,16 +582,18 @@ const Landing = () => {
               { num: '02', title: 'השווה והחלט', desc: 'קראו ביקורות, בדקו דירוגים והשוו מחירים לבחירת הספק המתאים', icon: FaStar },
               { num: '03', title: 'הזמן טיפול', desc: 'צרו קשר ישירות או הזמינו דרך הפלטפורמה בזמן שנוח לכם', icon: FaCheckCircle },
             ].map((step, index) => (
-              <div key={index} className="relative text-center group">
-                <div className="bg-carelink-teal-pale/30 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-carelink-teal group-hover:scale-110 transition-all duration-300">
-                  <step.icon className="text-3xl text-carelink-teal group-hover:text-white transition-colors" />
+              <AnimatedSection key={index} delay={index * 150}>
+                <div className="relative text-center group">
+                  <div className="shadow-soft w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-carelink-teal group-hover:scale-110 transition-all duration-300 bg-carelink-teal-pale/30">
+                    <step.icon className="text-3xl text-carelink-teal group-hover:text-white transition-colors" />
+                  </div>
+                  <span className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-2 bg-carelink-navy text-white text-sm font-bold px-3 py-1 rounded-full shadow-soft badge-glow">
+                    {step.num}
+                  </span>
+                  <h3 className="text-xl font-bold text-carelink-navy mb-3">{step.title}</h3>
+                  <p className="text-carelink-slate leading-relaxed">{step.desc}</p>
                 </div>
-                <span className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-2 bg-carelink-navy text-white text-sm font-bold px-3 py-1 rounded-full">
-                  {step.num}
-                </span>
-                <h3 className="text-xl font-bold text-carelink-navy mb-3">{step.title}</h3>
-                <p className="text-carelink-slate leading-relaxed">{step.desc}</p>
-              </div>
+              </AnimatedSection>
             ))}
           </div>
         </div>
@@ -598,26 +602,26 @@ const Landing = () => {
       {/* ==================== TESTIMONIALS ==================== */}
       <section className="py-16 bg-carelink-navy" data-testid="testimonials-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white font-heading mb-4">
-              מה הלקוחות שלנו אומרים
-            </h2>
-            <p className="text-carelink-teal-pale">אלפי לקוחות מרוצים כבר נהנים משירותים איכותיים</p>
-          </div>
+          <AnimatedSection>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-white font-heading mb-4">
+                מה הלקוחות שלנו אומרים
+              </h2>
+              <p className="text-carelink-teal-pale">אלפי לקוחות מרוצים כבר נהנים משירותים איכותיים</p>
+            </div>
+          </AnimatedSection>
           
           <div className="grid md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial) => (
-              <div
-                key={testimonial.id}
-                className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/10 hover:bg-white/15 transition-all"
-              >
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <FaStar key={i} className="text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-white mb-6 leading-relaxed">"{testimonial.content}"</p>
-                <div className="flex items-center gap-3">
+            {testimonials.map((testimonial, index) => (
+              <AnimatedSection key={testimonial.id} delay={index * 150}>
+                <div className="glass-card-dark p-6 rounded-2xl hover-lift">
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <FaStar key={i} className="text-yellow-400" />
+                    ))}
+                  </div>
+                  <p className="text-white mb-6 leading-relaxed">"{testimonial.content}"</p>
+                  <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-carelink-teal rounded-full flex items-center justify-center text-white font-bold text-lg">
                     {testimonial.avatar}
                   </div>
