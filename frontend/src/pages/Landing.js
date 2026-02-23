@@ -84,6 +84,67 @@ const testimonials = [
   { id: 3, name: 'רחל אברהם', role: 'ספקית שירות', content: 'הפלטפורמה עזרה לי להגיע ללקוחות חדשים ולפתח את העסק שלי בצורה משמעותית.', rating: 5, avatar: 'ר' },
 ];
 
+// Israeli cities list
+const israeliCities = [
+  // מרכז
+  { name: 'תל אביב', region: 'מרכז' },
+  { name: 'רמת גן', region: 'מרכז' },
+  { name: 'גבעתיים', region: 'מרכז' },
+  { name: 'בני ברק', region: 'מרכז' },
+  { name: 'חולון', region: 'מרכז' },
+  { name: 'בת ים', region: 'מרכז' },
+  { name: 'פתח תקווה', region: 'מרכז' },
+  { name: 'ראשון לציון', region: 'מרכז' },
+  { name: 'נתניה', region: 'מרכז' },
+  { name: 'הרצליה', region: 'מרכז' },
+  { name: 'רעננה', region: 'מרכז' },
+  { name: 'כפר סבא', region: 'מרכז' },
+  { name: 'הוד השרון', region: 'מרכז' },
+  { name: 'רמת השרון', region: 'מרכז' },
+  { name: 'לוד', region: 'מרכז' },
+  { name: 'רמלה', region: 'מרכז' },
+  { name: 'מודיעין', region: 'מרכז' },
+  { name: 'ראש העין', region: 'מרכז' },
+  { name: 'יהוד', region: 'מרכז' },
+  { name: 'אור יהודה', region: 'מרכז' },
+  // צפון
+  { name: 'חיפה', region: 'צפון' },
+  { name: 'נהריה', region: 'צפון' },
+  { name: 'עכו', region: 'צפון' },
+  { name: 'כרמיאל', region: 'צפון' },
+  { name: 'נצרת', region: 'צפון' },
+  { name: 'טבריה', region: 'צפון' },
+  { name: 'צפת', region: 'צפון' },
+  { name: 'קריית שמונה', region: 'צפון' },
+  { name: 'קריית ביאליק', region: 'צפון' },
+  { name: 'קריית מוצקין', region: 'צפון' },
+  { name: 'קריית אתא', region: 'צפון' },
+  { name: 'קריית ים', region: 'צפון' },
+  { name: 'עפולה', region: 'צפון' },
+  { name: 'יקנעם', region: 'צפון' },
+  // דרום
+  { name: 'באר שבע', region: 'דרום' },
+  { name: 'אשדוד', region: 'דרום' },
+  { name: 'אשקלון', region: 'דרום' },
+  { name: 'אילת', region: 'דרום' },
+  { name: 'דימונה', region: 'דרום' },
+  { name: 'קריית גת', region: 'דרום' },
+  { name: 'שדרות', region: 'דרום' },
+  { name: 'נתיבות', region: 'דרום' },
+  { name: 'אופקים', region: 'דרום' },
+  { name: 'ערד', region: 'דרום' },
+  // ירושלים והסביבה
+  { name: 'ירושלים', region: 'ירושלים' },
+  { name: 'בית שמש', region: 'ירושלים' },
+  { name: 'מעלה אדומים', region: 'ירושלים' },
+  { name: 'גבעת זאב', region: 'ירושלים' },
+  // השרון
+  { name: 'רחובות', region: 'השרון' },
+  { name: 'נס ציונה', region: 'השרון' },
+  { name: 'יבנה', region: 'השרון' },
+  { name: 'גדרה', region: 'השרון' },
+];
+
 // Popular searches data
 const popularSearches = {
   providers: [
