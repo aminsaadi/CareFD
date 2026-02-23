@@ -241,6 +241,36 @@ const Landing = () => {
               {/* ==================== SEARCH BOX ==================== */}
               <form onSubmit={handleSearch} className="mb-6" data-testid="hero-search-form">
                 <div className="glass-card p-4 sm:p-5 rounded-2xl shadow-soft-xl">
+                  {/* Search Tabs */}
+                  <div className="flex mb-4 bg-white/10 rounded-xl p-1" data-testid="search-tabs">
+                    <button
+                      type="button"
+                      onClick={() => setSearchTab('providers')}
+                      className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
+                        searchTab === 'providers'
+                          ? 'bg-white text-carelink-teal shadow-soft'
+                          : 'text-white hover:bg-white/10'
+                      }`}
+                      data-testid="search-tab-providers"
+                    >
+                      <FaUserMd className="text-lg" />
+                      <span>נותני שירות</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSearchTab('services')}
+                      className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
+                        searchTab === 'services'
+                          ? 'bg-white text-carelink-teal shadow-soft'
+                          : 'text-white hover:bg-white/10'
+                      }`}
+                      data-testid="search-tab-services"
+                    >
+                      <FaHospital className="text-lg" />
+                      <span>שירותים</span>
+                    </button>
+                  </div>
+                  
                   {/* Search Inputs */}
                   <div className="grid sm:grid-cols-2 gap-3 mb-3">
                     {/* Search Input */}
