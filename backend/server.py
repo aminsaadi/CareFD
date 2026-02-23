@@ -4304,6 +4304,299 @@ async def admin_update_settings(
     
     return {"message": "Settings updated successfully"}
 
+# ==================== SERVICE TYPES MANAGEMENT ====================
+
+@api_router.get("/service-types")
+async def get_service_types():
+    """Get all service types for public use"""
+    service_types = await db.service_types.find({}, {"_id": 0}).to_list(100)
+    
+    if not service_types:
+        # Initialize default service types
+        default_types = [
+            {
+                "type_id": "visit",
+                "name": "שירות ביקור",
+                "name_en": "Visit Service",
+                "description": "שירות הניתן בביקור אחד",
+                "icon": "home",
+                "requires_location": True,
+                "is_active": True
+            },
+            {
+                "type_id": "hourly",
+                "name": "שירות שעתי",
+                "name_en": "Hourly Service",
+                "description": "שירות המחושב לפי שעות",
+                "icon": "clock",
+                "requires_location": True,
+                "has_minimum_hours": True,
+                "is_active": True
+            },
+            {
+                "type_id": "consultation",
+                "name": "שירות ייעוץ",
+                "name_en": "Consultation Service",
+                "description": "שירות ייעוץ מקצועי",
+                "icon": "message-circle",
+                "requires_location": False,
+                "is_active": True
+            },
+            {
+                "type_id": "product",
+                "name": "מוצר",
+                "name_en": "Product",
+                "description": "מוצר למכירה",
+                "icon": "package",
+                "requires_location": False,
+                "has_shipping": True,
+                "is_active": True
+            }
+        ]
+        await db.service_types.insert_many(default_types)
+        return {"service_types": default_types}
+    
+    return {"service_types": service_types}
+
+@api_router.get("/delivery-types")
+async def get_delivery_types():
+    """Get all delivery types for public use"""
+    delivery_types = await db.delivery_types.find({}, {"_id": 0}).to_list(100)
+    
+    if not delivery_types:
+        # Initialize default delivery types
+        default_types = [
+            {
+                "type_id": "home_visit",
+                "name": "בבית",
+                "name_en": "At Home",
+                "description": "השירות יינתן בבית הלקוח",
+                "icon": "home",
+                "requires_address": True,
+                "is_active": True
+            },
+            {
+                "type_id": "hospital",
+                "name": "בבית חולים / מוסד",
+                "name_en": "Hospital / Institution",
+                "description": "השירות יינתן בבית חולים או מוסד רפואי",
+                "icon": "building",
+                "requires_address": True,
+                "is_active": True
+            },
+            {
+                "type_id": "clinic",
+                "name": "בקליניקה",
+                "name_en": "At Clinic",
+                "description": "השירות יינתן בקליניקה של הספק",
+                "icon": "building-2",
+                "requires_address": False,
+                "is_active": True
+            },
+            {
+                "type_id": "virtual",
+                "name": "וירטואלי",
+                "name_en": "Virtual",
+                "description": "השירות יינתן בטלפון או וידאו",
+                "icon": "video",
+                "requires_address": False,
+                "sub_types": ["phone", "video"],
+                "is_active": True
+            }
+        ]
+        await db.delivery_types.insert_many(default_types)
+        return {"delivery_types": default_types}
+    
+    return {"delivery_types": delivery_types}
+
+@api_router.get("/admin/service-types")
+async def admin_get_service_types(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get all service types"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    service_types = await db.service_types.find({}, {"_id": 0}).to_list(100)
+    
+    if not service_types:
+        # Trigger initialization
+        response = await get_service_types()
+        return {"service_types": response["service_types"]}
+    
+    return {"service_types": service_types}
+
+@api_router.post("/admin/service-types")
+async def admin_create_service_type(
+    type_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Create a new service type"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    service_type = {
+        "type_id": f"type_{uuid.uuid4().hex[:8]}",
+        "name": type_data.get("name"),
+        "name_en": type_data.get("name_en", ""),
+        "description": type_data.get("description", ""),
+        "icon": type_data.get("icon", "box"),
+        "requires_location": type_data.get("requires_location", True),
+        "has_minimum_hours": type_data.get("has_minimum_hours", False),
+        "has_shipping": type_data.get("has_shipping", False),
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.service_types.insert_one(service_type)
+    if "_id" in service_type:
+        del service_type["_id"]
+    
+    return {"message": "Service type created", "service_type": service_type}
+
+@api_router.put("/admin/service-types/{type_id}")
+async def admin_update_service_type(
+    type_id: str,
+    type_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update a service type"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    update_data = {k: v for k, v in type_data.items() if k in [
+        "name", "name_en", "description", "icon", 
+        "requires_location", "has_minimum_hours", "has_shipping", "is_active"
+    ]}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.service_types.update_one(
+        {"type_id": type_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Service type not found")
+    
+    return {"message": "Service type updated"}
+
+@api_router.delete("/admin/service-types/{type_id}")
+async def admin_delete_service_type(
+    type_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Delete a service type"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.service_types.delete_one({"type_id": type_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Service type not found")
+    
+    return {"message": "Service type deleted"}
+
+@api_router.get("/admin/delivery-types")
+async def admin_get_delivery_types(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get all delivery types"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    delivery_types = await db.delivery_types.find({}, {"_id": 0}).to_list(100)
+    
+    if not delivery_types:
+        response = await get_delivery_types()
+        return {"delivery_types": response["delivery_types"]}
+    
+    return {"delivery_types": delivery_types}
+
+@api_router.post("/admin/delivery-types")
+async def admin_create_delivery_type(
+    type_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Create a new delivery type"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    delivery_type = {
+        "type_id": f"delivery_{uuid.uuid4().hex[:8]}",
+        "name": type_data.get("name"),
+        "name_en": type_data.get("name_en", ""),
+        "description": type_data.get("description", ""),
+        "icon": type_data.get("icon", "map-pin"),
+        "requires_address": type_data.get("requires_address", True),
+        "sub_types": type_data.get("sub_types", []),
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.delivery_types.insert_one(delivery_type)
+    if "_id" in delivery_type:
+        del delivery_type["_id"]
+    
+    return {"message": "Delivery type created", "delivery_type": delivery_type}
+
+@api_router.put("/admin/delivery-types/{type_id}")
+async def admin_update_delivery_type(
+    type_id: str,
+    type_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update a delivery type"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    update_data = {k: v for k, v in type_data.items() if k in [
+        "name", "name_en", "description", "icon", 
+        "requires_address", "sub_types", "is_active"
+    ]}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.delivery_types.update_one(
+        {"type_id": type_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Delivery type not found")
+    
+    return {"message": "Delivery type updated"}
+
+@api_router.delete("/admin/delivery-types/{type_id}")
+async def admin_delete_delivery_type(
+    type_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Delete a delivery type"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.delivery_types.delete_one({"type_id": type_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Delivery type not found")
+    
+    return {"message": "Delivery type deleted"}
+
 # ==================== PUBLIC PROFESSIONS ====================
 
 @api_router.get("/professions")
