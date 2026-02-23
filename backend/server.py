@@ -4046,35 +4046,79 @@ async def admin_get_professions(
     professions = await db.professions.find({}, {"_id": 0}).to_list(100)
     
     if not professions:
-        # Return default structure
-        professions = [
+        # Initialize default professions and save to DB
+        default_professions = [
             {
                 "profession_id": "prof_medicine",
                 "name": "רפואה",
                 "name_en": "Medicine",
+                "icon": "stethoscope",
+                "specializations": ["רפואת משפחה", "רפואה פנימית", "רפואת ילדים", "גריאטריה"],
                 "sub_professions": [
-                    {"sub_profession_id": "sub_family", "name": "רפואת משפחה", "name_en": "Family Medicine", "categories": []},
-                    {"sub_profession_id": "sub_pediatrics", "name": "ילדים", "name_en": "Pediatrics", "categories": []}
-                ]
+                    {"sub_profession_id": "sub_family", "name": "רפואת משפחה", "name_en": "Family Medicine", "categories": [
+                        {"category_id": "cat_home_visit", "name": "ביקור בית", "name_en": "Home Visit"},
+                        {"category_id": "cat_checkup", "name": "בדיקה כללית", "name_en": "General Checkup"}
+                    ]},
+                    {"sub_profession_id": "sub_pediatrics", "name": "ילדים", "name_en": "Pediatrics", "categories": []},
+                    {"sub_profession_id": "sub_geriatrics", "name": "גריאטריה", "name_en": "Geriatrics", "categories": []}
+                ],
+                "created_at": datetime.now(timezone.utc).isoformat()
             },
             {
                 "profession_id": "prof_nursing",
                 "name": "סיעוד",
                 "name_en": "Nursing",
+                "icon": "heart-pulse",
+                "specializations": ["סיעוד ביתי", "טיפול בקשישים", "סיעוד אחרי ניתוח", "טיפול פליאטיבי"],
                 "sub_professions": [
-                    {"sub_profession_id": "sub_home_care", "name": "סיעוד ביתי", "name_en": "Home Care", "categories": []}
-                ]
+                    {"sub_profession_id": "sub_home_care", "name": "סיעוד ביתי", "name_en": "Home Care", "categories": []},
+                    {"sub_profession_id": "sub_elderly_care", "name": "טיפול בקשישים", "name_en": "Elderly Care", "categories": []},
+                    {"sub_profession_id": "sub_post_op", "name": "סיעוד אחרי ניתוח", "name_en": "Post-Op Care", "categories": []}
+                ],
+                "created_at": datetime.now(timezone.utc).isoformat()
             },
             {
                 "profession_id": "prof_therapy",
-                "name": "טיפול",
+                "name": "טיפולים",
                 "name_en": "Therapy",
+                "icon": "activity",
+                "specializations": ["פיזיותרפיה", "ריפוי בעיסוק", "קלינאות תקשורת", "טיפול רגשי"],
                 "sub_professions": [
                     {"sub_profession_id": "sub_physio", "name": "פיזיותרפיה", "name_en": "Physiotherapy", "categories": []},
-                    {"sub_profession_id": "sub_occupational", "name": "ריפוי בעיסוק", "name_en": "Occupational Therapy", "categories": []}
-                ]
+                    {"sub_profession_id": "sub_occupational", "name": "ריפוי בעיסוק", "name_en": "Occupational Therapy", "categories": []},
+                    {"sub_profession_id": "sub_speech", "name": "קלינאות תקשורת", "name_en": "Speech Therapy", "categories": []}
+                ],
+                "created_at": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "profession_id": "prof_mental",
+                "name": "בריאות הנפש",
+                "name_en": "Mental Health",
+                "icon": "brain",
+                "specializations": ["פסיכולוגיה", "פסיכיאטריה", "טיפול קוגניטיבי", "טיפול משפחתי"],
+                "sub_professions": [
+                    {"sub_profession_id": "sub_psychology", "name": "פסיכולוגיה", "name_en": "Psychology", "categories": []},
+                    {"sub_profession_id": "sub_psychiatry", "name": "פסיכיאטריה", "name_en": "Psychiatry", "categories": []}
+                ],
+                "created_at": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "profession_id": "prof_alternative",
+                "name": "רפואה משלימה",
+                "name_en": "Alternative Medicine",
+                "icon": "leaf",
+                "specializations": ["דיקור סיני", "נטורופתיה", "הומאופתיה", "עיסוי רפואי"],
+                "sub_professions": [
+                    {"sub_profession_id": "sub_acupuncture", "name": "דיקור סיני", "name_en": "Acupuncture", "categories": []},
+                    {"sub_profession_id": "sub_naturopathy", "name": "נטורופתיה", "name_en": "Naturopathy", "categories": []},
+                    {"sub_profession_id": "sub_massage", "name": "עיסוי רפואי", "name_en": "Medical Massage", "categories": []}
+                ],
+                "created_at": datetime.now(timezone.utc).isoformat()
             }
         ]
+        # Save to database
+        await db.professions.insert_many(default_professions)
+        professions = default_professions
     
     return {"professions": professions}
 
