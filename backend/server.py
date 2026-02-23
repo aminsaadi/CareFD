@@ -1863,10 +1863,52 @@ async def create_service(
     
     service_dict = service.model_dump()
     service_dict['created_at'] = service_dict['created_at'].isoformat()
+    service_dict['updated_at'] = service_dict['updated_at'].isoformat()
     
     await db.services.insert_one(service_dict)
+    if "_id" in service_dict:
+        del service_dict["_id"]
     
-    return service.model_dump()
+    return service_dict
+
+@api_router.put("/services/{service_id}")
+async def update_service(
+    service_id: str,
+    service_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Update a service"""
+    user = await get_current_user(authorization, request)
+    
+    # Get service
+    service = await db.services.find_one({"service_id": service_id}, {"_id": 0})
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    # Get provider and verify ownership
+    provider = await db.providers.find_one({"provider_id": service["provider_id"]}, {"_id": 0})
+    if not provider or provider["user_id"] != user["user_id"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Build update data
+    allowed_fields = [
+        "name", "description", "service_category", "delivery_types",
+        "pricing_type", "price", "minimum_hours", "duration_minutes",
+        "weekend_pricing_type", "weekend_price_addition",
+        "has_travel_cost", "travel_cost", "travel_cost_per_km",
+        "has_shipping", "shipping_cost", "free_shipping_above",
+        "stock_quantity", "is_active"
+    ]
+    update_data = {k: v for k, v in service_data.items() if k in allowed_fields}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.services.update_one(
+        {"service_id": service_id},
+        {"$set": update_data}
+    )
+    
+    return {"message": "Service updated successfully"}
 
 @api_router.get("/services")
 async def search_services(
