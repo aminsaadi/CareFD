@@ -3889,6 +3889,7 @@ async def create_region(
     region = {
         "region_id": f"region_{uuid.uuid4().hex[:8]}",
         "name": region_data.get("name"),
+        "name_en": region_data.get("name_en", ""),
         "cities": region_data.get("cities", []),
         "created_at": datetime.now(timezone.utc).isoformat()
     }
@@ -3914,6 +3915,8 @@ async def update_region(
     update_data = {}
     if "name" in region_data:
         update_data["name"] = region_data["name"]
+    if "name_en" in region_data:
+        update_data["name_en"] = region_data["name_en"]
     if "cities" in region_data:
         update_data["cities"] = region_data["cities"]
     
