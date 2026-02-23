@@ -4137,6 +4137,8 @@ async def admin_create_profession(
         "profession_id": f"prof_{uuid.uuid4().hex[:12]}",
         "name": profession_data.get("name"),
         "name_en": profession_data.get("name_en", ""),
+        "icon": profession_data.get("icon", "briefcase"),
+        "specializations": profession_data.get("specializations", []),
         "sub_professions": [],
         "created_at": datetime.now(timezone.utc).isoformat()
     }
@@ -4144,6 +4146,68 @@ async def admin_create_profession(
     await db.professions.insert_one(profession)
     
     return {"message": "Profession created", "profession": {k: v for k, v in profession.items() if k != "_id"}}
+
+@api_router.put("/admin/professions/{profession_id}")
+async def admin_update_profession(
+    profession_id: str,
+    profession_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update a profession"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    update_data = {}
+    if "name" in profession_data:
+        update_data["name"] = profession_data["name"]
+    if "name_en" in profession_data:
+        update_data["name_en"] = profession_data["name_en"]
+    if "icon" in profession_data:
+        update_data["icon"] = profession_data["icon"]
+    if "specializations" in profession_data:
+        update_data["specializations"] = profession_data["specializations"]
+    
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.professions.update_one(
+        {"profession_id": profession_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Profession not found")
+    
+    return {"message": "Profession updated"}
+
+@api_router.put("/admin/sub-professions/{sub_profession_id}")
+async def admin_update_sub_profession(
+    sub_profession_id: str,
+    sub_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update a sub-profession"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    update_fields = {}
+    if "name" in sub_data:
+        update_fields["sub_professions.$.name"] = sub_data["name"]
+    if "name_en" in sub_data:
+        update_fields["sub_professions.$.name_en"] = sub_data["name_en"]
+    
+    result = await db.professions.update_one(
+        {"sub_professions.sub_profession_id": sub_profession_id},
+        {"$set": update_fields}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Sub-profession not found")
+    
+    return {"message": "Sub-profession updated"}
 
 @api_router.post("/admin/professions/{profession_id}/sub-professions")
 async def admin_create_sub_profession(
