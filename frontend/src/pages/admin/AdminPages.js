@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../utils/api';
 import { toast } from 'sonner';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import { useConfirm } from '../../hooks/useConfirm';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import {
   FiPlus, FiEdit2, FiTrash2, FiEye, FiFileText, FiSave,
-  FiX, FiGlobe, FiCheckCircle
+  FiX, FiCheckCircle, FiLoader
 } from 'react-icons/fi';
 
 const AdminPages = () => {
   const [pages, setPages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [editingPage, setEditingPage] = useState(null);
   const [showEditor, setShowEditor] = useState(false);
   const [currentPage, setCurrentPage] = useState({
@@ -23,36 +26,75 @@ const AdminPages = () => {
   });
   const { confirmState, confirm, closeConfirm } = useConfirm();
 
-  useEffect(() => {
-    fetchPages();
-  }, []);
+  // ReactQuill modules configuration
+  const modules = useMemo(() => ({
+    toolbar: [
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'font': [] }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'indent': '-1' }, { 'indent': '+1' }],
+      [{ 'direction': 'rtl' }],
+      [{ 'align': [] }],
+      ['link', 'image', 'video'],
+      ['blockquote', 'code-block'],
+      ['clean']
+    ],
+  }), []);
 
-  const fetchPages = async () => {
+  const formats = [
+    'header', 'font', 'size',
+    'bold', 'italic', 'underline', 'strike',
+    'color', 'background',
+    'list', 'bullet', 'indent',
+    'direction', 'align',
+    'link', 'image', 'video',
+    'blockquote', 'code-block'
+  ];
+
+  const fetchPages = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get('/admin/pages');
       setPages(response.data.pages || []);
     } catch (error) {
       console.error('Failed to fetch pages:', error);
-      // Demo data
-      setPages([
-        { page_id: 'page_1', title: 'אודות', slug: 'about', is_published: true, updated_at: new Date().toISOString() },
-        { page_id: 'page_2', title: 'תנאי שימוש', slug: 'terms', is_published: true, updated_at: new Date().toISOString() },
-        { page_id: 'page_3', title: 'מדיניות פרטיות', slug: 'privacy', is_published: true, updated_at: new Date().toISOString() },
-        { page_id: 'page_4', title: 'צור קשר', slug: 'contact', is_published: true, updated_at: new Date().toISOString() },
-        { page_id: 'page_5', title: 'שאלות נפוצות', slug: 'faq', is_published: false, updated_at: new Date().toISOString() },
-      ]);
+      toast.error('שגיאה בטעינת הדפים');
     } finally {
       setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPages();
+  }, [fetchPages]);
+
+  const fetchPageContent = async (pageId) => {
+    try {
+      const response = await api.get(`/pages/${pageId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch page content:', error);
+      return null;
     }
   };
 
   const savePage = async () => {
+    if (!currentPage.title.trim() || !currentPage.slug.trim()) {
+      toast.error('נא למלא כותרת ונתיב');
+      return;
+    }
+
+    setSaving(true);
     try {
       if (editingPage) {
         await api.put(`/admin/pages/${editingPage}`, currentPage);
+        toast.success('הדף עודכן בהצלחה');
       } else {
         await api.post('/admin/pages', currentPage);
+        toast.success('הדף נוצר בהצלחה');
       }
       setShowEditor(false);
       setEditingPage(null);
@@ -60,52 +102,53 @@ const AdminPages = () => {
       fetchPages();
     } catch (error) {
       console.error('Failed to save page:', error);
-      // Demo - add locally
-      setPages(prev => [...prev, { 
-        page_id: `page_${Date.now()}`, 
-        ...currentPage,
-        updated_at: new Date().toISOString()
-      }]);
-      setShowEditor(false);
+      toast.error('שגיאה בשמירת הדף');
+    } finally {
+      setSaving(false);
     }
   };
 
   const deletePage = async (pageId) => {
-    await confirm({
+    const confirmed = await confirm({
       title: 'מחיקת דף',
-      message: 'האם אתה בטוח שברצונך למחוק דף זה?',
+      message: 'האם אתה בטוח שברצונך למחוק דף זה? פעולה זו לא ניתנת לביטול.',
       type: 'danger',
       confirmText: 'מחק',
       cancelText: 'ביטול'
     });
+    
+    if (!confirmed) return;
+    
     try {
       await api.delete(`/admin/pages/${pageId}`);
+      toast.success('הדף נמחק בהצלחה');
       fetchPages();
     } catch (error) {
       console.error('Failed to delete page:', error);
-      setPages(prev => prev.filter(p => p.page_id !== pageId));
+      toast.error('שגיאה במחיקת הדף');
     }
   };
 
   const togglePublish = async (page) => {
     try {
       await api.put(`/admin/pages/${page.page_id}`, { is_published: !page.is_published });
+      toast.success(page.is_published ? 'הדף הועבר לטיוטה' : 'הדף פורסם');
       fetchPages();
     } catch (error) {
       console.error('Failed to toggle publish:', error);
-      setPages(prev => prev.map(p => 
-        p.page_id === page.page_id ? { ...p, is_published: !p.is_published } : p
-      ));
+      toast.error('שגיאה בעדכון סטטוס');
     }
   };
 
-  const openEditor = (page = null) => {
+  const openEditor = async (page = null) => {
     if (page) {
       setEditingPage(page.page_id);
+      // Fetch full page content
+      const fullPage = await fetchPageContent(page.slug);
       setCurrentPage({
         title: page.title,
         slug: page.slug,
-        content: page.content || '',
+        content: fullPage?.content || page.content || '',
         meta_description: page.meta_description || '',
         is_published: page.is_published
       });
@@ -114,6 +157,15 @@ const AdminPages = () => {
       setCurrentPage({ title: '', slug: '', content: '', meta_description: '', is_published: true });
     }
     setShowEditor(true);
+  };
+
+  const handleSlugChange = (value) => {
+    // Convert to URL-friendly slug
+    const slug = value.toLowerCase()
+      .replace(/[^a-z0-9-]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+    setCurrentPage(prev => ({ ...prev, slug }));
   };
 
   return (
@@ -128,6 +180,7 @@ const AdminPages = () => {
           <button
             onClick={() => openEditor()}
             className="flex items-center gap-2 px-4 py-2 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition"
+            data-testid="create-page-btn"
           >
             <FiPlus size={18} />
             דף חדש
@@ -162,7 +215,7 @@ const AdminPages = () => {
                 </tr>
               ) : (
                 pages.map((page) => (
-                  <tr key={page.page_id} className="border-b border-gray-100/50 hover:bg-gray-50/30 transition">
+                  <tr key={page.page_id} className="border-b border-gray-100/50 hover:bg-gray-50/30 transition" data-testid={`page-row-${page.slug}`}>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-carelink-teal/20 rounded-lg flex items-center justify-center">
@@ -179,9 +232,10 @@ const AdminPages = () => {
                         onClick={() => togglePublish(page)}
                         className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm ${
                           page.is_published 
-                            ? 'bg-emerald-500/20 text-emerald-400' 
-                            : 'bg-gray-100/50 text-carelink-slate'
+                            ? 'bg-emerald-500/20 text-emerald-600' 
+                            : 'bg-gray-100 text-carelink-slate'
                         }`}
+                        data-testid={`toggle-publish-${page.slug}`}
                       >
                         {page.is_published ? (
                           <>
@@ -206,18 +260,24 @@ const AdminPages = () => {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="p-2 text-carelink-slate hover:text-carelink-navy hover:bg-gray-50 rounded-lg transition"
+                          title="צפה בדף"
+                          data-testid={`view-page-${page.slug}`}
                         >
                           <FiEye size={16} />
                         </a>
                         <button
                           onClick={() => openEditor(page)}
                           className="p-2 text-carelink-slate hover:text-carelink-teal hover:bg-carelink-teal/10 rounded-lg transition"
+                          title="ערוך"
+                          data-testid={`edit-page-${page.slug}`}
                         >
                           <FiEdit2 size={16} />
                         </button>
                         <button
                           onClick={() => deletePage(page.page_id)}
-                          className="p-2 text-carelink-slate hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
+                          className="p-2 text-carelink-slate hover:text-red-500 hover:bg-red-500/10 rounded-lg transition"
+                          title="מחק"
+                          data-testid={`delete-page-${page.slug}`}
                         >
                           <FiTrash2 size={16} />
                         </button>
@@ -234,7 +294,7 @@ const AdminPages = () => {
       {/* Page Editor Modal */}
       {showEditor && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-4xl max-h-[90vh] overflow-hidden border border-gray-100 flex flex-col">
+          <div className="bg-white rounded-xl w-full max-w-5xl max-h-[90vh] overflow-hidden border border-gray-100 flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
               <h2 className="text-lg font-bold text-carelink-navy">
@@ -252,26 +312,28 @@ const AdminPages = () => {
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2">כותרת הדף</label>
+                  <label className="block text-sm text-carelink-slate mb-2">כותרת הדף *</label>
                   <input
                     type="text"
                     value={currentPage.title}
                     onChange={(e) => setCurrentPage(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="לדוגמה: אודות"
                     className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    data-testid="page-title-input"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2">נתיב (Slug)</label>
-                  <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg overflow-hidden focus-within:border-carelink-teal focus-within:ring-1 focus-within:ring-indigo-500">
+                  <label className="block text-sm text-carelink-slate mb-2">נתיב (Slug) *</label>
+                  <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg overflow-hidden focus-within:border-carelink-teal focus-within:ring-1 focus-within:ring-carelink-teal">
                     <span className="px-3 text-carelink-gray">/</span>
                     <input
                       type="text"
                       value={currentPage.slug}
-                      onChange={(e) => setCurrentPage(prev => ({ ...prev, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') }))}
+                      onChange={(e) => handleSlugChange(e.target.value)}
                       placeholder="about"
                       className="flex-1 bg-transparent py-2.5 text-carelink-navy placeholder-carelink-gray outline-none"
                       dir="ltr"
+                      data-testid="page-slug-input"
                     />
                   </div>
                 </div>
@@ -285,18 +347,23 @@ const AdminPages = () => {
                   onChange={(e) => setCurrentPage(prev => ({ ...prev, meta_description: e.target.value }))}
                   placeholder="תיאור קצר לתוצאות חיפוש..."
                   className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                  data-testid="page-meta-input"
                 />
               </div>
 
               <div>
                 <label className="block text-sm text-carelink-slate mb-2">תוכן הדף</label>
-                <textarea
-                  value={currentPage.content}
-                  onChange={(e) => setCurrentPage(prev => ({ ...prev, content: e.target.value }))}
-                  placeholder="כתוב את תוכן הדף כאן... (תומך ב-HTML)"
-                  rows={12}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none resize-none font-mono text-sm"
-                />
+                <div className="quill-rtl border border-gray-200 rounded-lg overflow-hidden" data-testid="page-content-editor">
+                  <ReactQuill
+                    theme="snow"
+                    value={currentPage.content}
+                    onChange={(content) => setCurrentPage(prev => ({ ...prev, content }))}
+                    modules={modules}
+                    formats={formats}
+                    placeholder="כתוב את תוכן הדף כאן..."
+                    style={{ minHeight: '300px' }}
+                  />
+                </div>
               </div>
 
               <div className="flex items-center gap-3">
@@ -306,8 +373,9 @@ const AdminPages = () => {
                     checked={currentPage.is_published}
                     onChange={(e) => setCurrentPage(prev => ({ ...prev, is_published: e.target.checked }))}
                     className="sr-only peer"
+                    data-testid="page-publish-toggle"
                   />
-                  <div className="w-11 h-6 bg-gray-100 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
+                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
                 </label>
                 <span className="text-carelink-slate">פרסם דף (גלוי לציבור)</span>
               </div>
@@ -317,17 +385,28 @@ const AdminPages = () => {
             <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-100">
               <button
                 onClick={() => setShowEditor(false)}
-                className="px-6 py-2.5 bg-gray-50 text-carelink-navy rounded-lg hover:bg-gray-100 transition"
+                className="px-6 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+                data-testid="cancel-page-btn"
               >
                 ביטול
               </button>
               <button
                 onClick={savePage}
-                disabled={!currentPage.title.trim() || !currentPage.slug.trim()}
-                className="flex items-center gap-2 px-6 py-2.5 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition disabled:opacity-50"
+                disabled={!currentPage.title.trim() || !currentPage.slug.trim() || saving}
+                className="flex items-center gap-2 px-6 py-2.5 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                data-testid="save-page-btn"
               >
-                <FiSave size={18} />
-                שמור
+                {saving ? (
+                  <>
+                    <FiLoader className="animate-spin" size={18} />
+                    שומר...
+                  </>
+                ) : (
+                  <>
+                    <FiSave size={18} />
+                    שמור
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -344,6 +423,28 @@ const AdminPages = () => {
         confirmText={confirmState.confirmText}
         cancelText={confirmState.cancelText}
       />
+
+      {/* Custom styles for RTL Quill editor */}
+      <style>{`
+        .quill-rtl .ql-editor {
+          direction: rtl;
+          text-align: right;
+          min-height: 300px;
+        }
+        .quill-rtl .ql-toolbar {
+          direction: ltr;
+          border-top-left-radius: 0.5rem;
+          border-top-right-radius: 0.5rem;
+        }
+        .quill-rtl .ql-container {
+          border-bottom-left-radius: 0.5rem;
+          border-bottom-right-radius: 0.5rem;
+        }
+        .quill-rtl .ql-editor.ql-blank::before {
+          right: 15px;
+          left: auto;
+        }
+      `}</style>
     </AdminLayout>
   );
 };
