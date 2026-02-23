@@ -130,6 +130,22 @@ const Landing = () => {
     fetchHomeData();
   }, []);
 
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchDropdownRef.current && !searchDropdownRef.current.contains(event.target) &&
+          searchInputRef.current && !searchInputRef.current.contains(event.target)) {
+        setShowSearchDropdown(false);
+      }
+      if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target) &&
+          locationInputRef.current && !locationInputRef.current.contains(event.target)) {
+        setShowLocationDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const fetchHomeData = async () => {
     try {
       const providersRes = await api.get('/providers?recommended=true&limit=6');
@@ -140,6 +156,14 @@ const Landing = () => {
 
       const regionsRes = await api.get('/regions');
       setRegions(regionsRes.data.regions || []);
+      
+      // Fetch cities for location dropdown
+      try {
+        const citiesRes = await api.get('/cities');
+        setCities(citiesRes.data.cities || []);
+      } catch {
+        setCities([]);
+      }
 
       try {
         const statsRes = await api.get('/stats/public');
