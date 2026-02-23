@@ -1113,7 +1113,10 @@ async def forgot_password(data: dict):
     
     # In production, send email here
     # For now, log the reset link
-    reset_url = f"{os.environ.get('FRONTEND_URL', 'http://localhost:3000')}/reset-password?token={reset_token}"
+    frontend_url = os.environ.get('FRONTEND_URL', os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:3000'))
+    if '/api' in frontend_url:
+        frontend_url = frontend_url.replace('/api', '')
+    reset_url = f"{frontend_url}/reset-password?token={reset_token}"
     print(f"Password reset link for {email}: {reset_url}")
     
     return {"message": "If the email exists, a reset link has been sent"}
