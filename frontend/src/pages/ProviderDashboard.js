@@ -136,7 +136,21 @@ const ProviderDashboard = () => {
 
   useEffect(() => {
     fetchDashboardData();
+    fetchServiceAndDeliveryTypes();
   }, []);
+
+  const fetchServiceAndDeliveryTypes = async () => {
+    try {
+      const [serviceRes, deliveryRes] = await Promise.all([
+        api.get('/service-types'),
+        api.get('/delivery-types')
+      ]);
+      setServiceTypes(serviceRes.data.service_types || []);
+      setDeliveryTypes(deliveryRes.data.delivery_types || []);
+    } catch (error) {
+      console.error('Failed to fetch types:', error);
+    }
+  };
 
   useEffect(() => {
     if (provider) {
