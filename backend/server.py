@@ -2554,6 +2554,26 @@ async def cancel_booking(
                 f"הלקוח ביטל את ההזמנה ל-{booking.get('service_name', 'שירות')}",
                 {"booking_id": booking_id}
             )
+            # Send email to provider
+            provider_user = await db.users.find_one({"user_id": target_provider["user_id"]}, {"_id": 0})
+            if provider_user and provider_user.get("email"):
+                client_user = await db.users.find_one({"user_id": booking["user_id"]}, {"_id": 0})
+                await send_email_async(
+                    provider_user["email"],
+                    "CareLink - הזמנה בוטלה ❌",
+                    f"""
+                    <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                        <h2 style="color: #e74c3c;">הזמנה בוטלה</h2>
+                        <p>שלום {provider_user.get('name', 'ספק')},</p>
+                        <p>הלקוח {client_user.get('name', 'לקוח') if client_user else 'לקוח'} ביטל את ההזמנה:</p>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                            <p><strong>שירות:</strong> {booking.get('service_name', 'שירות')}</p>
+                            <p><strong>תאריך:</strong> {booking.get('booking_date', '')[:10]}</p>
+                        </div>
+                        <p>צוות CareLink</p>
+                    </div>
+                    """
+                )
     else:
         # Provider cancelled - notify client
         await create_notification(
@@ -2563,6 +2583,27 @@ async def cancel_booking(
             f"הספק ביטל את ההזמנה ל-{booking.get('service_name', 'שירות')}",
             {"booking_id": booking_id}
         )
+        # Send email to client
+        client_user = await db.users.find_one({"user_id": booking["user_id"]}, {"_id": 0})
+        if client_user and client_user.get("email"):
+            provider_info = await db.providers.find_one({"provider_id": booking["provider_id"]}, {"_id": 0})
+            await send_email_async(
+                client_user["email"],
+                "CareLink - הזמנה בוטלה ❌",
+                f"""
+                <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <h2 style="color: #e74c3c;">הזמנה בוטלה</h2>
+                    <p>שלום {client_user.get('name', 'לקוח')},</p>
+                    <p>הספק {provider_info.get('business_name', 'ספק') if provider_info else 'ספק'} ביטל את ההזמנה:</p>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                        <p><strong>שירות:</strong> {booking.get('service_name', 'שירות')}</p>
+                        <p><strong>תאריך:</strong> {booking.get('booking_date', '')[:10]}</p>
+                    </div>
+                    <p>מומלץ לחפש ספק חלופי.</p>
+                    <p>צוות CareLink</p>
+                </div>
+                """
+            )
     
     return {"message": "Booking cancelled successfully"}
 
