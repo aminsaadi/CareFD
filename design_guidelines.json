@@ -1,0 +1,190 @@
+{
+  "project_name": "CareLink - Premium Luxury Upgrade",
+  "theme": "light",
+  "emotional_archetype": "The Private Clinic (Jewel & Luxury)",
+  "design_philosophy": {
+    "core_principles": [
+      "Fusion over Imitation: Mix 'Premium Hotel' warmth with 'Clinical' precision.",
+      "Emotion First: Evoke 'Safety', 'Quiet', and 'Meticulous Care'.",
+      "Content is King: Every service card tells a story of comfort.",
+      "Zoom In: Use intimate, high-quality portraits of care interactions.",
+      "Negative Space: Generous padding (p-8 to p-16) to create breathing room.",
+      "Contrast: Deep Navy text against soft Sand/White backgrounds for readability."
+    ],
+    "hall_of_shame": [
+      "No generic 'Bootstrap' grids.",
+      "No 'Inter' for headings.",
+      "No high-saturation 'Tech Blue' gradients.",
+      "No cluttered, dense lists.",
+      "No sharp, hard borders without softness."
+    ]
+  },
+  "typography": {
+    "headings": {
+      "font_family": "Playfair Display, serif",
+      "weights": ["600", "700"],
+      "tracking": "-0.02em",
+      "line_height": "1.2",
+      "usage": "Use for all H1-H3 headings. Major brand statements.",
+      "case": "Sentence case for natural reading, Uppercase for small labels only."
+    },
+    "body": {
+      "font_family": "Manrope, sans-serif",
+      "weights": ["400", "500"],
+      "tracking": "0",
+      "line_height": "1.8",
+      "usage": "All paragraphs, inputs, and UI text."
+    },
+    "installation_steps": [
+      "Add to index.css: @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700;800&display=swap');"
+    ]
+  },
+  "colors": {
+    "palette_name": "Midnight & Champagne",
+    "primary": {
+      "DEFAULT": "#0F172A",
+      "foreground": "#F8FAFC",
+      "description": "Deep Navy (Midnight) - Replaces the old teal-navy for a more serious, premium feel."
+    },
+    "secondary": {
+      "DEFAULT": "#F5F5F4",
+      "foreground": "#1C1917",
+      "description": "Warm Stone/Sand - Replaces sterile gray."
+    },
+    "accent": {
+      "DEFAULT": "#D4B483",
+      "foreground": "#0F172A",
+      "description": "Champagne Gold - Use for subtle highlights, active states, and borders."
+    },
+    "background": {
+      "DEFAULT": "#FFFFFF",
+      "alt": "#FAFAF9",
+      "glass": "rgba(255, 255, 255, 0.7)"
+    },
+    "text": {
+      "primary": "#0F172A",
+      "secondary": "#475569",
+      "muted": "#94A3B8"
+    },
+    "semantic_mappings": {
+      "carelink-navy": "#0F172A",
+      "carelink-slate": "#334155",
+      "carelink-teal": "#0D9488",
+      "carelink-gold": "#D4B483"
+    }
+  },
+  "layout_strategy": {
+    "container_width": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "spacing_scale": {
+      "section_padding": "py-20 md:py-32",
+      "component_padding": "p-6 md:p-10",
+      "gap": "gap-8 md:gap-12"
+    },
+    "bento_grid": {
+      "description": "Use for Services and Features. Mix wide tiles (span-2) with tall tiles (row-span-2).",
+      "classes": "grid grid-cols-1 md:grid-cols-3 gap-6"
+    },
+    "rtl_support": {
+      "instruction": "All flex/grid layouts must use logical properties (start/end) or standard flex behavior which auto-flips in RTL. Test with dir='rtl' on html tag.",
+      "rules": [
+        "Use 'ms-2' (margin-start) instead of 'ml-2'.",
+        "Use 'me-2' (margin-end) instead of 'mr-2'.",
+        "Use 'text-start' instead of 'text-left'.",
+        "Ensure icons (arrows) flip in RTL."
+      ]
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": {
+      "classes": "bg-white/80 backdrop-blur-xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
+      "usage": "Use for all Cards, Floating Navs, and Modals."
+    },
+    "shadows": {
+      "soft": "shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)]",
+      "floating": "shadow-[0_20px_40px_-4px_rgba(0,0,0,0.08)]"
+    },
+    "border_radius": {
+      "cards": "rounded-2xl",
+      "buttons": "rounded-full"
+    },
+    "gradients": {
+      "subtle_mesh": "bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-stone-100 via-white to-white"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8 py-6 text-lg font-medium shadow-lg transition-transform hover:-translate-y-0.5",
+      "secondary": "bg-white text-primary border border-slate-200 hover:bg-slate-50 rounded-full px-8 py-6 text-lg font-medium",
+      "ghost": "hover:bg-slate-100 hover:text-slate-900 rounded-full px-6 py-4"
+    },
+    "cards": {
+      "service_card": "group relative overflow-hidden rounded-2xl bg-white p-8 transition-all hover:shadow-[0_20px_40px_-4px_rgba(0,0,0,0.08)] border border-slate-100",
+      "feature_highlight": "bg-slate-50 rounded-3xl p-10 border border-slate-100"
+    },
+    "inputs": {
+      "style": "rounded-xl border-slate-200 bg-white/50 backdrop-blur-sm focus:border-primary focus:ring-primary/20 h-12"
+    }
+  },
+  "images": {
+    "guidelines": "Use high-quality, authentic photography. Warm lighting, genuine smiles, clean medical environments.",
+    "selected_assets": [
+      {
+        "category": "hero",
+        "url": "https://images.unsplash.com/photo-1765896387377-e293914d1e69?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNDR8MHwxfHNlYXJjaHwyfHxzZW5pb3IlMjBlbGRlcmx5JTIwY2FyZSUyMHNtaWxpbmd8ZW58MHx8fHwxNzcxODgyMTkyfDA&ixlib=rb-4.1.0&q=85",
+        "alt": "Two women laughing together indoors - conveys warmth and connection",
+        "usage": "Hero Section Background or Main Feature Image"
+      },
+      {
+        "category": "consultation",
+        "url": "https://images.pexels.com/photos/7578808/pexels-photo-7578808.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "alt": "Doctor consulting with patient in modern clinic",
+        "usage": "Provider/Search Section"
+      },
+      {
+        "category": "care",
+        "url": "https://images.unsplash.com/photo-1765896387387-0538bc9f997e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNDR8MHwxfHNlYXJjaHwxfHxzZW5pb3IlMjBlbGRlcmx5JTIwY2FyZSUyMHNtaWxpbmd8ZW58MHx8fHwxNzcxODgyMTkyfDA&ixlib=rb-4.1.0&q=85",
+        "alt": "Nurse smiling with elderly patient",
+        "usage": "Services/Caregiver Section"
+      },
+      {
+        "category": "community",
+        "url": "https://images.unsplash.com/photo-1761666519794-ad6fbcef058b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNDR8MHwxfHNlYXJjaHwzfHxzZW5pb3IlMjBlbGRlcmx5JTIwY2FyZSUyMHNtaWxpbmd8ZW58MHx8fHwxNzcxODgyMTkyfDA&ixlib=rb-4.1.0&q=85",
+        "alt": "Group of elderly people gathered together",
+        "usage": "Community/Testimonials Section"
+      }
+    ]
+  },
+  "animations": {
+    "micro_interactions": {
+      "hover_lift": "transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-lg",
+      "fade_in": "animate-in fade-in zoom-in-95 duration-500",
+      "stagger_children": "stagger-100"
+    },
+    "libraries": [
+      "framer-motion (Recommended for complex transitions)",
+      "tailwindcss-animate (Required for basic entrance effects)"
+    ]
+  },
+  "instructions_to_main_agent": {
+    "step_1_setup": "Update tailwind.config.js with the new 'Midnight & Champagne' palette and fonts. Install fonts in index.css.",
+    "step_2_layout": "Refactor the main layout to use 'max-w-7xl' and generous padding. Ensure RTL direction is handled via 'dir=rtl' on the HTML tag in index.html (or dynamically).",
+    "step_3_components": "Update Button, Card, and Input components in /ui to match the 'Premium Luxury' rounded/glass style.",
+    "step_4_pages": "Redesign the Landing Page first using the 'Hero' image and 'Bento' grid for services.",
+    "step_5_dashboard": "Apply the 'Glassmorphism' sidebar and 'Card' style to the Provider/User dashboards. Keep data dense but readable with Manrope font.",
+    "critical_check": "Ensure all text has sufficient contrast (Navy on Sand/White). Do not use pure black."
+  },
+  "UNIVERSAL_GUIDELINES": {
+    "do_not": [
+      "Use gradients for text.",
+      "Use 'Inter' for headings.",
+      "Center align long text blocks.",
+      "Use default shadcn radius (use rounded-2xl or rounded-full)."
+    ],
+    "must_do": [
+      "Use 'data-testid' on all interactive elements.",
+      "Ensure mobile images are max-h-[80vh].",
+      "Use 'lucide-react' for icons (clean, consistent stroke).",
+      "Use 'sonner' for toasts."
+    ]
+  }
+}
