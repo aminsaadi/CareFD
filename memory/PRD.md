@@ -149,7 +149,15 @@ DELETE /api/admin/categories/{id}                        # Delete category
 ## Change Log
 
 ### Dec 2025 (Current Session)
-- **Landing Page Redesign (P1 COMPLETE)** ✅ NEW
+- **Landing Page Search Tabs (P0 COMPLETE)** ✅ NEW
+  - Restored tabbed search interface in Hero section
+  - **Tab 1: "נותני שירות"** - Searches providers, navigates to /providers
+  - **Tab 2: "שירותים"** - Searches services, navigates to /services
+  - Dynamic placeholder and button text based on selected tab
+  - Tabs styled with Glassmorphism effect (white active, transparent inactive)
+  - Icons for each tab (FaUserMd for providers, FaHospital for services)
+
+- **Landing Page Redesign (P1 COMPLETE)** ✅
   - Improved Hero section with cleaner white search box
   - Added **Professions Row** - clickable profession tags (nurse, doctor, physiotherapist, etc.)
   - Added **Categories Section** - 6 service categories with hover gradients
