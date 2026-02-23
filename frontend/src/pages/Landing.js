@@ -432,29 +432,30 @@ const Landing = () => {
             </div>
           </AnimatedSection>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {categories.map((category) => (
-              <Link
-                key={category.id}
-                to={`/services?category=${category.id}`}
-                className="group relative overflow-hidden rounded-2xl bg-white shadow-md hover:shadow-xl transition-all duration-300 p-6 text-center"
-                data-testid={`category-${category.id}`}
-              >
-                {/* Gradient Background on Hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
-                
-                <div className="relative z-10">
-                  <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-carelink-teal-pale/50 flex items-center justify-center group-hover:bg-white/20 transition-all">
-                    <category.icon className="text-2xl text-carelink-teal group-hover:text-white transition-colors" />
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 stagger-animation">
+            {categories.map((category, index) => (
+              <AnimatedSection key={category.id} delay={index * 100}>
+                <Link
+                  to={`/services?category=${category.id}`}
+                  className="group relative overflow-hidden rounded-2xl card-soft p-6 text-center hover-lift"
+                  data-testid={`category-${category.id}`}
+                >
+                  {/* Gradient Background on Hover */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
+                  
+                  <div className="relative z-10">
+                    <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-carelink-teal-pale/50 flex items-center justify-center group-hover:bg-white/20 transition-all">
+                      <category.icon className="text-2xl text-carelink-teal group-hover:text-white transition-colors" />
+                    </div>
+                    <h3 className="font-bold text-carelink-navy group-hover:text-white transition-colors mb-1">
+                      {category.name}
+                    </h3>
+                    <p className="text-xs text-carelink-gray group-hover:text-white/80 transition-colors line-clamp-2">
+                      {category.description}
+                    </p>
                   </div>
-                  <h3 className="font-bold text-carelink-navy group-hover:text-white transition-colors mb-1">
-                    {category.name}
-                  </h3>
-                  <p className="text-xs text-carelink-gray group-hover:text-white/80 transition-colors line-clamp-2">
-                    {category.description}
-                  </p>
-                </div>
-              </Link>
+                </Link>
+              </AnimatedSection>
             ))}
           </div>
         </div>
@@ -463,21 +464,23 @@ const Landing = () => {
       {/* ==================== FEATURED PROVIDERS ==================== */}
       <section className="py-16 bg-white" data-testid="featured-providers-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-10">
-            <div>
-              <h2 className="text-3xl font-bold text-carelink-navy font-heading mb-2">
-                ספקים מומלצים
-              </h2>
-              <p className="text-carelink-slate">הספקים המובילים בפלטפורמה שלנו</p>
+          <AnimatedSection>
+            <div className="flex items-center justify-between mb-10">
+              <div>
+                <h2 className="text-3xl font-bold text-carelink-navy font-heading mb-2">
+                  ספקים מומלצים
+                </h2>
+                <p className="text-carelink-slate">הספקים המובילים בפלטפורמה שלנו</p>
+              </div>
+              <Link
+                to="/providers"
+                className="hidden md:flex items-center gap-2 text-carelink-teal hover:text-carelink-teal-medium font-medium"
+              >
+                צפה בכל הספקים
+                <FaArrowLeft className="rtl:rotate-180" />
+              </Link>
             </div>
-            <Link
-              to="/providers"
-              className="hidden md:flex items-center gap-2 text-carelink-teal hover:text-carelink-teal-medium font-medium"
-            >
-              צפה בכל הספקים
-              <FaArrowLeft className="rtl:rotate-180" />
-            </Link>
-          </div>
+          </AnimatedSection>
           
           {loading ? (
             <div className="flex justify-center py-12">
