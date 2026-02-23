@@ -486,36 +486,60 @@ class ServiceLocation(BaseModel):
 class Booking(BaseModel):
     model_config = ConfigDict(extra="ignore")
     booking_id: str = Field(default_factory=lambda: f"booking_{uuid.uuid4().hex[:12]}")
+    booking_number: str = Field(default_factory=lambda: f"B{uuid.uuid4().hex[:8].upper()}")  # מספר הזמנה
     user_id: str
     provider_id: str
     service_id: str
     booking_date: datetime
     booking_time: Optional[str] = None  # "09:00"
     status: str = BookingStatus.PENDING
-    # Client details
+    
+    # Service details snapshot
+    service_name: Optional[str] = None
+    service_category: Optional[str] = None  # visit, hourly, consultation, product
+    delivery_type: Optional[str] = None  # home_visit, hospital, clinic, virtual
+    
+    # Client details (requester)
     client_name: Optional[str] = None
     client_phone: Optional[str] = None
     client_email: Optional[str] = None
-    # Contact person
+    
+    # Contact person (can be different from requester)
     contact_person: Optional[ContactPerson] = None
+    is_contact_same_as_requester: bool = True
+    
     # Service location
     service_location: Optional[ServiceLocation] = None
+    
+    # For products - shipping address
+    shipping_address: Optional[ServiceLocation] = None
+    
+    # Duration (for hourly services)
+    hours_booked: Optional[float] = None
+    
     # Additional info
     notes: Optional[str] = None
     special_requirements: Optional[str] = None
-    # Payment
+    
+    # Pricing breakdown
+    base_price: Optional[float] = None
+    travel_cost: Optional[float] = None
+    weekend_addition: Optional[float] = None
+    shipping_cost: Optional[float] = None
     final_price: Optional[float] = None
     payment_notes: Optional[str] = None
+    
     # Status timestamps
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     confirmed_at: Optional[datetime] = None
     provider_completed_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     cancelled_at: Optional[datetime] = None
-    # Provider/Client names for easy display
-    service_name: Optional[str] = None
+    
+    # Display names
     provider_name: Optional[str] = None
     user_name: Optional[str] = None
+    
     # Guest booking flag
     is_guest_booking: bool = False
 
@@ -523,12 +547,20 @@ class BookingCreate(BaseModel):
     service_id: str
     booking_date: datetime
     booking_time: Optional[str] = None
+    delivery_type: Optional[str] = None  # home_visit, hospital, clinic, virtual
+    
+    # Client details
     client_name: Optional[str] = None
     client_phone: Optional[str] = None
     client_email: Optional[str] = None
+    
+    # Contact person (if different from requester)
+    is_contact_same_as_requester: bool = True
     contact_person_name: Optional[str] = None
     contact_person_phone: Optional[str] = None
-    contact_person_relationship: Optional[str] = None
+    contact_person_relationship: Optional[str] = None  # self, family, caregiver, friend
+    
+    # Service location
     service_address: Optional[str] = None
     service_city: Optional[str] = None
     service_floor: Optional[str] = None
@@ -537,8 +569,19 @@ class BookingCreate(BaseModel):
     service_notes: Optional[str] = None
     service_latitude: Optional[float] = None
     service_longitude: Optional[float] = None
+    
+    # For products - shipping address
+    shipping_address: Optional[str] = None
+    shipping_city: Optional[str] = None
+    shipping_postal_code: Optional[str] = None
+    
+    # Duration (for hourly services)
+    hours_booked: Optional[float] = None
+    
+    # Notes
     notes: Optional[str] = None
     special_requirements: Optional[str] = None
+    
     # Guest booking fields
     guest_booking: bool = False
     guest_name: Optional[str] = None
