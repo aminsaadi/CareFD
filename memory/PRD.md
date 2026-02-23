@@ -166,6 +166,7 @@ DELETE /api/admin/categories/{id}                        # Delete category
 - Iteration 17: Professions - 100% backend (17/17), 100% frontend  
 - Iteration 18: Regions & Map - 100% backend (11/11), 100% frontend
 - Iteration 19: Service Types - 88% backend (15/17), 100% frontend
+- **Iteration 20: Provider Services & Booking Price - 100% backend (15/15), 100% frontend** ✅
 
 ## Service Model (Enhanced - Feb 23, 2026)
 
