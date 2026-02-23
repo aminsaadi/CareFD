@@ -228,18 +228,34 @@ const Providers = () => {
     }
 
     setIsLocating(true);
+    setShowLocationDropdown(false);
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        
+        // Reverse geocoding to get city name
+        let cityName = 'המיקום שלי';
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=he`
+          );
+          const data = await response.json();
+          cityName = data.address?.city || data.address?.town || data.address?.village || data.address?.municipality || 'המיקום שלי';
+        } catch (error) {
+          console.error('Reverse geocoding error:', error);
+        }
+        
         const newFilters = {
           ...filters,
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+          latitude: lat,
+          longitude: lng,
           useMyLocation: true,
           city: null,
           radius: filters.radius || 10
         };
         setFilters(newFilters);
-        setLocationQuery('המיקום שלי');
+        setLocationQuery(cityName);
         setIsLocating(false);
         
         // Update sort to distance
@@ -247,8 +263,8 @@ const Providers = () => {
         
         // Update URL
         const newParams = new URLSearchParams(searchParams);
-        newParams.set('latitude', position.coords.latitude);
-        newParams.set('longitude', position.coords.longitude);
+        newParams.set('latitude', lat);
+        newParams.set('longitude', lng);
         newParams.set('radius_km', newFilters.radius);
         newParams.delete('city');
         setSearchParams(newParams);
