@@ -349,7 +349,7 @@ const Landing = () => {
                     data-testid="hero-search-btn"
                   >
                     <FaSearch />
-                    <span>חפש עכשיו</span>
+                    <span>{searchTab === 'providers' ? 'חפש נותני שירות' : 'חפש שירותים'}</span>
                   </button>
                 </div>
                 
