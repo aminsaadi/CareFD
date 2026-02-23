@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Logo from './Logo';
-import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaPhone, FaEnvelope, FaMapMarkerAlt, FaArrowUp } from 'react-icons/fa';
+import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaPhone, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
 import api from '../utils/api';
 
 const Footer = () => {
@@ -40,6 +40,7 @@ const Footer = () => {
       const response = await api.get('/regions');
       setRegions(response.data.regions || []);
     } catch (error) {
+      // Use default regions
       setRegions([
         { name: 'תל אביב', cities: ['רמת גן', 'גבעתיים', 'הרצליה'] },
         { name: 'ירושלים', cities: ['בית שמש', 'מודיעין'] },
@@ -49,70 +50,68 @@ const Footer = () => {
     }
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
-    <footer className="bg-carelink-deep text-white mt-auto">
+    <footer className="bg-carelink-navy text-white mt-auto">
       {/* Main Footer */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 py-16 lg:py-20">
-        <div className="grid md:grid-cols-5 gap-12 lg:gap-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid md:grid-cols-5 gap-8">
           {/* Company Info */}
           <div className="md:col-span-1">
-            <div className="bg-white/10 backdrop-blur-sm px-5 py-3 rounded-2xl inline-block mb-6">
+            <div className="bg-white px-4 py-2 rounded-lg inline-block mb-4">
               <Logo />
             </div>
-            <p className="text-carelink-gold font-medium mb-4 tracking-wide text-sm">
+            <p className="text-carelink-teal-light mb-4 text-sm">
               Connecting Care Providers
             </p>
-            <p className="text-carelink-light-gray/70 leading-relaxed">
-              פלטפורמה משולבת המחברת בין מטופלים לספקי שירותי בריאות איכותיים.
+            <p className="text-carelink-light-gray text-sm">
+              פלטפורמה משולבת המחברת בין מטופלים לספקי שירותי בריאות.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-serif font-bold mb-6 text-white">קישורים מהירים</h3>
-            <ul className="space-y-4">
-              {[
-                { to: '/', label: 'בית' },
-                { to: '/providers', label: 'ספקים' },
-                { to: '/services', label: 'שירותים' },
-                { to: '/about', label: 'אודות' },
-              ].map((link) => (
-                <li key={link.to}>
-                  <Link 
-                    to={link.to} 
-                    className="text-carelink-light-gray/70 hover:text-carelink-teal transition-all duration-300 link-underline"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+            <h3 className="text-lg font-bold mb-4 text-carelink-teal">קישורים מהירים</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/" className="text-carelink-light-gray hover:text-carelink-teal transition">
+                  בית
+                </Link>
+              </li>
+              <li>
+                <Link to="/providers" className="text-carelink-light-gray hover:text-carelink-teal transition">
+                  ספקים
+                </Link>
+              </li>
+              <li>
+                <Link to="/services" className="text-carelink-light-gray hover:text-carelink-teal transition">
+                  שירותים
+                </Link>
+              </li>
+              <li>
+                <Link to="/about" className="text-carelink-light-gray hover:text-carelink-teal transition">
+                  אודות
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Regions/Cities */}
           <div>
-            <h3 className="text-lg font-serif font-bold mb-6 text-white">אזורים וערים</h3>
-            <ul className="space-y-4">
-              {regions.slice(0, 5).map((region, index) => (
+            <h3 className="text-lg font-bold mb-4 text-carelink-teal">אזורים וערים</h3>
+            <ul className="space-y-2">
+              {regions.slice(0, 6).map((region, index) => (
                 <li key={index}>
                   <Link 
                     to={`/providers?city=${encodeURIComponent(region.name || region)}`} 
-                    className="text-carelink-light-gray/70 hover:text-carelink-teal transition-all duration-300 link-underline"
+                    className="text-carelink-light-gray hover:text-carelink-teal transition"
                   >
                     {region.name || region}
                   </Link>
                 </li>
               ))}
               <li>
-                <Link 
-                  to="/providers" 
-                  className="text-carelink-teal hover:text-carelink-teal-light transition-all duration-300 text-sm font-medium"
-                >
-                  כל האזורים ←
+                <Link to="/providers" className="text-carelink-teal hover:text-carelink-teal-light transition text-sm">
+                  כל האזורים →
                 </Link>
               </li>
             </ul>
@@ -120,112 +119,86 @@ const Footer = () => {
 
           {/* For Providers */}
           <div>
-            <h3 className="text-lg font-serif font-bold mb-6 text-white">לספקים</h3>
-            <ul className="space-y-4">
-              {[
-                { to: '/register/provider', label: 'הירשם כספק' },
-                { to: '/provider/dashboard', label: 'דשבורד ספק' },
-                { to: '/pricing', label: 'מחירונים' },
-                { to: '/help', label: 'מרכז עזרה' },
-              ].map((link) => (
-                <li key={link.to}>
-                  <Link 
-                    to={link.to} 
-                    className="text-carelink-light-gray/70 hover:text-carelink-teal transition-all duration-300 link-underline"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+            <h3 className="text-lg font-bold mb-4 text-carelink-teal">לספקים</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/register/provider" className="text-carelink-light-gray hover:text-carelink-teal transition">
+                  הירשם כספק
+                </Link>
+              </li>
+              <li>
+                <Link to="/provider/dashboard" className="text-carelink-light-gray hover:text-carelink-teal transition">
+                  דשבורד ספק
+                </Link>
+              </li>
+              <li>
+                <Link to="/pricing" className="text-carelink-light-gray hover:text-carelink-teal transition">
+                  מחירונים
+                </Link>
+              </li>
+              <li>
+                <Link to="/help" className="text-carelink-light-gray hover:text-carelink-teal transition">
+                  מרכז עזרה
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="text-lg font-serif font-bold mb-6 text-white">צור קשר</h3>
-            <ul className="space-y-5">
-              <li className="flex items-center gap-4 text-carelink-light-gray/70">
-                <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center">
-                  <FaPhone className="text-carelink-teal" />
-                </div>
-                <span dir="ltr" className="font-medium">{settings.contact_phone}</span>
+            <h3 className="text-lg font-bold mb-4 text-carelink-teal">צור קשר</h3>
+            <ul className="space-y-3">
+              <li className="flex items-center gap-2 text-carelink-light-gray">
+                <FaPhone className="text-carelink-teal" />
+                <span dir="ltr">{settings.contact_phone}</span>
               </li>
-              <li className="flex items-center gap-4 text-carelink-light-gray/70">
-                <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center">
-                  <FaEnvelope className="text-carelink-teal" />
-                </div>
+              <li className="flex items-center gap-2 text-carelink-light-gray">
+                <FaEnvelope className="text-carelink-teal" />
                 <span>{settings.contact_email}</span>
               </li>
-              <li className="flex items-center gap-4 text-carelink-light-gray/70">
-                <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center">
-                  <FaMapMarkerAlt className="text-carelink-teal" />
-                </div>
+              <li className="flex items-center gap-2 text-carelink-light-gray">
+                <FaMapMarkerAlt className="text-carelink-teal" />
                 <span>{settings.contact_address}</span>
               </li>
             </ul>
 
             {/* Social Media */}
-            <div className="flex gap-3 mt-8">
+            <div className="flex gap-3 mt-4">
               {settings.social_facebook && (
-                <a 
-                  href={settings.social_facebook} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="w-11 h-11 bg-white/5 rounded-xl flex items-center justify-center hover:bg-carelink-teal transition-all duration-300"
-                >
+                <a href={settings.social_facebook} target="_blank" rel="noopener noreferrer" className="bg-carelink-slate p-2 rounded-full hover:bg-carelink-teal transition">
                   <FaFacebook className="text-lg" />
                 </a>
               )}
               {settings.social_twitter && (
-                <a 
-                  href={settings.social_twitter} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="w-11 h-11 bg-white/5 rounded-xl flex items-center justify-center hover:bg-carelink-teal transition-all duration-300"
-                >
+                <a href={settings.social_twitter} target="_blank" rel="noopener noreferrer" className="bg-carelink-slate p-2 rounded-full hover:bg-carelink-teal transition">
                   <FaTwitter className="text-lg" />
                 </a>
               )}
               {settings.social_instagram && (
-                <a 
-                  href={settings.social_instagram} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="w-11 h-11 bg-white/5 rounded-xl flex items-center justify-center hover:bg-carelink-teal transition-all duration-300"
-                >
+                <a href={settings.social_instagram} target="_blank" rel="noopener noreferrer" className="bg-carelink-slate p-2 rounded-full hover:bg-carelink-teal transition">
                   <FaInstagram className="text-lg" />
                 </a>
               )}
               {settings.social_linkedin && (
-                <a 
-                  href={settings.social_linkedin} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="w-11 h-11 bg-white/5 rounded-xl flex items-center justify-center hover:bg-carelink-teal transition-all duration-300"
-                >
+                <a href={settings.social_linkedin} target="_blank" rel="noopener noreferrer" className="bg-carelink-slate p-2 rounded-full hover:bg-carelink-teal transition">
                   <FaLinkedin className="text-lg" />
                 </a>
               )}
               {settings.social_youtube && (
-                <a 
-                  href={settings.social_youtube} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="w-11 h-11 bg-white/5 rounded-xl flex items-center justify-center hover:bg-carelink-teal transition-all duration-300"
-                >
+                <a href={settings.social_youtube} target="_blank" rel="noopener noreferrer" className="bg-carelink-slate p-2 rounded-full hover:bg-carelink-teal transition">
                   <FaYoutube className="text-lg" />
                 </a>
               )}
               {/* Show defaults if no social links */}
               {!settings.social_facebook && !settings.social_twitter && !settings.social_instagram && !settings.social_linkedin && (
                 <>
-                  <span className="w-11 h-11 bg-white/5 rounded-xl flex items-center justify-center opacity-40">
+                  <span className="bg-carelink-slate p-2 rounded-full opacity-50">
                     <FaFacebook className="text-lg" />
                   </span>
-                  <span className="w-11 h-11 bg-white/5 rounded-xl flex items-center justify-center opacity-40">
+                  <span className="bg-carelink-slate p-2 rounded-full opacity-50">
                     <FaInstagram className="text-lg" />
                   </span>
-                  <span className="w-11 h-11 bg-white/5 rounded-xl flex items-center justify-center opacity-40">
+                  <span className="bg-carelink-slate p-2 rounded-full opacity-50">
                     <FaLinkedin className="text-lg" />
                   </span>
                 </>
@@ -236,37 +209,26 @@ const Footer = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-carelink-light-gray/60 text-sm">
+      <div className="border-t border-carelink-slate">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-carelink-light-gray text-sm">
               {settings.footer_text}
             </p>
-            <div className="flex flex-wrap justify-center gap-8 text-sm">
-              {[
-                { to: '/about', label: 'אודות' },
-                { to: '/privacy', label: 'מדיניות פרטיות' },
-                { to: '/terms', label: 'תנאי שימוש' },
-                { to: '/contact', label: 'צור קשר' },
-              ].map((link) => (
-                <Link 
-                  key={link.to}
-                  to={link.to} 
-                  className="text-carelink-light-gray/60 hover:text-carelink-teal transition-all duration-300"
-                >
-                  {link.label}
-                </Link>
-              ))}
+            <div className="flex gap-6 text-sm">
+              <Link to="/about" className="text-carelink-light-gray hover:text-carelink-teal transition">
+                אודות
+              </Link>
+              <Link to="/privacy" className="text-carelink-light-gray hover:text-carelink-teal transition">
+                מדיניות פרטיות
+              </Link>
+              <Link to="/terms" className="text-carelink-light-gray hover:text-carelink-teal transition">
+                תנאי שימוש
+              </Link>
+              <Link to="/contact" className="text-carelink-light-gray hover:text-carelink-teal transition">
+                צור קשר
+              </Link>
             </div>
-            
-            {/* Scroll to top button */}
-            <button
-              onClick={scrollToTop}
-              className="w-11 h-11 bg-white/5 rounded-xl flex items-center justify-center hover:bg-carelink-teal transition-all duration-300 text-carelink-light-gray hover:text-white"
-              aria-label="חזרה למעלה"
-            >
-              <FaArrowUp />
-            </button>
           </div>
         </div>
       </div>

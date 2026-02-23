@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -15,75 +15,72 @@ a[href*="app.emergent.sh"] {
 
 body {
     margin: 0;
-    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+    font-family:
+        'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+        "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+        sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    line-height: 1.8;
 }
 
 code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+    font-family:
+        source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
-/* CareLink Premium Luxury Typography */
+/* CareLink Custom Styles */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Outfit', 'Inter', sans-serif;
   font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
-/* Premium Line Height */
-p, li, span {
-  line-height: 1.8;
 }
 
 @layer base {
     :root {
         --background: 0 0% 100%;
-        --foreground: 222 47% 11%;
+        --foreground: 0 0% 3.9%;
         --card: 0 0% 100%;
-        --card-foreground: 222 47% 11%;
+        --card-foreground: 0 0% 3.9%;
         --popover: 0 0% 100%;
-        --popover-foreground: 222 47% 11%;
+        --popover-foreground: 0 0% 3.9%;
         --primary: 181 75% 41%;
         --primary-foreground: 0 0% 98%;
         --secondary: 200 24% 40%;
         --secondary-foreground: 0 0% 98%;
-        --muted: 60 5% 96%;
+        --muted: 0 0% 96.1%;
         --muted-foreground: 0 0% 45.1%;
-        --accent: 60 5% 96%;
-        --accent-foreground: 222 47% 11%;
+        --accent: 0 0% 96.1%;
+        --accent-foreground: 0 0% 9%;
         --destructive: 0 84.2% 60.2%;
         --destructive-foreground: 0 0% 98%;
-        --border: 60 5% 90%;
-        --input: 60 5% 90%;
+        --border: 0 0% 89.8%;
+        --input: 0 0% 89.8%;
         --ring: 181 75% 41%;
         --chart-1: 12 76% 61%;
         --chart-2: 173 58% 39%;
         --chart-3: 197 37% 24%;
         --chart-4: 43 74% 66%;
         --chart-5: 27 87% 67%;
-        --radius: 0.75rem;
+        --radius: 0.5rem;
     }
     .dark {
-        --background: 222 47% 11%;
+        --background: 0 0% 3.9%;
         --foreground: 0 0% 98%;
-        --card: 222 47% 11%;
+        --card: 0 0% 3.9%;
         --card-foreground: 0 0% 98%;
-        --popover: 222 47% 11%;
+        --popover: 0 0% 3.9%;
         --popover-foreground: 0 0% 98%;
         --primary: 0 0% 98%;
-        --primary-foreground: 222 47% 11%;
-        --secondary: 215 19% 35%;
+        --primary-foreground: 0 0% 9%;
+        --secondary: 0 0% 14.9%;
         --secondary-foreground: 0 0% 98%;
-        --muted: 215 19% 35%;
+        --muted: 0 0% 14.9%;
         --muted-foreground: 0 0% 63.9%;
-        --accent: 215 19% 35%;
+        --accent: 0 0% 14.9%;
         --accent-foreground: 0 0% 98%;
         --destructive: 0 62.8% 30.6%;
         --destructive-foreground: 0 0% 98%;
-        --border: 215 19% 35%;
-        --input: 215 19% 35%;
+        --border: 0 0% 14.9%;
+        --input: 0 0% 14.9%;
         --ring: 0 0% 83.1%;
         --chart-1: 220 70% 50%;
         --chart-2: 160 60% 45%;
@@ -102,191 +99,36 @@ p, li, span {
     }
 }
 
-/* ============================================
-   PREMIUM LUXURY COMPONENTS
-   ============================================ */
-
-/* Glassmorphism Card */
-@layer components {
-    .glass-card {
-        @apply bg-white/70 backdrop-blur-xl border border-white/20 shadow-glass;
-    }
-    
-    .glass-card-dark {
-        @apply bg-carelink-deep/70 backdrop-blur-xl border border-white/10;
-    }
-    
-    .glass-card-premium {
-        background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255,255,255,0.3);
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-    }
-    
-    /* Premium Button Styles */
-    .btn-premium {
-        @apply relative overflow-hidden transition-all duration-500 transform;
-    }
-    
-    .btn-premium:hover {
-        @apply -translate-y-0.5 shadow-soft-lg;
-    }
-    
-    .btn-premium::after {
-        content: '';
-        @apply absolute inset-0 bg-white/20 translate-y-full transition-transform duration-500;
-    }
-    
-    .btn-premium:hover::after {
-        @apply translate-y-0;
-    }
-    
-    /* Soft Shadow Card */
-    .card-soft {
-        @apply bg-white rounded-3xl shadow-soft transition-all duration-500;
-    }
-    
-    .card-soft:hover {
-        @apply shadow-soft-lg -translate-y-1;
-    }
-    
-    /* Luxury Gradient Text */
-    .text-gradient-gold {
-        background: linear-gradient(135deg, #D4B483 0%, #E8D4B8 50%, #D4B483 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-    
-    /* Premium Input */
-    .input-premium {
-        @apply w-full px-6 py-4 bg-carelink-stone/50 border-0 rounded-2xl 
-               focus:outline-none focus:ring-2 focus:ring-carelink-teal/30 
-               transition-all duration-300 text-carelink-deep placeholder-carelink-gray/60;
-    }
-    
-    .input-premium:focus {
-        @apply bg-white shadow-soft;
-    }
-}
-
-/* ============================================
-   MICRO-INTERACTIONS & ANIMATIONS
-   ============================================ */
-
-/* Fade in on scroll - applied via JS intersection observer */
-.animate-on-scroll {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-.animate-on-scroll.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Staggered fade-in for children */
-.stagger-children > * {
-    opacity: 0;
-    animation: fade-in 0.6s ease-out forwards;
-}
-
-.stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
-.stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
-.stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
-.stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
-.stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
-.stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
-
-@keyframes fade-in {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Smooth hover transitions */
-.hover-lift {
-    @apply transition-all duration-500 ease-out;
-}
-
-.hover-lift:hover {
-    @apply -translate-y-2 shadow-premium;
-}
-
-/* Premium underline animation */
-.link-underline {
-    position: relative;
-}
-
-.link-underline::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    right: 0;
-    width: 0;
-    height: 2px;
-    background: currentColor;
-    transition: width 0.4s ease-out;
-}
-
-.link-underline:hover::after {
-    width: 100%;
-}
-
-/* ============================================
-   MOBILE RESPONSIVE IMPROVEMENTS
-   ============================================ */
+/* Mobile responsive improvements */
 @media (max-width: 640px) {
+    /* Prevent horizontal scroll */
     html, body {
         overflow-x: hidden;
         max-width: 100vw;
     }
     
+    /* Better touch targets */
     button, a {
-        min-height: 48px;
+        min-height: 44px;
     }
     
+    /* Improve text readability */
     .line-clamp-2 {
         -webkit-line-clamp: 3;
     }
-    
-    /* Reduce padding on mobile but keep premium feel */
-    .section-padding {
-        @apply py-12 px-4;
-    }
 }
 
-@media (min-width: 1024px) {
-    .section-padding {
-        @apply py-24 px-8;
-    }
-}
-
-/* ============================================
-   RTL SUPPORT FOR HEBREW
-   ============================================ */
+/* RTL Support for Hebrew */
 html[dir="rtl"], 
 body {
     direction: rtl;
     text-align: right;
 }
 
+/* Fix for phone numbers to display LTR */
 .direction-ltr {
     direction: ltr;
     unicode-bidi: isolate;
-}
-
-/* RTL-specific adjustments */
-[dir="rtl"] .link-underline::after {
-    right: auto;
-    left: 0;
 }
 
 @layer base {
@@ -319,33 +161,4 @@ body {
         border-top-color: inherit;
         border-bottom-color: inherit;
     }
-}
-
-/* ============================================
-   SCROLLBAR STYLING
-   ============================================ */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #F5F5F4;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #B8C2C9;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #83959E;
-}
-
-/* ============================================
-   SELECTION STYLING
-   ============================================ */
-::selection {
-    background: rgba(25, 184, 186, 0.2);
-    color: #0F172A;
 }
