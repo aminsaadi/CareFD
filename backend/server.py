@@ -3998,26 +3998,27 @@ async def remove_city_from_region(
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    # Support both old format (string) and new format (object with name)
+    # Decode URL-encoded city name
+    from urllib.parse import unquote
+    decoded_city_name = unquote(city_name)
+    
+    # Try removing city object (new format with name field)
     result = await db.regions.update_one(
         {"region_id": region_id},
-        {"$pull": {"cities": {"$or": [
-            {"name": city_name},
-            {"$eq": city_name}
-        ]}}}
+        {"$pull": {"cities": {"name": decoded_city_name}}}
     )
     
-    # Try simple string removal as fallback
+    # If no change, try removing as string (old format)
     if result.modified_count == 0:
         result = await db.regions.update_one(
             {"region_id": region_id},
-            {"$pull": {"cities": city_name}}
+            {"$pull": {"cities": decoded_city_name}}
         )
     
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Region not found")
     
-    return {"message": f"City '{city_name}' removed from region"}
+    return {"message": f"City '{decoded_city_name}' removed from region"}
 
 @api_router.put("/admin/providers/{provider_id}/recommend")
 async def admin_recommend_provider(
