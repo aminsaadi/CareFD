@@ -127,6 +127,208 @@ body {
     unicode-bidi: isolate;
 }
 
+/* ============================================
+   GLASSMORPHISM & VISUAL EFFECTS
+   ============================================ */
+
+/* Glassmorphism Card */
+.glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.glass-card-dark {
+    background: rgba(30, 77, 95, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Soft Shadow Classes */
+.shadow-soft {
+    box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-soft-md {
+    box-shadow: 0 8px 30px -6px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-soft-lg {
+    box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.12);
+}
+
+.shadow-soft-xl {
+    box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.15);
+}
+
+/* Card with soft shadow (no borders) */
+.card-soft {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.08);
+    border: none;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-soft:hover {
+    box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+}
+
+/* ============================================
+   MICRO-INTERACTIONS & ANIMATIONS
+   ============================================ */
+
+/* Fade-in on scroll animation */
+.fade-in-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.fade-in-scroll.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Staggered animation for children */
+.stagger-animation > * {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.stagger-animation > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-animation > *:nth-child(2) { animation-delay: 0.15s; }
+.stagger-animation > *:nth-child(3) { animation-delay: 0.2s; }
+.stagger-animation > *:nth-child(4) { animation-delay: 0.25s; }
+.stagger-animation > *:nth-child(5) { animation-delay: 0.3s; }
+.stagger-animation > *:nth-child(6) { animation-delay: 0.35s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Scale animation on hover */
+.hover-scale {
+    transition: transform 0.3s ease-out;
+}
+
+.hover-scale:hover {
+    transform: scale(1.02);
+}
+
+/* Lift animation on hover */
+.hover-lift {
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+.hover-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.15);
+}
+
+/* Smooth button press effect */
+.btn-press {
+    transition: transform 0.15s ease-out;
+}
+
+.btn-press:active {
+    transform: scale(0.97);
+}
+
+/* Pulse animation for notifications */
+@keyframes softPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+.pulse-soft {
+    animation: softPulse 2s ease-in-out infinite;
+}
+
+/* Float animation */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.animate-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+/* Shimmer effect for loading */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* ============================================
+   ENHANCED COMPONENT STYLES
+   ============================================ */
+
+/* Enhanced input fields */
+.input-soft {
+    border: none;
+    background: rgba(248, 250, 252, 0.8);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease-out;
+}
+
+.input-soft:focus {
+    background: white;
+    box-shadow: 0 0 0 3px rgba(25, 184, 186, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+/* Enhanced buttons */
+.btn-soft {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease-out;
+}
+
+.btn-soft:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+/* Badge with glow */
+.badge-glow {
+    box-shadow: 0 2px 8px rgba(25, 184, 186, 0.3);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
 @layer base {
     [data-debug-wrapper="true"] {
         display: contents !important;
