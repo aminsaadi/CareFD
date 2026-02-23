@@ -38,7 +38,7 @@ CareLink is a healthcare services platform in Israel connecting users with healt
 - Professional Admin Dashboard with Light theme
 - User Management with suspend/delete
 - Provider Management and Verification Queue
-- Booking/Services/Professions/Regions Management
+- Booking/Services Management
 - Static Pages CMS
 - Blog Management
 - Reports & Analytics with Recharts
@@ -54,90 +54,93 @@ CareLink is a healthcare services platform in Israel connecting users with healt
 - Forgot Password / Reset Password flow
 - Admin can reset user passwords
 
-#### Phase 7 - Static Pages Editor & Email Notifications (Feb 23, 2026) ✅
+#### Phase 7 - Static Pages Editor & Professions Management (Feb 23, 2026) ✅
 - **Rich Text Editor for Static Pages**: ReactQuill-based WYSIWYG editor
   - Admin can create/edit/delete static pages
   - Full formatting toolbar (headers, bold, colors, lists, etc.)
   - RTL support for Hebrew
   - Publish/Draft status toggle
+  - Public API: GET /api/pages/{slug}
+  
 - **Automatic Email to Admins on Provider Registration**
   - In-app notification created for all admins
   - Email notification sent with provider details and verification link
   - Email to new provider with profile completion guide
-- **Public Pages API**: GET /api/pages/{slug} for frontend consumption
+  - **Note**: Email MOCKED (requires RESEND_API_KEY)
+
+- **Professions & Categories Management** (NEW)
+  - 3-level hierarchy: מקצוע → תת-מקצוע → קטגוריה
+  - Each profession has **specializations** array (התמחויות)
+  - Full CRUD for all levels (create, read, update, delete)
+  - Default professions initialized on first load:
+    - רפואה (4 התמחויות, 3 תתי-מקצועות)
+    - סיעוד (4 התמחויות, 3 תתי-מקצועות)
+    - טיפולים (4 התמחויות, 3 תתי-מקצועות)
+    - בריאות הנפש (4 התמחויות, 2 תתי-מקצועות)
+    - רפואה משלימה (4 התמחויות, 3 תתי-מקצועות)
+  - Public API for dropdowns: GET /api/professions
+
+### API Endpoints - Professions (NEW)
+
+```
+GET  /api/professions                                    # Public - for dropdowns
+GET  /api/admin/professions                              # Admin - full list
+POST /api/admin/professions                              # Create profession
+PUT  /api/admin/professions/{id}                         # Update profession  
+DELETE /api/admin/professions/{id}                       # Delete profession
+POST /api/admin/professions/{id}/sub-professions         # Add sub-profession
+PUT  /api/admin/sub-professions/{id}                     # Update sub-profession
+DELETE /api/admin/sub-professions/{id}                   # Delete sub-profession
+POST /api/admin/sub-professions/{id}/categories          # Add category
+DELETE /api/admin/categories/{id}                        # Delete category
+```
+
+### Data Model - Profession
+
+```json
+{
+  "profession_id": "prof_xxx",
+  "name": "רפואה",
+  "name_en": "Medicine",
+  "icon": "stethoscope",
+  "specializations": ["רפואת משפחה", "רפואה פנימית", "רפואת ילדים"],
+  "sub_professions": [
+    {
+      "sub_profession_id": "sub_xxx",
+      "name": "רפואת משפחה",
+      "name_en": "Family Medicine",
+      "categories": [
+        {"category_id": "cat_xxx", "name": "ביקור בית", "name_en": "Home Visit"}
+      ]
+    }
+  ]
+}
+```
 
 ### Pending Features 🔄
 
 #### P1 - Backend Refactoring
-- The monolithic server.py file (4500+ lines) needs to be split into router modules
-- Directory structure exists at /backend/app/routers/
+- The monolithic server.py file (4800+ lines) needs splitting into router modules
 
 #### P2 - Admin Notifications/Messages Pages
 - /admin/notifications and /admin/messages pages return 404
-- Need to create these admin interface pages
-
-#### P2 - Database Model for Regions
-- Footer regions list is hardcoded
-- Needs dynamic management from admin panel
 
 #### P2 - PayPal Live Integration
 - Waiting for PayPal API credentials
-- Integration code exists but is mocked
 
-#### P3 - Advanced Features
-- Provider Image Gallery
-- SMS/Email Reminders
-- Export reports to PDF/Excel
-
-## Technical Stack
-- **Frontend**: React 18, TailwindCSS, React Router, react-quill-new
-- **Backend**: FastAPI (Python)
-- **Database**: MongoDB
-- **Email**: Resend (MOCKED - requires API key)
-
-## API Endpoints
-
-### Static Pages (NEW - Feb 23, 2026)
-- `GET /api/pages/{slug}` - Get public page by slug
-- `GET /api/admin/pages` - List all pages (admin)
-- `POST /api/admin/pages` - Create page (admin)
-- `PUT /api/admin/pages/{page_id}` - Update page (admin)
-- `DELETE /api/admin/pages/{page_id}` - Delete page (admin)
-
-### Provider Registration (Updated Feb 23, 2026)
-- On provider registration:
-  - Creates provider document
-  - Creates in-app notification for all admins
-  - Sends email to all admins with provider details
-  - Sends welcome email to new provider
-
-## Testing Credentials
+### Testing Credentials
 - Admin: admin@carelink.co.il / password
 - User: user@carelink.co.il / password
 - Provider: provider@carelink.co.il / password
 
-## Mocked Integrations
+### Mocked Integrations
 1. **Email (Resend)** - RESEND_API_KEY is empty, emails logged to console
 2. **PayPal** - Waiting for API credentials
 
 ## Change Log
 
 ### Feb 23, 2026 (Current Session)
-- **Static Pages Editor (P0 COMPLETE)**
-  - Replaced react-quill with react-quill-new (React 18+ compatibility)
-  - Created AdminPages.js with full CRUD functionality
-  - Rich text editor with RTL support
-  - Public API endpoint for pages
-  - Testing: 100% backend, 100% frontend
-
-- **Admin Email Notifications (P2 COMPLETE)**
-  - Added email notification to admins when provider registers
-  - Email includes: provider name, email, number, registration date
-  - Link to verification queue
-  - Works alongside existing in-app notifications
-  - Email is MOCKED (requires RESEND_API_KEY)
-
-### Previous Sessions
-- Feb 22, 2026: User Dashboard overhaul, Password Reset, Admin Provider/User management
-- Feb 18-19, 2026: Admin Dashboard system, Reports, Provider Profile enhancements
-- Feb 12, 2026: GPS search, Regions, Guest booking
+- **Static Pages Editor (P0 COMPLETE)** - ReactQuill rich text editor
+- **Admin Email Notifications (P2 COMPLETE)** - Email to admins on provider registration
+- **Professions Management (P0 COMPLETE)** - Full CRUD with 3-level hierarchy + specializations
+- Testing: 100% backend (17/17), 100% frontend
