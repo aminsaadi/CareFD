@@ -49,6 +49,7 @@ import AdminPushNotifications from './pages/admin/AdminPushNotifications';
 import AdminNotifications from './pages/admin/AdminNotifications';
 import AdminMessages from './pages/admin/AdminMessages';
 import AdminProviderEdit from './pages/admin/AdminProviderEdit';
+import Notifications from './pages/Notifications';
 import './i18n';
 import './App.css';
 
