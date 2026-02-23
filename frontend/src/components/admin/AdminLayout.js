@@ -41,6 +41,7 @@ const AdminLayout = ({ children }) => {
       submenu: [
         { id: 'professions', label: 'מקצועות וקטגוריות', icon: FiGrid, path: '/admin/professions' },
         { id: 'regions', label: 'אזורים וערים', icon: FiMapPin, path: '/admin/regions' },
+        { id: 'service-types', label: 'סוגי שירותים', icon: FiTag, path: '/admin/service-types' },
       ]
     },
     {
