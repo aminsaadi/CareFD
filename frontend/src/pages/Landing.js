@@ -362,63 +362,75 @@ const Landing = () => {
             
             {/* Right Content - Stats Cards */}
             <div className="hidden lg:grid grid-cols-2 gap-4">
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20 hover:bg-white/15 transition-all">
-                <div className="text-4xl font-bold text-white mb-2">{statistics.providers}+</div>
-                <div className="text-carelink-teal-pale">ספקים מאומתים</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20 mt-8 hover:bg-white/15 transition-all">
-                <div className="text-4xl font-bold text-white mb-2">{statistics.services}+</div>
-                <div className="text-carelink-teal-pale">שירותים זמינים</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20 hover:bg-white/15 transition-all">
-                <div className="text-4xl font-bold text-white mb-2">{statistics.happyClients}+</div>
-                <div className="text-carelink-teal-pale">לקוחות מרוצים</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20 mt-8 hover:bg-white/15 transition-all">
-                <div className="text-4xl font-bold text-white mb-2">{statistics.cities}+</div>
-                <div className="text-carelink-teal-pale">ערים בישראל</div>
-              </div>
+              <AnimatedSection delay={100}>
+                <div className="glass-card-dark p-6 rounded-2xl hover-lift">
+                  <div className="text-4xl font-bold text-white mb-2">{statistics.providers}+</div>
+                  <div className="text-carelink-teal-pale">ספקים מאומתים</div>
+                </div>
+              </AnimatedSection>
+              <AnimatedSection delay={200}>
+                <div className="glass-card-dark p-6 rounded-2xl mt-8 hover-lift">
+                  <div className="text-4xl font-bold text-white mb-2">{statistics.services}+</div>
+                  <div className="text-carelink-teal-pale">שירותים זמינים</div>
+                </div>
+              </AnimatedSection>
+              <AnimatedSection delay={300}>
+                <div className="glass-card-dark p-6 rounded-2xl hover-lift">
+                  <div className="text-4xl font-bold text-white mb-2">{statistics.happyClients}+</div>
+                  <div className="text-carelink-teal-pale">לקוחות מרוצים</div>
+                </div>
+              </AnimatedSection>
+              <AnimatedSection delay={400}>
+                <div className="glass-card-dark p-6 rounded-2xl mt-8 hover-lift">
+                  <div className="text-4xl font-bold text-white mb-2">{statistics.cities}+</div>
+                  <div className="text-carelink-teal-pale">ערים בישראל</div>
+                </div>
+              </AnimatedSection>
             </div>
           </div>
         </div>
       </section>
 
       {/* ==================== PROFESSIONS ROW ==================== */}
-      <section className="py-8 bg-white border-b border-gray-100" data-testid="professions-section">
+      <section className="py-8 bg-white" data-testid="professions-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-carelink-navy">חפש לפי מקצוע</h3>
-            <Link to="/providers" className="text-carelink-teal hover:text-carelink-teal-medium text-sm font-medium">
-              כל המקצועות ←
-            </Link>
-          </div>
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {professions.map((prof) => (
-              <Link
-                key={prof.id}
-                to={`/providers?search=${encodeURIComponent(prof.name)}`}
-                className={`flex items-center gap-3 px-5 py-3 rounded-xl ${prof.color} hover:shadow-md transition-all flex-shrink-0`}
-                data-testid={`profession-${prof.id}`}
-              >
-                <prof.icon className="text-xl" />
-                <span className="font-medium whitespace-nowrap">{prof.name}</span>
+          <AnimatedSection>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-carelink-navy">חפש לפי מקצוע</h3>
+              <Link to="/providers" className="text-carelink-teal hover:text-carelink-teal-medium text-sm font-medium">
+                כל המקצועות ←
               </Link>
-            ))}
-          </div>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide stagger-animation">
+              {professions.map((prof) => (
+                <Link
+                  key={prof.id}
+                  to={`/providers?search=${encodeURIComponent(prof.name)}`}
+                  className={`flex items-center gap-3 px-5 py-3 rounded-xl ${prof.color} transition-all flex-shrink-0 btn-press`}
+                  data-testid={`profession-${prof.id}`}
+                >
+                  <prof.icon className="text-xl" />
+                  <span className="font-medium whitespace-nowrap">{prof.name}</span>
+                </Link>
+              ))}
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
       {/* ==================== CATEGORIES SECTION ==================== */}
       <section className="py-16 bg-gradient-to-b from-white to-gray-50" data-testid="categories-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-carelink-navy font-heading mb-4">
-              קטגוריות שירותים
-            </h2>
-            <p className="text-carelink-slate max-w-2xl mx-auto">
-              מצאו את השירות המתאים לכם מתוך מגוון רחב של קטגוריות
-            </p>
-          </div>
+          <AnimatedSection>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-carelink-navy font-heading mb-4">
+                קטגוריות שירותים
+              </h2>
+              <p className="text-carelink-slate max-w-2xl mx-auto">
+                מצאו את השירות המתאים לכם מתוך מגוון רחב של קטגוריות
+              </p>
+            </div>
+          </AnimatedSection>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {categories.map((category) => (
