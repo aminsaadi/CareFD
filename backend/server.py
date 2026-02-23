@@ -3960,19 +3960,27 @@ async def add_city_to_region(
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    city_name = city_data.get("city")
+    city_name = city_data.get("name") or city_data.get("city")
     if not city_name:
         raise HTTPException(status_code=400, detail="City name required")
     
+    # Create city object with coordinates if provided
+    city = {
+        "name": city_name,
+        "name_en": city_data.get("name_en", ""),
+        "lat": city_data.get("lat"),
+        "lng": city_data.get("lng")
+    }
+    
     result = await db.regions.update_one(
         {"region_id": region_id},
-        {"$addToSet": {"cities": city_name}}
+        {"$addToSet": {"cities": city}}
     )
     
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Region not found")
     
-    return {"message": f"City '{city_name}' added to region"}
+    return {"message": f"City '{city_name}' added to region", "city": city}
 
 @api_router.delete("/admin/regions/{region_id}/cities/{city_name}")
 async def remove_city_from_region(
@@ -3986,10 +3994,21 @@ async def remove_city_from_region(
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     
+    # Support both old format (string) and new format (object with name)
     result = await db.regions.update_one(
         {"region_id": region_id},
-        {"$pull": {"cities": city_name}}
+        {"$pull": {"cities": {"$or": [
+            {"name": city_name},
+            {"$eq": city_name}
+        ]}}}
     )
+    
+    # Try simple string removal as fallback
+    if result.modified_count == 0:
+        result = await db.regions.update_one(
+            {"region_id": region_id},
+            {"$pull": {"cities": city_name}}
+        )
     
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Region not found")
