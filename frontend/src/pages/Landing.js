@@ -77,6 +77,8 @@ const categories = [
   { id: 'baby', name: 'טיפול בתינוקות', icon: FaBaby, description: 'מטפלות ושמרטפות', color: 'from-amber-500 to-orange-500' },
 ];
 
+import { israeliLocalities } from '../data/israeliLocalities';
+
 // Testimonials
 const testimonials = [
   { id: 1, name: 'שרה לוי', role: 'בת של מטופלת', content: 'מצאנו מטפלת סיעודית מדהימה לאמא שלי תוך יום אחד. השירות מקצועי ואמין!', rating: 5, avatar: 'ש' },
