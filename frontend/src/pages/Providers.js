@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import ProviderCard from '../components/ProviderCard';
 import AdvancedFilters from '../components/AdvancedFilters';
 import api from '../utils/api';
+import { israeliLocalities } from '../data/israeliLocalities';
 import { 
   FaSearch, FaFilter, FaTimes, FaSortAmountDown, FaMapMarkerAlt,
   FaThLarge, FaList, FaCrosshairs, FaSpinner, FaMap
@@ -19,15 +20,6 @@ const popularSearches = [
   'אחות', 'רופא משפחה', 'פיזיותרפיסט', 'מטפל סיעודי', 
   'פסיכולוג', 'דיאטנית', 'רופא ילדים', 'מעסה'
 ];
-
-// Israeli cities list
-const israeliCities = [
-  // מרכז
-  { name: 'תל אביב', region: 'מרכז' },
-  { name: 'רמת גן', region: 'מרכז' },
-  { name: 'גבעתיים', region: 'מרכז' },
-  { name: 'בני ברק', region: 'מרכז' },
-  { name: 'חולון', region: 'מרכז' },
   { name: 'בת ים', region: 'מרכז' },
   { name: 'פתח תקווה', region: 'מרכז' },
   { name: 'ראשון לציון', region: 'מרכז' },
