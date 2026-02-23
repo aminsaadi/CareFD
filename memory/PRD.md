@@ -168,6 +168,12 @@ DELETE /api/admin/categories/{id}                        # Delete category
   - **Reverse Geocoding**: GPS button now fetches actual city name from coordinates using Nominatim API
   - Click outside to close dropdowns
 
+- **SMTP Email Integration (P0 COMPLETE)** ✅ NEW
+  - Replaced Resend API with Gmail SMTP
+  - Email: carelink.co.il@gmail.com
+  - Works for: password reset, provider notifications, booking confirmations
+  - Tested and verified working
+
 - **Providers Page Search Enhancement (P0 COMPLETE)** ✅ NEW
   - Added search tabs (נותני שירות / שירותים) - clicking "שירותים" navigates to /services
   - Added popular searches dropdown on search input
