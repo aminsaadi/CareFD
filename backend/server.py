@@ -4393,6 +4393,21 @@ async def admin_update_booking_status(
     
     return {"message": f"Booking status updated to {new_status}"}
 
+# ==================== PUBLIC PAGES ====================
+
+@api_router.get("/pages/{slug}")
+async def get_public_page(slug: str):
+    """Get a public static page by slug"""
+    page = await db.static_pages.find_one(
+        {"slug": slug, "is_published": True},
+        {"_id": 0}
+    )
+    
+    if not page:
+        raise HTTPException(status_code=404, detail="Page not found")
+    
+    return page
+
 # ==================== ADMIN PAGES (Static Pages) ====================
 
 @api_router.get("/admin/pages")
