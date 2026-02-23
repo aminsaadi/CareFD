@@ -288,6 +288,14 @@ function AppRouter() {
         }
       />
       <Route
+        path="/admin/service-types"
+        element={
+          <ProtectedRoute>
+            <AdminServiceTypes />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/admin/subscriptions"
         element={
           <ProtectedRoute>
