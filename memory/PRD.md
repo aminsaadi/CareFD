@@ -168,6 +168,17 @@ DELETE /api/admin/categories/{id}                        # Delete category
   - **Reverse Geocoding**: GPS button now fetches actual city name from coordinates using Nominatim API
   - Click outside to close dropdowns
 
+- **Providers Page Search Enhancement (P0 COMPLETE)** ✅ NEW
+  - Added search tabs (נותני שירות / שירותים) - clicking "שירותים" navigates to /services
+  - Added popular searches dropdown on search input
+  - Added location dropdown with GPS option and regions
+  - Added reverse geocoding for GPS to get city name
+
+- **Categories Section Design Fix (P0 COMPLETE)** ✅ NEW
+  - Fixed category cards to have visible white background with shadow
+  - Increased icon size and improved spacing
+  - Better contrast and hover effects with gradient backgrounds
+
 - **Landing Page Redesign (P1 COMPLETE)** ✅
   - Improved Hero section with cleaner white search box
   - Added **Professions Row** - clickable profession tags (nurse, doctor, physiotherapist, etc.)
