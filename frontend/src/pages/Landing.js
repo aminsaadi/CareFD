@@ -91,6 +91,7 @@ const Landing = () => {
   const [isLocating, setIsLocating] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
   const [selectedRadius, setSelectedRadius] = useState('');
+  const [searchTab, setSearchTab] = useState('providers'); // 'providers' or 'services'
   
   // Real data from API
   const [featuredProviders, setFeaturedProviders] = useState([]);
