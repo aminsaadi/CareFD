@@ -2601,6 +2601,41 @@ async def confirm_booking(
         {"booking_id": booking_id}
     )
     
+    # Send email to client about confirmed booking
+    client_user = await db.users.find_one({"user_id": booking["user_id"]}, {"_id": 0})
+    if client_user and client_user.get("email"):
+        provider_info = await db.providers.find_one({"provider_id": booking["provider_id"]}, {"_id": 0})
+        await send_email_async(
+            client_user["email"],
+            "CareLink - ההזמנה שלך אושרה! ✅",
+            f"""
+            <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #19B8BA;">ההזמנה אושרה! 🎉</h1>
+                </div>
+                
+                <p style="font-size: 16px; color: #1E4D5F;">שלום {client_user.get('name', 'לקוח')},</p>
+                
+                <p style="font-size: 16px; color: #4C6D7F;">
+                    הספק אישר את ההזמנה שלך!
+                </p>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <h3 style="color: #19B8BA; margin-top: 0;">פרטי ההזמנה:</h3>
+                    <p><strong>שירות:</strong> {booking.get('service_name', 'שירות')}</p>
+                    <p><strong>ספק:</strong> {provider_info.get('business_name', 'ספק') if provider_info else 'ספק'}</p>
+                    <p><strong>תאריך:</strong> {booking.get('booking_date', '')[:10]}</p>
+                    <p><strong>שעה:</strong> {booking.get('booking_time', 'לא צוין')}</p>
+                    <p><strong>כתובת:</strong> {booking.get('service_address', 'לא צוין')}, {booking.get('service_city', '')}</p>
+                </div>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">
+                    <p>צוות CareLink</p>
+                </div>
+            </div>
+            """
+        )
+    
     return {"message": "Booking confirmed successfully"}
 
 @api_router.put("/bookings/{booking_id}/provider-complete")
