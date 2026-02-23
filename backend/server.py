@@ -757,14 +757,50 @@ async def register(user_data: UserRegister):
         provider_id = provider.provider_id
         
         # Notify all admins about new provider registration
-        admins = await db.users.find({"role": "admin"}, {"user_id": 1}).to_list(100)
+        admins = await db.users.find({"role": "admin"}, {"_id": 0, "user_id": 1, "email": 1}).to_list(100)
         for admin in admins:
+            # In-app notification
             await create_notification(
                 admin["user_id"],
                 NotificationType.PROVIDER_NEW_REGISTRATION,
                 "ספק חדש נרשם!",
                 f"ספק חדש נרשם למערכת: {user.name}. נדרש אימות.",
                 {"provider_id": provider.provider_id, "user_id": user.user_id}
+            )
+            # Email notification to admin
+            admin_link = f"https://carelink.co.il/admin/verification"
+            await send_email_async(
+                admin.get("email"),
+                f"🆕 ספק חדש נרשם: {user.name}",
+                f"""
+                <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="color: #1E4D5F;">ספק חדש נרשם!</h1>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                        <h3 style="color: #19B8BA; margin-top: 0;">פרטי הספק:</h3>
+                        <p><strong>שם:</strong> {user.name}</p>
+                        <p><strong>אימייל:</strong> {user.email}</p>
+                        <p><strong>מספר ספק:</strong> {provider.provider_number}</p>
+                        <p><strong>תאריך הרשמה:</strong> {datetime.now(timezone.utc).strftime('%d/%m/%Y %H:%M')}</p>
+                    </div>
+                    
+                    <p style="font-size: 16px; color: #4C6D7F;">
+                        נדרש אימות לפני שהספק יוכל להציע שירותים בפלטפורמה.
+                    </p>
+                    
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="{admin_link}" style="background-color: #19B8BA; color: white; padding: 15px 40px; text-decoration: none; border-radius: 30px; font-size: 18px; font-weight: bold; display: inline-block;">
+                            עבור לאימות ספקים ➜
+                        </a>
+                    </div>
+                    
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">
+                        <p>מערכת CareLink</p>
+                    </div>
+                </div>
+                """
             )
         
         # Send welcome email to new provider with profile completion link
