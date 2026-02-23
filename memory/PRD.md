@@ -139,11 +139,21 @@ DELETE /api/admin/categories/{id}                        # Delete category
 
 ## Change Log
 
-### Feb 23, 2026 (Current Session)
+### Dec 2025 (Current Session)
+- **Provider Service Form & Booking Price Calculation (P0 COMPLETE)** ✅ NEW
+  - Full service CRUD with 4 categories: Visit, Hourly, Consultation, Product
+  - Weekend pricing (percentage or fixed surcharge)
+  - Travel cost for home visits
+  - Shipping options for products with free_shipping_above threshold
+  - Minimum hours enforcement for hourly services
+  - Price calculation in bookings: base + weekend + travel + shipping
+  - Fixed: Added missing DELETE /api/services/{service_id} endpoint
+
+### Feb 23, 2026 (Previous Session)
 - **Static Pages Editor (P0 COMPLETE)** - ReactQuill rich text editor
 - **Admin Email Notifications (P2 COMPLETE)** - Email to admins on provider registration
 - **Professions Management (P0 COMPLETE)** - Full CRUD with 3-level hierarchy + specializations
-- **Regions & Cities Management (P0 COMPLETE)** - NEW
+- **Regions & Cities Management (P0 COMPLETE)**
   - 8 regions of Israel: צפון, חיפה והקריות, השרון, מרכז, ירושלים והסביבה, דרום, שפלה, יהודה ושומרון
   - 102 cities with GPS coordinates (lat/lng)
   - Admin can add/edit/delete regions and cities
