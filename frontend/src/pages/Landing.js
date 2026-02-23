@@ -649,25 +649,25 @@ const Landing = () => {
             </div>
           </AnimatedSection>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 stagger-animation">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {categories.map((category, index) => (
               <AnimatedSection key={category.id} delay={index * 100}>
                 <Link
                   to={`/services?category=${category.id}`}
-                  className="group relative overflow-hidden rounded-2xl card-soft p-6 text-center hover-lift"
+                  className="group relative overflow-hidden rounded-2xl bg-white border border-gray-100 p-6 text-center shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                   data-testid={`category-${category.id}`}
                 >
                   {/* Gradient Background on Hover */}
                   <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
                   
                   <div className="relative z-10">
-                    <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-carelink-teal-pale/50 flex items-center justify-center group-hover:bg-white/20 transition-all">
-                      <category.icon className="text-2xl text-carelink-teal group-hover:text-white transition-colors" />
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-carelink-teal/10 flex items-center justify-center group-hover:bg-white/20 transition-all">
+                      <category.icon className="text-3xl text-carelink-teal group-hover:text-white transition-colors" />
                     </div>
-                    <h3 className="font-bold text-carelink-navy group-hover:text-white transition-colors mb-1">
+                    <h3 className="font-bold text-carelink-navy group-hover:text-white transition-colors mb-2 text-lg">
                       {category.name}
                     </h3>
-                    <p className="text-xs text-carelink-gray group-hover:text-white/80 transition-colors line-clamp-2">
+                    <p className="text-sm text-carelink-gray group-hover:text-white/80 transition-colors line-clamp-2">
                       {category.description}
                     </p>
                   </div>
