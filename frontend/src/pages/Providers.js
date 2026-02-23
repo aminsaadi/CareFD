@@ -337,27 +337,6 @@ const Providers = () => {
           {/* Search and Filter Bar */}
           <div className="bg-white rounded-2xl shadow-lg p-4 mb-6">
             <form onSubmit={handleSearch} className="space-y-4">
-              {/* Search Tabs */}
-              <div className="flex mb-2 bg-gray-100 rounded-xl p-1" data-testid="search-tabs">
-                <button
-                  type="button"
-                  className="flex-1 py-2.5 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 bg-carelink-teal text-white shadow-md"
-                  data-testid="search-tab-providers"
-                >
-                  <FaUserMd className="text-lg" />
-                  <span>נותני שירות</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate('/services')}
-                  className="flex-1 py-2.5 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 text-carelink-gray hover:bg-gray-200"
-                  data-testid="search-tab-services"
-                >
-                  <FaHospital className="text-lg" />
-                  <span>שירותים</span>
-                </button>
-              </div>
-              
               {/* Two Column Search */}
               <div className="grid md:grid-cols-2 gap-3">
                 {/* Column 1: Profession/Category with Dropdown */}
