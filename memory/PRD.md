@@ -1,59 +1,52 @@
-# CareLink - Product Requirements Document
+# CareLink - Service Marketplace Platform
 
 ## Original Problem Statement
-CareLink is a healthcare services marketplace platform in Israel connecting users with healthcare providers. The platform supports provider registration/verification, service listings, bookings, reviews, ratings, and chat communication. The entire application is in Hebrew.
+A full-stack service marketplace platform (CareLink) allowing users to find and book services from providers. Features admin dashboard, provider management, user-provider chat, booking lifecycle, and review system. Hebrew-only, targeting carelink.co.il.
 
-## Subscription Model
+## Tech Stack
+- **Frontend:** React, Tailwind CSS, Shadcn/UI, react-router-dom, sonner, react-big-calendar
+- **Backend:** Python, FastAPI, Motor (async MongoDB)
+- **Database:** MongoDB Atlas
 
-### Plans
-| Feature | חינם (Free) | פרו (Pro) ₪59/חודש | זהב (Gold) ₪149/חודש |
-|---------|-------------|--------------------|-----------------------|
-| ניהול פרופיל מתקדם | V | V | V |
-| כפתור יצירת קשר (צ'אט/טלפון/וואצאפ) | V | V | V |
-| שירותים | 1 בלבד | ללא הגבלה | ללא הגבלה |
-| הזמנות/חודש | 10 | ללא הגבלה | ללא הגבלה |
-| ניהול קליניקות/סניפים | X | עד 5 | ללא הגבלה |
-| פרופיל מקודם | X | V | V |
-| תווית מומלץ | X | V | V |
-| ניהול צוות | X | X | V (ללא הגבלה) |
-| תמיכה ולווי צוות | X | V | V |
-| **ניסיון חינם** | - | **30 יום** | - |
+## Core Architecture
+- Frontend: /app/frontend (port 3000)
+- Backend: /app/backend (port 8001, prefix /api)
+- All API calls via REACT_APP_BACKEND_URL
 
-### Pricing
-- Pro: ₪59/חודש, ₪600/שנה + 30 יום ניסיון חינם
-- Gold: ₪149/חודש, ₪1,500/שנה
-- All managed via admin panel
+## Implemented Features (Complete)
+- User/Provider/Admin role system with document verification
+- Advanced search filtering (providers & services)
+- Dynamic multi-step booking form (home_visit, clinic_visit, video_call, phone_call, hourly, product)
+- Complete booking lifecycle (pending → confirmed → completed/cancelled)
+- Moderated review system (admin approval required)
+- 3-tier subscription model (Free, Pro, Gold) with 30-day free trial
+- User-provider chat system
+- Email notifications (SMTP/Gmail)
+- Push notifications infrastructure
+- Forgot password flow
+- ScrollToTop navigation fix
+- Dynamic footer links from admin
+- Clinics & Team management infrastructure
 
-## Completed Features
+## P0 Bugs Fixed (Feb 24, 2026)
+1. **Booking "Confirm and Book" button unresponsive** - Frontend sent service_address as nested object but backend expected flat string fields. Fixed in BookService.js handleBooking().
+2. **Chat messages not appearing** - other_user enrichment failed silently, unread_count never computed. Fixed in server.py chat endpoints.
 
-### Phase 1-11 (Previously completed)
-- Full authentication, provider/user system, admin dashboard
-- Services, bookings, reviews, chat, notifications, advanced search
-- Booking lifecycle, review moderation, dynamic booking form
-- ScrollToTop, footer sync, UI cleanup
+## Mocked/Pending Integrations
+- PayPal: MOCKED (awaiting API keys)
+- Subscription payments: Simulated (no real gateway)
 
-### Phase 12 - Subscription System (Feb 24, 2026)
-- 3 subscription tiers with admin management
-- Provider Dashboard: Subscription/Clinics/Team tabs
-- Service limit enforcement, upgrade banners
-- **Payment:** Infrastructure only (MOCKED)
-
-### Phase 13 - Trial + Redirect Fix (Feb 24, 2026)
-- **30 Day Free Trial:** for Pro plan, one-time per provider
-- **Landing page redirect fix:** removed aggressive 401 redirect from API interceptor
-- Trial shows countdown date, banner for free users, blocks double use
-
-## Pending Features
-- P1: Backend Refactoring (server.py 7500+ lines)
-- P2: Real Payment Integration (PayPal/Stripe)
-- P3: Provider Image Gallery
-- P4: SMS Reminders
-
-## Testing Credentials
+## Test Credentials
 - Admin: admin@carelink.co.il / password
 - User: user@carelink.co.il / password
 - Provider: provider@carelink.co.il / password
 
-## Mocked Integrations
-- PayPal - Awaiting API credentials
-- Payment Processing - Infrastructure only
+## Backlog (Prioritized)
+- **P1:** Backend refactoring - split monolithic server.py into routers
+- **P2:** PayPal integration (blocked on API keys)
+- **P3:** Provider image gallery
+- **P4:** SMS reminders
+
+## Known Issues
+- Production caching (Cloudflare - user-side)
+- Public provider search returns empty (test provider verification_status=None)
