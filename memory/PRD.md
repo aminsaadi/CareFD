@@ -36,17 +36,24 @@ CareLink is a healthcare services marketplace platform in Israel connecting user
 
 #### Phase 9 - Booking Lifecycle & Review System (Feb 24, 2026)
 - Full Booking Status Lifecycle (pending/confirmed/provider_completed/completed/rejected/on_hold/cancelled)
-- Provider Dashboard: booking management (confirm/reject/hold/mark-complete), calendar view
-- User Dashboard: completion confirmation, write review links, booking detail modal
-- WriteReview Page (/review/:bookingId) with star ratings
-- Admin Reviews Management (/admin/reviews) with filter/approve/reject
+- Provider Dashboard: booking management, calendar view
+- User Dashboard: completion confirmation, write review links
+- WriteReview Page (/review/:bookingId)
+- Admin Reviews Management (/admin/reviews)
 - Email notifications for status changes
 
 #### Phase 10 - Booking Form & Service Cards Upgrade (Feb 24, 2026)
-- **BookingForm (popup):** "הפרטים שלי" + "הכתובת שלי" quick-fill buttons, success/error dialogs
-- **BookService (full page):** "הכתובת שלי" + "הפרטים שלי" buttons for address/contact, replaced all alert() with toast.error()
-- **ServiceCard:** Upgraded with price units (₪80/לשעה), category labels (ביקור, שעתי), service type badges, fixed provider link (/providers/ path)
-- **ProviderProfile service section:** Price with unit, category/type labels
+- BookingForm: fill-my-details/address buttons, success/error dialogs
+- BookService: fill-my-address/contact buttons, toast notifications
+- ServiceCard: price units, category labels, fixed provider link
+- ProviderProfile: price units, type/category badges
+
+#### Phase 11 - UI Cleanup & Data Sync (Feb 24, 2026)
+- **Border color change:** carelink-teal-pale from #ACEDEA (teal) to #E2E8F0 (light gray) for cleaner look
+- **ScrollToTop:** Added component to fix page navigation scrolling to top
+- **Footer synced with admin:** Footer dynamically loads static pages from admin panel
+- **GenericPage component:** Dynamic page rendering for admin-created static pages (/page/:slug)
+- **Regions/cities/categories:** Already synced from database via API
 
 ### Pending Features
 
@@ -75,7 +82,7 @@ CareLink is a healthcare services marketplace platform in Israel connecting user
 
 ## Testing Results
 - Iteration 22: Booking & Review Lifecycle - 94.7% backend, 100% frontend
-- Iteration 23: ServiceCard/BookService/ProviderProfile upgrades - 91.7% frontend (11/12)
+- Iteration 23: ServiceCard/BookService/ProviderProfile upgrades - 91.7% frontend
 
 ## Mocked Integrations
 - **PayPal** - Waiting for API credentials
