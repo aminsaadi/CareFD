@@ -308,38 +308,56 @@ const BookService = () => {
     try {
       setBooking(true);
       
-      let bookingDateTime;
+      let bookingDate;
+      let bookingTime = null;
+      
       if (skipTimeSelection) {
-        bookingDateTime = null;
+        // Send today's date as fallback when skipping time selection
+        bookingDate = new Date().toISOString();
       } else if (selectedDate && selectedTime) {
-        bookingDateTime = new Date(`${format(selectedDate, 'yyyy-MM-dd')}T${selectedTime}:00`);
+        bookingDate = new Date(`${format(selectedDate, 'yyyy-MM-dd')}T${selectedTime}:00`).toISOString();
+        bookingTime = selectedTime;
       } else if (selectedDate && selectedShift) {
         const shiftStart = selectedShift.hours.split('-')[0];
-        bookingDateTime = new Date(`${format(selectedDate, 'yyyy-MM-dd')}T${shiftStart}:00`);
+        bookingDate = new Date(`${format(selectedDate, 'yyyy-MM-dd')}T${shiftStart}:00`).toISOString();
+        bookingTime = shiftStart;
+      } else if (selectedDate) {
+        bookingDate = new Date(`${format(selectedDate, 'yyyy-MM-dd')}T00:00:00`).toISOString();
       }
       
       const bookingData = {
         service_id: serviceId,
-        booking_date: bookingDateTime?.toISOString(),
+        booking_date: bookingDate,
+        booking_time: bookingTime,
         notes,
-        skip_time_selection: skipTimeSelection,
-        service_type: service.service_type,
-        total_price: calculateTotalPrice(),
-        
-        // Shift/hours info
-        selected_shift: selectedShift?.id,
-        hours_booked: selectedShift?.duration || customHours,
-        
-        // Platform for telemedicine
-        platform: selectedPlatform,
-        
-        // Address info
-        service_address: serviceTypeConfig.requiresAddress ? serviceAddress : null,
-        shipping_address: serviceTypeConfig.requiresShipping ? shippingAddress : null,
-        
-        // Contact person
-        contact_person: serviceTypeConfig.requiresContact ? contactPerson : null
+        delivery_type: service.service_type,
+        hours_booked: selectedShift?.duration || customHours || null,
       };
+
+      // Flatten address fields for backend
+      if (serviceTypeConfig.requiresAddress && serviceAddress) {
+        bookingData.service_address = serviceAddress.street || '';
+        bookingData.service_city = serviceAddress.city || '';
+        bookingData.service_apartment = serviceAddress.apartment || '';
+        bookingData.service_floor = serviceAddress.floor || '';
+        bookingData.service_entry_code = serviceAddress.entrance || '';
+        bookingData.service_notes = serviceAddress.specialInstructions || '';
+      }
+
+      // Flatten shipping address for products
+      if (serviceTypeConfig.requiresShipping && shippingAddress) {
+        bookingData.shipping_address = shippingAddress.street || '';
+        bookingData.shipping_city = shippingAddress.city || '';
+        bookingData.shipping_postal_code = shippingAddress.postalCode || '';
+      }
+
+      // Flatten contact person fields
+      if (serviceTypeConfig.requiresContact && contactPerson) {
+        bookingData.is_contact_same_as_requester = contactPerson.relationship === 'self';
+        bookingData.contact_person_name = contactPerson.name || '';
+        bookingData.contact_person_phone = contactPerson.phone || '';
+        bookingData.contact_person_relationship = contactPerson.relationship || '';
+      }
 
       if (!isAuthenticated && guestMode) {
         bookingData.guest_booking = true;
@@ -355,7 +373,9 @@ const BookService = () => {
       setStep('success');
     } catch (error) {
       console.error('Booking failed:', error);
-      toast.error(error.response?.data?.detail || 'שגיאה בשליחת ההזמנה');
+      const detail = error.response?.data?.detail;
+      const msg = typeof detail === 'string' ? detail : 'שגיאה בשליחת ההזמנה, אנא נסו שוב';
+      toast.error(msg);
     } finally {
       setBooking(false);
     }
