@@ -982,6 +982,27 @@ const ProviderDashboard = () => {
                     </div>
                   )}
 
+                  {/* Subscription Tab */}
+                  {activeTab === 'subscription' && (
+                    <div className="bg-white p-6 rounded-2xl shadow-lg">
+                      <ProviderSubscription provider={providerData} onRefresh={fetchDashboardData} />
+                    </div>
+                  )}
+
+                  {/* Clinics Tab */}
+                  {activeTab === 'clinics' && (
+                    <div className="bg-white p-6 rounded-2xl shadow-lg">
+                      <ProviderClinics provider={providerData} />
+                    </div>
+                  )}
+
+                  {/* Team Tab */}
+                  {activeTab === 'team' && (
+                    <div className="bg-white p-6 rounded-2xl shadow-lg">
+                      <ProviderTeam provider={providerData} />
+                    </div>
+                  )}
+
                   {/* Services Tab - Enhanced */}
                   {activeTab === 'services' && (
                     <div className="space-y-6">
