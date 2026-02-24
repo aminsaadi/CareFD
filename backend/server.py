@@ -6464,7 +6464,15 @@ async def cancel_subscription(
         }}
     )
     
-    return {"message": "Subscription cancelled successfully"}
+    # Reset provider tier to free
+    provider = await db.providers.find_one({"user_id": user["user_id"]})
+    if provider:
+        await db.providers.update_one(
+            {"user_id": user["user_id"]},
+            {"$set": {"subscription_tier": "free", "is_recommended": False}}
+        )
+    
+    return {"message": "המנוי בוטל. חזרת למנוי חינם."}
 
 @api_router.get("/payments/history")
 async def get_payment_history(
