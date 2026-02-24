@@ -171,14 +171,7 @@ const Landing = () => {
     }
   };
 
-  const defaultRegions = [
-    { id: 'north', name: 'צפון' },
-    { id: 'haifa', name: 'חיפה והקריות' },
-    { id: 'center', name: 'מרכז' },
-    { id: 'tel-aviv', name: 'תל אביב' },
-    { id: 'jerusalem', name: 'ירושלים' },
-    { id: 'south', name: 'דרום' },
-  ];
+  const defaultRegions = israeliRegions.slice(0, 6);
 
   const displayRegions = regions.length > 0 ? regions.slice(0, 6) : defaultRegions;
 
