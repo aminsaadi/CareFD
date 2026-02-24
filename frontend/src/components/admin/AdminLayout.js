@@ -31,6 +31,7 @@ const AdminLayout = ({ children }) => {
         { id: 'providers', label: 'ספקים', icon: FiBriefcase, path: '/admin/providers' },
         { id: 'verification', label: 'אימות ספקים', icon: FiShield, path: '/admin/verification', badge: true },
         { id: 'bookings', label: 'הזמנות', icon: FiCalendar, path: '/admin/bookings' },
+        { id: 'reviews', label: 'ביקורות', icon: FiStar, path: '/admin/reviews', badge: true },
         { id: 'services', label: 'שירותים', icon: FiTag, path: '/admin/services' },
       ]
     },
