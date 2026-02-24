@@ -6669,7 +6669,14 @@ async def admin_update_plan(
     if admin.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    allowed_fields = ["price_monthly", "price_yearly", "features", "max_services", "max_bookings_per_month", "is_active"]
+    allowed_fields = [
+        "name_he", "price_monthly", "price_yearly", "features", "features_list",
+        "max_services", "max_bookings_per_month", "max_clinics", "max_team_members",
+        "has_promoted_profile", "has_recommended_badge", "has_team_management",
+        "has_chat_contact", "has_phone_contact", "has_whatsapp_contact",
+        "has_clinic_management", "has_product_shipping", "has_priority_support",
+        "has_staff_support", "analytics_access", "is_active", "sort_order"
+    ]
     update_data = {k: v for k, v in plan_data.items() if k in allowed_fields}
     
     if not update_data:
