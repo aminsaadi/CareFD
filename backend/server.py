@@ -2438,7 +2438,8 @@ async def create_booking(
     
     booking_dict = booking.model_dump()
     booking_dict['created_at'] = booking_dict['created_at'].isoformat()
-    booking_dict['booking_date'] = booking_dict['booking_date'].isoformat()
+    if booking_dict.get('booking_date'):
+        booking_dict['booking_date'] = booking_dict['booking_date'].isoformat()
     if booking_dict.get('contact_person'):
         booking_dict['contact_person'] = dict(booking_dict['contact_person'])
     if booking_dict.get('service_location'):
@@ -2450,16 +2451,16 @@ async def create_booking(
     
     # Create notification for provider
     notification_client_name = user_name or client_name or "לקוח"
+    booking_date_formatted = booking_data.booking_date.strftime('%d/%m/%Y') if booking_data.booking_date else "יתואם טלפונית"
     await create_notification(
         provider["user_id"],
         NotificationType.BOOKING_NEW,
         "הזמנה חדשה!",
-        f"{notification_client_name} הזמין {service.get('name', 'שירות')} לתאריך {booking_data.booking_date.strftime('%d/%m/%Y')}",
+        f"{notification_client_name} הזמין {service.get('name', 'שירות')} לתאריך {booking_date_formatted}",
         {"booking_id": booking.booking_id, "service_id": service["service_id"]}
     )
     
     # Format booking date nicely
-    booking_date_formatted = booking_data.booking_date.strftime('%d/%m/%Y')
     booking_time_str = booking_data.booking_time or "יתואם טלפונית"
     
     # Send notification email to provider
