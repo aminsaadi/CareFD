@@ -13,6 +13,7 @@ const ProviderSubscription = ({ provider, onRefresh }) => {
   const [loading, setLoading] = useState(true);
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [upgrading, setUpgrading] = useState(false);
+  const [hasUsedTrial, setHasUsedTrial] = useState(false);
 
   useEffect(() => {
     fetchData();
