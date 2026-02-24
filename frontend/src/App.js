@@ -356,6 +356,14 @@ function AppRouter() {
         }
       />
       <Route
+        path="/admin/reviews"
+        element={
+          <ProtectedRoute>
+            <AdminReviews />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/admin/providers/:providerId/edit"
         element={
           <ProtectedRoute>
