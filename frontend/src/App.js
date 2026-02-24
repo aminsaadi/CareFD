@@ -50,6 +50,7 @@ import AdminNotifications from './pages/admin/AdminNotifications';
 import AdminMessages from './pages/admin/AdminMessages';
 import AdminProviderEdit from './pages/admin/AdminProviderEdit';
 import Notifications from './pages/Notifications';
+import VerificationRequest from './pages/VerificationRequest';
 import './i18n';
 import './App.css';
 
