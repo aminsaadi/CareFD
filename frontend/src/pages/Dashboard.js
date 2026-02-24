@@ -303,6 +303,20 @@ const Dashboard = () => {
                   <p className="text-carelink-teal-pale text-sm font-mono" data-testid="user-number">
                     {user?.user_number || `U${user?.user_id?.slice(-7) || '0000000'}`}
                   </p>
+                  {/* Verification Badge */}
+                  {user?.is_verified ? (
+                    <span className="inline-flex items-center gap-1 mt-2 bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-xs">
+                      <FaCheckCircle /> מאומת
+                    </span>
+                  ) : (
+                    <Link 
+                      to="/verify-account" 
+                      className="inline-flex items-center gap-1 mt-2 bg-amber-500/20 text-amber-300 px-3 py-1 rounded-full text-xs hover:bg-amber-500/30 transition"
+                      data-testid="request-verification-btn"
+                    >
+                      <FaShieldAlt /> בקש אימות
+                    </Link>
+                  )}
                 </div>
 
                 {/* Navigation */}
