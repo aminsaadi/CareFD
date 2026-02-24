@@ -148,6 +148,14 @@ function AppRouter() {
         }
       />
       <Route
+        path="/review/:bookingId"
+        element={
+          <ProtectedRoute>
+            <WriteReview />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/verify-account"
         element={
           <ProtectedRoute>
