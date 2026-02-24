@@ -38,9 +38,11 @@ def generate_provider_number():
     """Generate provider number like P7784569"""
     return f"P{random.randint(1000000, 9999999)}"
 
+import certifi
+
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
+client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where())
 db = client[os.environ['DB_NAME']]
 
 # Configuration
