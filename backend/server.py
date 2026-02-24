@@ -3483,13 +3483,11 @@ async def get_chat_rooms(
         if provider:
             # Provider viewing - get patient info
             patient = await db.users.find_one({"user_id": room["user_id"]}, {"_id": 0, "password_hash": 0})
-            if patient:
-                room["other_user"] = patient
+            room["other_user"] = patient or {"name": "משתמש", "user_id": room["user_id"]}
         else:
             # Patient viewing - get provider info
             provider_info = await db.providers.find_one({"provider_id": room["provider_id"]}, {"_id": 0})
-            if provider_info:
-                room["other_user"] = provider_info
+            room["other_user"] = provider_info or {"business_name": "ספק", "provider_id": room["provider_id"]}
         
         # Get last message
         last_msg_cursor = db.messages.find(
@@ -3499,6 +3497,10 @@ async def get_chat_rooms(
         last_msg_list = await last_msg_cursor.to_list(1)
         if last_msg_list:
             room["last_message"] = last_msg_list[0]
+        
+        # Calculate unread count
+        unread_query = {"room_id": room["room_id"], "sender_id": {"$ne": user["user_id"]}, "is_read": False}
+        room["unread_count"] = await db.messages.count_documents(unread_query)
     
     return {"rooms": rooms}
 
