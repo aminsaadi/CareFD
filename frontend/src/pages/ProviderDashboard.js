@@ -238,10 +238,36 @@ const ProviderDashboard = () => {
 
   const updateBookingStatus = async (bookingId, status) => {
     try {
-      await api.put(`/bookings/${bookingId}/status`, { status });
+      // Use specific endpoints for each action
+      const endpointMap = {
+        'confirmed': `/bookings/${bookingId}/confirm`,
+        'rejected': `/bookings/${bookingId}/reject`,
+        'on_hold': `/bookings/${bookingId}/hold`,
+        'provider_completed': `/bookings/${bookingId}/provider-complete`,
+        'cancelled': `/bookings/${bookingId}/status`
+      };
+      
+      const endpoint = endpointMap[status];
+      if (!endpoint) {
+        await api.put(`/bookings/${bookingId}/status`, { status });
+      } else if (status === 'cancelled') {
+        await api.put(endpoint, { status });
+      } else {
+        await api.put(endpoint, {});
+      }
+      
+      const statusLabels = {
+        confirmed: 'ההזמנה אושרה',
+        rejected: 'ההזמנה נדחתה',
+        on_hold: 'ההזמנה הושהתה',
+        provider_completed: 'ההזמנה סומנה כהושלמה',
+        cancelled: 'ההזמנה בוטלה'
+      };
+      toast.success(statusLabels[status] || 'הסטטוס עודכן');
       fetchDashboardData();
     } catch (error) {
       console.error('Failed to update booking:', error);
+      toast.error(error.response?.data?.detail || 'שגיאה בעדכון ההזמנה');
     }
   };
 
