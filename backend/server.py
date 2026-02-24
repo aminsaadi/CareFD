@@ -6595,7 +6595,7 @@ async def admin_get_subscriptions(
     # Get stats
     total_active = await db.subscriptions.count_documents({"status": "active"})
     total_pro = await db.subscriptions.count_documents({"tier": "pro", "status": "active"})
-    total_premium = await db.subscriptions.count_documents({"tier": "premium", "status": "active"})
+    total_gold = await db.subscriptions.count_documents({"tier": "gold", "status": "active"})
     
     return {
         "subscriptions": subscriptions,
