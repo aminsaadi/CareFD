@@ -7,19 +7,17 @@ import ProviderCard from '../components/ProviderCard';
 import AdvancedFilters from '../components/AdvancedFilters';
 import api from '../utils/api';
 import { israeliLocalities } from '../data/israeliLocalities';
+import { israeliRegions, healthcareProfessions, popularSearches as searchData } from '../data/searchData';
 import { 
   FaSearch, FaFilter, FaTimes, FaSortAmountDown, FaMapMarkerAlt,
-  FaThLarge, FaList, FaCrosshairs, FaSpinner, FaMap
+  FaThLarge, FaList, FaCrosshairs, FaSpinner, FaMap, FaBriefcase
 } from 'react-icons/fa';
 
 // Lazy load map component
 const ProvidersMap = lazy(() => import('../components/ProvidersMap'));
 
-// Popular searches data
-const popularSearches = [
-  'אחות', 'רופא משפחה', 'פיזיותרפיסט', 'מטפל סיעודי', 
-  'פסיכולוג', 'דיאטנית', 'רופא ילדים', 'מעסה'
-];
+// Popular searches data - use from searchData
+const popularSearches = searchData.providers;
 const Providers = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
