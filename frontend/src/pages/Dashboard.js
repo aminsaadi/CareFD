@@ -243,6 +243,8 @@ const Dashboard = () => {
       case 'provider_completed': return 'bg-purple-100 text-purple-600';
       case 'in_progress': return 'bg-cyan-100 text-cyan-600';
       case 'cancelled': return 'bg-red-100 text-red-600';
+      case 'rejected': return 'bg-red-100 text-red-600';
+      case 'on_hold': return 'bg-gray-100 text-gray-600';
       default: return 'bg-gray-100 text-gray-600';
     }
   };
