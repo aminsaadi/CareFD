@@ -86,17 +86,8 @@ const testimonials = [
   { id: 3, name: 'רחל אברהם', role: 'ספקית שירות', content: 'הפלטפורמה עזרה לי להגיע ללקוחות חדשים ולפתח את העסק שלי בצורה משמעותית.', rating: 5, avatar: 'ר' },
 ];
 
-// Popular searches data
-const popularSearches = {
-  providers: [
-    'אחות', 'רופא משפחה', 'פיזיותרפיסט', 'מטפל סיעודי', 
-    'פסיכולוג', 'דיאטנית', 'רופא ילדים', 'מעסה'
-  ],
-  services: [
-    'ביקור בית', 'טיפול סיעודי', 'פיזיותרפיה', 'ייעוץ רפואי',
-    'טיפול פסיכולוגי', 'עיסוי רפואי', 'בדיקות דם', 'חיסונים'
-  ]
-};
+// Popular searches data - use from searchData
+const popularSearches = searchData;
 
 const Landing = () => {
   const navigate = useNavigate();
