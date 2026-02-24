@@ -612,10 +612,27 @@ const BookService = () => {
                 {/* Address for Home Visit / Hourly */}
                 {serviceTypeConfig.requiresAddress && (
                   <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale">
-                    <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
-                      <FaHome className="text-carelink-teal" />
-                      כתובת לביקור
-                    </h2>
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-lg font-bold text-carelink-navy flex items-center gap-2">
+                        <FaHome className="text-carelink-teal" />
+                        כתובת לביקור
+                      </h2>
+                      {user && (
+                        <button
+                          type="button"
+                          onClick={() => setServiceAddress(prev => ({
+                            ...prev,
+                            street: user.address || prev.street,
+                            city: user.city || prev.city
+                          }))}
+                          className="inline-flex items-center gap-1.5 text-xs font-medium text-carelink-teal bg-carelink-teal-pale/40 hover:bg-carelink-teal-pale px-3 py-1.5 rounded-full transition"
+                          data-testid="fill-my-address-btn"
+                        >
+                          <FaMapMarkerAlt className="text-[10px]" />
+                          הכתובת שלי
+                        </button>
+                      )}
+                    </div>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="sm:col-span-2">
