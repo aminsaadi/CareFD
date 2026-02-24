@@ -6603,7 +6603,7 @@ async def admin_get_subscriptions(
         "stats": {
             "total_active": total_active,
             "total_pro": total_pro,
-            "total_premium": total_premium
+            "total_gold": total_gold
         }
     }
 
