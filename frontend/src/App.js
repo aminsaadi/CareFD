@@ -375,6 +375,7 @@ function AppRouter() {
           </ProtectedRoute>
         }
       />
+      <Route path="/page/:slug" element={<GenericPage />} />
     </Routes>
     </>
   );
