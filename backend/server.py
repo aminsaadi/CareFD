@@ -1949,6 +1949,20 @@ async def create_service(
     if not provider:
         raise HTTPException(status_code=404, detail="Provider not found")
     
+    # Check subscription service limit
+    tier = provider.get("subscription_tier", "free")
+    plan = await db.subscription_plans.find_one({"tier": tier}, {"_id": 0})
+    if not plan:
+        plan = DEFAULT_PLANS[0]
+    max_services = plan.get("max_services", 1)
+    if max_services != -1:
+        current_count = await db.services.count_documents({"provider_id": provider["provider_id"]})
+        if current_count >= max_services:
+            raise HTTPException(
+                status_code=403,
+                detail=f"הגעת למגבלת השירותים במנוי שלך ({max_services}). שדרג את המנוי כדי להוסיף שירותים נוספים."
+            )
+    
     service = Service(
         provider_id=provider["provider_id"],
         **service_data.model_dump()
