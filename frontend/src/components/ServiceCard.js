@@ -66,7 +66,6 @@ const ServiceCard = ({ service, showProvider = true }) => {
       data-testid={`service-card-${service.service_id}`}
     >
       {/* Top color accent */}
-      <div className="h-1 bg-gradient-to-l from-carelink-teal to-carelink-navy" />
 
       <div className="p-5">
         {/* Tags row */}
@@ -159,7 +158,7 @@ const ServiceCard = ({ service, showProvider = true }) => {
           </button>
           <button
             onClick={handleWhatsApp}
-            className="w-10 h-10 flex items-center justify-center bg-carelink-teal text-white rounded-xl hover:bg-carelink-teal-medium transition-colors"
+            className="w-10 h-10 flex items-center justify-center bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors"
             title="WhatsApp"
           >
             <FaWhatsapp className="text-sm" />
