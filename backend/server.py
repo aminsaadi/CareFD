@@ -483,12 +483,14 @@ class OfferCreate(BaseModel):
 
 # Booking Models
 class BookingStatus:
-    PENDING = "pending"
-    CONFIRMED = "confirmed"
-    IN_PROGRESS = "in_progress"
-    PROVIDER_COMPLETED = "provider_completed"
-    COMPLETED = "completed"
-    CANCELLED = "cancelled"
+    PENDING = "pending"           # ממתינה לאישור
+    CONFIRMED = "confirmed"       # מאושרת
+    IN_PROGRESS = "in_progress"   # בביצוע
+    PROVIDER_COMPLETED = "provider_completed"  # הספק סיים
+    COMPLETED = "completed"       # הושלמה
+    CANCELLED = "cancelled"       # בוטלה
+    REJECTED = "rejected"         # נדחתה
+    ON_HOLD = "on_hold"          # בהשהיה
 
 class ContactPerson(BaseModel):
     name: str
