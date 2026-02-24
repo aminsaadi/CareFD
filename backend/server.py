@@ -2424,19 +2424,58 @@ async def create_booking(
         {"booking_id": booking.booking_id, "service_id": service["service_id"]}
     )
     
+    # Format booking date nicely
+    booking_date_formatted = booking_data.booking_date.strftime('%d/%m/%Y')
+    booking_time_str = booking_data.booking_time or "יתואם טלפונית"
+    
     # Send notification email to provider
     provider_user = await db.users.find_one({"user_id": provider["user_id"]}, {"_id": 0})
     if provider_user:
         await send_email_async(
             provider_user.get("email"),
-            "CareLink - הזמנה חדשה!",
+            f"CareLink - הזמנה חדשה #{booking.booking_number}",
             f"""
-            <h1>יש לך הזמנה חדשה!</h1>
-            <p><strong>לקוח:</strong> {client_name}</p>
-            <p><strong>שירות:</strong> {service.get('name', 'שירות')}</p>
-            <p><strong>תאריך:</strong> {booking_data.booking_date.strftime('%d/%m/%Y')}</p>
-            <p><strong>כתובת:</strong> {booking_data.service_address or booking_data.guest_address or 'לא צוין'}, {booking_data.service_city or ''}</p>
-            <p>היכנס לדשבורד כדי לאשר את ההזמנה.</p>
+            <!DOCTYPE html>
+            <html dir="rtl" lang="he">
+            <head><meta charset="UTF-8"></head>
+            <body style="font-family: Arial, sans-serif; direction: rtl; text-align: right; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background: linear-gradient(135deg, #00a99d, #0d5c63); color: white; padding: 30px; border-radius: 15px 15px 0 0; text-align: center;">
+                    <h1 style="margin: 0;">הזמנה חדשה!</h1>
+                    <p style="margin: 10px 0 0;">מספר הזמנה: {booking.booking_number}</p>
+                </div>
+                
+                <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 15px 15px;">
+                    <h2 style="color: #0d5c63; border-bottom: 2px solid #00a99d; padding-bottom: 10px;">פרטי ההזמנה</h2>
+                    
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr><td style="padding: 10px 0; color: #666;">לקוח:</td><td style="padding: 10px 0; font-weight: bold;">{client_name}</td></tr>
+                        <tr><td style="padding: 10px 0; color: #666;">טלפון:</td><td style="padding: 10px 0;">{client_phone or 'לא צוין'}</td></tr>
+                        <tr><td style="padding: 10px 0; color: #666;">שירות:</td><td style="padding: 10px 0; font-weight: bold;">{service.get('name', 'שירות')}</td></tr>
+                        <tr><td style="padding: 10px 0; color: #666;">תאריך:</td><td style="padding: 10px 0;">{booking_date_formatted}</td></tr>
+                        <tr><td style="padding: 10px 0; color: #666;">שעה:</td><td style="padding: 10px 0;">{booking_time_str}</td></tr>
+                        <tr><td style="padding: 10px 0; color: #666;">כתובת:</td><td style="padding: 10px 0;">{booking_data.service_address or booking_data.guest_address or 'לא צוין'}, {booking_data.service_city or ''}</td></tr>
+                    </table>
+                    
+                    <div style="background: #fff3cd; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                        <strong>⚠️ סטטוס:</strong> ממתינה לאישורך
+                    </div>
+                    
+                    <h3 style="color: #0d5c63;">סיכום מחירים</h3>
+                    <table style="width: 100%; border-collapse: collapse; background: white; padding: 15px; border-radius: 10px;">
+                        <tr><td style="padding: 8px 0;">מחיר בסיס:</td><td style="text-align: left;">₪{service.get('price', 0)}</td></tr>
+                        {'<tr><td style="padding: 8px 0;">תוספת נסיעות:</td><td style="text-align: left;">₪' + str(travel_cost) + '</td></tr>' if travel_cost > 0 else ''}
+                        {'<tr><td style="padding: 8px 0;">תוספת סופ"ש:</td><td style="text-align: left;">₪' + str(weekend_addition) + '</td></tr>' if weekend_addition > 0 else ''}
+                        <tr style="border-top: 2px solid #00a99d;"><td style="padding: 10px 0; font-weight: bold;">סה"כ:</td><td style="text-align: left; font-weight: bold; color: #00a99d; font-size: 18px;">₪{final_price}</td></tr>
+                    </table>
+                    
+                    {f'<div style="background: #e8f5f3; padding: 15px; border-radius: 10px; margin-top: 20px;"><strong>הערות:</strong> {booking_data.notes}</div>' if booking_data.notes else ''}
+                    
+                    <div style="text-align: center; margin-top: 30px;">
+                        <a href="https://carelink.co.il/provider/dashboard" style="background: #00a99d; color: white; padding: 15px 40px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">אשר את ההזמנה</a>
+                    </div>
+                </div>
+            </body>
+            </html>
             """
         )
     
@@ -2445,13 +2484,62 @@ async def create_booking(
     if client_email_to_send:
         await send_email_async(
             client_email_to_send,
-            "CareLink - אישור הזמנה",
+            f"CareLink - אישור קבלת הזמנה #{booking.booking_number}",
             f"""
-            <h1>ההזמנה נשלחה בהצלחה!</h1>
-            <p><strong>שירות:</strong> {service.get('name', 'שירות')}</p>
-            <p><strong>ספק:</strong> {provider.get('business_name', 'ספק')}</p>
-            <p><strong>תאריך:</strong> {booking_data.booking_date.strftime('%d/%m/%Y')}</p>
-            <p>סטטוס: ממתין לאישור הספק</p>
+            <!DOCTYPE html>
+            <html dir="rtl" lang="he">
+            <head><meta charset="UTF-8"></head>
+            <body style="font-family: Arial, sans-serif; direction: rtl; text-align: right; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background: linear-gradient(135deg, #00a99d, #0d5c63); color: white; padding: 30px; border-radius: 15px 15px 0 0; text-align: center;">
+                    <h1 style="margin: 0;">ההזמנה נשלחה בהצלחה!</h1>
+                    <p style="margin: 10px 0 0;">מספר הזמנה: {booking.booking_number}</p>
+                </div>
+                
+                <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 15px 15px;">
+                    <div style="background: #d4edda; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center;">
+                        <span style="font-size: 30px;">✅</span>
+                        <p style="margin: 10px 0 0; font-weight: bold; color: #155724;">ההזמנה התקבלה וממתינה לאישור הספק</p>
+                    </div>
+                    
+                    <h2 style="color: #0d5c63; border-bottom: 2px solid #00a99d; padding-bottom: 10px;">סיכום ההזמנה</h2>
+                    
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr><td style="padding: 10px 0; color: #666;">שירות:</td><td style="padding: 10px 0; font-weight: bold;">{service.get('name', 'שירות')}</td></tr>
+                        <tr><td style="padding: 10px 0; color: #666;">ספק:</td><td style="padding: 10px 0;">{provider.get('business_name', 'ספק')}</td></tr>
+                        <tr><td style="padding: 10px 0; color: #666;">תאריך:</td><td style="padding: 10px 0;">{booking_date_formatted}</td></tr>
+                        <tr><td style="padding: 10px 0; color: #666;">שעה:</td><td style="padding: 10px 0;">{booking_time_str}</td></tr>
+                        {'<tr><td style="padding: 10px 0; color: #666;">כתובת:</td><td style="padding: 10px 0;">' + (booking_data.service_address or booking_data.guest_address or '') + ', ' + (booking_data.service_city or '') + '</td></tr>' if booking_data.service_address or booking_data.guest_address else ''}
+                    </table>
+                    
+                    <h3 style="color: #0d5c63; margin-top: 20px;">פירוט עלויות</h3>
+                    <div style="background: white; padding: 20px; border-radius: 10px; border: 1px solid #e0e0e0;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr><td style="padding: 8px 0;">מחיר בסיס:</td><td style="text-align: left;">₪{service.get('price', 0)}</td></tr>
+                            {'<tr><td style="padding: 8px 0;">תוספת נסיעות:</td><td style="text-align: left;">₪' + str(travel_cost) + '</td></tr>' if travel_cost > 0 else ''}
+                            {'<tr><td style="padding: 8px 0;">תוספת סופ"ש:</td><td style="text-align: left;">₪' + str(weekend_addition) + '</td></tr>' if weekend_addition > 0 else ''}
+                            {'<tr><td style="padding: 8px 0;">דמי משלוח:</td><td style="text-align: left;">₪' + str(shipping_cost) + '</td></tr>' if shipping_cost > 0 else ''}
+                        </table>
+                        <div style="border-top: 2px solid #00a99d; margin-top: 15px; padding-top: 15px;">
+                            <strong style="font-size: 18px;">סה"כ לתשלום: </strong>
+                            <span style="font-size: 24px; color: #00a99d; font-weight: bold; float: left;">₪{final_price}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #e8f5f3; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                        <h4 style="margin: 0 0 10px; color: #0d5c63;">מה הלאה?</h4>
+                        <p style="margin: 0; color: #666;">הספק יבדוק את ההזמנה ויאשר אותה בהקדם. נעדכן אותך במייל ובהתראה באפליקציה.</p>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 30px;">
+                        <a href="https://carelink.co.il/dashboard" style="background: #00a99d; color: white; padding: 15px 40px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">צפה בהזמנות שלי</a>
+                    </div>
+                    
+                    <p style="text-align: center; color: #999; font-size: 12px; margin-top: 30px;">
+                        יש שאלות? צרו קשר: support@carelink.co.il
+                    </p>
+                </div>
+            </body>
+            </html>
             """
         )
     
