@@ -375,6 +375,7 @@ function AppRouter() {
         }
       />
     </Routes>
+    </>
   );
 }
 
