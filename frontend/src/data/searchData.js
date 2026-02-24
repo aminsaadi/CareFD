@@ -42,6 +42,34 @@ export const israeliRegions = [
   }
 ];
 
+// Gender options
+export const genderOptions = [
+  { id: 'male', name: 'זכר', icon: 'FaMale' },
+  { id: 'female', name: 'נקבה', icon: 'FaFemale' },
+  { id: 'any', name: 'לא משנה', icon: 'FaUsers' }
+];
+
+// Languages
+export const languageOptions = [
+  { id: 'hebrew', name: 'עברית' },
+  { id: 'arabic', name: 'ערבית' },
+  { id: 'russian', name: 'רוסית' },
+  { id: 'english', name: 'אנגלית' },
+  { id: 'french', name: 'צרפתית' },
+  { id: 'amharic', name: 'אמהרית' },
+  { id: 'spanish', name: 'ספרדית' },
+  { id: 'yiddish', name: 'יידיש' }
+];
+
+// Health Funds (Kupot Cholim)
+export const healthFunds = [
+  { id: 'clalit', name: 'כללית', color: '#00a651' },
+  { id: 'maccabi', name: 'מכבי', color: '#0072bc' },
+  { id: 'meuhedet', name: 'מאוחדת', color: '#ed1c24' },
+  { id: 'leumit', name: 'לאומית', color: '#f7941d' },
+  { id: 'private', name: 'פרטי', color: '#6b7280' }
+];
+
 // Professions/Occupations for healthcare
 export const healthcareProfessions = [
   { id: 'nurse', name: 'אחות/אח', searchTerms: ['אחות', 'אח', 'סיעוד', 'אחות מוסמכת', 'אחות מעשית'] },
