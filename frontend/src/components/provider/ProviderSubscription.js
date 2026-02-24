@@ -95,8 +95,16 @@ const ProviderSubscription = ({ provider, onRefresh }) => {
               <p className="text-sm text-gray-500">המנוי הנוכחי שלך</p>
               <h3 className="text-2xl font-bold text-gray-900">
                 {currentPlan?.name_he || 'חינם'}
+                {currentSub?.is_trial && (
+                  <span className="text-sm font-normal text-orange-600 mr-2">(תקופת ניסיון)</span>
+                )}
               </h3>
-              {currentSub?.billing_cycle && currentTier !== 'free' && (
+              {currentSub?.is_trial && currentSub?.trial_end_date && (
+                <p className="text-sm text-orange-600">
+                  ניסיון עד {new Date(currentSub.trial_end_date).toLocaleDateString('he-IL')}
+                </p>
+              )}
+              {currentSub?.billing_cycle && currentTier !== 'free' && !currentSub?.is_trial && (
                 <p className="text-sm text-gray-500">
                   {currentSub.billing_cycle === 'yearly' ? 'מנוי שנתי' : 'מנוי חודשי'}
                 </p>
@@ -114,6 +122,31 @@ const ProviderSubscription = ({ provider, onRefresh }) => {
           )}
         </div>
       </div>
+
+      {/* Free Trial Banner - for free users who haven't used trial */}
+      {currentTier === 'free' && !hasUsedTrial && (
+        <div className="bg-gradient-to-l from-orange-400 to-amber-500 rounded-2xl p-6 text-white" data-testid="trial-banner">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <FaStar className="text-2xl" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold">30 יום ניסיון חינם למנוי פרו!</h3>
+                <p className="text-amber-100 text-sm">נסה את כל התכונות המתקדמות ללא התחייבות</p>
+              </div>
+            </div>
+            <button
+              onClick={() => handleUpgrade('plan_pro', true)}
+              disabled={upgrading}
+              className="bg-white text-amber-600 px-6 py-3 rounded-xl font-bold hover:bg-amber-50 transition whitespace-nowrap disabled:opacity-50"
+              data-testid="start-trial-btn"
+            >
+              {upgrading ? 'מפעיל...' : 'התחל ניסיון חינם'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Billing Toggle */}
       <div className="flex items-center justify-center gap-4 bg-white rounded-xl p-4 shadow-sm border">
