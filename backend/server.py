@@ -526,7 +526,7 @@ class Booking(BaseModel):
     user_id: str
     provider_id: str
     service_id: str
-    booking_date: datetime
+    booking_date: Optional[datetime] = None
     booking_time: Optional[str] = None  # "09:00"
     status: str = BookingStatus.PENDING
     
