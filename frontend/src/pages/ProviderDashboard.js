@@ -501,6 +501,7 @@ const ProviderDashboard = () => {
   const tabs = [
     { id: 'overview', label: 'סקירה כללית', icon: FaChartBar },
     { id: 'bookings', label: 'תורים', icon: FaCalendarAlt },
+    { id: 'calendar', label: 'לוח שנה', icon: FaClock },
     { id: 'services', label: 'שירותים', icon: FaBriefcase },
     { id: 'requests', label: 'בקשות פתוחות', icon: FaFileAlt },
     { id: 'notifications', label: 'התראות', icon: FaBell, link: '/notifications' },
@@ -520,8 +521,40 @@ const ProviderDashboard = () => {
       case 'provider_completed': return 'bg-purple-100 text-purple-600';
       case 'in_progress': return 'bg-cyan-100 text-cyan-600';
       case 'cancelled': return 'bg-red-100 text-red-600';
+      case 'rejected': return 'bg-red-100 text-red-600';
+      case 'on_hold': return 'bg-gray-100 text-gray-600';
       default: return 'bg-gray-100 text-gray-600';
     }
+  };
+
+  const getStatusLabel = (status) => {
+    const labels = {
+      pending: 'ממתין לאישור',
+      confirmed: 'מאושר',
+      in_progress: 'בביצוע',
+      provider_completed: 'סומן כהושלם',
+      completed: 'הושלם',
+      cancelled: 'בוטל',
+      rejected: 'נדחה',
+      on_hold: 'בהשהיה'
+    };
+    return labels[status] || status;
+  };
+
+  // Calendar helpers
+  const getCalendarBookings = () => {
+    return bookings.filter(b => ['confirmed', 'in_progress'].includes(b.status));
+  };
+
+  const groupBookingsByDate = () => {
+    const grouped = {};
+    getCalendarBookings().forEach(booking => {
+      const date = booking.booking_date?.split('T')[0] || '';
+      if (!grouped[date]) grouped[date] = [];
+      grouped[date].push(booking);
+    });
+    // Sort by date
+    return Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
   };
 
   return (
