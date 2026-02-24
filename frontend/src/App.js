@@ -146,6 +146,14 @@ function AppRouter() {
         }
       />
       <Route
+        path="/verify-account"
+        element={
+          <ProtectedRoute>
+            <VerificationRequest />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/requests/:requestId"
         element={
           <ProtectedRoute>
