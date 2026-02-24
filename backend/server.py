@@ -2786,6 +2786,120 @@ async def confirm_booking(
     
     return {"message": "Booking confirmed successfully"}
 
+@api_router.put("/bookings/{booking_id}/reject")
+async def reject_booking(
+    booking_id: str,
+    body: dict = None,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Reject a booking (provider only)"""
+    user = await get_current_user(authorization, request)
+    
+    booking = await db.bookings.find_one({"booking_id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    # Check if user is the provider
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider or booking["provider_id"] != provider["provider_id"]:
+        raise HTTPException(status_code=403, detail="Only provider can reject bookings")
+    
+    reason = body.get("reason", "") if body else ""
+    
+    await db.bookings.update_one(
+        {"booking_id": booking_id},
+        {"$set": {
+            "status": BookingStatus.REJECTED,
+            "rejected_at": datetime.now(timezone.utc).isoformat(),
+            "rejection_reason": reason
+        }}
+    )
+    
+    # Notify client
+    await create_notification(
+        booking["user_id"],
+        NotificationType.BOOKING_CANCELLED,
+        "ההזמנה נדחתה",
+        f"לצערנו, הספק דחה את ההזמנה ל-{booking.get('service_name', 'שירות')}. {('סיבה: ' + reason) if reason else ''}",
+        {"booking_id": booking_id}
+    )
+    
+    # Send email to client
+    client_user = await db.users.find_one({"user_id": booking["user_id"]}, {"_id": 0})
+    if client_user and client_user.get("email"):
+        await send_email_async(
+            client_user["email"],
+            "CareLink - ההזמנה נדחתה",
+            f"""
+            <!DOCTYPE html>
+            <html dir="rtl" lang="he">
+            <head><meta charset="UTF-8"></head>
+            <body style="font-family: Arial, sans-serif; direction: rtl; text-align: right; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background: #dc3545; color: white; padding: 30px; border-radius: 15px 15px 0 0; text-align: center;">
+                    <h1 style="margin: 0;">ההזמנה נדחתה</h1>
+                </div>
+                <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 15px 15px;">
+                    <p>שלום {client_user.get('name', 'לקוח')},</p>
+                    <p>לצערנו, הספק דחה את ההזמנה שלך:</p>
+                    <div style="background: white; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                        <p><strong>שירות:</strong> {booking.get('service_name', 'שירות')}</p>
+                        <p><strong>תאריך:</strong> {booking.get('booking_date', '')[:10]}</p>
+                        {f'<p><strong>סיבה:</strong> {reason}</p>' if reason else ''}
+                    </div>
+                    <p>מומלץ לחפש ספק חלופי באתר.</p>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <a href="https://carelink.co.il/providers" style="background: #00a99d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold;">חפש ספק אחר</a>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+        )
+    
+    return {"message": "Booking rejected successfully"}
+
+@api_router.put("/bookings/{booking_id}/hold")
+async def hold_booking(
+    booking_id: str,
+    body: dict = None,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Put a booking on hold (provider only)"""
+    user = await get_current_user(authorization, request)
+    
+    booking = await db.bookings.find_one({"booking_id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    # Check if user is the provider
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider or booking["provider_id"] != provider["provider_id"]:
+        raise HTTPException(status_code=403, detail="Only provider can put bookings on hold")
+    
+    reason = body.get("reason", "") if body else ""
+    
+    await db.bookings.update_one(
+        {"booking_id": booking_id},
+        {"$set": {
+            "status": BookingStatus.ON_HOLD,
+            "on_hold_at": datetime.now(timezone.utc).isoformat(),
+            "hold_reason": reason
+        }}
+    )
+    
+    # Notify client
+    await create_notification(
+        booking["user_id"],
+        NotificationType.SYSTEM,
+        "ההזמנה הושהתה",
+        f"ההזמנה ל-{booking.get('service_name', 'שירות')} הושהתה. {('סיבה: ' + reason) if reason else ''}",
+        {"booking_id": booking_id}
+    )
+    
+    return {"message": "Booking put on hold successfully"}
+
 @api_router.put("/bookings/{booking_id}/provider-complete")
 async def provider_complete_booking(
     booking_id: str,
