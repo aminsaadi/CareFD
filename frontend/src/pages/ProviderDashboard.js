@@ -661,6 +661,26 @@ const ProviderDashboard = () => {
                   {/* Overview Tab */}
                   {activeTab === 'overview' && (
                     <div className="space-y-6">
+                      {/* Free tier upgrade banner */}
+                      {(!providerData?.subscription_tier || providerData?.subscription_tier === 'free') && (
+                        <div className="bg-gradient-to-l from-blue-500 to-blue-600 rounded-2xl p-5 text-white flex flex-col md:flex-row items-center justify-between gap-4" data-testid="overview-upgrade-banner">
+                          <div className="flex items-center gap-4">
+                            <FaCrown className="text-3xl text-yellow-300" />
+                            <div>
+                              <h3 className="text-lg font-bold">שדרג את הפרופיל שלך לפרו!</h3>
+                              <p className="text-blue-100 text-sm">פרופיל מקודם, שירותים ללא הגבלה, תווית מומלץ</p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setActiveTab('subscription')}
+                            className="bg-white text-blue-600 px-6 py-2.5 rounded-xl font-bold hover:bg-blue-50 transition whitespace-nowrap"
+                            data-testid="overview-upgrade-btn"
+                          >
+                            שדרג עכשיו - ₪59/חודש
+                          </button>
+                        </div>
+                      )}
+                      
                       {/* Stats Cards */}
                       <div className="grid md:grid-cols-4 gap-4">
                         <div className="bg-white p-6 rounded-2xl shadow-lg">
