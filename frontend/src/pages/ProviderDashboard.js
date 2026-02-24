@@ -513,11 +513,19 @@ const ProviderDashboard = () => {
               <p className="text-carelink-gray">ניהול העסק שלך</p>
             </div>
             {provider && (
-              <div className="flex items-center gap-3">
-                {provider.is_verified && (
+              <div className="flex items-center gap-3 flex-wrap">
+                {provider.is_verified ? (
                   <span className="inline-flex items-center gap-1 bg-carelink-teal text-white px-3 py-1 rounded-full text-sm">
                     <FaCheckCircle /> מאומת
                   </span>
+                ) : (
+                  <Link
+                    to="/verify-account"
+                    className="inline-flex items-center gap-1 bg-amber-500 text-white px-3 py-2 rounded-xl text-sm font-medium hover:bg-amber-600 transition"
+                    data-testid="request-verification-btn"
+                  >
+                    <FaAward /> בקש אימות
+                  </Link>
                 )}
                 {provider.is_recommended && (
                   <span className="inline-flex items-center gap-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1 rounded-full text-sm">
