@@ -122,6 +122,18 @@ DELETE /api/admin/categories/{id}                        # Delete category
 - Booking price calculation with weekend/travel/shipping fees
 - Service CRUD with DELETE endpoint fix
 
+### Completed Features ✅ (Feb 24, 2026) - NEW
+- **User/Provider Verification System (P0 COMPLETE)** ✅
+  - Users can request verification by uploading ID documents
+  - Providers can request verification by uploading ID + professional license
+  - API endpoints: GET /api/verification/status, POST /api/verification/request
+  - Admin can view, approve, reject user verifications via /api/admin/user-verifications
+  - Dashboard shows verification badge (מאומת/בקש אימות) for both users and providers
+  - Dedicated verification page at /verify-account
+  - Document upload supports: JPG, PNG, WEBP, PDF (max 5MB)
+  - Notifications sent to admins on new verification requests
+  - Notifications sent to users on approval/rejection
+
 ### Pending Features 🔄
 
 #### P1 - Backend Refactoring (HIGH PRIORITY)
