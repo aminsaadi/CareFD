@@ -135,19 +135,27 @@ const NotificationBell = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full mt-2 left-0 rtl:left-auto rtl:right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-carelink-teal-pale overflow-hidden z-50">
+        <div className="fixed md:absolute top-16 md:top-full md:mt-2 right-0 left-0 md:left-auto md:right-0 mx-2 md:mx-0 w-auto md:w-96 bg-white rounded-2xl shadow-xl border border-carelink-teal-pale overflow-hidden z-50 max-h-[80vh] md:max-h-none">
           {/* Header */}
           <div className="bg-carelink-navy text-white p-4 flex items-center justify-between">
             <h3 className="font-bold">התראות</h3>
-            {unreadCount > 0 && (
+            <div className="flex items-center gap-3">
+              {unreadCount > 0 && (
+                <button
+                  onClick={markAllAsRead}
+                  className="text-sm text-carelink-teal-pale hover:text-white flex items-center gap-1"
+                >
+                  <FaCheck />
+                  <span className="hidden sm:inline">סמן הכל כנקרא</span>
+                </button>
+              )}
               <button
-                onClick={markAllAsRead}
-                className="text-sm text-carelink-teal-pale hover:text-white flex items-center gap-1"
+                onClick={() => setIsOpen(false)}
+                className="md:hidden text-white hover:text-carelink-teal-pale"
               >
-                <FaCheck />
-                סמן הכל כנקרא
+                <FaTimes />
               </button>
-            )}
+            </div>
           </div>
 
           {/* Notifications List */}
