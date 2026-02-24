@@ -159,7 +159,7 @@ const NotificationBell = () => {
           </div>
 
           {/* Notifications List */}
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-[60vh] md:max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
               <div className="p-8 text-center text-carelink-gray">
                 <FaBell className="text-4xl mx-auto mb-2 text-carelink-teal-pale" />
@@ -178,7 +178,7 @@ const NotificationBell = () => {
                       if (!notification.is_read) markAsRead(notification.notification_id);
                       setIsOpen(false);
                     }}
-                    className={`block p-4 border-b border-carelink-teal-pale/50 hover:bg-carelink-teal-pale/10 transition ${
+                    className={`block p-3 md:p-4 border-b border-carelink-teal-pale/50 hover:bg-carelink-teal-pale/10 transition ${
                       !notification.is_read ? 'bg-carelink-teal-pale/20' : ''
                     }`}
                   >
@@ -188,12 +188,12 @@ const NotificationBell = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
-                          <p className={`text-sm ${!notification.is_read ? 'font-bold' : ''} text-carelink-navy`}>
+                          <p className={`text-sm ${!notification.is_read ? 'font-bold' : ''} text-carelink-navy truncate`}>
                             {notification.title}
                           </p>
                           <button
                             onClick={(e) => deleteNotification(notification.notification_id, e)}
-                            className="text-carelink-gray hover:text-red-500 p-1"
+                            className="text-carelink-gray hover:text-red-500 p-1 flex-shrink-0"
                           >
                             <FaTrash className="text-xs" />
                           </button>
