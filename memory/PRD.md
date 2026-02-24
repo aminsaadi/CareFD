@@ -17,55 +17,37 @@ CareLink is a healthcare services marketplace platform in Israel connecting user
 | תווית מומלץ | X | V | V |
 | ניהול צוות | X | X | V (ללא הגבלה) |
 | תמיכה ולווי צוות | X | V | V |
+| **ניסיון חינם** | - | **30 יום** | - |
 
 ### Pricing
-- Pro: ₪59/חודש, ₪600/שנה
+- Pro: ₪59/חודש, ₪600/שנה + 30 יום ניסיון חינם
 - Gold: ₪149/חודש, ₪1,500/שנה
 - All managed via admin panel
 
 ## Completed Features
 
-### Phase 1-8 (Previously completed)
+### Phase 1-11 (Previously completed)
 - Full authentication, provider/user system, admin dashboard
-- Services, bookings, reviews, chat, notifications
-- Advanced search, verification, dynamic booking form
-
-### Phase 9 - Booking Lifecycle & Reviews (Feb 24, 2026)
-- Full booking status lifecycle with Hebrew labels
-- Admin review approval system
-- Calendar view for providers
-
-### Phase 10 - Booking Form & Service Cards Upgrade (Feb 24, 2026)
-- Quick-fill buttons, toast notifications, upgraded service cards
-
-### Phase 11 - UI Cleanup & Data Sync (Feb 24, 2026)
-- ScrollToTop, footer synced with admin, GenericPage for dynamic pages
+- Services, bookings, reviews, chat, notifications, advanced search
+- Booking lifecycle, review moderation, dynamic booking form
+- ScrollToTop, footer sync, UI cleanup
 
 ### Phase 12 - Subscription System (Feb 24, 2026)
-- **3 subscription tiers:** Free, Pro (₪59/mo), Gold (₪149/mo)
-- **Provider Dashboard tabs:** Subscription (upgrade/cancel), Clinics, Team
-- **Admin subscription management:** Edit plans, prices, features
-- **Service limit enforcement:** Free = 1 service, Pro/Gold = unlimited
-- **Clinics management:** Pro+ can manage multiple locations with navigation
-- **Team management:** Gold-only, add staff members with roles
-- **Upgrade banner:** Shows in free tier overview dashboard
-- **Payment:** Infrastructure only (no real payment processing yet)
+- 3 subscription tiers with admin management
+- Provider Dashboard: Subscription/Clinics/Team tabs
+- Service limit enforcement, upgrade banners
+- **Payment:** Infrastructure only (MOCKED)
+
+### Phase 13 - Trial + Redirect Fix (Feb 24, 2026)
+- **30 Day Free Trial:** for Pro plan, one-time per provider
+- **Landing page redirect fix:** removed aggressive 401 redirect from API interceptor
+- Trial shows countdown date, banner for free users, blocks double use
 
 ## Pending Features
-
-### P1 - Backend Refactoring (HIGH PRIORITY)
-- Monolithic server.py (7500+ lines) → separate router files
-
-### P2 - PayPal/Payment Integration
-- Connect real payment to subscription upgrades
-
-### P3 - Provider Image Gallery
-### P4 - SMS Reminders
-
-## Testing Results
-- Iteration 22: Booking & Review - 94.7% backend, 100% frontend
-- Iteration 23: ServiceCard upgrades - 91.7% frontend
-- Iteration 24: Subscription System - **100% backend (28/28), 100% frontend**
+- P1: Backend Refactoring (server.py 7500+ lines)
+- P2: Real Payment Integration (PayPal/Stripe)
+- P3: Provider Image Gallery
+- P4: SMS Reminders
 
 ## Testing Credentials
 - Admin: admin@carelink.co.il / password
@@ -73,5 +55,5 @@ CareLink is a healthcare services marketplace platform in Israel connecting user
 - Provider: provider@carelink.co.il / password
 
 ## Mocked Integrations
-- **PayPal** - Awaiting API credentials
-- **Payment Processing** - Infrastructure only, no real charges
+- PayPal - Awaiting API credentials
+- Payment Processing - Infrastructure only
