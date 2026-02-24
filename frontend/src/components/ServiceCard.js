@@ -37,9 +37,9 @@ const ServiceCard = ({ service, showProvider = true }) => {
 
   // Resolve the correct provider profile link
   const getProviderLink = () => {
-    if (service.provider?.provider_id) return `/provider/${service.provider.provider_id}`;
-    if (service.provider?.user_id) return `/provider/${service.provider.user_id}`;
-    if (service.provider_id) return `/provider/${service.provider_id}`;
+    if (service.provider?.provider_id) return `/providers/${service.provider.provider_id}`;
+    if (service.provider?.user_id) return `/providers/${service.provider.user_id}`;
+    if (service.provider_id) return `/providers/${service.provider_id}`;
     return '#';
   };
 
