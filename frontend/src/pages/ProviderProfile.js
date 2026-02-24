@@ -534,41 +534,64 @@ const ProviderProfile = () => {
                 {activeTab === 'services' && (
                   <div className="space-y-4" data-testid="services-section">
                     {provider.services_list && provider.services_list.length > 0 ? (
-                      provider.services_list.map((service) => (
-                        <div
-                          key={service.service_id}
-                          className="border-2 border-carelink-teal-pale rounded-xl p-5 hover:border-carelink-teal transition group"
-                          data-testid={`service-${service.service_id}`}
-                        >
-                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div className="flex-1">
-                              <h3 className="text-xl font-bold text-carelink-navy mb-2">{service.name}</h3>
-                              <p className="text-carelink-slate mb-3">{service.description}</p>
-                              <div className="flex flex-wrap gap-3">
-                                <span className="inline-flex items-center gap-1 text-sm text-carelink-gray">
-                                  <FaClock className="text-carelink-teal" />
-                                  {service.duration_minutes ? `${service.duration_minutes} דקות` : t(service.pricing_type)}
-                                </span>
-                                <span className="bg-carelink-navy text-white text-xs px-3 py-1 rounded-full">
-                                  {t(service.service_type)}
-                                </span>
+                      provider.services_list.map((service) => {
+                        const typeConfig = serviceTypeConfig[service.service_type] || serviceTypeConfig.clinic_visit;
+                        const TypeIcon = typeConfig.icon;
+                        const categoryLabels = { visit: 'ביקור', hourly: 'שעתי', consultation: 'ייעוץ', product: 'מוצר' };
+                        const pricingUnits = { per_hour: 'לשעה', per_visit: 'לביקור', per_session: 'לפגישה', fixed: '' };
+                        const catLabel = categoryLabels[service.service_category] || '';
+                        const priceUnit = pricingUnits[service.pricing_type] || '';
+
+                        return (
+                          <div
+                            key={service.service_id}
+                            className="border border-gray-100 rounded-xl p-5 hover:border-carelink-teal hover:shadow-md transition group bg-white"
+                            data-testid={`service-${service.service_id}`}
+                          >
+                            <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                              <div className="flex-1">
+                                {/* Tags */}
+                                <div className="flex flex-wrap gap-2 mb-2">
+                                  <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium ${typeConfig.color}`}>
+                                    <TypeIcon className="text-[10px]" />
+                                    {typeConfig.label}
+                                  </span>
+                                  {catLabel && (
+                                    <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-600">
+                                      {catLabel}
+                                    </span>
+                                  )}
+                                </div>
+                                <h3 className="text-xl font-bold text-carelink-navy mb-1.5">{service.name}</h3>
+                                <p className="text-carelink-slate text-sm mb-3 line-clamp-2">{service.description}</p>
+                                <div className="flex flex-wrap items-center gap-3 text-sm text-carelink-gray">
+                                  {service.duration_minutes && (
+                                    <span className="inline-flex items-center gap-1">
+                                      <FaClock className="text-carelink-teal text-xs" />
+                                      {service.duration_minutes} דקות
+                                    </span>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                            <div className="flex flex-col items-end gap-3">
-                              <div className="text-3xl font-bold text-carelink-teal">
-                                ₪{service.price}
+                              <div className="flex flex-col items-end gap-3">
+                                <div className="text-left">
+                                  <span className="text-3xl font-bold text-carelink-teal">₪{service.price}</span>
+                                  {priceUnit && (
+                                    <span className="text-sm text-carelink-gray mr-1">/{priceUnit}</span>
+                                  )}
+                                </div>
+                                <button
+                                  onClick={() => handleBookService(service.service_id)}
+                                  className="bg-carelink-teal text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-carelink-teal-medium transition text-sm"
+                                  data-testid={`book-${service.service_id}`}
+                                >
+                                  הזמן עכשיו
+                                </button>
                               </div>
-                              <button
-                                onClick={() => handleBookService(service.service_id)}
-                                className="bg-carelink-teal text-white px-6 py-2 rounded-lg font-semibold hover:bg-carelink-teal-medium transition"
-                                data-testid={`book-${service.service_id}`}
-                              >
-                                הזמן עכשיו
-                              </button>
                             </div>
                           </div>
-                        </div>
-                      ))
+                        );
+                      })
                     ) : (
                       <div className="text-center py-8 text-carelink-gray">
                         <FaCalendarAlt className="text-4xl mx-auto mb-3 text-carelink-teal-pale" />
