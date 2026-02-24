@@ -22,49 +22,36 @@ CareLink is a healthcare services marketplace platform in Israel connecting user
 - Forgot Password / Reset Password flow
 - Chat system, notifications, favorites
 
-#### Phase 7 - Static Pages & Professions (Feb 23, 2026)
+#### Phase 7 - Static Pages & Professions
 - Rich Text Editor for static pages (ReactQuill)
 - Professions & Categories Management (3-level hierarchy)
 - Regions & Cities Management (8 regions, 102 cities)
 - Map view for providers (Leaflet/OpenStreetMap)
 
-#### Phase 8 - Verification & Advanced Search (Feb 24, 2026)
+#### Phase 8 - Verification & Advanced Search
 - User/Provider document verification system
 - Advanced unified search filters (gender, languages, health funds)
 - Dynamic multi-step booking form
 - Mobile-responsive notification UI
 
-#### Phase 9 - Booking Lifecycle & Review System (Feb 24, 2026) ✅ NEW
-- **Full Booking Status Lifecycle:**
-  - pending → confirmed → provider_completed → completed
-  - pending → rejected / on_hold / cancelled
-- **Provider Dashboard Enhancements:**
-  - Booking management with confirm/reject/hold/mark-complete actions
-  - Calendar view for confirmed bookings grouped by date
-  - Hebrew status labels throughout
-- **User Dashboard Enhancements:**
-  - Completion confirmation dialog with payment recording
-  - "Write Review" button for completed bookings
-  - Booking detail modal with status-specific actions
-- **WriteReview Page (/review/:bookingId):**
-  - Star ratings (overall + 4 detailed categories)
-  - Comment with minimum length validation
-  - "Would recommend" toggle
-  - Pending admin approval notice
-- **Admin Reviews Management (/admin/reviews):**
-  - Filter tabs: pending/approved/rejected/all
-  - Approve/reject with reason
-  - User and provider info display
-  - Provider rating auto-recalculation on approval
-- **Email Notifications:**
-  - Booking confirmation email to client
-  - Status change notifications
+#### Phase 9 - Booking Lifecycle & Review System (Feb 24, 2026)
+- Full Booking Status Lifecycle (pending/confirmed/provider_completed/completed/rejected/on_hold/cancelled)
+- Provider Dashboard: booking management (confirm/reject/hold/mark-complete), calendar view
+- User Dashboard: completion confirmation, write review links, booking detail modal
+- WriteReview Page (/review/:bookingId) with star ratings
+- Admin Reviews Management (/admin/reviews) with filter/approve/reject
+- Email notifications for status changes
+
+#### Phase 10 - Booking Form & Service Cards Upgrade (Feb 24, 2026)
+- **BookingForm (popup):** "הפרטים שלי" + "הכתובת שלי" quick-fill buttons, success/error dialogs
+- **BookService (full page):** "הכתובת שלי" + "הפרטים שלי" buttons for address/contact, replaced all alert() with toast.error()
+- **ServiceCard:** Upgraded with price units (₪80/לשעה), category labels (ביקור, שעתי), service type badges, fixed provider link (/providers/ path)
+- **ProviderProfile service section:** Price with unit, category/type labels
 
 ### Pending Features
 
 #### P1 - Backend Refactoring (HIGH PRIORITY)
 - The monolithic server.py (7200+ lines) needs splitting into router modules
-- Target: /backend/app/routers/ (auth.py, providers.py, bookings.py, admin.py, etc.)
 
 #### P2 - PayPal Live Integration
 - Waiting for PayPal API credentials
@@ -76,31 +63,10 @@ CareLink is a healthcare services marketplace platform in Israel connecting user
 - Automated reminders before appointments
 
 ## Technical Architecture
-- **Frontend:** React, Tailwind CSS, react-router-dom, Axios
+- **Frontend:** React, Tailwind CSS, react-router-dom, Axios, Sonner (toasts)
 - **Backend:** Python, FastAPI, MongoDB (Motor/Pymongo)
 - **Database:** MongoDB Atlas (cloud)
 - **Email:** Gmail SMTP with App Password
-
-## Key API Endpoints
-
-### Booking Lifecycle
-- POST /api/bookings - Create booking
-- GET /api/bookings/my - User's bookings
-- GET /api/bookings/provider - Provider's bookings
-- PUT /api/bookings/{id}/confirm - Provider confirms
-- PUT /api/bookings/{id}/reject - Provider rejects
-- PUT /api/bookings/{id}/hold - Provider holds
-- PUT /api/bookings/{id}/provider-complete - Provider marks complete
-- PUT /api/bookings/{id}/client-confirm - User confirms completion
-- PUT /api/bookings/{id}/status - Generic status update
-
-### Reviews
-- POST /api/reviews - Create review (requires completed booking)
-- GET /api/reviews/my - User's reviews
-- GET /api/providers/{id}/reviews - Provider's approved reviews
-- GET /api/admin/reviews - Admin: all reviews with status filter
-- PUT /api/admin/reviews/{id}/approve - Admin approves
-- PUT /api/admin/reviews/{id}/reject - Admin rejects
 
 ## Testing Credentials
 - Admin: admin@carelink.co.il / password
@@ -108,10 +74,11 @@ CareLink is a healthcare services marketplace platform in Israel connecting user
 - Provider: provider@carelink.co.il / password
 
 ## Testing Results
-- Iteration 22: Booking & Review Lifecycle - 94.7% backend (18/19), 100% frontend ✅
+- Iteration 22: Booking & Review Lifecycle - 94.7% backend, 100% frontend
+- Iteration 23: ServiceCard/BookService/ProviderProfile upgrades - 91.7% frontend (11/12)
 
 ## Mocked Integrations
-1. **PayPal** - Waiting for API credentials
+- **PayPal** - Waiting for API credentials
 
 ## Technical Debt
 - **HIGH:** Monolithic server.py (7200+ lines) needs refactoring into separate router files
