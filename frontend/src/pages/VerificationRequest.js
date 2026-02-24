@@ -159,7 +159,7 @@ const VerificationRequest = () => {
         {verificationStatus.status === 'approved' && (
           <div className="mt-4 flex justify-end">
             <button
-              onClick={() => navigate(isProvider ? '/provider/dashboard' : '/user/dashboard')}
+              onClick={() => navigate(isProvider ? '/provider/dashboard' : '/dashboard')}
               className="flex items-center gap-2 text-carelink-teal hover:underline"
             >
               <span>חזור לדאשבורד</span>
