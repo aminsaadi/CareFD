@@ -33,7 +33,7 @@ module.exports = {
                         'carelink-teal': '#19B8BA',
                         'carelink-teal-medium': '#41C9C2',
                         'carelink-teal-light': '#75D9D2',
-                        'carelink-teal-pale': '#ACEDEA',
+                        'carelink-teal-pale': '#E2E8F0',
                         
                         background: 'hsl(var(--background))',
                         foreground: 'hsl(var(--foreground))',
