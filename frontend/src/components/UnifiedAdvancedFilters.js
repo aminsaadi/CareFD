@@ -6,9 +6,9 @@ import {
   FaBox, FaMale, FaFemale, FaUsers, FaGlobe, FaHospital, FaSearch,
   FaSpinner
 } from 'react-icons/fa';
-import { israeliRegions, israeliLocalities } from '../data/israeliLocalities';
+import { israeliLocalities } from '../data/israeliLocalities';
 import { 
-  healthcareProfessions, serviceCategories, serviceTypes,
+  israeliRegions, healthcareProfessions, serviceCategories, serviceTypes,
   genderOptions, languageOptions, healthFunds 
 } from '../data/searchData';
 
