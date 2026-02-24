@@ -1143,16 +1143,15 @@ const Dashboard = () => {
                   </button>
                 )}
                 {showBookingDetails.status === 'completed' && !showBookingDetails.has_review && (
-                  <button
-                    onClick={() => {
-                      setShowBookingDetails(null);
-                      setShowCompletionDialog(showBookingDetails);
-                    }}
+                  <Link
+                    to={`/review/${showBookingDetails.booking_id}`}
+                    onClick={() => setShowBookingDetails(null)}
                     className="flex-1 bg-amber-500 text-white py-3 rounded-xl font-medium hover:bg-amber-600 transition flex items-center justify-center gap-2"
+                    data-testid="modal-write-review-btn"
                   >
                     <FaStar />
                     כתוב ביקורת
-                  </button>
+                  </Link>
                 )}
                 <Link
                   to={`/providers/${showBookingDetails.provider_id}`}
