@@ -7,6 +7,9 @@ import Footer from '../components/Footer';
 import VerificationDocuments from '../components/VerificationDocuments';
 import NotificationSettings from '../components/NotificationSettings';
 import ConfirmDialog from '../components/ConfirmDialog';
+import ProviderSubscription from '../components/provider/ProviderSubscription';
+import ProviderClinics from '../components/provider/ProviderClinics';
+import ProviderTeam from '../components/provider/ProviderTeam';
 import api from '../utils/api';
 import { toast } from 'sonner';
 import { 
