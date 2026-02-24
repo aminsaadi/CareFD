@@ -18,10 +18,12 @@ const Footer = () => {
     footer_links: []
   });
   const [regions, setRegions] = useState([]);
+  const [staticPages, setStaticPages] = useState([]);
 
   useEffect(() => {
     fetchSettings();
     fetchRegions();
+    fetchStaticPages();
   }, []);
 
   const fetchSettings = async () => {
@@ -31,7 +33,7 @@ const Footer = () => {
         setSettings(prev => ({ ...prev, ...response.data }));
       }
     } catch (error) {
-      // Use defaults silently
+      // Use defaults
     }
   };
 
@@ -40,19 +42,43 @@ const Footer = () => {
       const response = await api.get('/regions');
       setRegions(response.data.regions || []);
     } catch (error) {
-      // Use default regions
-      setRegions([
-        { name: 'תל אביב', cities: ['רמת גן', 'גבעתיים', 'הרצליה'] },
-        { name: 'ירושלים', cities: ['בית שמש', 'מודיעין'] },
-        { name: 'חיפה', cities: ['כרמיאל', 'עכו', 'נהריה'] },
-        { name: 'באר שבע', cities: ['אשדוד', 'אשקלון'] }
-      ]);
+      setRegions([]);
     }
   };
 
+  const fetchStaticPages = async () => {
+    try {
+      const response = await api.get('/admin/pages');
+      const pages = (response.data.pages || []).filter(p => p.is_active !== false);
+      setStaticPages(pages);
+    } catch (error) {
+      setStaticPages([]);
+    }
+  };
+
+  const getPageLink = (page) => {
+    const slugMap = {
+      'about': '/about',
+      'privacy': '/privacy',
+      'terms': '/terms',
+      'contact': '/contact'
+    };
+    return slugMap[page.slug] || `/page/${page.slug}`;
+  };
+
+  const defaultBottomLinks = [
+    { label: 'אודות', to: '/about' },
+    { label: 'מדיניות פרטיות', to: '/privacy' },
+    { label: 'תנאי שימוש', to: '/terms' },
+    { label: 'צור קשר', to: '/contact' }
+  ];
+
+  const bottomLinks = staticPages.length > 0
+    ? staticPages.map(p => ({ label: p.title, to: getPageLink(p) }))
+    : defaultBottomLinks;
+
   return (
     <footer className="bg-carelink-navy text-white mt-auto">
-      {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid md:grid-cols-5 gap-8">
           {/* Company Info */}
@@ -73,25 +99,26 @@ const Footer = () => {
             <h3 className="text-lg font-bold mb-4 text-carelink-teal">קישורים מהירים</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-carelink-light-gray hover:text-carelink-teal transition">
-                  בית
-                </Link>
+                <Link to="/" className="text-carelink-light-gray hover:text-carelink-teal transition">בית</Link>
               </li>
               <li>
-                <Link to="/providers" className="text-carelink-light-gray hover:text-carelink-teal transition">
-                  ספקים
-                </Link>
+                <Link to="/providers" className="text-carelink-light-gray hover:text-carelink-teal transition">ספקים</Link>
               </li>
               <li>
-                <Link to="/services" className="text-carelink-light-gray hover:text-carelink-teal transition">
-                  שירותים
-                </Link>
+                <Link to="/services" className="text-carelink-light-gray hover:text-carelink-teal transition">שירותים</Link>
               </li>
-              <li>
-                <Link to="/about" className="text-carelink-light-gray hover:text-carelink-teal transition">
-                  אודות
-                </Link>
-              </li>
+              {staticPages.filter(p => ['about'].includes(p.slug)).map(p => (
+                <li key={p.slug}>
+                  <Link to={getPageLink(p)} className="text-carelink-light-gray hover:text-carelink-teal transition">
+                    {p.title}
+                  </Link>
+                </li>
+              ))}
+              {staticPages.filter(p => ['about'].includes(p.slug)).length === 0 && (
+                <li>
+                  <Link to="/about" className="text-carelink-light-gray hover:text-carelink-teal transition">אודות</Link>
+                </li>
+              )}
             </ul>
           </div>
 
@@ -111,7 +138,7 @@ const Footer = () => {
               ))}
               <li>
                 <Link to="/providers" className="text-carelink-teal hover:text-carelink-teal-light transition text-sm">
-                  כל האזורים →
+                  כל האזורים
                 </Link>
               </li>
             </ul>
@@ -129,16 +156,6 @@ const Footer = () => {
               <li>
                 <Link to="/provider/dashboard" className="text-carelink-light-gray hover:text-carelink-teal transition">
                   דשבורד ספק
-                </Link>
-              </li>
-              <li>
-                <Link to="/pricing" className="text-carelink-light-gray hover:text-carelink-teal transition">
-                  מחירונים
-                </Link>
-              </li>
-              <li>
-                <Link to="/help" className="text-carelink-light-gray hover:text-carelink-teal transition">
-                  מרכז עזרה
                 </Link>
               </li>
             </ul>
@@ -162,7 +179,6 @@ const Footer = () => {
               </li>
             </ul>
 
-            {/* Social Media */}
             <div className="flex gap-3 mt-4">
               {settings.social_facebook && (
                 <a href={settings.social_facebook} target="_blank" rel="noopener noreferrer" className="bg-carelink-slate p-2 rounded-full hover:bg-carelink-teal transition">
@@ -189,18 +205,11 @@ const Footer = () => {
                   <FaYoutube className="text-lg" />
                 </a>
               )}
-              {/* Show defaults if no social links */}
               {!settings.social_facebook && !settings.social_twitter && !settings.social_instagram && !settings.social_linkedin && (
                 <>
-                  <span className="bg-carelink-slate p-2 rounded-full opacity-50">
-                    <FaFacebook className="text-lg" />
-                  </span>
-                  <span className="bg-carelink-slate p-2 rounded-full opacity-50">
-                    <FaInstagram className="text-lg" />
-                  </span>
-                  <span className="bg-carelink-slate p-2 rounded-full opacity-50">
-                    <FaLinkedin className="text-lg" />
-                  </span>
+                  <span className="bg-carelink-slate p-2 rounded-full opacity-50"><FaFacebook className="text-lg" /></span>
+                  <span className="bg-carelink-slate p-2 rounded-full opacity-50"><FaInstagram className="text-lg" /></span>
+                  <span className="bg-carelink-slate p-2 rounded-full opacity-50"><FaLinkedin className="text-lg" /></span>
                 </>
               )}
             </div>
@@ -208,26 +217,19 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Bottom Bar */}
+      {/* Bottom Bar - synced with admin static pages */}
       <div className="border-t border-carelink-slate">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-carelink-light-gray text-sm">
               {settings.footer_text}
             </p>
-            <div className="flex gap-6 text-sm">
-              <Link to="/about" className="text-carelink-light-gray hover:text-carelink-teal transition">
-                אודות
-              </Link>
-              <Link to="/privacy" className="text-carelink-light-gray hover:text-carelink-teal transition">
-                מדיניות פרטיות
-              </Link>
-              <Link to="/terms" className="text-carelink-light-gray hover:text-carelink-teal transition">
-                תנאי שימוש
-              </Link>
-              <Link to="/contact" className="text-carelink-light-gray hover:text-carelink-teal transition">
-                צור קשר
-              </Link>
+            <div className="flex gap-6 text-sm flex-wrap justify-center">
+              {bottomLinks.map((link, i) => (
+                <Link key={i} to={link.to} className="text-carelink-light-gray hover:text-carelink-teal transition">
+                  {link.label}
+                </Link>
+              ))}
             </div>
           </div>
         </div>
