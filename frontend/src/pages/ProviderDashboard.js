@@ -503,9 +503,12 @@ const ProviderDashboard = () => {
 
   const tabs = [
     { id: 'overview', label: 'סקירה כללית', icon: FaChartBar },
+    { id: 'subscription', label: 'מנוי', icon: FaCrown },
     { id: 'bookings', label: 'תורים', icon: FaCalendarAlt },
     { id: 'calendar', label: 'לוח שנה', icon: FaClock },
     { id: 'services', label: 'שירותים', icon: FaBriefcase },
+    { id: 'clinics', label: 'קליניקות', icon: FaBuilding },
+    { id: 'team', label: 'צוות', icon: FaUsers },
     { id: 'requests', label: 'בקשות פתוחות', icon: FaFileAlt },
     { id: 'notifications', label: 'התראות', icon: FaBell, link: '/notifications' },
     { id: 'messages', label: 'הודעות', icon: FaComments },
