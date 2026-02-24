@@ -254,7 +254,9 @@ const Dashboard = () => {
       completed: 'הושלם',
       provider_completed: 'ממתין לאישורך',
       in_progress: 'בתהליך',
-      cancelled: 'בוטל'
+      cancelled: 'בוטל',
+      rejected: 'נדחה',
+      on_hold: 'בהשהיה'
     };
     return labels[status] || status;
   };
