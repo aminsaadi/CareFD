@@ -28,6 +28,20 @@ const ProviderSubscription = ({ provider, onRefresh }) => {
       setPlans(plansRes.data.plans || []);
       setCurrentSub(subRes.data.subscription);
       setCurrentPlan(subRes.data.plan);
+      // Check if user already used trial
+      if (subRes.data.subscription?.is_trial || subRes.data.subscription?.has_used_trial) {
+        setHasUsedTrial(true);
+      }
+      // Also check by looking for past trial subscriptions
+      try {
+        const historyRes = await api.get('/subscriptions/history');
+        const history = historyRes.data.subscriptions || [];
+        if (history.some(s => s.is_trial)) {
+          setHasUsedTrial(true);
+        }
+      } catch (e) {
+        // History endpoint might not exist, ignore
+      }
     } catch (error) {
       console.error(error);
     } finally {
