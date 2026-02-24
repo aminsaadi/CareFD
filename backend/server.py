@@ -3285,6 +3285,10 @@ async def admin_reject_review(
     
     reason = body.get("reason", "חוות הדעת לא עומדת בקריטריונים") if body else "חוות הדעת לא עומדת בקריטריונים"
     
+    review = await db.reviews.find_one({"review_id": review_id}, {"_id": 0})
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+    
     await db.reviews.update_one(
         {"review_id": review_id},
         {"$set": {
@@ -3296,15 +3300,13 @@ async def admin_reject_review(
     )
     
     # Notify user
-    review = await db.reviews.find_one({"review_id": review_id}, {"_id": 0, "user_id": 1})
-    if review:
-        await create_notification(
-            review["user_id"],
-            NotificationType.SYSTEM,
-            "חוות הדעת נדחתה",
-            f"חוות הדעת שלך נדחתה. סיבה: {reason}",
-            {"review_id": review_id}
-        )
+    await create_notification(
+        review["user_id"],
+        NotificationType.SYSTEM,
+        "חוות הדעת נדחתה",
+        f"חוות הדעת שלך נדחתה. סיבה: {reason}",
+        {"review_id": review_id}
+    )
     
     return {"message": "Review rejected successfully"}
 
