@@ -62,7 +62,7 @@ const ServiceCard = ({ service, showProvider = true }) => {
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all border border-gray-100 hover:border-teal-300 relative group overflow-hidden"
+      className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all border border-gray-100 hover:border-carelink-teal relative group overflow-hidden"
       data-testid={`service-card-${service.service_id}`}
     >
       {/* Top color accent */}
