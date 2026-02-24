@@ -2315,17 +2315,18 @@ async def create_booking(
     if provider.get("verification_status") not in ["verified", None] and not provider.get("is_verified"):
         raise HTTPException(status_code=400, detail="Provider is not verified yet")
     
-    # Check for conflicts
-    booking_date_str = booking_data.booking_date.isoformat()
-    existing = await db.bookings.find_one({
-        "provider_id": service["provider_id"],
-        "booking_date": booking_date_str,
-        "booking_time": booking_data.booking_time,
-        "status": {"$in": ["pending", "confirmed", "in_progress"]}
-    })
-    
-    if existing:
-        raise HTTPException(status_code=400, detail="Time slot already booked")
+    # Check for conflicts (only when date is provided)
+    if booking_data.booking_date:
+        booking_date_str = booking_data.booking_date.isoformat()
+        existing = await db.bookings.find_one({
+            "provider_id": service["provider_id"],
+            "booking_date": booking_date_str,
+            "booking_time": booking_data.booking_time,
+            "status": {"$in": ["pending", "confirmed", "in_progress"]}
+        })
+        
+        if existing:
+            raise HTTPException(status_code=400, detail="Time slot already booked")
     
     # Build contact person
     contact_person = None
