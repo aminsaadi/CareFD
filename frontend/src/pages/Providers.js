@@ -40,13 +40,8 @@ const Providers = () => {
   const searchDropdownRef = useRef(null);
   const locationDropdownRef = useRef(null);
   
-  // Israeli regions for quick selection
-  const regions = [
-    { id: 'north', name: 'צפון', cities: ['חיפה', 'נהריה', 'עכו', 'כרמיאל', 'צפת'] },
-    { id: 'center', name: 'מרכז', cities: ['תל אביב', 'רמת גן', 'פתח תקווה', 'הרצליה', 'רעננה'] },
-    { id: 'south', name: 'דרום', cities: ['באר שבע', 'אשדוד', 'אשקלון', 'אילת'] },
-    { id: 'jerusalem', name: 'ירושלים', cities: ['ירושלים', 'בית שמש', 'מודיעין'] }
-  ];
+  // Israeli regions for quick selection - use from searchData
+  const regions = israeliRegions;
 
   const radiusOptions = [
     { value: 5, label: '5 ק"מ' },
