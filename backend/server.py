@@ -6955,12 +6955,22 @@ async def upgrade_subscription(
     user = await get_current_user(authorization, request)
     plan_id = body.get("plan_id")
     billing_cycle = body.get("billing_cycle", "monthly")
+    use_trial = body.get("use_trial", False)
     
     plan = await db.subscription_plans.find_one({"plan_id": plan_id, "is_active": True}, {"_id": 0})
     if not plan:
         raise HTTPException(status_code=404, detail="Plan not found")
     
     provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    
+    # Check if user already used trial
+    if use_trial:
+        existing_trial = await db.subscriptions.find_one({
+            "user_id": user["user_id"],
+            "is_trial": True
+        })
+        if existing_trial:
+            raise HTTPException(status_code=400, detail="כבר ניצלת את תקופת הניסיון. שדרג למנוי בתשלום.")
     
     # Cancel existing active subscription
     await db.subscriptions.update_many(
@@ -6970,6 +6980,8 @@ async def upgrade_subscription(
     
     # Create new subscription
     now = datetime.now(timezone.utc)
+    trial_end = (now + timedelta(days=30)).isoformat() if use_trial else None
+    
     sub = {
         "subscription_id": f"sub_{uuid.uuid4().hex[:12]}",
         "user_id": user["user_id"],
@@ -6978,6 +6990,8 @@ async def upgrade_subscription(
         "tier": plan["tier"],
         "status": "active",
         "billing_cycle": billing_cycle,
+        "is_trial": use_trial,
+        "trial_end_date": trial_end,
         "start_date": now.isoformat(),
         "created_at": now.isoformat()
     }
@@ -6996,7 +7010,8 @@ async def upgrade_subscription(
             {"$set": update_fields}
         )
     
-    return {"message": "המנוי שודרג בהצלחה", "subscription": sub, "plan": plan}
+    msg = "תקופת הניסיון החלה! 30 יום חינם" if use_trial else "המנוי שודרג בהצלחה"
+    return {"message": msg, "subscription": sub, "plan": plan}
 
 # ==================== PUSH NOTIFICATIONS ====================
 
