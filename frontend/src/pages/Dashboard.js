@@ -530,7 +530,8 @@ const Dashboard = () => {
                       ) : (
                         <div className="space-y-4">
                           {bookings.map((booking) => {
-                            const StatusIcon = getStatusIcon(booking.status);
+                            const statusConfig = getBookingStatusConfig(booking.status);
+                            const StatusIcon = statusConfig.icon;
                             return (
                               <div 
                                 key={booking.booking_id} 
@@ -540,7 +541,7 @@ const Dashboard = () => {
                               >
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                   <div className="flex items-center gap-4">
-                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${getStatusColor(booking.status)}`}>
+                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${statusConfig.color}`}>
                                       <StatusIcon className="text-xl" />
                                     </div>
                                     <div>
@@ -548,7 +549,7 @@ const Dashboard = () => {
                                       <p className="text-sm text-carelink-gray">{booking.provider_name || 'ספק'}</p>
                                     </div>
                                   </div>
-                                  <div className="flex items-center gap-4">
+                                  <div className="flex flex-wrap items-center gap-3">
                                     <div className="text-right">
                                       <p className="font-medium text-carelink-navy">
                                         {new Date(booking.booking_date).toLocaleDateString('he-IL')}
@@ -562,9 +563,10 @@ const Dashboard = () => {
                                         ₪{booking.price}
                                       </div>
                                     )}
-                                    <span className={`px-4 py-2 rounded-xl text-sm font-medium ${getStatusColor(booking.status)}`}>
-                                      {getStatusLabel(booking.status)}
+                                    <span className={`px-4 py-2 rounded-xl text-sm font-medium ${statusConfig.color}`}>
+                                      {statusConfig.label}
                                     </span>
+                                    {/* Show confirm button only when provider completed */}
                                     {booking.status === 'provider_completed' && (
                                       <button
                                         onClick={(e) => {
@@ -574,8 +576,27 @@ const Dashboard = () => {
                                         className="bg-carelink-teal text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-carelink-teal-medium transition"
                                         data-testid={`confirm-booking-${booking.booking_id}`}
                                       >
-                                        אשר והעריך
+                                        אשר השלמה
                                       </button>
+                                    )}
+                                    {/* Show write review button only when completed and no review */}
+                                    {booking.status === 'completed' && !booking.has_review && (
+                                      <Link
+                                        to={`/review/${booking.booking_id}`}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="bg-amber-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-amber-600 transition flex items-center gap-2"
+                                        data-testid={`write-review-${booking.booking_id}`}
+                                      >
+                                        <FaStar />
+                                        כתוב חוות דעת
+                                      </Link>
+                                    )}
+                                    {/* Show review written badge */}
+                                    {booking.has_review && (
+                                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1">
+                                        <FaCheckCircle />
+                                        חוות דעת נכתבה
+                                      </span>
                                     )}
                                   </div>
                                 </div>
