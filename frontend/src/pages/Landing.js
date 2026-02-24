@@ -6,6 +6,7 @@ import ProviderCard from '../components/ProviderCard';
 import ServiceCard from '../components/ServiceCard';
 import api from '../utils/api';
 import { israeliLocalities } from '../data/israeliLocalities';
+import { israeliRegions, healthcareProfessions, popularSearches as searchData } from '../data/searchData';
 import { 
   FaUserNurse, FaWalking, FaUserMd, FaHeart, 
   FaHandHoldingHeart, FaSpa, FaStar, FaSearch,
