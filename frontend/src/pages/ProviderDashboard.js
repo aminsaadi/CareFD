@@ -904,6 +904,78 @@ const ProviderDashboard = () => {
                     </div>
                   )}
 
+                  {/* Calendar Tab */}
+                  {activeTab === 'calendar' && (
+                    <div className="bg-white p-6 rounded-2xl shadow-lg" data-testid="provider-calendar">
+                      <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
+                        <FaClock className="text-carelink-teal" />
+                        לוח שנה - הזמנות מאושרות
+                      </h3>
+                      {getCalendarBookings().length === 0 ? (
+                        <div className="text-center py-12 text-carelink-gray">
+                          <FaCalendarAlt className="text-5xl mx-auto mb-3 text-carelink-teal-pale" />
+                          <p className="text-lg">אין הזמנות מאושרות</p>
+                          <p className="text-sm mt-2">כאשר תאשר הזמנות, הן יופיעו כאן בלוח השנה</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-6">
+                          {groupBookingsByDate().map(([date, dayBookings]) => (
+                            <div key={date} className="border-r-4 border-carelink-teal pr-4">
+                              <div className="flex items-center gap-3 mb-3">
+                                <div className="bg-carelink-teal text-white px-4 py-2 rounded-xl text-sm font-bold">
+                                  {new Date(date).toLocaleDateString('he-IL', {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                  })}
+                                </div>
+                                <span className="text-sm text-carelink-gray">
+                                  {dayBookings.length} הזמנות
+                                </span>
+                              </div>
+                              <div className="space-y-2">
+                                {dayBookings.map(booking => (
+                                  <div
+                                    key={booking.booking_id}
+                                    className="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-100 hover:bg-green-100/50 transition"
+                                    data-testid={`calendar-booking-${booking.booking_id}`}
+                                  >
+                                    <div className="flex items-center gap-4">
+                                      <div className="text-center min-w-[60px]">
+                                        <div className="text-lg font-bold text-carelink-navy">
+                                          {booking.booking_time || '--:--'}
+                                        </div>
+                                      </div>
+                                      <div className="border-r border-green-200 pr-4">
+                                        <p className="font-medium text-carelink-navy">{booking.user_name || 'לקוח'}</p>
+                                        <p className="text-sm text-carelink-gray">{booking.service_name}</p>
+                                        {booking.service_city && (
+                                          <p className="text-xs text-carelink-gray flex items-center gap-1 mt-0.5">
+                                            <FaMapMarkerAlt className="text-carelink-teal" />
+                                            {booking.service_city}
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      {booking.price && (
+                                        <span className="text-sm font-bold text-carelink-teal">₪{booking.price}</span>
+                                      )}
+                                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
+                                        {getStatusLabel(booking.status)}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Services Tab - Enhanced */}
                   {activeTab === 'services' && (
                     <div className="space-y-6">
