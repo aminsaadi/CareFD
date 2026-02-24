@@ -175,7 +175,7 @@ const BookService = () => {
       }
     } catch (error) {
       console.error('Failed to fetch service:', error);
-      alert(t('errorOccurred'));
+      toast.error('אירעה שגיאה, אנא נסו שוב');
       navigate('/services');
     } finally {
       setLoading(false);
@@ -225,11 +225,11 @@ const BookService = () => {
     
     if (serviceTypeConfig.showShiftSelect) {
       if (!selectedShift && !customHours) {
-        alert('אנא בחר משמרת או מספר שעות');
+        toast.error('אנא בחר משמרת או מספר שעות');
         return false;
       }
       if (!selectedDate) {
-        alert('אנא בחר תאריך');
+        toast.error('אנא בחר תאריך');
         return false;
       }
       return true;
@@ -237,7 +237,7 @@ const BookService = () => {
     
     if (serviceTypeConfig.showTimeSlots) {
       if (!selectedDate || !selectedTime) {
-        alert('אנא בחר תאריך ושעה');
+        toast.error('אנא בחר תאריך ושעה');
         return false;
       }
     }
@@ -248,20 +248,20 @@ const BookService = () => {
   const validateStep2 = () => {
     if (serviceTypeConfig.requiresAddress) {
       if (!serviceAddress.street || !serviceAddress.city) {
-        alert('אנא מלא כתובת מלאה');
+        toast.error('אנא מלא כתובת מלאה');
         return false;
       }
     }
     
     if (serviceTypeConfig.requiresShipping) {
       if (!shippingAddress.street || !shippingAddress.city) {
-        alert('אנא מלא כתובת למשלוח');
+        toast.error('אנא מלא כתובת למשלוח');
         return false;
       }
     }
     
     if (serviceTypeConfig.showPlatformSelect && !selectedPlatform) {
-      alert('אנא בחר פלטפורמה לשיחה');
+      toast.error('אנא בחר פלטפורמה לשיחה');
       return false;
     }
     
@@ -270,11 +270,11 @@ const BookService = () => {
 
   const validateStep3 = () => {
     if (!acceptTerms) {
-      alert('יש לאשר את תנאי השימוש');
+      toast.error('יש לאשר את תנאי השימוש');
       return false;
     }
     if (!acceptCancellation) {
-      alert('יש לאשר את מדיניות הביטולים');
+      toast.error('יש לאשר את מדיניות הביטולים');
       return false;
     }
     return true;
@@ -355,7 +355,7 @@ const BookService = () => {
       setStep('success');
     } catch (error) {
       console.error('Booking failed:', error);
-      alert(error.response?.data?.detail || t('errorOccurred'));
+      toast.error(error.response?.data?.detail || 'שגיאה בשליחת ההזמנה');
     } finally {
       setBooking(false);
     }
