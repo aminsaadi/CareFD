@@ -155,8 +155,9 @@ DELETE /api/admin/categories/{id}                        # Delete category
 - Provider: provider@carelink.co.il / password
 
 ### Mocked Integrations
-1. **Email (Resend)** - RESEND_API_KEY is empty, emails logged to console
-2. **PayPal** - Waiting for API credentials
+1. **PayPal** - Waiting for API credentials
+
+**Note**: Email integration now works via SMTP (Gmail) - NOT mocked anymore!
 
 ## Change Log
 
