@@ -34,14 +34,15 @@ const ProviderSubscription = ({ provider, onRefresh }) => {
     }
   };
 
-  const handleUpgrade = async (planId) => {
+  const handleUpgrade = async (planId, useTrial = false) => {
     try {
       setUpgrading(true);
-      await api.post('/subscriptions/upgrade', {
+      const res = await api.post('/subscriptions/upgrade', {
         plan_id: planId,
-        billing_cycle: billingCycle
+        billing_cycle: billingCycle,
+        use_trial: useTrial
       });
-      toast.success('המנוי שודרג בהצלחה!');
+      toast.success(res.data.message || 'המנוי שודרג בהצלחה!');
       fetchData();
       onRefresh?.();
     } catch (error) {
