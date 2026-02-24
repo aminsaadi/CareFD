@@ -51,6 +51,8 @@ import AdminMessages from './pages/admin/AdminMessages';
 import AdminProviderEdit from './pages/admin/AdminProviderEdit';
 import Notifications from './pages/Notifications';
 import VerificationRequest from './pages/VerificationRequest';
+import WriteReview from './pages/WriteReview';
+import AdminReviews from './pages/admin/AdminReviews';
 import './i18n';
 import './App.css';
 
