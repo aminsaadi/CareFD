@@ -29,20 +29,18 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Don't redirect if the request has a custom flag to skip redirect
-      // or if it's a request that doesn't require auth (e.g., checking availability)
-      const skipRedirect = error.config?.skipAuthRedirect;
       const url = error.config?.url || '';
       
-      // Skip redirect for public endpoints being queried without auth
-      const publicEndpoints = ['/bookings', '/favorites/check', '/admin/stats', '/providers', '/services', '/regions', '/settings'];
-      const isPublicQuery = publicEndpoints.some(ep => url.includes(ep));
+      // Only redirect for explicit auth actions (login/register failed won't trigger)
+      // Never redirect automatically - let components handle their own auth state
+      const authEndpoints = ['/auth/me'];
+      const isAuthCheck = authEndpoints.some(ep => url.includes(ep));
       
-      if (!skipRedirect && !isPublicQuery) {
+      if (isAuthCheck) {
         localStorage.removeItem('session_token');
         localStorage.removeItem('user');
-        window.location.href = '/login';
       }
+      // Don't redirect to /login automatically - let ProtectedRoute handle it
     }
     return Promise.reject(error);
   }
