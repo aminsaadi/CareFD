@@ -628,6 +628,11 @@ class Review(BaseModel):
     price_value: Optional[int] = None  # 1-5
     would_recommend: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    # Admin approval
+    status: str = "pending"  # pending, approved, rejected
+    admin_notes: Optional[str] = None
+    approved_at: Optional[datetime] = None
+    approved_by: Optional[str] = None
 
 class ReviewCreate(BaseModel):
     provider_id: str
