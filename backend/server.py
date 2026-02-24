@@ -6706,6 +6706,290 @@ async def admin_update_plan(
     
     return {"message": "Plan updated"}
 
+# ==================== CLINICS MANAGEMENT ====================
+
+@api_router.get("/clinics")
+async def get_my_clinics(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Get provider's clinics"""
+    user = await get_current_user(authorization, request)
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    clinics = await db.clinics.find(
+        {"provider_id": provider["provider_id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    
+    return {"clinics": clinics}
+
+@api_router.post("/clinics")
+async def create_clinic(
+    clinic_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Create a new clinic/location"""
+    user = await get_current_user(authorization, request)
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    # Check subscription
+    tier = provider.get("subscription_tier", "free")
+    plan = await db.subscription_plans.find_one({"tier": tier}, {"_id": 0})
+    if not plan:
+        plan = DEFAULT_PLANS[0]
+    
+    if not plan.get("has_clinic_management", False):
+        raise HTTPException(status_code=403, detail="שדרג את המנוי שלך כדי לנהל קליניקות")
+    
+    max_clinics = plan.get("max_clinics", 0)
+    if max_clinics != -1:
+        current_count = await db.clinics.count_documents({"provider_id": provider["provider_id"]})
+        if current_count >= max_clinics:
+            raise HTTPException(status_code=403, detail=f"הגעת למגבלת הקליניקות ({max_clinics})")
+    
+    clinic = {
+        "clinic_id": f"clinic_{uuid.uuid4().hex[:12]}",
+        "provider_id": provider["provider_id"],
+        "name": clinic_data.get("name", ""),
+        "address": clinic_data.get("address", ""),
+        "city": clinic_data.get("city", ""),
+        "phone": clinic_data.get("phone", ""),
+        "latitude": clinic_data.get("latitude"),
+        "longitude": clinic_data.get("longitude"),
+        "working_hours": clinic_data.get("working_hours", ""),
+        "notes": clinic_data.get("notes", ""),
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.clinics.insert_one(clinic)
+    if "_id" in clinic:
+        del clinic["_id"]
+    
+    return clinic
+
+@api_router.put("/clinics/{clinic_id}")
+async def update_clinic(
+    clinic_id: str,
+    clinic_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Update a clinic"""
+    user = await get_current_user(authorization, request)
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    clinic = await db.clinics.find_one({"clinic_id": clinic_id, "provider_id": provider["provider_id"]})
+    if not clinic:
+        raise HTTPException(status_code=404, detail="Clinic not found")
+    
+    allowed = ["name", "address", "city", "phone", "latitude", "longitude", "working_hours", "notes", "is_active"]
+    update = {k: v for k, v in clinic_data.items() if k in allowed}
+    update["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.clinics.update_one({"clinic_id": clinic_id}, {"$set": update})
+    return {"message": "Clinic updated"}
+
+@api_router.delete("/clinics/{clinic_id}")
+async def delete_clinic(
+    clinic_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Delete a clinic"""
+    user = await get_current_user(authorization, request)
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    result = await db.clinics.delete_one({"clinic_id": clinic_id, "provider_id": provider["provider_id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Clinic not found")
+    
+    return {"message": "Clinic deleted"}
+
+# ==================== TEAM MANAGEMENT ====================
+
+@api_router.get("/team")
+async def get_my_team(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Get provider's team members"""
+    user = await get_current_user(authorization, request)
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    # Check subscription
+    tier = provider.get("subscription_tier", "free")
+    plan = await db.subscription_plans.find_one({"tier": tier}, {"_id": 0})
+    if not plan:
+        plan = DEFAULT_PLANS[0]
+    
+    if not plan.get("has_team_management", False):
+        raise HTTPException(status_code=403, detail="ניהול צוות זמין במנוי זהב בלבד")
+    
+    members = await db.team_members.find(
+        {"provider_id": provider["provider_id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    return {"members": members}
+
+@api_router.post("/team")
+async def add_team_member(
+    member_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Add a team member"""
+    user = await get_current_user(authorization, request)
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    tier = provider.get("subscription_tier", "free")
+    plan = await db.subscription_plans.find_one({"tier": tier}, {"_id": 0})
+    if not plan:
+        plan = DEFAULT_PLANS[0]
+    
+    if not plan.get("has_team_management", False):
+        raise HTTPException(status_code=403, detail="ניהול צוות זמין במנוי זהב בלבד")
+    
+    max_members = plan.get("max_team_members", 0)
+    if max_members != -1:
+        current_count = await db.team_members.count_documents({"provider_id": provider["provider_id"]})
+        if current_count >= max_members:
+            raise HTTPException(status_code=403, detail=f"הגעת למגבלת חברי הצוות ({max_members})")
+    
+    member = {
+        "member_id": f"member_{uuid.uuid4().hex[:12]}",
+        "provider_id": provider["provider_id"],
+        "name": member_data.get("name", ""),
+        "role": member_data.get("role", ""),
+        "phone": member_data.get("phone", ""),
+        "email": member_data.get("email", ""),
+        "specialization": member_data.get("specialization", ""),
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.team_members.insert_one(member)
+    if "_id" in member:
+        del member["_id"]
+    
+    return member
+
+@api_router.put("/team/{member_id}")
+async def update_team_member(
+    member_id: str,
+    member_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Update team member"""
+    user = await get_current_user(authorization, request)
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    allowed = ["name", "role", "phone", "email", "specialization", "is_active"]
+    update = {k: v for k, v in member_data.items() if k in allowed}
+    update["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.team_members.update_one(
+        {"member_id": member_id, "provider_id": provider["provider_id"]},
+        {"$set": update}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Member not found")
+    
+    return {"message": "Member updated"}
+
+@api_router.delete("/team/{member_id}")
+async def delete_team_member(
+    member_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Delete team member"""
+    user = await get_current_user(authorization, request)
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    result = await db.team_members.delete_one(
+        {"member_id": member_id, "provider_id": provider["provider_id"]}
+    )
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Member not found")
+    
+    return {"message": "Member deleted"}
+
+# ==================== SUBSCRIPTION UPGRADE (No Payment) ====================
+
+@api_router.post("/subscriptions/upgrade")
+async def upgrade_subscription(
+    body: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Upgrade subscription (infrastructure only, no payment)"""
+    user = await get_current_user(authorization, request)
+    plan_id = body.get("plan_id")
+    billing_cycle = body.get("billing_cycle", "monthly")
+    
+    plan = await db.subscription_plans.find_one({"plan_id": plan_id, "is_active": True}, {"_id": 0})
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    
+    # Cancel existing active subscription
+    await db.subscriptions.update_many(
+        {"user_id": user["user_id"], "status": "active"},
+        {"$set": {"status": "cancelled", "cancelled_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    # Create new subscription
+    now = datetime.now(timezone.utc)
+    sub = {
+        "subscription_id": f"sub_{uuid.uuid4().hex[:12]}",
+        "user_id": user["user_id"],
+        "provider_id": provider["provider_id"] if provider else None,
+        "plan_id": plan_id,
+        "tier": plan["tier"],
+        "status": "active",
+        "billing_cycle": billing_cycle,
+        "start_date": now.isoformat(),
+        "created_at": now.isoformat()
+    }
+    
+    await db.subscriptions.insert_one(sub)
+    if "_id" in sub:
+        del sub["_id"]
+    
+    # Update provider tier
+    if provider:
+        update_fields = {"subscription_tier": plan["tier"]}
+        if plan.get("has_recommended_badge"):
+            update_fields["is_recommended"] = True
+        await db.providers.update_one(
+            {"provider_id": provider["provider_id"]},
+            {"$set": update_fields}
+        )
+    
+    return {"message": "המנוי שודרג בהצלחה", "subscription": sub, "plan": plan}
+
 # ==================== PUSH NOTIFICATIONS ====================
 
 @api_router.get("/push/vapid-public-key")
