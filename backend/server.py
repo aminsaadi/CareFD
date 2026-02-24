@@ -148,19 +148,31 @@ class SubscriptionTier:
 
 class SubscriptionPlan(BaseModel):
     plan_id: str = Field(default_factory=lambda: f"plan_{uuid.uuid4().hex[:12]}")
-    name: str  # Free, Pro, Premium
-    name_he: str  # חינם, פרו, פרימיום
-    tier: str  # free, pro, premium
-    price_monthly: float  # 0, 99, 199
-    price_yearly: float  # 0, 990, 1990
+    name: str  # Free, Pro, Gold
+    name_he: str  # חינם, פרו, זהב
+    tier: str  # free, pro, gold
+    price_monthly: float  # 0, 59, 149
+    price_yearly: float  # 0, 600, 0 (gold no yearly)
     currency: str = "ILS"
-    features: List[str] = []
-    max_services: int = 3  # -1 for unlimited
+    features: dict = {}  # detailed feature flags
+    features_list: List[str] = []  # human-readable features
+    max_services: int = 1  # -1 for unlimited
     max_bookings_per_month: int = 10  # -1 for unlimited
-    priority_support: bool = False
-    featured_listing: bool = False
+    max_clinics: int = 0  # 0 = not allowed, -1 = unlimited
+    max_team_members: int = 0  # 0 = not allowed, -1 = unlimited
+    has_promoted_profile: bool = False
+    has_recommended_badge: bool = False
+    has_team_management: bool = False
+    has_chat_contact: bool = True
+    has_phone_contact: bool = True
+    has_whatsapp_contact: bool = True
+    has_clinic_management: bool = False
+    has_product_shipping: bool = True
+    has_priority_support: bool = False
+    has_staff_support: bool = False
     analytics_access: bool = False
     is_active: bool = True
+    sort_order: int = 0
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class Subscription(BaseModel):
