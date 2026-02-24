@@ -622,6 +622,24 @@ const Dashboard = () => {
                         <div className="space-y-4">
                           {myReviews.map((review) => (
                             <div key={review.review_id} className="border-2 border-carelink-teal-pale rounded-xl p-4">
+                              {/* Review status badge */}
+                              {review.status && review.status !== 'approved' && (
+                                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-medium mb-3 ${
+                                  review.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                                }`}>
+                                  {review.status === 'pending' ? (
+                                    <>
+                                      <FaHourglass />
+                                      ממתין לאישור מנהל
+                                    </>
+                                  ) : (
+                                    <>
+                                      <FaTimes />
+                                      נדחה: {review.rejection_reason || 'לא עומד בקריטריונים'}
+                                    </>
+                                  )}
+                                </div>
+                              )}
                               <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center gap-3">
                                   {review.provider?.profile_image ? (
