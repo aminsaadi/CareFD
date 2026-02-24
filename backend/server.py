@@ -581,7 +581,7 @@ class Booking(BaseModel):
 
 class BookingCreate(BaseModel):
     service_id: str
-    booking_date: datetime
+    booking_date: Optional[datetime] = None
     booking_time: Optional[str] = None
     delivery_type: Optional[str] = None  # home_visit, hospital, clinic, virtual
     
