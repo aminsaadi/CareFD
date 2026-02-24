@@ -2972,11 +2972,34 @@ async def create_review(
     authorization: Optional[str] = Header(None),
     request: Request = None
 ):
-    """Create a review"""
+    """Create a review - only allowed after booking is completed"""
     user = await get_current_user(authorization, request)
+    
+    # Check if booking_id is provided and if the booking is completed
+    if review_data.booking_id:
+        booking = await db.bookings.find_one({"booking_id": review_data.booking_id}, {"_id": 0})
+        if not booking:
+            raise HTTPException(status_code=404, detail="Booking not found")
+        
+        # Check if user is the booking owner
+        if booking.get("user_id") != user["user_id"]:
+            raise HTTPException(status_code=403, detail="You can only review your own bookings")
+        
+        # Check if booking is completed
+        if booking.get("status") != BookingStatus.COMPLETED:
+            raise HTTPException(status_code=400, detail="ניתן לכתוב חוות דעת רק לאחר השלמת ההזמנה")
+        
+        # Check if already reviewed
+        existing_review = await db.reviews.find_one({
+            "booking_id": review_data.booking_id,
+            "user_id": user["user_id"]
+        })
+        if existing_review:
+            raise HTTPException(status_code=400, detail="כבר כתבת חוות דעת להזמנה זו")
     
     review = Review(
         user_id=user["user_id"],
+        status="pending",  # Requires admin approval
         **review_data.model_dump()
     )
     
@@ -2985,24 +3008,36 @@ async def create_review(
     
     await db.reviews.insert_one(review_dict)
     
-    # Update provider rating
-    reviews = await db.reviews.find({"provider_id": review_data.provider_id}, {"_id": 0}).to_list(1000)
-    avg_rating = sum(r["rating"] for r in reviews) / len(reviews)
+    # Mark booking as reviewed
+    if review_data.booking_id:
+        await db.bookings.update_one(
+            {"booking_id": review_data.booking_id},
+            {"$set": {"has_review": True, "review_id": review.review_id}}
+        )
     
-    await db.providers.update_one(
-        {"provider_id": review_data.provider_id},
-        {"$set": {
-            "rating": round(avg_rating, 1),
-            "total_reviews": len(reviews)
-        }}
-    )
+    # Notify admins about new review pending approval
+    admins = await db.users.find({"role": "admin"}, {"_id": 0, "user_id": 1}).to_list(100)
+    for admin in admins:
+        await create_notification(
+            admin["user_id"],
+            NotificationType.SYSTEM,
+            "חוות דעת חדשה ממתינה לאישור",
+            f"משתמש {user.get('name', 'לקוח')} כתב חוות דעת חדשה",
+            {"review_id": review.review_id, "provider_id": review_data.provider_id}
+        )
     
-    return review.model_dump()
+    return {
+        "message": "חוות הדעת נשלחה בהצלחה וממתינה לאישור מנהל",
+        "review": review.model_dump()
+    }
 
 @api_router.get("/providers/{provider_id}/reviews")
 async def get_provider_reviews(provider_id: str, skip: int = 0, limit: int = 20):
-    """Get provider reviews"""
-    reviews = await db.reviews.find({"provider_id": provider_id}, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
+    """Get provider reviews - only approved reviews"""
+    reviews = await db.reviews.find({
+        "provider_id": provider_id,
+        "status": "approved"  # Only show approved reviews
+    }, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
     
     # Enhance with user info
     for review in reviews:
