@@ -266,6 +266,7 @@ const Dashboard = () => {
     { id: 'reviews', label: 'הביקורות שלי', icon: FaStar },
     { id: 'messages', label: 'הודעות', icon: FaComments },
     { id: 'favorites', label: 'מועדפים', icon: FaHeart },
+    { id: 'verification', label: 'אימות חשבון', icon: FaShieldAlt, link: '/verify-account' },
     { id: 'settings', label: 'הגדרות', icon: FaCog }
   ];
 
