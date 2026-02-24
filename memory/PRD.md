@@ -146,9 +146,6 @@ DELETE /api/admin/categories/{id}                        # Delete category
 #### P2 - PayPal Live Integration
 - Waiting for PayPal API credentials
 
-#### P2 - Email Integration
-- Waiting for RESEND_API_KEY (currently mocked)
-
 ### Testing Credentials
 - Admin: admin@carelink.co.il / password
 - User: user@carelink.co.il / password
