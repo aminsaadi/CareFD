@@ -6,11 +6,32 @@ import Footer from '../components/Footer';
 import ServiceCard from '../components/ServiceCard';
 import api from '../utils/api';
 import { israeliLocalities } from '../data/israeliLocalities';
-import { israeliRegions, healthcareProfessions, popularSearches, serviceTypes, serviceCategories } from '../data/searchData';
+import { israeliRegions, healthcareProfessions, popularSearches as searchData, serviceTypes, serviceCategories } from '../data/searchData';
 import { 
   FaFilter, FaTimes, FaSearch, FaMapMarkerAlt, FaCrosshairs, 
-  FaSpinner, FaSortAmountDown, FaThLarge, FaList, FaBriefcase
+  FaSpinner, FaSortAmountDown, FaThLarge, FaList, FaBriefcase,
+  FaStar, FaCheckCircle, FaAward, FaChevronDown, FaChevronUp,
+  FaHome, FaVideo, FaClinicMedical, FaPhoneAlt, FaClock, FaBox,
+  FaUserMd
 } from 'react-icons/fa';
+
+// Service type icons mapping
+const serviceTypeIcons = {
+  home_visit: FaHome,
+  clinic_visit: FaClinicMedical,
+  video_call: FaVideo,
+  phone_call: FaPhoneAlt,
+  hourly: FaClock,
+  product: FaBox,
+};
+
+// Rating options
+const ratingOptions = [
+  { value: 4.5, label: '4.5+ כוכבים' },
+  { value: 4.0, label: '4.0+ כוכבים' },
+  { value: 3.5, label: '3.5+ כוכבים' },
+  { value: 3.0, label: '3.0+ כוכבים' }
+];
 
 const Services = () => {
   const { t } = useTranslation();
@@ -33,6 +54,16 @@ const Services = () => {
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [showProfessionDropdown, setShowProfessionDropdown] = useState(false);
   
+  // Filter sections expanded state
+  const [expandedSections, setExpandedSections] = useState({
+    category: true,
+    serviceType: true,
+    profession: false,
+    price: false,
+    rating: false,
+    badges: false
+  });
+  
   // Refs
   const searchInputRef = useRef(null);
   const locationInputRef = useRef(null);
@@ -47,7 +78,10 @@ const Services = () => {
     priceMin: searchParams.get('priceMin') || '',
     priceMax: searchParams.get('priceMax') || '',
     city: searchParams.get('city') || '',
-    profession: searchParams.get('profession') || ''
+    profession: searchParams.get('profession') || '',
+    minRating: searchParams.get('minRating') ? parseFloat(searchParams.get('minRating')) : null,
+    verifiedOnly: searchParams.get('verifiedOnly') === 'true',
+    recommendedOnly: searchParams.get('recommendedOnly') === 'true'
   });
 
   useEffect(() => {
@@ -56,7 +90,7 @@ const Services = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [services, filters, sortBy]);
+  }, [services, filters, sortBy, searchQuery]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -77,6 +111,10 @@ const Services = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const toggleSection = (section) => {
+    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+  };
 
   const fetchServices = async () => {
     try {
@@ -137,6 +175,21 @@ const Services = () => {
         s.provider?.profession?.toLowerCase().includes(professionLower) ||
         s.provider?.specialization?.some(spec => spec.toLowerCase().includes(professionLower))
       );
+    }
+    
+    // Rating filter
+    if (filters.minRating) {
+      result = result.filter(s => (s.provider?.rating || 0) >= filters.minRating);
+    }
+    
+    // Verified only
+    if (filters.verifiedOnly) {
+      result = result.filter(s => s.provider?.is_verified);
+    }
+    
+    // Recommended only
+    if (filters.recommendedOnly) {
+      result = result.filter(s => s.provider?.is_recommended);
     }
     
     // Sort
@@ -214,7 +267,10 @@ const Services = () => {
   };
 
   const resetFilters = () => {
-    setFilters({ serviceType: '', category: '', priceMin: '', priceMax: '', city: '', profession: '' });
+    setFilters({ 
+      serviceType: '', category: '', priceMin: '', priceMax: '', 
+      city: '', profession: '', minRating: null, verifiedOnly: false, recommendedOnly: false 
+    });
     setSearchQuery('');
     setLocationQuery('');
     setProfessionQuery('');
@@ -223,8 +279,8 @@ const Services = () => {
 
   // Filter data for dropdowns
   const filteredSearches = searchQuery.trim() 
-    ? popularSearches.services.filter(s => s.includes(searchQuery))
-    : popularSearches.services;
+    ? searchData.services.filter(s => s.includes(searchQuery))
+    : searchData.services;
     
   const filteredCities = locationQuery.trim()
     ? israeliLocalities.filter(c => c.name?.includes(locationQuery)).slice(0, 10)
@@ -239,8 +295,30 @@ const Services = () => {
 
   const activeFiltersCount = [
     filters.serviceType, filters.category, filters.priceMin, 
-    filters.priceMax, filters.city, filters.profession
+    filters.priceMax, filters.city, filters.profession,
+    filters.minRating, filters.verifiedOnly, filters.recommendedOnly
   ].filter(Boolean).length;
+
+  // Filter Section Component
+  const FilterSection = ({ title, icon: Icon, sectionKey, children }) => (
+    <div className="border-b border-carelink-teal-pale/50 last:border-0">
+      <button
+        onClick={() => toggleSection(sectionKey)}
+        className="w-full flex items-center justify-between py-3 px-4 hover:bg-carelink-teal-pale/10 transition"
+      >
+        <div className="flex items-center gap-2 font-semibold text-carelink-navy">
+          <Icon className="text-carelink-teal" />
+          {title}
+        </div>
+        {expandedSections[sectionKey] ? <FaChevronUp className="text-carelink-gray" /> : <FaChevronDown className="text-carelink-gray" />}
+      </button>
+      {expandedSections[sectionKey] && (
+        <div className="px-4 pb-4">
+          {children}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale flex flex-col">
@@ -454,85 +532,201 @@ const Services = () => {
         </form>
 
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Filters Sidebar */}
-          <div className={`lg:w-72 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-            <div className="bg-white rounded-xl shadow-lg p-5 sticky top-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-carelink-navy flex items-center gap-2">
-                  <FaFilter className="text-carelink-teal" />
-                  סינון מתקדם
+          {/* Advanced Filters Sidebar */}
+          <div className={`lg:w-80 ${showFilters ? 'block' : 'hidden lg:block'}`}>
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-4">
+              {/* Header */}
+              <div className="bg-carelink-navy text-white p-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FaFilter />
+                  <span className="font-bold">סינון מתקדם</span>
                   {activeFiltersCount > 0 && (
                     <span className="bg-carelink-teal text-white text-xs px-2 py-0.5 rounded-full">
                       {activeFiltersCount}
                     </span>
                   )}
-                </h3>
+                </div>
                 <button 
                   onClick={resetFilters}
-                  className="text-sm text-carelink-teal hover:underline"
+                  className="text-sm text-carelink-teal-pale hover:text-white transition"
                 >
                   נקה הכל
                 </button>
               </div>
 
-              {/* Category */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-carelink-navy mb-2">קטגוריה</label>
-                <select
-                  value={filters.category}
-                  onChange={(e) => setFilters({...filters, category: e.target.value})}
-                  className="w-full p-2.5 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
-                >
-                  <option value="">הכל</option>
+              {/* Category Filter */}
+              <FilterSection title="קטגוריה" icon={FaBriefcase} sectionKey="category">
+                <div className="grid grid-cols-2 gap-2">
                   {serviceCategories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    <button
+                      key={cat.id}
+                      onClick={() => setFilters({...filters, category: filters.category === cat.id ? '' : cat.id})}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        filters.category === cat.id
+                          ? 'bg-carelink-teal text-white'
+                          : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                      }`}
+                    >
+                      {cat.name}
+                    </button>
                   ))}
-                </select>
-              </div>
-
-              {/* Service Type */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-carelink-navy mb-2">סוג שירות</label>
-                <select
-                  value={filters.serviceType}
-                  onChange={(e) => setFilters({...filters, serviceType: e.target.value})}
-                  className="w-full p-2.5 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
-                >
-                  <option value="">הכל</option>
-                  {serviceTypes.map(type => (
-                    <option key={type.id} value={type.id}>{type.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Price Range */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-carelink-navy mb-2">טווח מחירים (₪)</label>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    placeholder="מ-"
-                    value={filters.priceMin}
-                    onChange={(e) => setFilters({...filters, priceMin: e.target.value})}
-                    className="w-1/2 p-2.5 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
-                  />
-                  <input
-                    type="number"
-                    placeholder="עד"
-                    value={filters.priceMax}
-                    onChange={(e) => setFilters({...filters, priceMax: e.target.value})}
-                    className="w-1/2 p-2.5 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
-                  />
                 </div>
-              </div>
+              </FilterSection>
 
-              {/* Close button on mobile */}
-              <button
-                onClick={() => setShowFilters(false)}
-                className="lg:hidden w-full mt-4 py-2.5 bg-carelink-teal text-white rounded-lg font-medium"
-              >
-                החל סינון
-              </button>
+              {/* Service Type Filter */}
+              <FilterSection title="סוג שירות" icon={FaHome} sectionKey="serviceType">
+                <div className="space-y-2">
+                  {serviceTypes.map(type => {
+                    const Icon = serviceTypeIcons[type.id] || FaHome;
+                    return (
+                      <button
+                        key={type.id}
+                        onClick={() => setFilters({...filters, serviceType: filters.serviceType === type.id ? '' : type.id})}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                          filters.serviceType === type.id
+                            ? 'bg-carelink-teal text-white'
+                            : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                        }`}
+                      >
+                        <Icon />
+                        {type.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </FilterSection>
+
+              {/* Profession Filter */}
+              <FilterSection title="מקצוע" icon={FaUserMd} sectionKey="profession">
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {healthcareProfessions.slice(0, 12).map(prof => (
+                    <button
+                      key={prof.id}
+                      onClick={() => {
+                        setFilters({...filters, profession: filters.profession === prof.name ? '' : prof.name});
+                        setProfessionQuery(filters.profession === prof.name ? '' : prof.name);
+                      }}
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        filters.profession === prof.name
+                          ? 'bg-carelink-teal text-white'
+                          : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                      }`}
+                    >
+                      <FaUserMd className="text-xs" />
+                      {prof.name}
+                    </button>
+                  ))}
+                </div>
+              </FilterSection>
+
+              {/* Price Filter */}
+              <FilterSection title="טווח מחירים" icon={FaSortAmountDown} sectionKey="price">
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <label className="text-xs text-carelink-gray mb-1 block">מ-</label>
+                      <input
+                        type="number"
+                        placeholder="₪0"
+                        value={filters.priceMin}
+                        onChange={(e) => setFilters({...filters, priceMin: e.target.value})}
+                        className="w-full p-2.5 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="text-xs text-carelink-gray mb-1 block">עד</label>
+                      <input
+                        type="number"
+                        placeholder="₪999"
+                        value={filters.priceMax}
+                        onChange={(e) => setFilters({...filters, priceMax: e.target.value})}
+                        className="w-full p-2.5 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                      />
+                    </div>
+                  </div>
+                  {/* Quick price ranges */}
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { min: '', max: '100', label: 'עד ₪100' },
+                      { min: '100', max: '300', label: '₪100-300' },
+                      { min: '300', max: '500', label: '₪300-500' },
+                      { min: '500', max: '', label: '₪500+' }
+                    ].map((range, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setFilters({...filters, priceMin: range.min, priceMax: range.max})}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          filters.priceMin === range.min && filters.priceMax === range.max
+                            ? 'bg-carelink-teal text-white'
+                            : 'bg-gray-100 text-carelink-navy hover:bg-gray-200'
+                        }`}
+                      >
+                        {range.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </FilterSection>
+
+              {/* Rating Filter */}
+              <FilterSection title="דירוג מינימלי" icon={FaStar} sectionKey="rating">
+                <div className="space-y-2">
+                  {ratingOptions.map(option => (
+                    <button
+                      key={option.value}
+                      onClick={() => setFilters({...filters, minRating: filters.minRating === option.value ? null : option.value})}
+                      className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                        filters.minRating === option.value
+                          ? 'bg-carelink-teal text-white'
+                          : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <FaStar key={i} className={i < Math.floor(option.value) ? 'text-yellow-400' : 'text-gray-300'} />
+                        ))}
+                      </div>
+                      <span>{option.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </FilterSection>
+
+              {/* Badges Filter */}
+              <FilterSection title="תגיות מיוחדות" icon={FaAward} sectionKey="badges">
+                <div className="space-y-2">
+                  <label className="flex items-center gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-carelink-teal-pale/20 transition">
+                    <input
+                      type="checkbox"
+                      checked={filters.verifiedOnly}
+                      onChange={(e) => setFilters({...filters, verifiedOnly: e.target.checked})}
+                      className="w-5 h-5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
+                    />
+                    <FaCheckCircle className="text-carelink-teal" />
+                    <span className="text-sm font-medium text-carelink-navy">ספקים מאומתים בלבד</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-carelink-teal-pale/20 transition">
+                    <input
+                      type="checkbox"
+                      checked={filters.recommendedOnly}
+                      onChange={(e) => setFilters({...filters, recommendedOnly: e.target.checked})}
+                      className="w-5 h-5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
+                    />
+                    <FaAward className="text-amber-500" />
+                    <span className="text-sm font-medium text-carelink-navy">ספקים מומלצים בלבד</span>
+                  </label>
+                </div>
+              </FilterSection>
+
+              {/* Mobile Close Button */}
+              <div className="lg:hidden p-4 border-t border-carelink-teal-pale">
+                <button
+                  onClick={() => setShowFilters(false)}
+                  className="w-full py-3 bg-carelink-teal text-white rounded-xl font-semibold"
+                >
+                  החל סינון ({filteredServices.length} תוצאות)
+                </button>
+              </div>
             </div>
           </div>
 
@@ -546,7 +740,7 @@ const Services = () => {
                 className="lg:hidden flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm"
               >
                 <FaFilter className="text-carelink-teal" />
-                סינון
+                סינון מתקדם
                 {activeFiltersCount > 0 && (
                   <span className="bg-carelink-teal text-white text-xs px-2 py-0.5 rounded-full">
                     {activeFiltersCount}
@@ -595,6 +789,7 @@ const Services = () => {
               <div className="flex flex-wrap gap-2 mb-4">
                 {filters.city && (
                   <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm">
+                    <FaMapMarkerAlt className="text-xs" />
                     {filters.city}
                     <button onClick={() => { setFilters({...filters, city: ''}); setLocationQuery(''); }}>
                       <FaTimes className="text-xs" />
@@ -603,6 +798,7 @@ const Services = () => {
                 )}
                 {filters.profession && (
                   <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm">
+                    <FaUserMd className="text-xs" />
                     {filters.profession}
                     <button onClick={() => { setFilters({...filters, profession: ''}); setProfessionQuery(''); }}>
                       <FaTimes className="text-xs" />
@@ -621,6 +817,33 @@ const Services = () => {
                   <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm">
                     {serviceTypes.find(t => t.id === filters.serviceType)?.name}
                     <button onClick={() => setFilters({...filters, serviceType: ''})}>
+                      <FaTimes className="text-xs" />
+                    </button>
+                  </span>
+                )}
+                {filters.minRating && (
+                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm">
+                    <FaStar className="text-xs" />
+                    {filters.minRating}+ כוכבים
+                    <button onClick={() => setFilters({...filters, minRating: null})}>
+                      <FaTimes className="text-xs" />
+                    </button>
+                  </span>
+                )}
+                {filters.verifiedOnly && (
+                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm">
+                    <FaCheckCircle className="text-xs" />
+                    מאומתים
+                    <button onClick={() => setFilters({...filters, verifiedOnly: false})}>
+                      <FaTimes className="text-xs" />
+                    </button>
+                  </span>
+                )}
+                {filters.recommendedOnly && (
+                  <span className="inline-flex items-center gap-1 bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-sm">
+                    <FaAward className="text-xs" />
+                    מומלצים
+                    <button onClick={() => setFilters({...filters, recommendedOnly: false})}>
                       <FaTimes className="text-xs" />
                     </button>
                   </span>
