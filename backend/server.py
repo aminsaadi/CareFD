@@ -101,6 +101,11 @@ class User(BaseModel):
     is_suspended: bool = False
     suspended_at: Optional[datetime] = None
     suspension_reason: Optional[str] = None
+    # Verification fields for users
+    verification_status: str = "none"  # none, pending, approved, rejected
+    verification_documents: List[dict] = []
+    verification_notes: Optional[str] = None
+    verification_submitted_at: Optional[datetime] = None
 
 class UserRegister(BaseModel):
     email: EmailStr
