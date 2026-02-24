@@ -668,7 +668,7 @@ const ProviderDashboard = () => {
                             <FaCrown className="text-3xl text-yellow-300" />
                             <div>
                               <h3 className="text-lg font-bold">שדרג את הפרופיל שלך לפרו!</h3>
-                              <p className="text-blue-100 text-sm">פרופיל מקודם, שירותים ללא הגבלה, תווית מומלץ</p>
+                              <p className="text-blue-100 text-sm">30 יום ניסיון חינם - פרופיל מקודם, שירותים ללא הגבלה, תווית מומלץ</p>
                             </div>
                           </div>
                           <button
@@ -676,7 +676,7 @@ const ProviderDashboard = () => {
                             className="bg-white text-blue-600 px-6 py-2.5 rounded-xl font-bold hover:bg-blue-50 transition whitespace-nowrap"
                             data-testid="overview-upgrade-btn"
                           >
-                            שדרג עכשיו - ₪59/חודש
+                            נסה חינם 30 יום
                           </button>
                         </div>
                       )}
