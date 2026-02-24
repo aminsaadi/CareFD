@@ -701,10 +701,28 @@ const BookService = () => {
                 {/* Contact Person */}
                 {serviceTypeConfig.requiresContact && (
                   <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale">
-                    <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
-                      <FaUserFriends className="text-carelink-teal" />
-                      איש קשר לתיאום
-                    </h2>
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-lg font-bold text-carelink-navy flex items-center gap-2">
+                        <FaUserFriends className="text-carelink-teal" />
+                        איש קשר לתיאום
+                      </h2>
+                      {user && (
+                        <button
+                          type="button"
+                          onClick={() => setContactPerson(prev => ({
+                            ...prev,
+                            name: user.name || prev.name,
+                            phone: user.phone || prev.phone,
+                            relationship: 'self'
+                          }))}
+                          className="inline-flex items-center gap-1.5 text-xs font-medium text-carelink-teal bg-carelink-teal-pale/40 hover:bg-carelink-teal-pale px-3 py-1.5 rounded-full transition"
+                          data-testid="fill-my-contact-btn"
+                        >
+                          <FaUser className="text-[10px]" />
+                          הפרטים שלי
+                        </button>
+                      )}
+                    </div>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
