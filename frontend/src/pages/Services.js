@@ -4,34 +4,15 @@ import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ServiceCard from '../components/ServiceCard';
+import UnifiedAdvancedFilters from '../components/UnifiedAdvancedFilters';
 import api from '../utils/api';
 import { israeliLocalities } from '../data/israeliLocalities';
 import { israeliRegions, healthcareProfessions, popularSearches as searchData, serviceTypes, serviceCategories } from '../data/searchData';
 import { 
   FaFilter, FaTimes, FaSearch, FaMapMarkerAlt, FaCrosshairs, 
-  FaSpinner, FaSortAmountDown, FaThLarge, FaList, FaBriefcase,
-  FaStar, FaCheckCircle, FaAward, FaChevronDown, FaChevronUp,
-  FaHome, FaVideo, FaClinicMedical, FaPhoneAlt, FaClock, FaBox,
-  FaUserMd
+  FaSpinner, FaThLarge, FaList, FaBriefcase, FaStar, FaCheckCircle,
+  FaAward, FaUserMd, FaGlobe, FaHospital
 } from 'react-icons/fa';
-
-// Service type icons mapping
-const serviceTypeIcons = {
-  home_visit: FaHome,
-  clinic_visit: FaClinicMedical,
-  video_call: FaVideo,
-  phone_call: FaPhoneAlt,
-  hourly: FaClock,
-  product: FaBox,
-};
-
-// Rating options
-const ratingOptions = [
-  { value: 4.5, label: '4.5+ כוכבים' },
-  { value: 4.0, label: '4.0+ כוכבים' },
-  { value: 3.5, label: '3.5+ כוכבים' },
-  { value: 3.0, label: '3.0+ כוכבים' }
-];
 
 const Services = () => {
   const { t } = useTranslation();
@@ -54,16 +35,6 @@ const Services = () => {
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [showProfessionDropdown, setShowProfessionDropdown] = useState(false);
   
-  // Filter sections expanded state
-  const [expandedSections, setExpandedSections] = useState({
-    category: true,
-    serviceType: true,
-    profession: false,
-    price: false,
-    rating: false,
-    badges: false
-  });
-  
   // Refs
   const searchInputRef = useRef(null);
   const locationInputRef = useRef(null);
@@ -78,7 +49,11 @@ const Services = () => {
     priceMin: searchParams.get('priceMin') || '',
     priceMax: searchParams.get('priceMax') || '',
     city: searchParams.get('city') || '',
+    region: searchParams.get('region') || '',
     profession: searchParams.get('profession') || '',
+    gender: searchParams.get('gender') || '',
+    languages: searchParams.get('languages')?.split(',').filter(Boolean) || [],
+    healthFunds: searchParams.get('healthFunds')?.split(',').filter(Boolean) || [],
     minRating: searchParams.get('minRating') ? parseFloat(searchParams.get('minRating')) : null,
     verifiedOnly: searchParams.get('verifiedOnly') === 'true',
     recommendedOnly: searchParams.get('recommendedOnly') === 'true'
@@ -111,10 +86,6 @@ const Services = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const toggleSection = (section) => {
-    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
-  };
 
   const fetchServices = async () => {
     try {
@@ -168,12 +139,41 @@ const Services = () => {
       result = result.filter(s => s.provider?.location?.city?.includes(filters.city));
     }
     
+    // Region filter
+    if (filters.region) {
+      const region = israeliRegions.find(r => r.name === filters.region);
+      if (region) {
+        result = result.filter(s => 
+          region.cities.some(city => s.provider?.location?.city?.includes(city))
+        );
+      }
+    }
+    
     // Profession filter
     if (filters.profession) {
       const professionLower = filters.profession.toLowerCase();
       result = result.filter(s => 
         s.provider?.profession?.toLowerCase().includes(professionLower) ||
         s.provider?.specialization?.some(spec => spec.toLowerCase().includes(professionLower))
+      );
+    }
+    
+    // Gender filter
+    if (filters.gender && filters.gender !== 'any') {
+      result = result.filter(s => s.provider?.gender === filters.gender);
+    }
+    
+    // Languages filter
+    if (filters.languages?.length > 0) {
+      result = result.filter(s => 
+        filters.languages.some(lang => s.provider?.languages?.includes(lang))
+      );
+    }
+    
+    // Health funds filter
+    if (filters.healthFunds?.length > 0) {
+      result = result.filter(s => 
+        filters.healthFunds.some(fund => s.provider?.health_funds?.includes(fund))
       );
     }
     
@@ -218,19 +218,10 @@ const Services = () => {
     
     const newFilters = {
       ...filters,
-      city: locationQuery && locationQuery !== 'המיקום שלי' ? locationQuery : '',
-      profession: professionQuery
+      city: locationQuery && locationQuery !== 'המיקום שלי' ? locationQuery : filters.city,
+      profession: professionQuery || filters.profession
     };
     setFilters(newFilters);
-    
-    // Update URL
-    const newParams = new URLSearchParams();
-    if (searchQuery) newParams.set('search', searchQuery);
-    if (newFilters.city) newParams.set('city', newFilters.city);
-    if (newFilters.profession) newParams.set('profession', newFilters.profession);
-    if (newFilters.serviceType) newParams.set('type', newFilters.serviceType);
-    if (newFilters.category) newParams.set('category', newFilters.category);
-    setSearchParams(newParams);
   };
 
   const handleGetLocation = () => {
@@ -252,7 +243,7 @@ const Services = () => {
           const data = await response.json();
           const cityName = data.address?.city || data.address?.town || data.address?.village || 'המיקום שלי';
           setLocationQuery(cityName);
-          setFilters({ ...filters, city: cityName });
+          setFilters({ ...filters, city: cityName, region: '' });
         } catch (error) {
           setLocationQuery('המיקום שלי');
         }
@@ -269,7 +260,9 @@ const Services = () => {
   const resetFilters = () => {
     setFilters({ 
       serviceType: '', category: '', priceMin: '', priceMax: '', 
-      city: '', profession: '', minRating: null, verifiedOnly: false, recommendedOnly: false 
+      city: '', region: '', profession: '', gender: '',
+      languages: [], healthFunds: [],
+      minRating: null, verifiedOnly: false, recommendedOnly: false 
     });
     setSearchQuery('');
     setLocationQuery('');
@@ -295,30 +288,10 @@ const Services = () => {
 
   const activeFiltersCount = [
     filters.serviceType, filters.category, filters.priceMin, 
-    filters.priceMax, filters.city, filters.profession,
-    filters.minRating, filters.verifiedOnly, filters.recommendedOnly
+    filters.priceMax, filters.city, filters.region, filters.profession,
+    filters.gender, filters.minRating, filters.verifiedOnly, filters.recommendedOnly,
+    filters.languages?.length > 0, filters.healthFunds?.length > 0
   ].filter(Boolean).length;
-
-  // Filter Section Component
-  const FilterSection = ({ title, icon: Icon, sectionKey, children }) => (
-    <div className="border-b border-carelink-teal-pale/50 last:border-0">
-      <button
-        onClick={() => toggleSection(sectionKey)}
-        className="w-full flex items-center justify-between py-3 px-4 hover:bg-carelink-teal-pale/10 transition"
-      >
-        <div className="flex items-center gap-2 font-semibold text-carelink-navy">
-          <Icon className="text-carelink-teal" />
-          {title}
-        </div>
-        {expandedSections[sectionKey] ? <FaChevronUp className="text-carelink-gray" /> : <FaChevronDown className="text-carelink-gray" />}
-      </button>
-      {expandedSections[sectionKey] && (
-        <div className="px-4 pb-4">
-          {children}
-        </div>
-      )}
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale flex flex-col">
@@ -333,7 +306,7 @@ const Services = () => {
           <p className="text-carelink-gray">מצאו את השירות המושלם עבורכם</p>
         </div>
 
-        {/* Advanced Search Box */}
+        {/* Search Box */}
         <form onSubmit={handleSearch} className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             {/* Search Input */}
@@ -350,7 +323,6 @@ const Services = () => {
                 data-testid="services-search-input"
               />
               
-              {/* Search Dropdown */}
               {showSearchDropdown && (
                 <div 
                   ref={searchDropdownRef}
@@ -393,7 +365,6 @@ const Services = () => {
                 data-testid="services-profession-input"
               />
               
-              {/* Profession Dropdown */}
               {showProfessionDropdown && (
                 <div 
                   ref={professionDropdownRef}
@@ -437,13 +408,11 @@ const Services = () => {
                   data-testid="services-location-input"
                 />
                 
-                {/* Location Dropdown */}
                 {showLocationDropdown && (
                   <div 
                     ref={locationDropdownRef}
                     className="absolute top-full right-0 left-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 z-50 max-h-64 overflow-y-auto"
                   >
-                    {/* GPS Option */}
                     <button
                       type="button"
                       onClick={handleGetLocation}
@@ -454,7 +423,6 @@ const Services = () => {
                       {isLocating && <FaSpinner className="animate-spin mr-auto" />}
                     </button>
                     
-                    {/* Regions */}
                     {!locationQuery && (
                       <>
                         <div className="p-3 border-b border-gray-100">
@@ -479,7 +447,6 @@ const Services = () => {
                       </>
                     )}
                     
-                    {/* Cities */}
                     {locationQuery && filteredCities.length > 0 && (
                       <>
                         <div className="p-3 border-b border-gray-100">
@@ -507,7 +474,6 @@ const Services = () => {
                 )}
               </div>
               
-              {/* GPS Button */}
               <button
                 type="button"
                 onClick={handleGetLocation}
@@ -520,7 +486,6 @@ const Services = () => {
             </div>
           </div>
 
-          {/* Search Button */}
           <button
             type="submit"
             className="w-full bg-carelink-teal text-white px-8 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition-all flex items-center justify-center gap-2"
@@ -532,201 +497,18 @@ const Services = () => {
         </form>
 
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Advanced Filters Sidebar */}
+          {/* Advanced Filters Sidebar - Using Unified Component */}
           <div className={`lg:w-80 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-4">
-              {/* Header */}
-              <div className="bg-carelink-navy text-white p-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <FaFilter />
-                  <span className="font-bold">סינון מתקדם</span>
-                  {activeFiltersCount > 0 && (
-                    <span className="bg-carelink-teal text-white text-xs px-2 py-0.5 rounded-full">
-                      {activeFiltersCount}
-                    </span>
-                  )}
-                </div>
-                <button 
-                  onClick={resetFilters}
-                  className="text-sm text-carelink-teal-pale hover:text-white transition"
-                >
-                  נקה הכל
-                </button>
-              </div>
-
-              {/* Category Filter */}
-              <FilterSection title="קטגוריה" icon={FaBriefcase} sectionKey="category">
-                <div className="grid grid-cols-2 gap-2">
-                  {serviceCategories.map(cat => (
-                    <button
-                      key={cat.id}
-                      onClick={() => setFilters({...filters, category: filters.category === cat.id ? '' : cat.id})}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                        filters.category === cat.id
-                          ? 'bg-carelink-teal text-white'
-                          : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
-                      }`}
-                    >
-                      {cat.name}
-                    </button>
-                  ))}
-                </div>
-              </FilterSection>
-
-              {/* Service Type Filter */}
-              <FilterSection title="סוג שירות" icon={FaHome} sectionKey="serviceType">
-                <div className="space-y-2">
-                  {serviceTypes.map(type => {
-                    const Icon = serviceTypeIcons[type.id] || FaHome;
-                    return (
-                      <button
-                        key={type.id}
-                        onClick={() => setFilters({...filters, serviceType: filters.serviceType === type.id ? '' : type.id})}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                          filters.serviceType === type.id
-                            ? 'bg-carelink-teal text-white'
-                            : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
-                        }`}
-                      >
-                        <Icon />
-                        {type.name}
-                      </button>
-                    );
-                  })}
-                </div>
-              </FilterSection>
-
-              {/* Profession Filter */}
-              <FilterSection title="מקצוע" icon={FaUserMd} sectionKey="profession">
-                <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {healthcareProfessions.slice(0, 12).map(prof => (
-                    <button
-                      key={prof.id}
-                      onClick={() => {
-                        setFilters({...filters, profession: filters.profession === prof.name ? '' : prof.name});
-                        setProfessionQuery(filters.profession === prof.name ? '' : prof.name);
-                      }}
-                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                        filters.profession === prof.name
-                          ? 'bg-carelink-teal text-white'
-                          : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
-                      }`}
-                    >
-                      <FaUserMd className="text-xs" />
-                      {prof.name}
-                    </button>
-                  ))}
-                </div>
-              </FilterSection>
-
-              {/* Price Filter */}
-              <FilterSection title="טווח מחירים" icon={FaSortAmountDown} sectionKey="price">
-                <div className="space-y-3">
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                      <label className="text-xs text-carelink-gray mb-1 block">מ-</label>
-                      <input
-                        type="number"
-                        placeholder="₪0"
-                        value={filters.priceMin}
-                        onChange={(e) => setFilters({...filters, priceMin: e.target.value})}
-                        className="w-full p-2.5 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <label className="text-xs text-carelink-gray mb-1 block">עד</label>
-                      <input
-                        type="number"
-                        placeholder="₪999"
-                        value={filters.priceMax}
-                        onChange={(e) => setFilters({...filters, priceMax: e.target.value})}
-                        className="w-full p-2.5 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
-                      />
-                    </div>
-                  </div>
-                  {/* Quick price ranges */}
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { min: '', max: '100', label: 'עד ₪100' },
-                      { min: '100', max: '300', label: '₪100-300' },
-                      { min: '300', max: '500', label: '₪300-500' },
-                      { min: '500', max: '', label: '₪500+' }
-                    ].map((range, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setFilters({...filters, priceMin: range.min, priceMax: range.max})}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                          filters.priceMin === range.min && filters.priceMax === range.max
-                            ? 'bg-carelink-teal text-white'
-                            : 'bg-gray-100 text-carelink-navy hover:bg-gray-200'
-                        }`}
-                      >
-                        {range.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </FilterSection>
-
-              {/* Rating Filter */}
-              <FilterSection title="דירוג מינימלי" icon={FaStar} sectionKey="rating">
-                <div className="space-y-2">
-                  {ratingOptions.map(option => (
-                    <button
-                      key={option.value}
-                      onClick={() => setFilters({...filters, minRating: filters.minRating === option.value ? null : option.value})}
-                      className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                        filters.minRating === option.value
-                          ? 'bg-carelink-teal text-white'
-                          : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
-                      }`}
-                    >
-                      <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <FaStar key={i} className={i < Math.floor(option.value) ? 'text-yellow-400' : 'text-gray-300'} />
-                        ))}
-                      </div>
-                      <span>{option.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </FilterSection>
-
-              {/* Badges Filter */}
-              <FilterSection title="תגיות מיוחדות" icon={FaAward} sectionKey="badges">
-                <div className="space-y-2">
-                  <label className="flex items-center gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-carelink-teal-pale/20 transition">
-                    <input
-                      type="checkbox"
-                      checked={filters.verifiedOnly}
-                      onChange={(e) => setFilters({...filters, verifiedOnly: e.target.checked})}
-                      className="w-5 h-5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
-                    />
-                    <FaCheckCircle className="text-carelink-teal" />
-                    <span className="text-sm font-medium text-carelink-navy">ספקים מאומתים בלבד</span>
-                  </label>
-                  <label className="flex items-center gap-3 cursor-pointer p-2.5 rounded-lg hover:bg-carelink-teal-pale/20 transition">
-                    <input
-                      type="checkbox"
-                      checked={filters.recommendedOnly}
-                      onChange={(e) => setFilters({...filters, recommendedOnly: e.target.checked})}
-                      className="w-5 h-5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
-                    />
-                    <FaAward className="text-amber-500" />
-                    <span className="text-sm font-medium text-carelink-navy">ספקים מומלצים בלבד</span>
-                  </label>
-                </div>
-              </FilterSection>
-
-              {/* Mobile Close Button */}
-              <div className="lg:hidden p-4 border-t border-carelink-teal-pale">
-                <button
-                  onClick={() => setShowFilters(false)}
-                  className="w-full py-3 bg-carelink-teal text-white rounded-xl font-semibold"
-                >
-                  החל סינון ({filteredServices.length} תוצאות)
-                </button>
-              </div>
+            <div className="sticky top-4">
+              <UnifiedAdvancedFilters 
+                filters={filters}
+                onFilterChange={setFilters}
+                onReset={resetFilters}
+                showMobile={showFilters}
+                onClose={() => setShowFilters(false)}
+                resultsCount={filteredServices.length}
+                pageType="services"
+              />
             </div>
           </div>
 
@@ -734,7 +516,6 @@ const Services = () => {
           <div className="flex-1">
             {/* Top Bar */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-              {/* Mobile Filter Button */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className="lg:hidden flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg shadow-sm"
@@ -748,12 +529,10 @@ const Services = () => {
                 )}
               </button>
 
-              {/* Results count */}
               <p className="text-carelink-gray">
                 נמצאו <span className="font-bold text-carelink-navy">{filteredServices.length}</span> שירותים
               </p>
 
-              {/* Sort & View */}
               <div className="flex items-center gap-3">
                 <select
                   value={sortBy}
@@ -791,7 +570,16 @@ const Services = () => {
                   <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm">
                     <FaMapMarkerAlt className="text-xs" />
                     {filters.city}
-                    <button onClick={() => { setFilters({...filters, city: ''}); setLocationQuery(''); }}>
+                    <button onClick={() => setFilters({...filters, city: ''})}>
+                      <FaTimes className="text-xs" />
+                    </button>
+                  </span>
+                )}
+                {filters.region && (
+                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm">
+                    <FaMapMarkerAlt className="text-xs" />
+                    {filters.region}
+                    <button onClick={() => setFilters({...filters, region: ''})}>
                       <FaTimes className="text-xs" />
                     </button>
                   </span>
@@ -800,7 +588,7 @@ const Services = () => {
                   <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm">
                     <FaUserMd className="text-xs" />
                     {filters.profession}
-                    <button onClick={() => { setFilters({...filters, profession: ''}); setProfessionQuery(''); }}>
+                    <button onClick={() => setFilters({...filters, profession: ''})}>
                       <FaTimes className="text-xs" />
                     </button>
                   </span>
@@ -817,6 +605,32 @@ const Services = () => {
                   <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm">
                     {serviceTypes.find(t => t.id === filters.serviceType)?.name}
                     <button onClick={() => setFilters({...filters, serviceType: ''})}>
+                      <FaTimes className="text-xs" />
+                    </button>
+                  </span>
+                )}
+                {filters.gender && filters.gender !== 'any' && (
+                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm">
+                    {filters.gender === 'male' ? 'זכר' : 'נקבה'}
+                    <button onClick={() => setFilters({...filters, gender: ''})}>
+                      <FaTimes className="text-xs" />
+                    </button>
+                  </span>
+                )}
+                {filters.languages?.length > 0 && (
+                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm">
+                    <FaGlobe className="text-xs" />
+                    {filters.languages.length} שפות
+                    <button onClick={() => setFilters({...filters, languages: []})}>
+                      <FaTimes className="text-xs" />
+                    </button>
+                  </span>
+                )}
+                {filters.healthFunds?.length > 0 && (
+                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm">
+                    <FaHospital className="text-xs" />
+                    {filters.healthFunds.length} קופות
+                    <button onClick={() => setFilters({...filters, healthFunds: []})}>
                       <FaTimes className="text-xs" />
                     </button>
                   </span>
