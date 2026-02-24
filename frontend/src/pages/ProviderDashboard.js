@@ -482,7 +482,7 @@ const ProviderDashboard = () => {
     { id: 'reviews', label: 'ביקורות', icon: FaStar },
     { id: 'user_info', label: 'פרטי משתמש', icon: FaUser },
     { id: 'provider_profile', label: 'פרופיל ספק', icon: FaUserTie },
-    { id: 'verification', label: 'אימות', icon: FaAward },
+    { id: 'verification', label: 'אימות חשבון', icon: FaAward, link: '/verify-account' },
     { id: 'settings', label: 'הגדרות', icon: FaCog }
   ];
 
