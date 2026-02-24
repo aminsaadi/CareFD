@@ -165,6 +165,22 @@ const Dashboard = () => {
     toast.success('התמונה הוסרה');
   };
 
+  // Booking status configuration
+  const bookingStatusConfig = {
+    pending: { label: 'ממתין לאישור', color: 'bg-yellow-100 text-yellow-700', icon: FaHourglass },
+    confirmed: { label: 'מאושר', color: 'bg-green-100 text-green-700', icon: FaCheckCircle },
+    in_progress: { label: 'בביצוע', color: 'bg-blue-100 text-blue-700', icon: FaClock },
+    provider_completed: { label: 'הספק סיים - אשר השלמה', color: 'bg-purple-100 text-purple-700', icon: FaCheckCircle },
+    completed: { label: 'הושלם', color: 'bg-green-100 text-green-700', icon: FaCheckCircle },
+    cancelled: { label: 'בוטל', color: 'bg-red-100 text-red-700', icon: FaTimes },
+    rejected: { label: 'נדחה', color: 'bg-red-100 text-red-700', icon: FaTimes },
+    on_hold: { label: 'בהשהיה', color: 'bg-gray-100 text-gray-700', icon: FaHourglass }
+  };
+
+  const getBookingStatusConfig = (status) => {
+    return bookingStatusConfig[status] || bookingStatusConfig.pending;
+  };
+
   const handleSaveSettings = async () => {
     setSavingSettings(true);
     try {
