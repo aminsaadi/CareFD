@@ -807,34 +807,93 @@ const ProviderDashboard = () => {
                                   <td className="py-4 px-4">{new Date(booking.booking_date).toLocaleDateString('he-IL')}</td>
                                   <td className="py-4 px-4">
                                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
-                                      {t(booking.status)}
+                                      {getStatusLabel(booking.status)}
                                     </span>
                                   </td>
                                   <td className="py-4 px-4">
-                                    {booking.status === 'pending' && (
-                                      <div className="flex gap-2">
+                                    <div className="flex gap-2 flex-wrap">
+                                      {booking.status === 'pending' && (
+                                        <>
+                                          <button
+                                            onClick={() => {
+                                              setConfirmDialog({
+                                                isOpen: true,
+                                                title: 'אישור הזמנה',
+                                                message: `האם לאשר את ההזמנה של ${booking.user_name || 'הלקוח'} ל-${booking.service_name}?`,
+                                                type: 'success',
+                                                onConfirm: () => updateBookingStatus(booking.booking_id, 'confirmed')
+                                              });
+                                            }}
+                                            className="bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-green-600 transition font-medium"
+                                            data-testid={`confirm-booking-${booking.booking_id}`}
+                                          >
+                                            <FaCheckCircle className="inline ml-1" />
+                                            אשר
+                                          </button>
+                                          <button
+                                            onClick={() => {
+                                              setConfirmDialog({
+                                                isOpen: true,
+                                                title: 'דחיית הזמנה',
+                                                message: `האם לדחות את ההזמנה של ${booking.user_name || 'הלקוח'}?`,
+                                                type: 'danger',
+                                                onConfirm: () => updateBookingStatus(booking.booking_id, 'rejected')
+                                              });
+                                            }}
+                                            className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition font-medium"
+                                            data-testid={`reject-booking-${booking.booking_id}`}
+                                          >
+                                            <FaTimes className="inline ml-1" />
+                                            דחה
+                                          </button>
+                                          <button
+                                            onClick={() => updateBookingStatus(booking.booking_id, 'on_hold')}
+                                            className="bg-gray-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-gray-600 transition font-medium"
+                                            data-testid={`hold-booking-${booking.booking_id}`}
+                                          >
+                                            <FaHourglass className="inline ml-1" />
+                                            השהה
+                                          </button>
+                                        </>
+                                      )}
+                                      {booking.status === 'confirmed' && (
                                         <button
-                                          onClick={() => updateBookingStatus(booking.booking_id, 'confirmed')}
-                                          className="text-green-600 hover:text-green-700"
+                                          onClick={() => {
+                                            setConfirmDialog({
+                                              isOpen: true,
+                                              title: 'סימון כהושלם',
+                                              message: `האם לסמן את ההזמנה של ${booking.user_name || 'הלקוח'} כהושלמה? הלקוח יתבקש לאשר.`,
+                                              type: 'warning',
+                                              onConfirm: () => updateBookingStatus(booking.booking_id, 'provider_completed')
+                                            });
+                                          }}
+                                          className="bg-purple-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-purple-600 transition font-medium"
+                                          data-testid={`complete-booking-${booking.booking_id}`}
                                         >
-                                          <FaCheckCircle />
+                                          <FaCheckCircle className="inline ml-1" />
+                                          סמן כהושלם
                                         </button>
-                                        <button
-                                          onClick={() => updateBookingStatus(booking.booking_id, 'cancelled')}
-                                          className="text-red-600 hover:text-red-700"
-                                        >
-                                          <FaTimes />
-                                        </button>
-                                      </div>
-                                    )}
-                                    {booking.status === 'confirmed' && (
-                                      <button
-                                        onClick={() => updateBookingStatus(booking.booking_id, 'completed')}
-                                        className="text-blue-600 hover:text-blue-700 text-sm"
-                                      >
-                                        סמן כהושלם
-                                      </button>
-                                    )}
+                                      )}
+                                      {booking.status === 'on_hold' && (
+                                        <>
+                                          <button
+                                            onClick={() => updateBookingStatus(booking.booking_id, 'confirmed')}
+                                            className="bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-green-600 transition font-medium"
+                                          >
+                                            אשר
+                                          </button>
+                                          <button
+                                            onClick={() => updateBookingStatus(booking.booking_id, 'rejected')}
+                                            className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition font-medium"
+                                          >
+                                            דחה
+                                          </button>
+                                        </>
+                                      )}
+                                      {(booking.status === 'completed' || booking.status === 'cancelled' || booking.status === 'rejected' || booking.status === 'provider_completed') && (
+                                        <span className="text-xs text-gray-400">-</span>
+                                      )}
+                                    </div>
                                   </td>
                                 </tr>
                               ))}
