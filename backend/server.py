@@ -2370,8 +2370,10 @@ async def create_booking(
         base_price = base_price * actual_hours
     
     # Check if booking is on weekend (Friday after 14:00 or Saturday)
-    booking_day = booking_data.booking_date.weekday()  # 4 = Friday, 5 = Saturday
-    is_weekend = booking_day == 5 or (booking_day == 4 and booking_data.booking_time and booking_data.booking_time >= "14:00")
+    is_weekend = False
+    if booking_data.booking_date:
+        booking_day = booking_data.booking_date.weekday()  # 4 = Friday, 5 = Saturday
+        is_weekend = booking_day == 5 or (booking_day == 4 and booking_data.booking_time and booking_data.booking_time >= "14:00")
     
     if is_weekend and service.get("weekend_pricing_type", "none") != "none":
         weekend_pricing_type = service.get("weekend_pricing_type")
