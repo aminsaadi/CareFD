@@ -154,7 +154,9 @@ DELETE /api/admin/categories/{id}                        # Delete category
 ### Mocked Integrations
 1. **PayPal** - Waiting for API credentials
 
-**Note**: Email integration now works via SMTP (Gmail) - NOT mocked anymore!
+**Note**: 
+- Email integration works via SMTP (Gmail) - NOT mocked!
+- MongoDB Atlas configured and working!
 
 ## Change Log
 
