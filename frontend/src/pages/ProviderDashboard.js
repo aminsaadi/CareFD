@@ -662,7 +662,7 @@ const ProviderDashboard = () => {
                   {activeTab === 'overview' && (
                     <div className="space-y-6">
                       {/* Free tier upgrade banner */}
-                      {(!providerData?.subscription_tier || providerData?.subscription_tier === 'free') && (
+                      {(!provider?.subscription_tier || provider?.subscription_tier === 'free') && (
                         <div className="bg-gradient-to-l from-blue-500 to-blue-600 rounded-2xl p-5 text-white flex flex-col md:flex-row items-center justify-between gap-4" data-testid="overview-upgrade-banner">
                           <div className="flex items-center gap-4">
                             <FaCrown className="text-3xl text-yellow-300" />
@@ -1005,21 +1005,21 @@ const ProviderDashboard = () => {
                   {/* Subscription Tab */}
                   {activeTab === 'subscription' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <ProviderSubscription provider={providerData} onRefresh={fetchDashboardData} />
+                      <ProviderSubscription provider={provider} onRefresh={fetchDashboardData} />
                     </div>
                   )}
 
                   {/* Clinics Tab */}
                   {activeTab === 'clinics' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <ProviderClinics provider={providerData} />
+                      <ProviderClinics provider={provider} />
                     </div>
                   )}
 
                   {/* Team Tab */}
                   {activeTab === 'team' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <ProviderTeam provider={providerData} />
+                      <ProviderTeam provider={provider} />
                     </div>
                   )}
 
