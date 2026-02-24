@@ -9,6 +9,7 @@ import TimeSlotPicker from '../components/TimeSlotPicker';
 import api from '../utils/api';
 import { format, addHours } from 'date-fns';
 import { he } from 'date-fns/locale';
+import { toast } from 'sonner';
 import { 
   FaUser, FaPhone, FaEnvelope, FaMapMarkerAlt, FaCalendarAlt,
   FaClock, FaCheckCircle, FaSpinner, FaArrowRight, FaUserPlus,
