@@ -251,8 +251,8 @@ class TestBookingModelV2:
         data = response.json()
         bookings = data.get("bookings", [])
         
-        # Find our test bookings
-        test_bookings = [b for b in bookings if b.get("notes", "").startswith("TEST_")]
+        # Find our test bookings (handle None notes)
+        test_bookings = [b for b in bookings if (b.get("notes") or "").startswith("TEST_")]
         print(f"Found {len(test_bookings)} test bookings")
         
         # Check that at least some have the new fields
