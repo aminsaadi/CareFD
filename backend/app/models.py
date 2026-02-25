@@ -498,6 +498,7 @@ class BookingCreate(BaseModel):
     total_price: Optional[float] = None
     notes: Optional[str] = None
     special_requirements: Optional[str] = None
+    guest_booking: bool = False
     guest_name: Optional[str] = None
     guest_email: Optional[str] = None
     guest_phone: Optional[str] = None
