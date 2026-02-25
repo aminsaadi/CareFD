@@ -5,7 +5,7 @@ import uuid
 import secrets
 
 from app.database import db
-from app.models import User, UserRegister, UserLogin, UserSession, UserRole, Provider, ProviderRegister, NotificationType
+from app.models import User, UserRegister, UserLogin, UserSession, UserRole, Provider, ProviderRegister, NotificationType, VerificationStatus
 from app.utils import get_current_user, send_email_async, create_notification, hash_password, verify_password, create_jwt_token
 
 router = APIRouter()
