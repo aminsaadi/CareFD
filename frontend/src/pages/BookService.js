@@ -649,23 +649,68 @@ const BookService = () => {
             {/* ==================== STEP 2: Details ==================== */}
             {step === 2 && (
               <>
+                {/* Requester Details - always shown */}
+                <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale" data-testid="requester-form">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-bold text-carelink-navy flex items-center gap-2">
+                      <FaUser className="text-carelink-teal" />
+                      פרטי מזמין
+                    </h2>
+                    {user && (
+                      <button type="button"
+                        onClick={() => setContactPerson(prev => ({ ...prev, name: user.name || prev.name, phone: user.phone || prev.phone, relationship: 'self' }))}
+                        className="inline-flex items-center gap-1.5 text-xs font-medium text-carelink-teal bg-carelink-teal-pale/40 hover:bg-carelink-teal-pale px-3 py-1.5 rounded-full transition"
+                        data-testid="fill-my-details-btn">
+                        <FaUser className="text-[10px]" /> הפרטים שלי
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-carelink-navy mb-1">שם מלא *</label>
+                      <input type="text" value={contactPerson.name}
+                        onChange={(e) => setContactPerson({...contactPerson, name: e.target.value})}
+                        className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none"
+                        placeholder="שם מלא" data-testid="requester-name" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-carelink-navy mb-1">טלפון *</label>
+                      <input type="tel" value={contactPerson.phone}
+                        onChange={(e) => setContactPerson({...contactPerson, phone: e.target.value})}
+                        className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none"
+                        placeholder="050-0000000" data-testid="requester-phone" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-carelink-navy mb-1">קרבה למטופל</label>
+                      <select value={contactPerson.relationship}
+                        onChange={(e) => setContactPerson({...contactPerson, relationship: e.target.value})}
+                        className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none"
+                        data-testid="requester-relationship">
+                        <option value="">בחר</option>
+                        <option value="self">בעצמי</option>
+                        <option value="spouse">בן/בת זוג</option>
+                        <option value="child">ילד/ה</option>
+                        <option value="parent">הורה</option>
+                        <option value="other">אחר</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Address for Home Visits */}
                 {needsAddress && (
                   <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale" data-testid="address-form">
                     <div className="flex items-center justify-between mb-4">
                       <h2 className="text-lg font-bold text-carelink-navy flex items-center gap-2">
                         <FaHome className="text-carelink-teal" />
-                        כתובת לביקור
+                        כתובת מתן השירות
                       </h2>
                       {user && (
-                        <button
-                          type="button"
+                        <button type="button"
                           onClick={() => setServiceAddress(prev => ({ ...prev, street: user.address || prev.street, city: user.city || prev.city }))}
                           className="inline-flex items-center gap-1.5 text-xs font-medium text-carelink-teal bg-carelink-teal-pale/40 hover:bg-carelink-teal-pale px-3 py-1.5 rounded-full transition"
-                          data-testid="fill-my-address-btn"
-                        >
-                          <FaMapMarkerAlt className="text-[10px]" />
-                          הכתובת שלי
+                          data-testid="fill-my-address-btn">
+                          <FaMapMarkerAlt className="text-[10px]" /> הכתובת שלי
                         </button>
                       )}
                     </div>
@@ -710,53 +755,6 @@ const BookService = () => {
                           onChange={(e) => setServiceAddress({...serviceAddress, specialInstructions: e.target.value})}
                           className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none resize-none"
                           rows="2" placeholder="קוד כניסה, מקום חניה..." />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Contact Person */}
-                {needsContact && (
-                  <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale" data-testid="contact-form">
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-lg font-bold text-carelink-navy flex items-center gap-2">
-                        <FaUserFriends className="text-carelink-teal" />
-                        איש קשר לתיאום
-                      </h2>
-                      {user && (
-                        <button type="button"
-                          onClick={() => setContactPerson(prev => ({ ...prev, name: user.name || prev.name, phone: user.phone || prev.phone, relationship: 'self' }))}
-                          className="inline-flex items-center gap-1.5 text-xs font-medium text-carelink-teal bg-carelink-teal-pale/40 hover:bg-carelink-teal-pale px-3 py-1.5 rounded-full transition"
-                          data-testid="fill-my-contact-btn">
-                          <FaUser className="text-[10px]" /> הפרטים שלי
-                        </button>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-carelink-navy mb-1">שם</label>
-                        <input type="text" value={contactPerson.name}
-                          onChange={(e) => setContactPerson({...contactPerson, name: e.target.value})}
-                          className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-carelink-navy mb-1">טלפון</label>
-                        <input type="tel" value={contactPerson.phone}
-                          onChange={(e) => setContactPerson({...contactPerson, phone: e.target.value})}
-                          className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-carelink-navy mb-1">קרבה</label>
-                        <select value={contactPerson.relationship}
-                          onChange={(e) => setContactPerson({...contactPerson, relationship: e.target.value})}
-                          className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none">
-                          <option value="">בחר</option>
-                          <option value="self">בעצמי</option>
-                          <option value="spouse">בן/בת זוג</option>
-                          <option value="child">ילד/ה</option>
-                          <option value="parent">הורה</option>
-                          <option value="other">אחר</option>
-                        </select>
                       </div>
                     </div>
                   </div>
@@ -821,7 +819,7 @@ const BookService = () => {
                   </div>
                 )}
 
-                {/* Notes */}
+                {/* Notes - always shown */}
                 <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale">
                   <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
                     <FaStickyNote className="text-carelink-teal" />
@@ -831,6 +829,7 @@ const BookService = () => {
                     className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none resize-none"
                     placeholder="הערות מיוחדות, בקשות, מידע רפואי רלוונטי..."
                     data-testid="booking-notes" />
+                </div>
                 </div>
               </>
             )}
