@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -11,18 +10,17 @@ import { format } from 'date-fns';
 import { he } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { 
-  FaUser, FaPhone, FaEnvelope, FaMapMarkerAlt, FaCalendarAlt,
-  FaClock, FaCheckCircle, FaSpinner, FaArrowRight, FaUserPlus,
-  FaSignInAlt, FaHome, FaVideo, FaPhoneAlt, FaTruck, FaBuilding,
-  FaWhatsapp, FaExternalLinkAlt, FaFileContract, FaTimesCircle,
-  FaInfoCircle, FaCalculator, FaUserFriends, FaStickyNote,
+  FaUser, FaPhone, FaMapMarkerAlt, FaCalendarAlt,
+  FaClock, FaCheckCircle, FaSpinner, FaArrowRight,
+  FaSignInAlt, FaHome, FaVideo, FaPhoneAlt, FaTruck, 
+  FaWhatsapp, FaExternalLinkAlt, FaFileContract,
+  FaInfoCircle, FaUserFriends, FaStickyNote,
   FaStethoscope, FaSyringe, FaRedoAlt, FaHospital, FaClinicMedical,
   FaLaptopMedical, FaBoxOpen
 } from 'react-icons/fa';
 
 // ==================== CONSTANTS ====================
 
-// Service categories (what kind of service)
 const SERVICE_CATEGORIES = {
   consultation: { label: 'יעוץ', icon: FaStethoscope, pricingLabel: 'ליעוץ' },
   visit:        { label: 'ביקור', icon: FaHome, pricingLabel: 'לביקור' },
@@ -32,16 +30,14 @@ const SERVICE_CATEGORIES = {
   series:       { label: 'סדרה', icon: FaRedoAlt, pricingLabel: 'לסדרה' },
 };
 
-// Delivery types (where/how the service is delivered)
 const DELIVERY_TYPES = {
-  home:     { label: 'בבית הלקוח', icon: FaHome, requiresAddress: true, requiresContact: true },
-  clinic:   { label: 'בקליניקה', icon: FaClinicMedical, requiresAddress: false, requiresContact: false },
-  hospital: { label: 'בבית חולים / מוסד', icon: FaHospital, requiresAddress: false, requiresContact: false },
-  virtual:  { label: 'וירטואלי', icon: FaLaptopMedical, requiresAddress: false, requiresContact: false, showPlatformSelect: true },
-  delivery: { label: 'משלוח', icon: FaTruck, requiresAddress: false, requiresContact: false, requiresShipping: true },
+  home:     { label: 'בבית הלקוח', icon: FaHome },
+  clinic:   { label: 'בקליניקה', icon: FaClinicMedical },
+  hospital: { label: 'בבית חולים / מוסד', icon: FaHospital },
+  virtual:  { label: 'וירטואלי', icon: FaLaptopMedical },
+  delivery: { label: 'משלוח', icon: FaTruck },
 };
 
-// Telemedicine platforms
 const TELEMEDICINE_PLATFORMS = [
   { id: 'phone', label: 'שיחה טלפונית', icon: FaPhoneAlt },
   { id: 'whatsapp', label: 'WhatsApp', icon: FaWhatsapp },
@@ -49,7 +45,6 @@ const TELEMEDICINE_PLATFORMS = [
   { id: 'google_meet', label: 'Google Meet', icon: FaExternalLinkAlt }
 ];
 
-// Shift options for hourly services
 const SHIFT_OPTIONS = [
   { id: 'morning', label: 'משמרת בוקר', hours: '07:00-15:00', duration: 8 },
   { id: 'afternoon', label: 'משמרת צהריים', hours: '15:00-23:00', duration: 8 },
@@ -57,53 +52,56 @@ const SHIFT_OPTIONS = [
   { id: 'custom', label: 'מותאם אישית', hours: 'בחר שעות', duration: 0 }
 ];
 
+// Section wrapper component
+const FormSection = ({ icon: Icon, title, children, testId }) => (
+  <div className="bg-white rounded-2xl shadow-lg border-2 border-carelink-teal-pale overflow-hidden" data-testid={testId}>
+    <div className="bg-carelink-teal-pale/30 px-6 py-3 border-b border-carelink-teal-pale flex items-center gap-2">
+      <Icon className="text-carelink-teal" />
+      <h2 className="font-bold text-carelink-navy">{title}</h2>
+    </div>
+    <div className="p-6">{children}</div>
+  </div>
+);
+
 // ==================== COMPONENT ====================
 
 const BookService = () => {
-  const { t } = useTranslation();
   const { serviceId } = useParams();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   
-  // Basic states
   const [loading, setLoading] = useState(true);
   const [booking, setBooking] = useState(false);
   const [service, setService] = useState(null);
   const [provider, setProvider] = useState(null);
   const [bookedSlots, setBookedSlots] = useState([]);
-  const [step, setStep] = useState(1);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [bookingId, setBookingId] = useState(null);
   
-  // Booking form states
+  // Form states
+  const [selectedDeliveryType, setSelectedDeliveryType] = useState('');
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState('');
   const [skipTimeSelection, setSkipTimeSelection] = useState(false);
   const [selectedShift, setSelectedShift] = useState(null);
   const [customHours, setCustomHours] = useState(null);
   const [selectedPlatform, setSelectedPlatform] = useState('');
-  const [selectedDeliveryType, setSelectedDeliveryType] = useState('');
   const [notes, setNotes] = useState('');
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptCancellation, setAcceptCancellation] = useState(false);
   
-  // Address & Contact states
   const [serviceAddress, setServiceAddress] = useState({
     street: '', city: '', apartment: '', floor: '', entrance: '', specialInstructions: ''
-  });
-  const [contactPerson, setContactPerson] = useState({
-    name: '', phone: '', relationship: ''
   });
   const [shippingAddress, setShippingAddress] = useState({
     street: '', city: '', apartment: '', postalCode: ''
   });
+  const [contactPerson, setContactPerson] = useState({ name: '', phone: '', relationship: '' });
   
-  // Terms acceptance
-  const [acceptTerms, setAcceptTerms] = useState(false);
-  const [acceptCancellation, setAcceptCancellation] = useState(false);
-  
-  // Guest mode
+  // Guest
+  const [showAuth, setShowAuth] = useState(false);
   const [guestMode, setGuestMode] = useState(false);
   const [guestDetails, setGuestDetails] = useState({ name: '', email: '', phone: '' });
-  const [guestErrors, setGuestErrors] = useState({});
 
   useEffect(() => {
     fetchServiceDetails();
@@ -112,187 +110,110 @@ const BookService = () => {
   const fetchServiceDetails = async () => {
     try {
       setLoading(true);
-      const serviceResponse = await api.get(`/services?service_id=${serviceId}`);
-      const services = serviceResponse.data.services || [];
-      const foundService = services.find(s => s.service_id === serviceId);
-      if (!foundService) throw new Error('Service not found');
-      setService(foundService);
+      const serviceRes = await api.get(`/services?service_id=${serviceId}`);
+      const found = (serviceRes.data.services || []).find(s => s.service_id === serviceId);
+      if (!found) throw new Error('Service not found');
+      setService(found);
       
-      // Auto-select delivery type if only one available
-      const deliveryTypes = foundService.delivery_types || [];
-      if (deliveryTypes.length === 1) {
-        setSelectedDeliveryType(deliveryTypes[0]);
-      }
+      const dt = found.delivery_types || [];
+      if (dt.length === 1) setSelectedDeliveryType(dt[0]);
+      if (found.minimum_hours) setCustomHours(found.minimum_hours);
+      else setCustomHours(4);
       
-      // Set custom hours to service minimum
-      if (foundService.minimum_hours) {
-        setCustomHours(foundService.minimum_hours);
-      } else {
-        setCustomHours(4);
-      }
-      
-      const providerResponse = await api.get(`/providers/${foundService.provider_id}`);
-      setProvider(providerResponse.data);
+      const provRes = await api.get(`/providers/${found.provider_id}`);
+      setProvider(provRes.data);
       
       try {
-        const bookingsResponse = await api.get(`/bookings?provider_id=${foundService.provider_id}`);
-        const bookings = bookingsResponse.data.bookings || [];
-        const booked = bookings.filter(b => b.status !== 'cancelled' && b.booking_date)
+        const bookingsRes = await api.get(`/bookings?provider_id=${found.provider_id}`);
+        const booked = (bookingsRes.data.bookings || [])
+          .filter(b => b.status !== 'cancelled' && b.booking_date)
           .map(b => format(new Date(b.booking_date), 'yyyy-MM-dd HH:mm'));
         setBookedSlots(booked);
       } catch { setBookedSlots([]); }
     } catch (error) {
       console.error('Failed to fetch service:', error);
-      toast.error('אירעה שגיאה, אנא נסו שוב');
+      toast.error('שירות לא נמצא');
       navigate('/services');
     } finally {
       setLoading(false);
     }
   };
 
-  // Derived config from service category + delivery type
+  // Derived config
   const category = service?.service_category || 'visit';
   const categoryConfig = SERVICE_CATEGORIES[category] || SERVICE_CATEGORIES.visit;
-  const deliveryConfig = DELIVERY_TYPES[selectedDeliveryType] || {};
   const isHourly = category === 'hourly';
   const isSeries = category === 'series';
-  const needsShifts = isHourly;
-  const needsPlatform = deliveryConfig.showPlatformSelect;
-  const needsAddress = deliveryConfig.requiresAddress;
-  const needsShipping = deliveryConfig.requiresShipping;
+  const deliveryTypes = service?.delivery_types || [];
+  const isVirtual = selectedDeliveryType === 'virtual';
+  const isHome = selectedDeliveryType === 'home';
+  const isDelivery = selectedDeliveryType === 'delivery';
+  const needsAddress = isHome;
+  const needsShipping = isDelivery;
 
-  // Calculate total price
+  // Calculate price
   const calculateTotalPrice = () => {
     if (!service) return 0;
-    let total = 0;
-    const basePrice = service.price || 0;
+    let total = service.price || 0;
     
     if (isHourly) {
-      const hours = selectedShift?.duration || customHours;
-      total = basePrice * hours;
+      const hours = selectedShift?.duration || customHours || 0;
+      total = (service.price || 0) * hours;
     } else if (isSeries && service.series_price) {
       total = service.series_price;
     } else if (isSeries && service.num_sessions) {
-      total = basePrice * service.num_sessions;
-    } else {
-      total = basePrice;
+      total = (service.price || 0) * service.num_sessions;
     }
     
-    // Travel cost for home visits
-    if (selectedDeliveryType === 'home' && service.has_travel_cost && service.travel_cost) {
-      total += service.travel_cost;
+    if (isHome && service.has_travel_cost && service.travel_cost) total += service.travel_cost;
+    if (isDelivery && service.has_shipping && service.shipping_cost) {
+      if (!service.free_shipping_above || total < service.free_shipping_above) total += service.shipping_cost;
     }
-    
-    // Shipping cost for deliveries
-    if (selectedDeliveryType === 'delivery' && service.has_shipping && service.shipping_cost) {
-      if (!service.free_shipping_above || total < service.free_shipping_above) {
-        total += service.shipping_cost;
-      }
-    }
-    
-    // Weekend surcharge
     if (selectedDate) {
-      const dayOfWeek = selectedDate.getDay();
-      if ((dayOfWeek === 5 || dayOfWeek === 6) && service.weekend_pricing_type !== 'none') {
-        if (service.weekend_pricing_type === 'percentage' && service.weekend_price_addition) {
-          total += total * (service.weekend_price_addition / 100);
-        } else if (service.weekend_pricing_type === 'fixed' && service.weekend_price_addition) {
-          total += service.weekend_price_addition;
-        }
+      const day = selectedDate.getDay();
+      if ((day === 5 || day === 6) && service.weekend_pricing_type !== 'none' && service.weekend_price_addition) {
+        if (service.weekend_pricing_type === 'percentage') total += total * (service.weekend_price_addition / 100);
+        else total += service.weekend_price_addition;
       }
     }
-    
     return Math.round(total);
   };
 
-  // ==================== VALIDATION ====================
-
-  const validateStep1 = () => {
-    // Must select delivery type if multiple available
-    const deliveryTypes = service?.delivery_types || [];
+  // Validate entire form
+  const validateForm = () => {
     if (deliveryTypes.length > 1 && !selectedDeliveryType) {
       toast.error('אנא בחר היכן תרצה לקבל את השירות');
       return false;
     }
-    
-    if (skipTimeSelection) return true;
-    
-    if (needsShifts) {
-      if (!selectedShift && !customHours) {
-        toast.error('אנא בחר משמרת או מספר שעות');
-        return false;
-      }
-      if (!selectedDate) {
-        toast.error('אנא בחר תאריך');
-        return false;
-      }
-      return true;
+    if (!skipTimeSelection) {
+      if (!selectedDate) { toast.error('אנא בחר תאריך'); return false; }
+      if (!selectedTime && !selectedShift) { toast.error('אנא בחר שעה או משמרת'); return false; }
     }
-    
-    if (needsTimeSlots) {
-      if (!selectedDate || !selectedTime) {
-        toast.error('אנא בחר תאריך ושעה');
-        return false;
-      }
-    }
-    
-    return true;
-  };
-
-  const validateStep2 = () => {
-    if (!contactPerson.name || !contactPerson.phone) {
-      toast.error('אנא מלא שם וטלפון של המזמין');
-      return false;
-    }
+    if (isVirtual && !selectedPlatform) { toast.error('אנא בחר פלטפורמה'); return false; }
     if (needsAddress && (!serviceAddress.street || !serviceAddress.city)) {
-      toast.error('אנא מלא כתובת מלאה');
-      return false;
+      toast.error('אנא מלא כתובת מתן השירות'); return false;
     }
     if (needsShipping && (!shippingAddress.street || !shippingAddress.city)) {
-      toast.error('אנא מלא כתובת למשלוח');
-      return false;
+      toast.error('אנא מלא כתובת למשלוח'); return false;
     }
-    if (needsPlatform && !selectedPlatform) {
-      toast.error('אנא בחר פלטפורמה לשיחה');
-      return false;
+    if (!contactPerson.name || !contactPerson.phone) {
+      toast.error('אנא מלא שם וטלפון של המזמין'); return false;
     }
-    return true;
-  };
-
-  const validateStep3 = () => {
     if (!acceptTerms) { toast.error('יש לאשר את תנאי השימוש'); return false; }
     if (!acceptCancellation) { toast.error('יש לאשר את מדיניות הביטולים'); return false; }
     return true;
   };
 
-  const validateGuestDetails = () => {
-    const errors = {};
-    if (!guestDetails.name.trim()) errors.name = 'נא להזין שם מלא';
-    if (!guestDetails.email.trim()) errors.email = 'נא להזין אימייל';
-    else if (!/\S+@\S+\.\S+/.test(guestDetails.email)) errors.email = 'אימייל לא תקין';
-    if (!guestDetails.phone.trim()) errors.phone = 'נא להזין טלפון';
-    setGuestErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleNextStep = () => {
-    if (step === 1 && validateStep1()) {
-      setStep(2);
-    } else if (step === 2 && validateStep2()) {
-      if (isAuthenticated) { setStep(3); } else { setStep('auth'); }
-    } else if (step === 3 && validateStep3()) {
-      handleBooking();
+  const handleSubmit = async () => {
+    if (!isAuthenticated && !guestMode) {
+      setShowAuth(true);
+      return;
     }
-  };
-
-  // ==================== BOOKING SUBMISSION ====================
-
-  const handleBooking = async () => {
+    if (!validateForm()) return;
+    
     try {
       setBooking(true);
-      
-      let bookingDate;
-      let bookingTime = null;
+      let bookingDate, bookingTime = null;
       
       if (skipTimeSelection) {
         bookingDate = new Date().toISOString();
@@ -307,67 +228,56 @@ const BookService = () => {
         bookingDate = new Date(`${format(selectedDate, 'yyyy-MM-dd')}T00:00:00`).toISOString();
       }
       
-      const bookingData = {
+      const data = {
         service_id: serviceId,
         booking_date: bookingDate,
         booking_time: bookingTime,
         notes,
-        delivery_type: selectedDeliveryType || (service.delivery_types?.[0]) || null,
+        delivery_type: selectedDeliveryType || deliveryTypes[0] || null,
         hours_booked: isHourly ? (selectedShift?.duration || customHours || null) : null,
         selected_shift: selectedShift?.id || null,
         platform: selectedPlatform || null,
         total_price: calculateTotalPrice(),
         num_sessions: isSeries ? (service.num_sessions || null) : null,
+        contact_person_name: contactPerson.name,
+        contact_person_phone: contactPerson.phone,
+        contact_person_relationship: contactPerson.relationship,
+        is_contact_same_as_requester: contactPerson.relationship === 'self',
       };
 
-      // Address fields for home visits
       if (needsAddress && serviceAddress.street) {
-        bookingData.service_address = serviceAddress.street;
-        bookingData.service_city = serviceAddress.city;
-        bookingData.service_apartment = serviceAddress.apartment;
-        bookingData.service_floor = serviceAddress.floor;
-        bookingData.service_entry_code = serviceAddress.entrance;
-        bookingData.service_notes = serviceAddress.specialInstructions;
+        data.service_address = serviceAddress.street;
+        data.service_city = serviceAddress.city;
+        data.service_apartment = serviceAddress.apartment;
+        data.service_floor = serviceAddress.floor;
+        data.service_entry_code = serviceAddress.entrance;
+        data.service_notes = serviceAddress.specialInstructions;
       }
-
-      // Shipping address for deliveries
       if (needsShipping && shippingAddress.street) {
-        bookingData.shipping_address = shippingAddress.street;
-        bookingData.shipping_city = shippingAddress.city;
-        bookingData.shipping_postal_code = shippingAddress.postalCode;
+        data.shipping_address = shippingAddress.street;
+        data.shipping_city = shippingAddress.city;
+        data.shipping_postal_code = shippingAddress.postalCode;
       }
-
-      // Contact person - always sent
-      if (contactPerson.name) {
-        bookingData.is_contact_same_as_requester = contactPerson.relationship === 'self';
-        bookingData.contact_person_name = contactPerson.name;
-        bookingData.contact_person_phone = contactPerson.phone;
-        bookingData.contact_person_relationship = contactPerson.relationship;
-      }
-
-      // Guest booking
       if (!isAuthenticated && guestMode) {
-        bookingData.guest_booking = true;
-        bookingData.guest_name = guestDetails.name;
-        bookingData.guest_email = guestDetails.email;
-        bookingData.guest_phone = guestDetails.phone;
+        data.guest_booking = true;
+        data.guest_name = guestDetails.name;
+        data.guest_email = guestDetails.email;
+        data.guest_phone = guestDetails.phone;
       }
 
-      const response = await api.post('/bookings', bookingData);
-      setBookingId(response.data.booking_id);
+      const res = await api.post('/bookings', data);
+      setBookingId(res.data.booking_id);
       setBookingSuccess(true);
-      setStep('success');
     } catch (error) {
       console.error('Booking failed:', error);
       const detail = error.response?.data?.detail;
-      const msg = typeof detail === 'string' ? detail : 'שגיאה בשליחת ההזמנה, אנא נסו שוב';
-      toast.error(msg);
+      toast.error(typeof detail === 'string' ? detail : 'שגיאה בשליחת ההזמנה');
     } finally {
       setBooking(false);
     }
   };
 
-  // ==================== RENDER HELPERS ====================
+  // ==================== LOADING / ERROR ====================
 
   if (loading) {
     return (
@@ -392,26 +302,12 @@ const BookService = () => {
     );
   }
 
-  // Build price label
-  const getPriceLabel = () => {
-    if (isHourly) return 'לשעה';
-    if (isSeries && service.series_price) return 'לסדרה';
-    if (isSeries) return 'למפגש';
-    return categoryConfig.pricingLabel;
-  };
-
-  // Build delivery type label for display
-  const getDeliveryLabel = () => {
-    if (selectedDeliveryType) return DELIVERY_TYPES[selectedDeliveryType]?.label || '';
-    return '';
-  };
-
   const CategoryIcon = categoryConfig.icon;
-  const deliveryTypes = service.delivery_types || [];
+  const totalPrice = calculateTotalPrice();
 
-  // ==================== SUCCESS STATE ====================
+  // ==================== SUCCESS ====================
 
-  if (step === 'success') {
+  if (bookingSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale">
         <Navbar />
@@ -421,30 +317,19 @@ const BookService = () => {
               <FaCheckCircle className="text-4xl text-green-500" />
             </div>
             <h2 className="text-2xl font-bold text-carelink-navy mb-4">ההזמנה נקלטה בהצלחה!</h2>
-            
-            <div className="bg-carelink-teal-pale/30 rounded-xl p-6 text-right mb-6">
-              <h3 className="font-bold text-carelink-navy mb-3">סיכום ההזמנה:</h3>
-              <div className="space-y-2 text-sm">
-                <p><strong>שירות:</strong> {service.name}</p>
-                <p><strong>סוג:</strong> {categoryConfig.label}</p>
-                <p><strong>ספק:</strong> {provider.business_name}</p>
-                {getDeliveryLabel() && <p><strong>מיקום:</strong> {getDeliveryLabel()}</p>}
-                {!skipTimeSelection && selectedDate && (
-                  <p><strong>תאריך:</strong> {format(selectedDate, 'dd/MM/yyyy', { locale: he })}</p>
-                )}
-                {selectedTime && <p><strong>שעה:</strong> {selectedTime}</p>}
-                {selectedShift && <p><strong>משמרת:</strong> {selectedShift.label}</p>}
-                {skipTimeSelection && <p><strong>תיאום:</strong> יתואם טלפונית</p>}
-                {selectedPlatform && (
-                  <p><strong>פלטפורמה:</strong> {TELEMEDICINE_PLATFORMS.find(p => p.id === selectedPlatform)?.label}</p>
-                )}
-                {isSeries && service.num_sessions && <p><strong>מפגשים:</strong> {service.num_sessions}</p>}
-                <div className="border-t border-carelink-teal-pale my-3"></div>
-                <p className="text-xl font-bold text-carelink-teal">סה"כ לתשלום: ₪{calculateTotalPrice()}</p>
-                {bookingId && <p className="text-xs text-carelink-gray">מספר הזמנה: {bookingId}</p>}
-              </div>
+            <div className="bg-carelink-teal-pale/30 rounded-xl p-6 text-right mb-6 space-y-2 text-sm">
+              <p><strong>שירות:</strong> {service.name}</p>
+              <p><strong>ספק:</strong> {provider.business_name}</p>
+              {selectedDeliveryType && <p><strong>מיקום:</strong> {DELIVERY_TYPES[selectedDeliveryType]?.label}</p>}
+              {!skipTimeSelection && selectedDate && <p><strong>תאריך:</strong> {format(selectedDate, 'dd/MM/yyyy', { locale: he })}</p>}
+              {selectedTime && <p><strong>שעה:</strong> {selectedTime}</p>}
+              {selectedShift && <p><strong>משמרת:</strong> {selectedShift.label}</p>}
+              {skipTimeSelection && <p><strong>תיאום:</strong> יתואם טלפונית</p>}
+              {selectedPlatform && <p><strong>פלטפורמה:</strong> {TELEMEDICINE_PLATFORMS.find(p => p.id === selectedPlatform)?.label}</p>}
+              <div className="border-t border-carelink-teal-pale my-3"></div>
+              <p className="text-xl font-bold text-carelink-teal">סה"כ: ₪{totalPrice}</p>
+              {bookingId && <p className="text-xs text-carelink-gray">מספר הזמנה: {bookingId}</p>}
             </div>
-
             <div className="flex gap-3">
               <Link to="/services" className="flex-1 bg-carelink-teal text-white py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition">
                 חזור לשירותים
@@ -462,6 +347,66 @@ const BookService = () => {
     );
   }
 
+  // ==================== AUTH MODAL ====================
+
+  if (showAuth && !isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale">
+        <Navbar />
+        <div className="max-w-lg mx-auto px-4 py-12">
+          <div className="bg-white rounded-2xl shadow-xl p-8 border-2 border-carelink-teal-pale">
+            {!guestMode ? (
+              <>
+                <h2 className="text-xl font-bold text-carelink-navy mb-6 text-center">כדי להשלים את ההזמנה</h2>
+                <div className="grid gap-4">
+                  <Link to={`/login?redirect=/book/${serviceId}`}
+                    className="bg-carelink-teal text-white p-5 rounded-xl hover:bg-carelink-teal-medium transition text-center">
+                    <FaSignInAlt className="text-2xl mx-auto mb-2" />
+                    <div className="font-bold">התחבר לחשבון</div>
+                  </Link>
+                  <button onClick={() => setGuestMode(true)}
+                    className="bg-white border-2 border-carelink-teal text-carelink-teal p-5 rounded-xl hover:bg-carelink-teal-pale transition text-center">
+                    <FaUser className="text-2xl mx-auto mb-2" />
+                    <div className="font-bold">המשך כאורח</div>
+                  </button>
+                </div>
+                <button onClick={() => setShowAuth(false)} className="w-full mt-4 text-carelink-gray hover:text-carelink-navy text-sm">
+                  <FaArrowRight className="inline ml-1" /> חזור לטופס
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-bold text-carelink-navy mb-6">פרטי אורח</h2>
+                <div className="space-y-4">
+                  <input type="text" value={guestDetails.name} placeholder="שם מלא *"
+                    onChange={(e) => setGuestDetails({...guestDetails, name: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none" />
+                  <input type="email" value={guestDetails.email} placeholder="אימייל *"
+                    onChange={(e) => setGuestDetails({...guestDetails, email: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none" />
+                  <input type="tel" value={guestDetails.phone} placeholder="טלפון *"
+                    onChange={(e) => setGuestDetails({...guestDetails, phone: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none" />
+                </div>
+                <button onClick={() => {
+                  if (!guestDetails.name || !guestDetails.email || !guestDetails.phone) {
+                    toast.error('אנא מלא את כל השדות'); return;
+                  }
+                  setShowAuth(false);
+                  setTimeout(() => handleSubmit(), 100);
+                }} className="w-full mt-6 bg-carelink-teal text-white py-3 rounded-xl font-bold hover:bg-carelink-teal-medium transition">
+                  המשך להזמנה
+                </button>
+                <button onClick={() => setGuestMode(false)} className="w-full mt-2 text-carelink-gray hover:text-carelink-navy text-sm">חזור</button>
+              </>
+            )}
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   // ==================== MAIN FORM ====================
 
   return (
@@ -469,589 +414,386 @@ const BookService = () => {
       <Navbar />
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Progress Steps */}
-        <div className="flex items-center justify-center mb-8" data-testid="booking-progress">
-          <div className="flex items-center gap-2 sm:gap-4">
-            {[
-              { num: 1, label: 'בחירת מועד' },
-              { num: 2, label: 'פרטים נוספים' },
-              { num: 3, label: 'אישור וסיכום' }
-            ].map((s, i) => (
-              <React.Fragment key={s.num}>
-                <div 
-                  className={`flex items-center gap-2 cursor-pointer ${step >= s.num ? 'text-carelink-teal' : 'text-carelink-gray'}`}
-                  onClick={() => step > s.num && setStep(s.num)}
-                >
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                    step >= s.num ? 'bg-carelink-teal text-white' : 'bg-gray-200'
-                  }`}>
-                    {step > s.num ? <FaCheckCircle /> : s.num}
-                  </div>
-                  <span className="hidden sm:inline text-sm font-medium">{s.label}</span>
-                </div>
-                {i < 2 && <div className="w-8 sm:w-16 h-0.5 bg-gray-200"></div>}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-
-        {/* Service Header */}
-        <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-6 border-2 border-carelink-teal-pale" data-testid="service-header">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-carelink-teal-pale rounded-xl flex items-center justify-center">
-              <CategoryIcon className="text-2xl text-carelink-teal" />
-            </div>
-            <div className="flex-1">
-              <h1 className="text-xl sm:text-2xl font-bold text-carelink-navy">{service.name}</h1>
-              <p className="text-carelink-gray text-sm">{provider.business_name} • {categoryConfig.label}</p>
-            </div>
-            <div className="text-left">
-              <div className="text-2xl font-bold text-carelink-teal">₪{isSeries && service.series_price ? service.series_price : service.price}</div>
-              <span className="text-xs text-carelink-gray">{getPriceLabel()}</span>
-            </div>
-          </div>
-          
-          {/* Series info badge */}
-          {isSeries && service.num_sessions && (
-            <div className="mt-3 bg-carelink-teal-pale/40 rounded-lg px-4 py-2 text-sm text-carelink-navy flex items-center gap-2">
-              <FaRedoAlt className="text-carelink-teal" />
-              <span>סדרה של <strong>{service.num_sessions}</strong> מפגשים</span>
-              {service.session_duration_minutes && <span> • {service.session_duration_minutes} דקות למפגש</span>}
-            </div>
-          )}
-        </div>
-
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Main Form Area */}
-          <div className="lg:col-span-2 space-y-6">
-            
-            {/* ==================== STEP 1: Date & Time ==================== */}
-            {step === 1 && (
-              <>
-                {/* Delivery Type - where service is provided */}
-                {deliveryTypes.length > 1 ? (
-                  <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale" data-testid="delivery-type-select">
-                    <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
-                      <FaMapMarkerAlt className="text-carelink-teal" />
-                      היכן תרצה לקבל את השירות?
-                    </h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {deliveryTypes.map(dt => {
-                        const dtConfig = DELIVERY_TYPES[dt];
-                        if (!dtConfig) return null;
-                        const DtIcon = dtConfig.icon;
-                        return (
-                          <button key={dt} onClick={() => setSelectedDeliveryType(dt)}
-                            data-testid={`delivery-type-${dt}`}
-                            className={`p-4 rounded-xl border-2 text-center transition ${
-                              selectedDeliveryType === dt
-                                ? 'border-carelink-teal bg-carelink-teal-pale'
-                                : 'border-gray-200 hover:border-carelink-teal-pale'
-                            }`}>
-                            <DtIcon className="text-2xl text-carelink-teal mx-auto mb-2" />
-                            <div className="font-semibold text-carelink-navy text-sm">{dtConfig.label}</div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ) : deliveryTypes.length === 1 && (
-                  <div className="bg-white rounded-2xl shadow-lg p-4 border-2 border-carelink-teal-pale" data-testid="delivery-type-info">
-                    <div className="flex items-center gap-3">
-                      {(() => { const DtIcon = DELIVERY_TYPES[deliveryTypes[0]]?.icon || FaMapMarkerAlt; return <DtIcon className="text-lg text-carelink-teal" />; })()}
-                      <span className="text-carelink-navy font-medium">איפה ניתן השירות: <strong>{DELIVERY_TYPES[deliveryTypes[0]]?.label}</strong></span>
-                    </div>
-                  </div>
-                )}
 
-                {/* Shift Selection for Hourly Services */}
-                {needsShifts && !skipTimeSelection && (
-                  <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale" data-testid="shift-select">
-                    <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
-                      <FaClock className="text-carelink-teal" />
-                      בחר משמרת / שעות
-                    </h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
-                      {SHIFT_OPTIONS.map(shift => (
-                        <button key={shift.id} onClick={() => setSelectedShift(shift)}
-                          data-testid={`shift-${shift.id}`}
-                          className={`p-4 rounded-xl border-2 text-center transition ${
-                            selectedShift?.id === shift.id
-                              ? 'border-carelink-teal bg-carelink-teal-pale'
-                              : 'border-gray-200 hover:border-carelink-teal-pale'
-                          }`}>
-                          <div className="font-semibold text-carelink-navy">{shift.label}</div>
-                          <div className="text-sm text-carelink-gray">{shift.hours}</div>
-                        </button>
-                      ))}
-                    </div>
-                    {selectedShift?.id === 'custom' && (
-                      <div className="mt-4">
-                        <label className="block text-sm font-medium text-carelink-navy mb-2">
-                          מספר שעות (מינימום {service.minimum_hours || 4})
-                        </label>
-                        <input type="number" min={service.minimum_hours || 4}
-                          value={customHours || service.minimum_hours || 4}
-                          onChange={(e) => setCustomHours(Math.max(service.minimum_hours || 4, parseInt(e.target.value) || 0))}
-                          className="w-32 px-4 py-2 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none"
-                          data-testid="custom-hours-input" />
-                      </div>
-                    )}
-                  </div>
-                )}
+          {/* ===== LEFT: Form Sections ===== */}
+          <div className="lg:col-span-2 space-y-5">
 
-                {/* Skip Time Option */}
-                <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale">
-                  <label className="flex items-center gap-3 cursor-pointer" data-testid="skip-time-checkbox">
-                    <input type="checkbox" checked={skipTimeSelection}
-                      onChange={(e) => setSkipTimeSelection(e.target.checked)}
-                      className="w-5 h-5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal" />
-                    <div>
-                      <span className="font-semibold text-carelink-navy">תאם מועד מאוחר יותר</span>
-                      <p className="text-sm text-carelink-gray">הספק יתקשר אליך לתיאום מועד נוח</p>
-                    </div>
-                  </label>
+            {/* 1. SERVICE DETAILS */}
+            <div className="bg-white rounded-2xl shadow-lg p-5 border-2 border-carelink-teal" data-testid="service-header">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-carelink-teal-pale rounded-xl flex items-center justify-center flex-shrink-0">
+                  <CategoryIcon className="text-2xl text-carelink-teal" />
                 </div>
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-xl font-bold text-carelink-navy truncate">{service.name}</h1>
+                  <p className="text-carelink-gray text-sm">{provider.business_name} &bull; {categoryConfig.label}</p>
+                </div>
+                <div className="text-left flex-shrink-0">
+                  <div className="text-2xl font-bold text-carelink-teal">₪{isSeries && service.series_price ? service.series_price : service.price}</div>
+                  <span className="text-xs text-carelink-gray">{isSeries && service.series_price ? 'לסדרה' : categoryConfig.pricingLabel}</span>
+                </div>
+              </div>
+              {isSeries && service.num_sessions && (
+                <div className="mt-3 bg-carelink-teal-pale/40 rounded-lg px-4 py-2 text-sm flex items-center gap-2">
+                  <FaRedoAlt className="text-carelink-teal" />
+                  <span>סדרה של <strong>{service.num_sessions}</strong> מפגשים</span>
+                  {service.session_duration_minutes && <span> &bull; {service.session_duration_minutes} דקות למפגש</span>}
+                </div>
+              )}
+            </div>
 
-                {/* Calendar - same for all types */}
-                {!skipTimeSelection && (
-                  <>
-                    <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale">
-                      <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
-                        <FaCalendarAlt className="text-carelink-teal" />
-                        בחר תאריך
-                      </h2>
-                      <BookingCalendar
-                        onDateSelect={(date) => { setSelectedDate(date); setSelectedTime(''); }}
+            {/* 2. WHERE - DELIVERY TYPE */}
+            <FormSection icon={FaMapMarkerAlt} title="איפה ניתן השירות?" testId="delivery-section">
+              {deliveryTypes.length > 1 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {deliveryTypes.map(dt => {
+                    const dtConfig = DELIVERY_TYPES[dt];
+                    if (!dtConfig) return null;
+                    const DtIcon = dtConfig.icon;
+                    return (
+                      <button key={dt} onClick={() => setSelectedDeliveryType(dt)}
+                        data-testid={`delivery-type-${dt}`}
+                        className={`p-4 rounded-xl border-2 text-center transition ${
+                          selectedDeliveryType === dt
+                            ? 'border-carelink-teal bg-carelink-teal-pale'
+                            : 'border-gray-200 hover:border-carelink-teal-pale'
+                        }`}>
+                        <DtIcon className="text-xl text-carelink-teal mx-auto mb-1" />
+                        <div className="font-semibold text-carelink-navy text-sm">{dtConfig.label}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : deliveryTypes.length === 1 && (
+                <div className="flex items-center gap-3 text-carelink-navy">
+                  {(() => { const DtIcon = DELIVERY_TYPES[deliveryTypes[0]]?.icon || FaMapMarkerAlt; return <DtIcon className="text-lg text-carelink-teal" />; })()}
+                  <span className="font-medium">{DELIVERY_TYPES[deliveryTypes[0]]?.label}</span>
+                </div>
+              )}
+            </FormSection>
+
+            {/* 3. WHEN - DATE & TIME */}
+            <FormSection icon={FaCalendarAlt} title="בחר מועד" testId="datetime-section">
+              {/* Shift for hourly */}
+              {isHourly && (
+                <div className="mb-5">
+                  <p className="text-sm font-medium text-carelink-navy mb-3">בחר משמרת / שעות</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+                    {SHIFT_OPTIONS.map(shift => (
+                      <button key={shift.id} onClick={() => setSelectedShift(shift)}
+                        data-testid={`shift-${shift.id}`}
+                        className={`p-3 rounded-xl border-2 text-center transition text-sm ${
+                          selectedShift?.id === shift.id
+                            ? 'border-carelink-teal bg-carelink-teal-pale'
+                            : 'border-gray-200 hover:border-carelink-teal-pale'
+                        }`}>
+                        <div className="font-semibold text-carelink-navy">{shift.label}</div>
+                        <div className="text-xs text-carelink-gray">{shift.hours}</div>
+                      </button>
+                    ))}
+                  </div>
+                  {selectedShift?.id === 'custom' && (
+                    <div className="flex items-center gap-3">
+                      <label className="text-sm text-carelink-navy">מספר שעות (מינימום {service.minimum_hours || 4}):</label>
+                      <input type="number" min={service.minimum_hours || 4}
+                        value={customHours || service.minimum_hours || 4}
+                        onChange={(e) => setCustomHours(Math.max(service.minimum_hours || 4, parseInt(e.target.value) || 0))}
+                        className="w-24 px-3 py-2 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-center"
+                        data-testid="custom-hours-input" />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Skip time option */}
+              <label className="flex items-center gap-3 cursor-pointer mb-5 p-3 bg-amber-50 rounded-xl border border-amber-200" data-testid="skip-time-checkbox">
+                <input type="checkbox" checked={skipTimeSelection}
+                  onChange={(e) => setSkipTimeSelection(e.target.checked)}
+                  className="w-5 h-5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal" />
+                <div>
+                  <span className="font-semibold text-carelink-navy text-sm">תאם מועד מאוחר יותר</span>
+                  <p className="text-xs text-carelink-gray">הספק יתקשר לתיאום מועד</p>
+                </div>
+              </label>
+
+              {/* Calendar */}
+              {!skipTimeSelection && (
+                <>
+                  <BookingCalendar
+                    onDateSelect={(date) => { setSelectedDate(date); setSelectedTime(''); }}
+                    availability={provider.availability || []}
+                    bookedSlots={bookedSlots.map(slot => slot.split(' ')[0])}
+                  />
+                  {selectedDate && (
+                    <div className="mt-5 pt-5 border-t border-carelink-teal-pale">
+                      <p className="text-sm font-medium text-carelink-navy mb-3 flex items-center gap-2">
+                        <FaClock className="text-carelink-teal" />
+                        {isHourly ? 'בחר שעת התחלה' : 'בחר שעה'}
+                      </p>
+                      <TimeSlotPicker
+                        selectedDate={selectedDate}
                         availability={provider.availability || []}
-                        bookedSlots={bookedSlots.map(slot => slot.split(' ')[0])}
+                        onTimeSelect={(time) => setSelectedTime(time)}
+                        bookedTimes={bookedSlots}
                       />
                     </div>
-                    {/* Time selection after date is picked */}
-                    {selectedDate && (
-                      <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale">
-                        <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
-                          <FaClock className="text-carelink-teal" />
-                          {needsShifts ? 'בחר שעת התחלה' : 'בחר שעה'}
-                        </h2>
-                        <TimeSlotPicker
-                          selectedDate={selectedDate}
-                          availability={provider.availability || []}
-                          onTimeSelect={(time) => setSelectedTime(time)}
-                          bookedTimes={bookedSlots}
-                        />
-                      </div>
-                    )}
-                  </>
-                )}
-              </>
-            )}
+                  )}
+                </>
+              )}
+            </FormSection>
 
-            {/* ==================== STEP 2: Details ==================== */}
-            {step === 2 && (
-              <>
-                {/* Requester Details - always shown */}
-                <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale" data-testid="requester-form">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-bold text-carelink-navy flex items-center gap-2">
-                      <FaUser className="text-carelink-teal" />
-                      פרטי מזמין
-                    </h2>
+            {/* 4. LOCATION - Address / Platform */}
+            <FormSection 
+              icon={isVirtual ? FaLaptopMedical : FaMapMarkerAlt} 
+              title={isVirtual ? 'פלטפורמה לשיחה' : 'מיקום מתן השירות'}
+              testId="location-section"
+            >
+              {/* Virtual → Platform selection */}
+              {isVirtual && (
+                <div className="grid grid-cols-2 gap-3">
+                  {TELEMEDICINE_PLATFORMS.map(platform => {
+                    const PlatformIcon = platform.icon;
+                    return (
+                      <button key={platform.id} onClick={() => setSelectedPlatform(platform.id)}
+                        data-testid={`platform-${platform.id}`}
+                        className={`p-4 rounded-xl border-2 flex items-center gap-3 transition ${
+                          selectedPlatform === platform.id
+                            ? 'border-carelink-teal bg-carelink-teal-pale'
+                            : 'border-gray-200 hover:border-carelink-teal-pale'
+                        }`}>
+                        <PlatformIcon className="text-xl text-carelink-teal" />
+                        <span className="font-medium text-carelink-navy text-sm">{platform.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Home → Full address form */}
+              {isHome && (
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <p className="text-sm font-medium text-carelink-navy">כתובת הלקוח</p>
                     {user && (
                       <button type="button"
-                        onClick={() => setContactPerson(prev => ({ ...prev, name: user.name || prev.name, phone: user.phone || prev.phone, relationship: 'self' }))}
-                        className="inline-flex items-center gap-1.5 text-xs font-medium text-carelink-teal bg-carelink-teal-pale/40 hover:bg-carelink-teal-pale px-3 py-1.5 rounded-full transition"
-                        data-testid="fill-my-details-btn">
-                        <FaUser className="text-[10px]" /> הפרטים שלי
+                        onClick={() => setServiceAddress(prev => ({ ...prev, street: user.address || prev.street, city: user.city || prev.city }))}
+                        className="text-xs text-carelink-teal bg-carelink-teal-pale/40 hover:bg-carelink-teal-pale px-3 py-1.5 rounded-full transition"
+                        data-testid="fill-my-address-btn">
+                        <FaMapMarkerAlt className="inline text-[10px] ml-1" />הכתובת שלי
                       </button>
                     )}
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-carelink-navy mb-1">שם מלא *</label>
-                      <input type="text" value={contactPerson.name}
-                        onChange={(e) => setContactPerson({...contactPerson, name: e.target.value})}
-                        className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none"
-                        placeholder="שם מלא" data-testid="requester-name" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="sm:col-span-2">
+                      <input type="text" value={serviceAddress.street} placeholder="רחוב ומספר *"
+                        onChange={(e) => setServiceAddress({...serviceAddress, street: e.target.value})}
+                        className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                        data-testid="address-street" />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-carelink-navy mb-1">טלפון *</label>
-                      <input type="tel" value={contactPerson.phone}
-                        onChange={(e) => setContactPerson({...contactPerson, phone: e.target.value})}
-                        className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none"
-                        placeholder="050-0000000" data-testid="requester-phone" />
+                    <input type="text" value={serviceAddress.city} placeholder="עיר *"
+                      onChange={(e) => setServiceAddress({...serviceAddress, city: e.target.value})}
+                      className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                      data-testid="address-city" />
+                    <div className="grid grid-cols-3 gap-2">
+                      <input type="text" value={serviceAddress.apartment} placeholder="דירה"
+                        onChange={(e) => setServiceAddress({...serviceAddress, apartment: e.target.value})}
+                        className="w-full px-3 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
+                      <input type="text" value={serviceAddress.floor} placeholder="קומה"
+                        onChange={(e) => setServiceAddress({...serviceAddress, floor: e.target.value})}
+                        className="w-full px-3 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
+                      <input type="text" value={serviceAddress.entrance} placeholder="כניסה"
+                        onChange={(e) => setServiceAddress({...serviceAddress, entrance: e.target.value})}
+                        className="w-full px-3 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-carelink-navy mb-1">קרבה למטופל</label>
-                      <select value={contactPerson.relationship}
-                        onChange={(e) => setContactPerson({...contactPerson, relationship: e.target.value})}
-                        className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none"
-                        data-testid="requester-relationship">
-                        <option value="">בחר</option>
-                        <option value="self">בעצמי</option>
-                        <option value="spouse">בן/בת זוג</option>
-                        <option value="child">ילד/ה</option>
-                        <option value="parent">הורה</option>
-                        <option value="other">אחר</option>
-                      </select>
+                    <div className="sm:col-span-2">
+                      <textarea value={serviceAddress.specialInstructions} placeholder="הנחיות הגעה (קוד כניסה, חניה...)"
+                        onChange={(e) => setServiceAddress({...serviceAddress, specialInstructions: e.target.value})}
+                        className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none resize-none text-sm" rows="2" />
                     </div>
                   </div>
                 </div>
+              )}
 
-                {/* Address for Home Visits */}
-                {needsAddress && (
-                  <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale" data-testid="address-form">
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-lg font-bold text-carelink-navy flex items-center gap-2">
-                        <FaHome className="text-carelink-teal" />
-                        כתובת מתן השירות
-                      </h2>
-                      {user && (
-                        <button type="button"
-                          onClick={() => setServiceAddress(prev => ({ ...prev, street: user.address || prev.street, city: user.city || prev.city }))}
-                          className="inline-flex items-center gap-1.5 text-xs font-medium text-carelink-teal bg-carelink-teal-pale/40 hover:bg-carelink-teal-pale px-3 py-1.5 rounded-full transition"
-                          data-testid="fill-my-address-btn">
-                          <FaMapMarkerAlt className="text-[10px]" /> הכתובת שלי
-                        </button>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="sm:col-span-2">
-                        <label className="block text-sm font-medium text-carelink-navy mb-1">רחוב ומספר *</label>
-                        <input type="text" value={serviceAddress.street}
-                          onChange={(e) => setServiceAddress({...serviceAddress, street: e.target.value})}
-                          className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none"
-                          placeholder="לדוגמה: הרצל 15" data-testid="address-street" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-carelink-navy mb-1">עיר *</label>
-                        <input type="text" value={serviceAddress.city}
-                          onChange={(e) => setServiceAddress({...serviceAddress, city: e.target.value})}
-                          className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none"
-                          placeholder="תל אביב" data-testid="address-city" />
-                      </div>
-                      <div className="grid grid-cols-3 gap-2">
-                        <div>
-                          <label className="block text-sm font-medium text-carelink-navy mb-1">דירה</label>
-                          <input type="text" value={serviceAddress.apartment}
-                            onChange={(e) => setServiceAddress({...serviceAddress, apartment: e.target.value})}
-                            className="w-full px-3 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none" />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-carelink-navy mb-1">קומה</label>
-                          <input type="text" value={serviceAddress.floor}
-                            onChange={(e) => setServiceAddress({...serviceAddress, floor: e.target.value})}
-                            className="w-full px-3 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none" />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-carelink-navy mb-1">כניסה</label>
-                          <input type="text" value={serviceAddress.entrance}
-                            onChange={(e) => setServiceAddress({...serviceAddress, entrance: e.target.value})}
-                            className="w-full px-3 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none" />
-                        </div>
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className="block text-sm font-medium text-carelink-navy mb-1">הנחיות הגעה</label>
-                        <textarea value={serviceAddress.specialInstructions}
-                          onChange={(e) => setServiceAddress({...serviceAddress, specialInstructions: e.target.value})}
-                          className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none resize-none"
-                          rows="2" placeholder="קוד כניסה, מקום חניה..." />
-                      </div>
-                    </div>
+              {/* Delivery → Shipping address */}
+              {isDelivery && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="sm:col-span-2">
+                    <input type="text" value={shippingAddress.street} placeholder="רחוב ומספר *"
+                      onChange={(e) => setShippingAddress({...shippingAddress, street: e.target.value})}
+                      className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                      data-testid="shipping-street" />
                   </div>
-                )}
-
-                {/* Shipping Address for Products/Delivery */}
-                {needsShipping && (
-                  <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale" data-testid="shipping-form">
-                    <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
-                      <FaTruck className="text-carelink-teal" />
-                      כתובת למשלוח
-                    </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="sm:col-span-2">
-                        <label className="block text-sm font-medium text-carelink-navy mb-1">רחוב ומספר *</label>
-                        <input type="text" value={shippingAddress.street}
-                          onChange={(e) => setShippingAddress({...shippingAddress, street: e.target.value})}
-                          className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none"
-                          data-testid="shipping-street" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-carelink-navy mb-1">עיר *</label>
-                        <input type="text" value={shippingAddress.city}
-                          onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
-                          className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none"
-                          data-testid="shipping-city" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-carelink-navy mb-1">דירה</label>
-                        <input type="text" value={shippingAddress.apartment}
-                          onChange={(e) => setShippingAddress({...shippingAddress, apartment: e.target.value})}
-                          className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Platform Selection for Virtual */}
-                {needsPlatform && (
-                  <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale" data-testid="platform-select">
-                    <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
-                      <FaVideo className="text-carelink-teal" />
-                      בחר פלטפורמה לשיחה
-                    </h2>
-                    <div className="grid grid-cols-2 gap-3">
-                      {TELEMEDICINE_PLATFORMS.map(platform => {
-                        const PlatformIcon = platform.icon;
-                        return (
-                          <button key={platform.id} onClick={() => setSelectedPlatform(platform.id)}
-                            data-testid={`platform-${platform.id}`}
-                            className={`p-4 rounded-xl border-2 flex items-center gap-3 transition ${
-                              selectedPlatform === platform.id
-                                ? 'border-carelink-teal bg-carelink-teal-pale'
-                                : 'border-gray-200 hover:border-carelink-teal-pale'
-                            }`}>
-                            <PlatformIcon className="text-xl text-carelink-teal" />
-                            <span className="font-medium text-carelink-navy">{platform.label}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Notes - always shown */}
-                <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale">
-                  <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
-                    <FaStickyNote className="text-carelink-teal" />
-                    הערות להזמנה
-                  </h2>
-                  <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows="3"
-                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none resize-none"
-                    placeholder="הערות מיוחדות, בקשות, מידע רפואי רלוונטי..."
-                    data-testid="booking-notes" />
+                  <input type="text" value={shippingAddress.city} placeholder="עיר *"
+                    onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                    data-testid="shipping-city" />
+                  <input type="text" value={shippingAddress.apartment} placeholder="דירה"
+                    onChange={(e) => setShippingAddress({...shippingAddress, apartment: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
                 </div>
-              </>
-            )}
+              )}
 
-            {/* ==================== STEP AUTH ==================== */}
-            {step === 'auth' && !isAuthenticated && (
-              <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale">
-                {!guestMode ? (
-                  <>
-                    <h2 className="text-xl font-bold text-carelink-navy mb-6 text-center">איך תרצה להמשיך?</h2>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <Link to={`/login?redirect=/book/${serviceId}`}
-                        className="bg-carelink-teal text-white p-6 rounded-xl hover:bg-carelink-teal-medium transition text-center">
-                        <FaSignInAlt className="text-3xl mx-auto mb-3" />
-                        <h3 className="font-bold mb-1">התחבר לחשבון</h3>
-                        <p className="text-sm text-white/80">עקוב אחר ההזמנות שלך</p>
-                      </Link>
-                      <button onClick={() => setGuestMode(true)}
-                        className="bg-white border-2 border-carelink-teal text-carelink-teal p-6 rounded-xl hover:bg-carelink-teal-pale transition text-center">
-                        <FaUser className="text-3xl mx-auto mb-3" />
-                        <h3 className="font-bold mb-1">המשך כאורח</h3>
-                        <p className="text-sm text-carelink-gray">הזמן ללא רישום</p>
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <h2 className="text-xl font-bold text-carelink-navy mb-6">פרטי האורח</h2>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-carelink-navy mb-1">שם מלא *</label>
-                        <input type="text" value={guestDetails.name}
-                          onChange={(e) => setGuestDetails({...guestDetails, name: e.target.value})}
-                          className={`w-full px-4 py-3 border-2 rounded-xl ${guestErrors.name ? 'border-red-500' : 'border-carelink-teal-pale'}`} />
-                        {guestErrors.name && <p className="text-red-500 text-sm mt-1">{guestErrors.name}</p>}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-carelink-navy mb-1">אימייל *</label>
-                        <input type="email" value={guestDetails.email}
-                          onChange={(e) => setGuestDetails({...guestDetails, email: e.target.value})}
-                          className={`w-full px-4 py-3 border-2 rounded-xl ${guestErrors.email ? 'border-red-500' : 'border-carelink-teal-pale'}`} />
-                        {guestErrors.email && <p className="text-red-500 text-sm mt-1">{guestErrors.email}</p>}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-carelink-navy mb-1">טלפון *</label>
-                        <input type="tel" value={guestDetails.phone}
-                          onChange={(e) => setGuestDetails({...guestDetails, phone: e.target.value})}
-                          className={`w-full px-4 py-3 border-2 rounded-xl ${guestErrors.phone ? 'border-red-500' : 'border-carelink-teal-pale'}`} />
-                        {guestErrors.phone && <p className="text-red-500 text-sm mt-1">{guestErrors.phone}</p>}
-                      </div>
-                    </div>
-                    <button onClick={() => { if (validateGuestDetails()) setStep(3); }}
-                      className="w-full mt-6 bg-carelink-teal text-white py-3 rounded-xl font-bold hover:bg-carelink-teal-medium transition">
-                      המשך לאישור
-                    </button>
-                    <button onClick={() => setGuestMode(false)} className="w-full mt-2 text-carelink-gray hover:text-carelink-navy">חזור</button>
-                  </>
+              {/* Clinic / Hospital → Just info */}
+              {(selectedDeliveryType === 'clinic' || selectedDeliveryType === 'hospital') && (
+                <div className="flex items-center gap-3 text-sm text-carelink-gray">
+                  <FaInfoCircle className="text-carelink-teal" />
+                  <span>הכתובת תישלח אליך לאחר אישור ההזמנה ע"י הספק</span>
+                </div>
+              )}
+
+              {/* No delivery type selected yet */}
+              {!selectedDeliveryType && (
+                <p className="text-sm text-carelink-gray">בחר תחילה היכן ניתן השירות</p>
+              )}
+            </FormSection>
+
+            {/* 5. WHO - Contact & Requester */}
+            <FormSection icon={FaUserFriends} title="למי - פרטי מזמין ואיש קשר" testId="contact-section">
+              <div className="flex justify-between items-center mb-4">
+                <p className="text-sm font-medium text-carelink-navy">פרטי המזמין</p>
+                {user && (
+                  <button type="button"
+                    onClick={() => setContactPerson({ name: user.name || '', phone: user.phone || '', relationship: 'self' })}
+                    className="text-xs text-carelink-teal bg-carelink-teal-pale/40 hover:bg-carelink-teal-pale px-3 py-1.5 rounded-full transition"
+                    data-testid="fill-my-details-btn">
+                    <FaUser className="inline text-[10px] ml-1" /> הפרטים שלי
+                  </button>
                 )}
               </div>
-            )}
-
-            {/* ==================== STEP 3: Terms ==================== */}
-            {step === 3 && (
-              <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale" data-testid="terms-section">
-                <h2 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                  <FaFileContract className="text-carelink-teal" />
-                  אישור תנאים
-                </h2>
-                <label className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl mb-4 cursor-pointer hover:bg-carelink-teal-pale/20 transition">
-                  <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)}
-                    className="w-5 h-5 mt-0.5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
-                    data-testid="accept-terms" />
-                  <div>
-                    <span className="font-medium text-carelink-navy">אני מאשר/ת את </span>
-                    <Link to="/terms" target="_blank" className="text-carelink-teal hover:underline">תנאי השימוש</Link>
-                    <span className="font-medium text-carelink-navy"> של האתר *</span>
-                  </div>
-                </label>
-                <label className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-carelink-teal-pale/20 transition">
-                  <input type="checkbox" checked={acceptCancellation} onChange={(e) => setAcceptCancellation(e.target.checked)}
-                    className="w-5 h-5 mt-0.5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
-                    data-testid="accept-cancellation" />
-                  <div>
-                    <span className="font-medium text-carelink-navy">אני מאשר/ת את </span>
-                    <Link to="/terms#cancellation" target="_blank" className="text-carelink-teal hover:underline">מדיניות הביטולים</Link>
-                    <span className="font-medium text-carelink-navy"> *</span>
-                    <p className="text-sm text-carelink-gray mt-1">ביטול עד 24 שעות לפני המועד - ללא עלות. ביטול מאוחר יותר - 50% מהעלות.</p>
-                  </div>
-                </label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-carelink-navy mb-1">שם מלא *</label>
+                  <input type="text" value={contactPerson.name}
+                    onChange={(e) => setContactPerson({...contactPerson, name: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                    placeholder="שם מלא" data-testid="requester-name" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-carelink-navy mb-1">טלפון *</label>
+                  <input type="tel" value={contactPerson.phone}
+                    onChange={(e) => setContactPerson({...contactPerson, phone: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                    placeholder="050-0000000" data-testid="requester-phone" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-carelink-navy mb-1">קרבה למטופל</label>
+                  <select value={contactPerson.relationship}
+                    onChange={(e) => setContactPerson({...contactPerson, relationship: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                    data-testid="requester-relationship">
+                    <option value="">בחר</option>
+                    <option value="self">בעצמי</option>
+                    <option value="spouse">בן/בת זוג</option>
+                    <option value="child">ילד/ה</option>
+                    <option value="parent">הורה</option>
+                    <option value="other">אחר</option>
+                  </select>
+                </div>
               </div>
-            )}
+            </FormSection>
+
+            {/* 6. NOTES */}
+            <FormSection icon={FaStickyNote} title="הערות" testId="notes-section">
+              <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows="3"
+                className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none resize-none text-sm"
+                placeholder="הערות מיוחדות, בקשות, מידע רפואי רלוונטי..."
+                data-testid="booking-notes" />
+            </FormSection>
+
+            {/* 7. TERMS */}
+            <FormSection icon={FaFileContract} title="תנאים ואישורים" testId="terms-section">
+              <label className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl mb-3 cursor-pointer hover:bg-carelink-teal-pale/20 transition">
+                <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)}
+                  className="w-5 h-5 mt-0.5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
+                  data-testid="accept-terms" />
+                <span className="text-sm">
+                  <span className="text-carelink-navy">אני מאשר/ת את </span>
+                  <Link to="/terms" target="_blank" className="text-carelink-teal hover:underline">תנאי השימוש</Link>
+                  <span className="text-carelink-navy"> *</span>
+                </span>
+              </label>
+              <label className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-carelink-teal-pale/20 transition">
+                <input type="checkbox" checked={acceptCancellation} onChange={(e) => setAcceptCancellation(e.target.checked)}
+                  className="w-5 h-5 mt-0.5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
+                  data-testid="accept-cancellation" />
+                <div className="text-sm">
+                  <span className="text-carelink-navy">אני מאשר/ת את </span>
+                  <Link to="/terms#cancellation" target="_blank" className="text-carelink-teal hover:underline">מדיניות הביטולים</Link>
+                  <span className="text-carelink-navy"> *</span>
+                  <p className="text-xs text-carelink-gray mt-1">ביטול עד 24 שעות לפני - ללא עלות. ביטול מאוחר - 50%.</p>
+                </div>
+              </label>
+            </FormSection>
           </div>
 
-          {/* ==================== SIDEBAR: Order Summary ==================== */}
+          {/* ===== RIGHT: Sticky Summary ===== */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal sticky top-4" data-testid="order-summary">
-              <h3 className="font-bold text-lg text-carelink-navy mb-4 flex items-center gap-2">
-                <FaCalculator className="text-carelink-teal" />
-                סיכום הזמנה
-              </h3>
+              <h3 className="font-bold text-lg text-carelink-navy mb-4">סיכום הזמנה</h3>
               
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-carelink-gray">שירות:</span>
-                  <span className="font-medium text-carelink-navy">{service.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-carelink-gray">סוג:</span>
-                  <span className="font-medium text-carelink-navy">{categoryConfig.label}</span>
-                </div>
-                {getDeliveryLabel() && (
-                  <div className="flex justify-between">
-                    <span className="text-carelink-gray">מיקום:</span>
-                    <span className="font-medium text-carelink-navy">{getDeliveryLabel()}</span>
-                  </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between"><span className="text-carelink-gray">שירות:</span><span className="font-medium text-carelink-navy">{service.name}</span></div>
+                <div className="flex justify-between"><span className="text-carelink-gray">סוג:</span><span className="font-medium text-carelink-navy">{categoryConfig.label}</span></div>
+                
+                {selectedDeliveryType && (
+                  <div className="flex justify-between"><span className="text-carelink-gray">מיקום:</span><span className="font-medium text-carelink-navy">{DELIVERY_TYPES[selectedDeliveryType]?.label}</span></div>
                 )}
                 {!skipTimeSelection && selectedDate && (
-                  <div className="flex justify-between">
-                    <span className="text-carelink-gray">תאריך:</span>
-                    <span className="font-medium text-carelink-navy">{format(selectedDate, 'dd/MM/yyyy', { locale: he })}</span>
-                  </div>
+                  <div className="flex justify-between"><span className="text-carelink-gray">תאריך:</span><span className="font-medium text-carelink-navy">{format(selectedDate, 'dd/MM/yyyy', { locale: he })}</span></div>
                 )}
                 {selectedTime && (
-                  <div className="flex justify-between">
-                    <span className="text-carelink-gray">שעה:</span>
-                    <span className="font-medium text-carelink-navy">{selectedTime}</span>
-                  </div>
+                  <div className="flex justify-between"><span className="text-carelink-gray">שעה:</span><span className="font-medium text-carelink-navy">{selectedTime}</span></div>
                 )}
                 {selectedShift && (
-                  <div className="flex justify-between">
-                    <span className="text-carelink-gray">משמרת:</span>
-                    <span className="font-medium text-carelink-navy">{selectedShift.label}</span>
-                  </div>
+                  <div className="flex justify-between"><span className="text-carelink-gray">משמרת:</span><span className="font-medium text-carelink-navy">{selectedShift.label}</span></div>
                 )}
                 {skipTimeSelection && (
-                  <div className="flex justify-between">
-                    <span className="text-carelink-gray">תיאום:</span>
-                    <span className="font-medium text-amber-600">יתואם טלפונית</span>
-                  </div>
+                  <div className="flex justify-between"><span className="text-carelink-gray">תיאום:</span><span className="font-medium text-amber-600">יתואם טלפונית</span></div>
                 )}
                 {selectedPlatform && (
-                  <div className="flex justify-between">
-                    <span className="text-carelink-gray">פלטפורמה:</span>
-                    <span className="font-medium text-carelink-navy">{TELEMEDICINE_PLATFORMS.find(p => p.id === selectedPlatform)?.label}</span>
-                  </div>
+                  <div className="flex justify-between"><span className="text-carelink-gray">פלטפורמה:</span><span className="font-medium text-carelink-navy">{TELEMEDICINE_PLATFORMS.find(p => p.id === selectedPlatform)?.label}</span></div>
                 )}
                 {isSeries && service.num_sessions && (
-                  <div className="flex justify-between">
-                    <span className="text-carelink-gray">מפגשים:</span>
-                    <span className="font-medium text-carelink-navy">{service.num_sessions}</span>
-                  </div>
+                  <div className="flex justify-between"><span className="text-carelink-gray">מפגשים:</span><span className="font-medium text-carelink-navy">{service.num_sessions}</span></div>
                 )}
 
-                <div className="border-t border-carelink-teal-pale my-4"></div>
+                <div className="border-t border-carelink-teal-pale my-3"></div>
 
-                {/* Price Breakdown */}
-                <div className="space-y-2">
-                  {isHourly ? (
-                    <div className="flex justify-between">
-                      <span className="text-carelink-gray">₪{service.price} x {selectedShift?.duration || customHours} שעות</span>
-                      <span className="font-medium">₪{service.price * (selectedShift?.duration || customHours)}</span>
-                    </div>
-                  ) : isSeries && service.num_sessions ? (
-                    <div className="flex justify-between">
-                      <span className="text-carelink-gray">{service.num_sessions} מפגשים</span>
-                      <span className="font-medium">₪{service.series_price || service.price * service.num_sessions}</span>
-                    </div>
-                  ) : (
-                    <div className="flex justify-between">
-                      <span className="text-carelink-gray">מחיר בסיס:</span>
-                      <span className="font-medium">₪{service.price}</span>
-                    </div>
-                  )}
-                  
-                  {selectedDeliveryType === 'home' && service.has_travel_cost && service.travel_cost > 0 && (
-                    <div className="flex justify-between text-carelink-gray">
-                      <span>תוספת נסיעות:</span>
-                      <span>₪{service.travel_cost}</span>
-                    </div>
-                  )}
-                  
-                  {selectedDeliveryType === 'delivery' && service.has_shipping && service.shipping_cost > 0 && (
-                    <div className="flex justify-between text-carelink-gray">
-                      <span>דמי משלוח:</span>
-                      <span>₪{service.shipping_cost}</span>
-                    </div>
-                  )}
-                </div>
+                {isHourly ? (
+                  <div className="flex justify-between"><span className="text-carelink-gray">₪{service.price} x {selectedShift?.duration || customHours} שעות</span><span className="font-medium">₪{service.price * (selectedShift?.duration || customHours)}</span></div>
+                ) : isSeries && service.num_sessions ? (
+                  <div className="flex justify-between"><span className="text-carelink-gray">{service.num_sessions} מפגשים</span><span className="font-medium">₪{service.series_price || service.price * service.num_sessions}</span></div>
+                ) : (
+                  <div className="flex justify-between"><span className="text-carelink-gray">מחיר בסיס:</span><span className="font-medium">₪{service.price}</span></div>
+                )}
+                
+                {isHome && service.has_travel_cost && service.travel_cost > 0 && (
+                  <div className="flex justify-between text-carelink-gray"><span>נסיעות:</span><span>₪{service.travel_cost}</span></div>
+                )}
+                {isDelivery && service.has_shipping && service.shipping_cost > 0 && (
+                  <div className="flex justify-between text-carelink-gray"><span>משלוח:</span><span>₪{service.shipping_cost}</span></div>
+                )}
 
-                <div className="border-t border-carelink-teal-pale my-4"></div>
-
+                <div className="border-t border-carelink-teal-pale my-3"></div>
                 <div className="flex justify-between text-lg">
-                  <span className="font-bold text-carelink-navy">סה"כ לתשלום:</span>
-                  <span className="font-bold text-carelink-teal">₪{calculateTotalPrice()}</span>
+                  <span className="font-bold text-carelink-navy">סה"כ:</span>
+                  <span className="font-bold text-carelink-teal">₪{totalPrice}</span>
                 </div>
               </div>
 
-              {/* Navigation Buttons */}
-              <div className="mt-6 space-y-3">
-                {step !== 'success' && step !== 'auth' && (
-                  <button onClick={handleNextStep} disabled={booking}
-                    className="w-full bg-carelink-teal text-white py-3 rounded-xl font-bold hover:bg-carelink-teal-medium transition disabled:opacity-50 flex items-center justify-center gap-2"
-                    data-testid="booking-next-btn">
-                    {booking ? (
-                      <><FaSpinner className="animate-spin" /> מעבד...</>
-                    ) : step === 3 ? (
-                      <><FaCheckCircle /> אשר והזמן</>
-                    ) : (
-                      <>המשך <FaArrowRight className="rotate-180" /></>
-                    )}
-                  </button>
+              <button onClick={handleSubmit} disabled={booking}
+                className="w-full mt-6 bg-carelink-teal text-white py-4 rounded-xl font-bold text-lg hover:bg-carelink-teal-medium transition disabled:opacity-50 flex items-center justify-center gap-2"
+                data-testid="booking-submit-btn">
+                {booking ? (
+                  <><FaSpinner className="animate-spin" /> מעבד...</>
+                ) : (
+                  <><FaCheckCircle /> אשר והזמן</>
                 )}
-                {step > 1 && step !== 'success' && step !== 'auth' && (
-                  <button onClick={() => setStep(step - 1)}
-                    className="w-full bg-gray-100 text-carelink-navy py-3 rounded-xl font-medium hover:bg-gray-200 transition flex items-center justify-center gap-2"
-                    data-testid="booking-back-btn">
-                    <FaArrowRight /> חזור
-                  </button>
-                )}
-              </div>
+              </button>
             </div>
           </div>
+
         </div>
       </div>
       
