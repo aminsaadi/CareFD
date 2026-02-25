@@ -273,22 +273,29 @@ class ProviderRegister(BaseModel):
 # ==================== SERVICE MODELS ====================
 
 class ServiceType:
-    HOME_VISIT = "home_visit"
-    HOSPITAL = "hospital"
-    CLINIC = "clinic"
-    VIRTUAL = "virtual"
+    """Where/how the service is delivered"""
+    HOME = "home"                   # בבית הלקוח
+    CLINIC = "clinic"               # בקליניקה
+    HOSPITAL = "hospital"           # בבית חולים / מוסד
+    VIRTUAL = "virtual"             # וירטואלי - זום, וואצאפ, טלפון, מייט
+    DELIVERY = "delivery"           # משלוח
 
 class ServiceCategory:
-    VISIT = "visit"
-    HOURLY = "hourly"
-    CONSULTATION = "consultation"
-    PRODUCT = "product"
+    """What kind of service"""
+    CONSULTATION = "consultation"   # יעוץ - מחיר קבוע
+    VISIT = "visit"                 # ביקור - שירות ביקור
+    PRODUCT = "product"             # מוצר - פיזי או וירטואלי
+    HOURLY = "hourly"               # שעתי - לפי שעות/משמרת
+    PROCEDURE = "procedure"         # פעולה - מחיר לפי פעולה רפואית
+    SERIES = "series"               # סדרה - סדרת טיפולים
 
 class PricingType:
-    FIXED = "fixed"
-    PER_HOUR = "per_hour"
-    PER_VISIT = "per_visit"
-    PER_UNIT = "per_unit"
+    FIXED = "fixed"                 # מחיר קבוע
+    PER_HOUR = "per_hour"           # לפי שעה
+    PER_VISIT = "per_visit"         # לפי ביקור
+    PER_UNIT = "per_unit"           # לפי יחידה (מוצר)
+    PER_PROCEDURE = "per_procedure" # לפי פעולה
+    PER_SERIES = "per_series"       # לפי סדרה
 
 class WeekendPricingType:
     NONE = "none"
