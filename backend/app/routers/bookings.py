@@ -392,6 +392,230 @@ async def get_provider_bookings(
     
     return {"bookings": bookings}
 
+@router.get("/bookings/{booking_id}")
+async def get_booking_details(
+    booking_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Get single booking details"""
+    user = await get_current_user(authorization, request)
+    
+    booking = await db.bookings.find_one({"booking_id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    # Check authorization - user or provider
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    is_owner = booking["user_id"] == user["user_id"]
+    is_provider = provider and booking["provider_id"] == provider["provider_id"]
+    is_admin = user.get("role") == "admin"
+    
+    if not (is_owner or is_provider or is_admin):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Enrich with user info
+    booking_user = await db.users.find_one({"user_id": booking["user_id"]}, {"_id": 0, "password_hash": 0})
+    if booking_user:
+        booking["user_info"] = {
+            "name": booking_user.get("name"),
+            "email": booking_user.get("email"),
+            "phone": booking_user.get("phone"),
+            "profile_image": booking_user.get("profile_image") or booking_user.get("picture")
+        }
+    
+    # Enrich with provider info
+    booking_provider = await db.providers.find_one({"provider_id": booking["provider_id"]}, {"_id": 0})
+    if booking_provider:
+        booking["provider_info"] = {
+            "business_name": booking_provider.get("business_name"),
+            "phone": booking_provider.get("phone"),
+            "email": booking_provider.get("email"),
+            "profile_image": booking_provider.get("profile_image")
+        }
+    
+    # Enrich with service info
+    service = await db.services.find_one({"service_id": booking["service_id"]}, {"_id": 0})
+    if service:
+        booking["service_info"] = {
+            "name": service.get("name"),
+            "description": service.get("description"),
+            "price": service.get("price"),
+            "duration_minutes": service.get("duration_minutes"),
+            "service_category": service.get("service_category"),
+            "delivery_types": service.get("delivery_types", [])
+        }
+    
+    return booking
+
+
+@router.put("/bookings/{booking_id}/request-change")
+async def request_booking_change(
+    booking_id: str,
+    body: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Provider requests a change of date/time for a booking"""
+    user = await get_current_user(authorization, request)
+    
+    booking = await db.bookings.find_one({"booking_id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    # Check if user is the provider
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider or booking["provider_id"] != provider["provider_id"]:
+        raise HTTPException(status_code=403, detail="Only provider can request changes")
+    
+    new_date = body.get("new_date")
+    new_time = body.get("new_time")
+    reason = body.get("reason", "")
+    
+    if not new_date and not new_time:
+        raise HTTPException(status_code=400, detail="Must provide new date or time")
+    
+    change_request = {
+        "request_id": f"cr_{uuid.uuid4().hex[:8]}",
+        "requested_by": user["user_id"],
+        "requested_at": datetime.now(timezone.utc).isoformat(),
+        "new_date": new_date,
+        "new_time": new_time,
+        "reason": reason,
+        "status": "pending"
+    }
+    
+    await db.bookings.update_one(
+        {"booking_id": booking_id},
+        {"$push": {"change_requests": change_request}}
+    )
+    
+    # Notify client
+    provider_name = provider.get("business_name", "הספק")
+    date_str = new_date or ""
+    time_str = new_time or ""
+    change_desc = f"תאריך חדש: {date_str}" if new_date else ""
+    if new_time:
+        change_desc += f"{' | ' if change_desc else ''}שעה חדשה: {time_str}"
+    
+    await create_notification(
+        booking["user_id"],
+        NotificationType.BOOKING_CHANGE_REQUESTED,
+        "בקשה לשינוי מועד",
+        f"{provider_name} מבקש לשנות את מועד ההזמנה ל-{booking.get('service_name', 'שירות')}. {change_desc}. {('סיבה: ' + reason) if reason else ''}",
+        {"booking_id": booking_id, "change_request": change_request}
+    )
+    
+    # Send email to client
+    client_user = await db.users.find_one({"user_id": booking["user_id"]}, {"_id": 0})
+    if client_user and client_user.get("email"):
+        await send_email_async(
+            client_user["email"],
+            f"CareLink - בקשה לשינוי מועד הזמנה",
+            f"""
+            <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 30px; border-radius: 15px 15px 0 0; text-align: center;">
+                    <h1 style="margin: 0;">בקשה לשינוי מועד</h1>
+                </div>
+                <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 15px 15px;">
+                    <p>שלום {client_user.get('name', 'לקוח')},</p>
+                    <p>{provider_name} מבקש לשנות את מועד ההזמנה שלך:</p>
+                    <div style="background: white; padding: 15px; border-radius: 10px; margin: 15px 0; border: 1px solid #e0e0e0;">
+                        <p><strong>שירות:</strong> {booking.get('service_name', 'שירות')}</p>
+                        {f'<p><strong>תאריך מבוקש:</strong> {new_date}</p>' if new_date else ''}
+                        {f'<p><strong>שעה מבוקשת:</strong> {new_time}</p>' if new_time else ''}
+                        {f'<p><strong>סיבה:</strong> {reason}</p>' if reason else ''}
+                    </div>
+                    <p>אנא היכנס לאזור האישי שלך לאשר או לדחות את הבקשה.</p>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <a href="https://carelink.co.il/dashboard" style="background: #00a99d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold;">לאזור האישי</a>
+                    </div>
+                </div>
+            </div>
+            """
+        )
+    
+    return {"message": "Change request sent successfully", "change_request": change_request}
+
+
+@router.put("/bookings/{booking_id}/respond-change")
+async def respond_to_change_request(
+    booking_id: str,
+    body: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Client approves or rejects a change request"""
+    user = await get_current_user(authorization, request)
+    
+    booking = await db.bookings.find_one({"booking_id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    
+    if booking["user_id"] != user["user_id"]:
+        raise HTTPException(status_code=403, detail="Only the client can respond to change requests")
+    
+    request_id = body.get("request_id")
+    action = body.get("action")  # "approve" or "reject"
+    
+    if action not in ["approve", "reject"]:
+        raise HTTPException(status_code=400, detail="Action must be 'approve' or 'reject'")
+    
+    change_requests = booking.get("change_requests", [])
+    updated = False
+    
+    for cr in change_requests:
+        if cr.get("request_id") == request_id and cr.get("status") == "pending":
+            cr["status"] = "approved" if action == "approve" else "rejected"
+            cr["responded_at"] = datetime.now(timezone.utc).isoformat()
+            updated = True
+            
+            if action == "approve":
+                # Update booking date/time
+                update_fields = {"change_requests": change_requests}
+                if cr.get("new_date"):
+                    update_fields["booking_date"] = cr["new_date"]
+                if cr.get("new_time"):
+                    update_fields["booking_time"] = cr["new_time"]
+                
+                await db.bookings.update_one(
+                    {"booking_id": booking_id},
+                    {"$set": update_fields}
+                )
+                
+                # Notify provider
+                provider = await db.providers.find_one({"provider_id": booking["provider_id"]}, {"_id": 0})
+                if provider:
+                    await create_notification(
+                        provider["user_id"],
+                        NotificationType.SYSTEM,
+                        "בקשת השינוי אושרה!",
+                        f"הלקוח אישר את שינוי המועד ל-{booking.get('service_name', 'שירות')}",
+                        {"booking_id": booking_id}
+                    )
+            else:
+                await db.bookings.update_one(
+                    {"booking_id": booking_id},
+                    {"$set": {"change_requests": change_requests}}
+                )
+                
+                provider = await db.providers.find_one({"provider_id": booking["provider_id"]}, {"_id": 0})
+                if provider:
+                    await create_notification(
+                        provider["user_id"],
+                        NotificationType.SYSTEM,
+                        "בקשת השינוי נדחתה",
+                        f"הלקוח דחה את בקשת שינוי המועד ל-{booking.get('service_name', 'שירות')}",
+                        {"booking_id": booking_id}
+                    )
+            break
+    
+    if not updated:
+        raise HTTPException(status_code=404, detail="Change request not found or already responded")
+    
+    return {"message": f"Change request {action}d successfully"}
+
+
 @router.put("/bookings/{booking_id}/cancel")
 async def cancel_booking(
     booking_id: str,
