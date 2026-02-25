@@ -13,7 +13,7 @@ import {
   FaChevronLeft, FaPlus, FaMapMarkerAlt, FaClock, FaCheckCircle,
   FaHourglass, FaTimes, FaEdit, FaBell, FaHeart, FaCamera, FaTrash,
   FaPhone, FaEnvelope, FaHome, FaLock, FaIdCard, FaShieldAlt,
-  FaMoneyBillWave, FaUserCircle
+  FaMoneyBillWave, FaUserCircle, FaExchangeAlt
 } from 'react-icons/fa';
 
 // Profile gradient colors
