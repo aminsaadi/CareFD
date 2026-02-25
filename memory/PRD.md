@@ -44,7 +44,7 @@ A full-stack healthcare service marketplace platform (CareLink) allowing users t
 ### Dynamic Booking Form:
 - Adapts based on category + delivery type combination
 - Always: summary, date/time (with skip option), requester details, terms
-- Hourly: shift selection (morning/afternoon/night/half-day/custom)
+- Hourly: shift selection (morning/afternoon/night/custom)
 - Home: address + contact person fields
 - Virtual: platform selection
 - Delivery: shipping address
@@ -61,11 +61,21 @@ A full-stack healthcare service marketplace platform (CareLink) allowing users t
 - Email notifications (SMTP/Gmail)
 - Push notifications infrastructure
 - Backend refactored into 18 separate routers
+- **Provider Dashboard - Enhanced Booking Management:**
+  - Card-based booking display with client info, service, date/time, price
+  - View full booking details modal (client info, pricing, location, notes, change history)
+  - Request date/time change with reason (sends email + notification to user)
+  - Contact user directly via chat from any booking
+- **User Dashboard - Change Request Management:**
+  - Enhanced booking details modal with full pricing breakdown
+  - View and respond to provider change requests (approve/reject)
+  - Change request approval auto-updates booking date/time
 
 ## Completed Tasks
 - **Feb 24, 2026:** Fixed P0 bugs - booking button + chat messages
 - **Feb 25, 2026:** P1 Backend refactoring - split 7656-line server.py into 18 routers
 - **Feb 25, 2026:** Booking Model V2 - Healthcare model with 6 categories, 5 delivery types, dynamic form
+- **Feb 25, 2026:** P0 Enhanced Provider & User Dashboards - booking details modal, request change, contact user, respond to changes
 
 ## Mocked/Pending Integrations
 - PayPal: MOCKED (awaiting API keys)
@@ -76,6 +86,11 @@ A full-stack healthcare service marketplace platform (CareLink) allowing users t
 - User: user@carelink.co.il / password
 - Provider: provider@carelink.co.il / password
 
+## Key API Endpoints (New)
+- `GET /api/bookings/{booking_id}` - Single booking with enriched user/provider/service info
+- `PUT /api/bookings/{booking_id}/request-change` - Provider requests date/time change
+- `PUT /api/bookings/{booking_id}/respond-change` - User approves/rejects change request
+
 ## Backlog (Prioritized)
 - **P2:** PayPal integration (blocked on API keys)
 - **P3:** Provider image gallery
@@ -83,4 +98,8 @@ A full-stack healthcare service marketplace platform (CareLink) allowing users t
 
 ## Known Issues
 - Production caching (Cloudflare - user-side)
-- Public provider search returns empty (test provider verification_status=None)
+
+## Test Reports
+- /app/test_reports/iteration_7.json - Post-refactoring validation
+- /app/test_reports/iteration_8.json - Post-bug-fix validation
+- /app/test_reports/iteration_28.json - Dashboard features validation (15/15 backend, 100% frontend)
