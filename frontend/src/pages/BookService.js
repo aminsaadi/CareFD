@@ -245,7 +245,7 @@ const BookService = () => {
         is_contact_same_as_requester: contactPerson.relationship === 'self',
       };
 
-      if (needsAddress && serviceAddress.street) {
+      if ((isHome || selectedDeliveryType === 'clinic' || selectedDeliveryType === 'hospital') && serviceAddress.street) {
         data.service_address = serviceAddress.street;
         data.service_city = serviceAddress.city;
         data.service_apartment = serviceAddress.apartment;
