@@ -289,7 +289,7 @@ class TestUserRespondChangeEndpoint:
             "password": PROVIDER_PASSWORD
         })
         if response.status_code == 200:
-            return response.json().get("token")
+            return response.json().get("session_token")
         return None
         
     def get_user_token(self):
@@ -299,7 +299,7 @@ class TestUserRespondChangeEndpoint:
             "password": USER_PASSWORD
         })
         if response.status_code == 200:
-            return response.json().get("token")
+            return response.json().get("session_token")
         return None
         
     def create_test_change_request(self):
