@@ -468,6 +468,7 @@ class Booking(BaseModel):
     hours_booked: Optional[float] = None
     selected_shift: Optional[str] = None
     platform: Optional[str] = None
+    num_sessions: Optional[int] = None
     notes: Optional[str] = None
     special_requirements: Optional[str] = None
     base_price: Optional[float] = None
