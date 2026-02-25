@@ -54,7 +54,6 @@ const SHIFT_OPTIONS = [
   { id: 'morning', label: 'משמרת בוקר', hours: '07:00-15:00', duration: 8 },
   { id: 'afternoon', label: 'משמרת צהריים', hours: '15:00-23:00', duration: 8 },
   { id: 'night', label: 'משמרת לילה', hours: '23:00-07:00', duration: 8 },
-  { id: 'half_day', label: 'חצי יום', hours: '4 שעות', duration: 4 },
   { id: 'custom', label: 'מותאם אישית', hours: 'בחר שעות', duration: 0 }
 ];
 
