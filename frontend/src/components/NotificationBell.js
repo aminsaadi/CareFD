@@ -70,8 +70,11 @@ const NotificationBell = () => {
       case 'booking_confirmed':
       case 'booking_cancelled':
       case 'booking_completed':
-        return data.booking_id ? `/bookings/${data.booking_id}` : '/bookings';
+      case 'booking_provider_completed':
+      case 'booking_change_requested':
+        return '/dashboard';
       case 'message_new':
+      case 'chat_message':
         return data.room_id ? `/chat/${data.room_id}` : '/chats';
       case 'offer_new':
       case 'offer_accepted':
