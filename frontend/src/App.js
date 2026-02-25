@@ -386,8 +386,10 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <AppRouter />
-        <CookieConsent />
+        <NotificationProvider>
+          <AppRouter />
+          <CookieConsent />
+        </NotificationProvider>
       </BrowserRouter>
     </AuthProvider>
   );
