@@ -527,8 +527,8 @@ const BookService = () => {
             {/* ==================== STEP 1: Date & Time ==================== */}
             {step === 1 && (
               <>
-                {/* Delivery Type Selection (if multiple) */}
-                {deliveryTypes.length > 1 && (
+                {/* Delivery Type - where service is provided */}
+                {deliveryTypes.length > 1 ? (
                   <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale" data-testid="delivery-type-select">
                     <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
                       <FaMapMarkerAlt className="text-carelink-teal" />
@@ -540,16 +540,13 @@ const BookService = () => {
                         if (!dtConfig) return null;
                         const DtIcon = dtConfig.icon;
                         return (
-                          <button
-                            key={dt}
-                            onClick={() => setSelectedDeliveryType(dt)}
+                          <button key={dt} onClick={() => setSelectedDeliveryType(dt)}
                             data-testid={`delivery-type-${dt}`}
                             className={`p-4 rounded-xl border-2 text-center transition ${
                               selectedDeliveryType === dt
                                 ? 'border-carelink-teal bg-carelink-teal-pale'
                                 : 'border-gray-200 hover:border-carelink-teal-pale'
-                            }`}
-                          >
+                            }`}>
                             <DtIcon className="text-2xl text-carelink-teal mx-auto mb-2" />
                             <div className="font-semibold text-carelink-navy text-sm">{dtConfig.label}</div>
                           </button>
@@ -557,17 +554,57 @@ const BookService = () => {
                       })}
                     </div>
                   </div>
+                ) : deliveryTypes.length === 1 && (
+                  <div className="bg-white rounded-2xl shadow-lg p-4 border-2 border-carelink-teal-pale" data-testid="delivery-type-info">
+                    <div className="flex items-center gap-3">
+                      {(() => { const DtIcon = DELIVERY_TYPES[deliveryTypes[0]]?.icon || FaMapMarkerAlt; return <DtIcon className="text-lg text-carelink-teal" />; })()}
+                      <span className="text-carelink-navy font-medium">איפה ניתן השירות: <strong>{DELIVERY_TYPES[deliveryTypes[0]]?.label}</strong></span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Shift Selection for Hourly Services */}
+                {needsShifts && !skipTimeSelection && (
+                  <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale" data-testid="shift-select">
+                    <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
+                      <FaClock className="text-carelink-teal" />
+                      בחר משמרת / שעות
+                    </h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                      {SHIFT_OPTIONS.map(shift => (
+                        <button key={shift.id} onClick={() => setSelectedShift(shift)}
+                          data-testid={`shift-${shift.id}`}
+                          className={`p-4 rounded-xl border-2 text-center transition ${
+                            selectedShift?.id === shift.id
+                              ? 'border-carelink-teal bg-carelink-teal-pale'
+                              : 'border-gray-200 hover:border-carelink-teal-pale'
+                          }`}>
+                          <div className="font-semibold text-carelink-navy">{shift.label}</div>
+                          <div className="text-sm text-carelink-gray">{shift.hours}</div>
+                        </button>
+                      ))}
+                    </div>
+                    {selectedShift?.id === 'custom' && (
+                      <div className="mt-4">
+                        <label className="block text-sm font-medium text-carelink-navy mb-2">
+                          מספר שעות (מינימום {service.minimum_hours || 4})
+                        </label>
+                        <input type="number" min={service.minimum_hours || 4}
+                          value={customHours || service.minimum_hours || 4}
+                          onChange={(e) => setCustomHours(Math.max(service.minimum_hours || 4, parseInt(e.target.value) || 0))}
+                          className="w-32 px-4 py-2 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none"
+                          data-testid="custom-hours-input" />
+                      </div>
+                    )}
+                  </div>
                 )}
 
                 {/* Skip Time Option */}
                 <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale">
                   <label className="flex items-center gap-3 cursor-pointer" data-testid="skip-time-checkbox">
-                    <input
-                      type="checkbox"
-                      checked={skipTimeSelection}
+                    <input type="checkbox" checked={skipTimeSelection}
                       onChange={(e) => setSkipTimeSelection(e.target.checked)}
-                      className="w-5 h-5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
-                    />
+                      className="w-5 h-5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal" />
                     <div>
                       <span className="font-semibold text-carelink-navy">תאם מועד מאוחר יותר</span>
                       <p className="text-sm text-carelink-gray">הספק יתקשר אליך לתיאום מועד נוח</p>
@@ -575,88 +612,32 @@ const BookService = () => {
                   </label>
                 </div>
 
+                {/* Calendar - same for all types */}
                 {!skipTimeSelection && (
                   <>
-                    {/* Shift Selection for Hourly Services */}
-                    {needsShifts && (
-                      <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale" data-testid="shift-select">
-                        <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
-                          <FaClock className="text-carelink-teal" />
-                          בחר משמרת / שעות
-                        </h2>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
-                          {SHIFT_OPTIONS.map(shift => (
-                            <button
-                              key={shift.id}
-                              onClick={() => setSelectedShift(shift)}
-                              data-testid={`shift-${shift.id}`}
-                              className={`p-4 rounded-xl border-2 text-center transition ${
-                                selectedShift?.id === shift.id
-                                  ? 'border-carelink-teal bg-carelink-teal-pale'
-                                  : 'border-gray-200 hover:border-carelink-teal-pale'
-                              }`}
-                            >
-                              <div className="font-semibold text-carelink-navy">{shift.label}</div>
-                              <div className="text-sm text-carelink-gray">{shift.hours}</div>
-                            </button>
-                          ))}
-                        </div>
-                        {selectedShift?.id === 'custom' && (
-                          <div className="mt-4">
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">
-                              מספר שעות (מינימום {service.minimum_hours || 4})
-                            </label>
-                            <input
-                              type="number"
-                              min={service.minimum_hours || 4}
-                              value={customHours}
-                              onChange={(e) => setCustomHours(parseInt(e.target.value) || 4)}
-                              className="w-32 px-4 py-2 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none"
-                              data-testid="custom-hours-input"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Calendar for Time Slot Services */}
-                    {needsTimeSlots && (
-                      <>
-                        <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale">
-                          <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
-                            <FaCalendarAlt className="text-carelink-teal" />
-                            בחר תאריך
-                          </h2>
-                          <BookingCalendar
-                            onDateSelect={(date) => { setSelectedDate(date); setSelectedTime(''); }}
-                            availability={provider.availability || []}
-                            bookedSlots={bookedSlots.map(slot => slot.split(' ')[0])}
-                          />
-                        </div>
-                        {selectedDate && (
-                          <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale">
-                            <TimeSlotPicker
-                              selectedDate={selectedDate}
-                              availability={provider.availability || []}
-                              onTimeSelect={(time) => setSelectedTime(time)}
-                              bookedTimes={bookedSlots}
-                            />
-                          </div>
-                        )}
-                      </>
-                    )}
-
-                    {/* Date only for Shift Services */}
-                    {needsShifts && (
+                    <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale">
+                      <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
+                        <FaCalendarAlt className="text-carelink-teal" />
+                        בחר תאריך
+                      </h2>
+                      <BookingCalendar
+                        onDateSelect={(date) => { setSelectedDate(date); setSelectedTime(''); }}
+                        availability={provider.availability || []}
+                        bookedSlots={bookedSlots.map(slot => slot.split(' ')[0])}
+                      />
+                    </div>
+                    {/* Time selection after date is picked */}
+                    {selectedDate && (
                       <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal-pale">
                         <h2 className="text-lg font-bold mb-4 text-carelink-navy flex items-center gap-2">
-                          <FaCalendarAlt className="text-carelink-teal" />
-                          בחר תאריך התחלה
+                          <FaClock className="text-carelink-teal" />
+                          {needsShifts ? 'בחר שעת התחלה' : 'בחר שעה'}
                         </h2>
-                        <BookingCalendar
-                          onDateSelect={(date) => setSelectedDate(date)}
+                        <TimeSlotPicker
+                          selectedDate={selectedDate}
                           availability={provider.availability || []}
-                          bookedSlots={[]}
+                          onTimeSelect={(time) => setSelectedTime(time)}
+                          bookedTimes={bookedSlots}
                         />
                       </div>
                     )}
