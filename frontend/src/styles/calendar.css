@@ -2,21 +2,39 @@
   width: 100%;
   border: 2px solid #B8C2C9;
   border-radius: 12px;
-  padding: 10px;
+  padding: 8px;
   background: white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  max-width: 100%;
+}
+
+@media (min-width: 640px) {
+  .carelink-calendar {
+    padding: 10px;
+  }
 }
 
 .carelink-calendar .react-calendar__navigation {
-  margin-bottom: 1em;
+  margin-bottom: 0.75em;
+  display: flex;
+  gap: 2px;
 }
 
 .carelink-calendar .react-calendar__navigation button {
   color: #1E4D5F;
-  min-width: 44px;
+  min-width: 36px;
   background: none;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
+  padding: 6px 2px;
+}
+
+@media (min-width: 640px) {
+  .carelink-calendar .react-calendar__navigation button {
+    min-width: 44px;
+    font-size: 16px;
+  }
 }
 
 .carelink-calendar .react-calendar__navigation button:enabled:hover,
@@ -25,15 +43,41 @@
   border-radius: 6px;
 }
 
+.carelink-calendar .react-calendar__month-view__weekdays {
+  font-size: 0.7em;
+}
+
+@media (min-width: 640px) {
+  .carelink-calendar .react-calendar__month-view__weekdays {
+    font-size: 0.8em;
+  }
+}
+
+.carelink-calendar .react-calendar__month-view__weekdays__weekday {
+  padding: 4px 2px;
+  text-align: center;
+}
+
+.carelink-calendar .react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none;
+}
+
 .carelink-calendar .react-calendar__tile {
   max-width: 100%;
-  padding: 10px 6px;
+  padding: 8px 2px;
   background: none;
   text-align: center;
   line-height: 16px;
-  font-size: 0.9em;
+  font-size: 0.8em;
   border-radius: 6px;
   color: #4C6D7F;
+}
+
+@media (min-width: 640px) {
+  .carelink-calendar .react-calendar__tile {
+    padding: 10px 6px;
+    font-size: 0.9em;
+  }
 }
 
 .carelink-calendar .react-calendar__tile:enabled:hover,
