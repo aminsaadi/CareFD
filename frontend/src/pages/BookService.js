@@ -831,7 +831,6 @@ const BookService = () => {
                     placeholder="הערות מיוחדות, בקשות, מידע רפואי רלוונטי..."
                     data-testid="booking-notes" />
                 </div>
-                </div>
               </>
             )}
 
