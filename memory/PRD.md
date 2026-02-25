@@ -11,7 +11,7 @@ A full-stack healthcare service marketplace platform (CareLink) allowing users t
 ## Architecture
 ```
 /app/backend/
-  server.py              # Slim entry point - imports & includes routers
+  server.py              # Slim entry point
   app/
     database.py           # MongoDB connection
     models.py             # All Pydantic models
@@ -22,33 +22,19 @@ A full-stack healthcare service marketplace platform (CareLink) allowing users t
       notifications.py, admin.py, subscriptions.py,
       clinics.py, team.py, subscriptions_upgrade.py,
       push.py, uploads.py, verification.py, contact.py
+/app/frontend/src/
+  context/
+    AuthContext.js        # Auth state management
+    NotificationContext.js # NEW - Real-time notification polling + toast popups
+  components/
+    NotificationBell.js   # UPDATED - Uses NotificationContext
+    provider/
+      BookingDetailsModal.js # NEW - Provider booking details view
 ```
 
 ## Booking Model V2 (Healthcare)
-
-### 6 Service Categories:
-1. **consultation (יעוץ)** - Fixed price per consultation
-2. **visit (ביקור)** - Service provider visit
-3. **product (מוצר)** - Physical/virtual product
-4. **hourly (שעתי)** - By hours, shifts, minimum hours
-5. **procedure (פעולה)** - Per medical procedure
-6. **series (סדרה)** - Series of treatments (num_sessions, series_price)
-
-### 5 Delivery Types:
-1. **home** - At client's home (requires address + contact)
-2. **clinic** - At provider's clinic
-3. **hospital** - Hospital/institution
-4. **virtual** - Zoom/WhatsApp/Phone/Google Meet (requires platform selection)
-5. **delivery** - Shipping (requires shipping address)
-
-### Dynamic Booking Form:
-- Adapts based on category + delivery type combination
-- Always: summary, date/time (with skip option), requester details, terms
-- Hourly: shift selection (morning/afternoon/night/custom)
-- Home: address + contact person fields
-- Virtual: platform selection
-- Delivery: shipping address
-- Series: number of sessions display
+### 6 Service Categories: consultation, visit, product, hourly, procedure, series
+### 5 Delivery Types: home, clinic, hospital, virtual, delivery
 
 ## Implemented Features (Complete)
 - User/Provider/Admin role system with document verification
@@ -63,19 +49,28 @@ A full-stack healthcare service marketplace platform (CareLink) allowing users t
 - Backend refactored into 18 separate routers
 - **Provider Dashboard - Enhanced Booking Management:**
   - Card-based booking display with client info, service, date/time, price
-  - View full booking details modal (client info, pricing, location, notes, change history)
-  - Request date/time change with reason (sends email + notification to user)
+  - View full booking details modal (BookingDetailsModal)
+  - Request date/time change with reason (sends email + notification)
   - Contact user directly via chat from any booking
 - **User Dashboard - Change Request Management:**
-  - Enhanced booking details modal with full pricing breakdown
+  - Enhanced booking details modal with pricing, location, notes
   - View and respond to provider change requests (approve/reject)
   - Change request approval auto-updates booking date/time
+- **Real-Time Notification System:**
+  - NotificationContext with 10-second polling
+  - Automatic toast popups (sonner) for new notifications
+  - Smart diff detection - only shows toasts for truly new notifications
+  - New notification types: booking_change_requested, booking_provider_completed
+  - Centralized notification state shared across all components
+  - NotificationBell uses context (no duplicate polling)
 
-## Completed Tasks
-- **Feb 24, 2026:** Fixed P0 bugs - booking button + chat messages
-- **Feb 25, 2026:** P1 Backend refactoring - split 7656-line server.py into 18 routers
-- **Feb 25, 2026:** Booking Model V2 - Healthcare model with 6 categories, 5 delivery types, dynamic form
-- **Feb 25, 2026:** P0 Enhanced Provider & User Dashboards - booking details modal, request change, contact user, respond to changes
+## Key API Endpoints
+- `GET /api/bookings/{booking_id}` - Single booking with enriched user/provider/service info
+- `PUT /api/bookings/{booking_id}/request-change` - Provider requests date/time change
+- `PUT /api/bookings/{booking_id}/respond-change` - User approves/rejects change request
+- `GET /api/notifications?limit=20` - Get notifications with unread_count
+- `PUT /api/notifications/{id}/read` - Mark single notification as read
+- `PUT /api/notifications/read-all` - Mark all as read
 
 ## Mocked/Pending Integrations
 - PayPal: MOCKED (awaiting API keys)
@@ -86,11 +81,6 @@ A full-stack healthcare service marketplace platform (CareLink) allowing users t
 - User: user@carelink.co.il / password
 - Provider: provider@carelink.co.il / password
 
-## Key API Endpoints (New)
-- `GET /api/bookings/{booking_id}` - Single booking with enriched user/provider/service info
-- `PUT /api/bookings/{booking_id}/request-change` - Provider requests date/time change
-- `PUT /api/bookings/{booking_id}/respond-change` - User approves/rejects change request
-
 ## Backlog (Prioritized)
 - **P2:** PayPal integration (blocked on API keys)
 - **P3:** Provider image gallery
@@ -100,6 +90,7 @@ A full-stack healthcare service marketplace platform (CareLink) allowing users t
 - Production caching (Cloudflare - user-side)
 
 ## Test Reports
-- /app/test_reports/iteration_7.json - Post-refactoring validation
-- /app/test_reports/iteration_8.json - Post-bug-fix validation
-- /app/test_reports/iteration_28.json - Dashboard features validation (15/15 backend, 100% frontend)
+- /app/test_reports/iteration_7.json - Post-refactoring
+- /app/test_reports/iteration_8.json - Post-bug-fix
+- /app/test_reports/iteration_28.json - Dashboard features (15/15 backend, 100% frontend)
+- /app/test_reports/iteration_29.json - Notification system (12/12 backend, 100% frontend)
