@@ -9,7 +9,7 @@ import { he } from 'date-fns/locale';
 import { 
   FaBell, FaCheck, FaTrash, FaCalendarCheck, FaComments, 
   FaStar, FaBullhorn, FaCheckCircle, FaTimes, FaFilter,
-  FaEnvelope, FaEnvelopeOpen
+  FaEnvelope, FaEnvelopeOpen, FaExchangeAlt
 } from 'react-icons/fa';
 
 const notificationIcons = {
@@ -17,6 +17,8 @@ const notificationIcons = {
   booking_confirmed: FaCheckCircle,
   booking_cancelled: FaTimes,
   booking_completed: FaCheck,
+  booking_provider_completed: FaCheckCircle,
+  booking_change_requested: FaExchangeAlt,
   message_new: FaComments,
   chat_message: FaComments,
   offer_new: FaBullhorn,
@@ -30,6 +32,8 @@ const notificationColors = {
   booking_confirmed: 'bg-green-100 text-green-600',
   booking_cancelled: 'bg-red-100 text-red-600',
   booking_completed: 'bg-green-100 text-green-600',
+  booking_provider_completed: 'bg-purple-100 text-purple-600',
+  booking_change_requested: 'bg-amber-100 text-amber-600',
   message_new: 'bg-purple-100 text-purple-600',
   chat_message: 'bg-purple-100 text-purple-600',
   offer_new: 'bg-amber-100 text-amber-600',
