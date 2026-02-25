@@ -478,7 +478,7 @@ class TestBookingEndpointsIntegration:
             "password": USER_PASSWORD
         })
         assert response.status_code == 200
-        token = response.json().get("token")
+        token = response.json().get("session_token")
         self.session.headers.update({"Authorization": f"Bearer {token}"})
         
         # Get user's bookings
