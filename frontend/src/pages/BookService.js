@@ -55,11 +55,11 @@ const SHIFT_OPTIONS = [
 // Section wrapper component
 const FormSection = ({ icon: Icon, title, children, testId }) => (
   <div className="bg-white rounded-2xl shadow-lg border-2 border-carelink-teal-pale overflow-hidden" data-testid={testId}>
-    <div className="bg-carelink-teal-pale/30 px-6 py-3 border-b border-carelink-teal-pale flex items-center gap-2">
+    <div className="bg-carelink-teal-pale/30 px-4 sm:px-6 py-3 border-b border-carelink-teal-pale flex items-center gap-2">
       <Icon className="text-carelink-teal" />
-      <h2 className="font-bold text-carelink-navy">{title}</h2>
+      <h2 className="font-bold text-carelink-navy text-sm sm:text-base">{title}</h2>
     </div>
-    <div className="p-6">{children}</div>
+    <div className="p-4 sm:p-6">{children}</div>
   </div>
 );
 
