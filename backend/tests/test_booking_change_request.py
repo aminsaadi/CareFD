@@ -452,7 +452,7 @@ class TestBookingEndpointsIntegration:
             "password": PROVIDER_PASSWORD
         })
         assert response.status_code == 200
-        token = response.json().get("token")
+        token = response.json().get("session_token")
         self.session.headers.update({"Authorization": f"Bearer {token}"})
         
         # Get provider's bookings
