@@ -458,21 +458,26 @@ const BookService = () => {
                     return (
                       <button key={dt} onClick={() => setSelectedDeliveryType(dt)}
                         data-testid={`delivery-type-${dt}`}
-                        className={`p-4 rounded-xl border-2 text-center transition ${
+                        className={`p-3 sm:p-4 rounded-xl border-2 text-center transition ${
                           selectedDeliveryType === dt
                             ? 'border-carelink-teal bg-carelink-teal-pale'
                             : 'border-gray-200 hover:border-carelink-teal-pale'
                         }`}>
-                        <DtIcon className="text-xl text-carelink-teal mx-auto mb-1" />
-                        <div className="font-semibold text-carelink-navy text-sm">{dtConfig.label}</div>
+                        <DtIcon className="text-lg sm:text-xl text-carelink-teal mx-auto mb-1" />
+                        <div className="font-semibold text-carelink-navy text-xs sm:text-sm">{dtConfig.label}</div>
                       </button>
                     );
                   })}
                 </div>
-              ) : deliveryTypes.length === 1 && (
+              ) : deliveryTypes.length === 1 ? (
                 <div className="flex items-center gap-3 text-carelink-navy">
                   {(() => { const DtIcon = DELIVERY_TYPES[deliveryTypes[0]]?.icon || FaMapMarkerAlt; return <DtIcon className="text-lg text-carelink-teal" />; })()}
                   <span className="font-medium">{DELIVERY_TYPES[deliveryTypes[0]]?.label}</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 text-carelink-navy">
+                  <FaMapMarkerAlt className="text-lg text-carelink-teal" />
+                  <span className="font-medium text-sm text-carelink-gray">יתואם עם הספק</span>
                 </div>
               )}
             </FormSection>
