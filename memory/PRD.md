@@ -8,17 +8,43 @@ A full-stack service marketplace platform (CareLink) allowing users to find and 
 - **Backend:** Python, FastAPI, Motor (async MongoDB)
 - **Database:** MongoDB Atlas
 
-## Core Architecture
-- Frontend: /app/frontend (port 3000)
-- Backend: /app/backend (port 8001, prefix /api)
-- All API calls via REACT_APP_BACKEND_URL
+## Architecture (Post-Refactoring)
+```
+/app/backend/
+  server.py              # Slim 63 lines - imports & includes routers
+  app/
+    __init__.py
+    database.py           # MongoDB connection (client, db)
+    models.py             # All Pydantic models
+    utils.py              # Shared helpers (auth, email, push, notifications)
+    routers/
+      __init__.py
+      auth.py             # Auth (register, login, session, forgot-password)
+      providers.py        # Provider CRUD, search, profiles
+      services.py         # Service CRUD
+      requests.py         # Service requests & offers
+      bookings.py         # Booking lifecycle
+      reviews.py          # Review system (with admin moderation)
+      favorites.py        # Provider favorites
+      chat.py             # Chat rooms & messages
+      notifications.py    # Notification CRUD
+      admin.py            # Admin dashboard (users, providers, settings, pages)
+      subscriptions.py    # Subscription plans & management
+      clinics.py          # Clinic management
+      team.py             # Team member management
+      subscriptions_upgrade.py  # Upgrade/cancel flows
+      push.py             # Push notifications (VAPID)
+      uploads.py          # File uploads
+      verification.py     # User/provider document verification
+      contact.py          # Contact form
+```
 
 ## Implemented Features (Complete)
 - User/Provider/Admin role system with document verification
 - Advanced search filtering (providers & services)
-- Dynamic multi-step booking form (home_visit, clinic_visit, video_call, phone_call, hourly, product)
-- Complete booking lifecycle (pending → confirmed → completed/cancelled)
-- Moderated review system (admin approval required)
+- Dynamic multi-step booking form
+- Complete booking lifecycle (pending -> confirmed -> completed/cancelled)
+- Moderated review system (admin approval)
 - 3-tier subscription model (Free, Pro, Gold) with 30-day free trial
 - User-provider chat system
 - Email notifications (SMTP/Gmail)
@@ -28,9 +54,9 @@ A full-stack service marketplace platform (CareLink) allowing users to find and 
 - Dynamic footer links from admin
 - Clinics & Team management infrastructure
 
-## P0 Bugs Fixed (Feb 24, 2026)
-1. **Booking "Confirm and Book" button unresponsive** - Frontend sent service_address as nested object but backend expected flat string fields. Fixed in BookService.js handleBooking().
-2. **Chat messages not appearing** - other_user enrichment failed silently, unread_count never computed. Fixed in server.py chat endpoints.
+## Completed Tasks
+- **Feb 24, 2026:** Fixed P0 bugs - booking button + chat messages
+- **Feb 25, 2026:** P1 Backend refactoring - split 7656-line server.py into 18 routers + shared modules. 100% regression test pass rate (22/22 backend, all frontend pages).
 
 ## Mocked/Pending Integrations
 - PayPal: MOCKED (awaiting API keys)
@@ -42,7 +68,6 @@ A full-stack service marketplace platform (CareLink) allowing users to find and 
 - Provider: provider@carelink.co.il / password
 
 ## Backlog (Prioritized)
-- **P1:** Backend refactoring - split monolithic server.py into routers
 - **P2:** PayPal integration (blocked on API keys)
 - **P3:** Provider image gallery
 - **P4:** SMS reminders
