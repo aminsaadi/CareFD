@@ -336,8 +336,8 @@ const BookService = () => {
         bookingData.shipping_postal_code = shippingAddress.postalCode;
       }
 
-      // Contact person
-      if (needsContact && contactPerson.name) {
+      // Contact person - always sent
+      if (contactPerson.name) {
         bookingData.is_contact_same_as_requester = contactPerson.relationship === 'self';
         bookingData.contact_person_name = contactPerson.name;
         bookingData.contact_person_phone = contactPerson.phone;
