@@ -147,7 +147,7 @@ class TestProviderRequestChangeEndpoint:
             "password": PROVIDER_PASSWORD
         })
         if response.status_code == 200:
-            return response.json().get("token")
+            return response.json().get("session_token")
         return None
         
     def get_user_token(self):
@@ -157,7 +157,7 @@ class TestProviderRequestChangeEndpoint:
             "password": USER_PASSWORD
         })
         if response.status_code == 200:
-            return response.json().get("token")
+            return response.json().get("session_token")
         return None
         
     def test_provider_can_request_date_change(self):
