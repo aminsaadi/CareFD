@@ -10,6 +10,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import ProviderSubscription from '../components/provider/ProviderSubscription';
 import ProviderClinics from '../components/provider/ProviderClinics';
 import ProviderTeam from '../components/provider/ProviderTeam';
+import BookingDetailsModal from '../components/provider/BookingDetailsModal';
 import api from '../utils/api';
 import { toast } from 'sonner';
 import { 
