@@ -243,6 +243,10 @@ const BookService = () => {
   };
 
   const validateStep2 = () => {
+    if (!contactPerson.name || !contactPerson.phone) {
+      toast.error('אנא מלא שם וטלפון של המזמין');
+      return false;
+    }
     if (needsAddress && (!serviceAddress.street || !serviceAddress.city)) {
       toast.error('אנא מלא כתובת מלאה');
       return false;
