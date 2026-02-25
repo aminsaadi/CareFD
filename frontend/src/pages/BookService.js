@@ -124,6 +124,13 @@ const BookService = () => {
         setSelectedDeliveryType(deliveryTypes[0]);
       }
       
+      // Set custom hours to service minimum
+      if (foundService.minimum_hours) {
+        setCustomHours(foundService.minimum_hours);
+      } else {
+        setCustomHours(4);
+      }
+      
       const providerResponse = await api.get(`/providers/${foundService.provider_id}`);
       setProvider(providerResponse.data);
       
