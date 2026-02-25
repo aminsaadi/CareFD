@@ -351,9 +351,9 @@ class ServiceCreate(BaseModel):
     shipping_cost: Optional[float] = None
     free_shipping_above: Optional[float] = None
     stock_quantity: Optional[int] = None
-
-
-# ==================== REQUEST & OFFER MODELS ====================
+    num_sessions: Optional[int] = None
+    series_price: Optional[float] = None
+    session_duration_minutes: Optional[int] = None
 
 class RequestStatus:
     OPEN = "open"
