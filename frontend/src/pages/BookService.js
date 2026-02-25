@@ -80,7 +80,7 @@ const BookService = () => {
   const [selectedTime, setSelectedTime] = useState('');
   const [skipTimeSelection, setSkipTimeSelection] = useState(false);
   const [selectedShift, setSelectedShift] = useState(null);
-  const [customHours, setCustomHours] = useState(4);
+  const [customHours, setCustomHours] = useState(null);
   const [selectedPlatform, setSelectedPlatform] = useState('');
   const [selectedDeliveryType, setSelectedDeliveryType] = useState('');
   const [notes, setNotes] = useState('');
