@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   FaBell, FaTimes, FaCheck, FaCalendarCheck, FaComments, 
-  FaStar, FaBullhorn, FaCheckCircle, FaTrash
+  FaStar, FaBullhorn, FaCheckCircle, FaTrash, FaExchangeAlt
 } from 'react-icons/fa';
-import api from '../utils/api';
+import { useNotifications } from '../context/NotificationContext';
 import { formatDistanceToNow } from 'date-fns';
 import { he } from 'date-fns/locale';
 
@@ -13,7 +13,10 @@ const notificationIcons = {
   booking_confirmed: FaCheckCircle,
   booking_cancelled: FaTimes,
   booking_completed: FaCheck,
+  booking_provider_completed: FaCheckCircle,
+  booking_change_requested: FaExchangeAlt,
   message_new: FaComments,
+  chat_message: FaComments,
   offer_new: FaBullhorn,
   offer_accepted: FaCheckCircle,
   review_new: FaStar,
@@ -25,7 +28,10 @@ const notificationColors = {
   booking_confirmed: 'bg-green-100 text-green-600',
   booking_cancelled: 'bg-red-100 text-red-600',
   booking_completed: 'bg-green-100 text-green-600',
+  booking_provider_completed: 'bg-purple-100 text-purple-600',
+  booking_change_requested: 'bg-amber-100 text-amber-600',
   message_new: 'bg-purple-100 text-purple-600',
+  chat_message: 'bg-purple-100 text-purple-600',
   offer_new: 'bg-amber-100 text-amber-600',
   offer_accepted: 'bg-green-100 text-green-600',
   review_new: 'bg-yellow-100 text-yellow-600',
@@ -33,10 +39,8 @@ const notificationColors = {
 };
 
 const NotificationBell = () => {
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
