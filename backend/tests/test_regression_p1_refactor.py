@@ -156,10 +156,14 @@ class TestBookingsRouterEndpoints:
     
     def test_create_booking(self, user_token):
         """POST /api/bookings - Create a booking"""
+        import random
+        # Use random time to avoid conflicts
+        random_hour = random.randint(8, 20)
+        random_day = random.randint(1, 28)
         booking_data = {
             "service_id": TEST_SERVICE_ID,
-            "booking_date": "2026-03-15T10:00:00",
-            "booking_time": "10:00",
+            "booking_date": f"2026-04-{random_day:02d}T{random_hour:02d}:00:00",
+            "booking_time": f"{random_hour:02d}:00",
             "service_address": "רחוב הרצל 50",
             "service_city": "תל אביב",
             "client_name": "Test Client",
