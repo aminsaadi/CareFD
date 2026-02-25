@@ -46,7 +46,7 @@ const BookingCalendar = ({ onDateSelect, availability = [], bookedSlots = [] }) 
   };
 
   return (
-    <div className="booking-calendar">
+    <div className="booking-calendar overflow-hidden">
       <Calendar
         onChange={handleDateChange}
         value={selectedDate}
@@ -54,6 +54,11 @@ const BookingCalendar = ({ onDateSelect, availability = [], bookedSlots = [] }) 
         tileClassName={tileClassName}
         minDate={new Date()}
         className="carelink-calendar"
+        locale="he-IL"
+        formatShortWeekday={(locale, date) => {
+          const days = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];
+          return days[date.getDay()];
+        }}
       />
     </div>
   );
