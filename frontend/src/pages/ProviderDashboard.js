@@ -2087,6 +2087,16 @@ const ProviderDashboard = () => {
         confirmText="אישור"
         cancelText="ביטול"
       />
+
+      {/* Booking Details Modal */}
+      {selectedBooking && (
+        <BookingDetailsModal
+          booking={selectedBooking}
+          provider={provider}
+          onClose={() => setSelectedBooking(null)}
+          onRefresh={fetchDashboardData}
+        />
+      )}
     </div>
   );
 };
