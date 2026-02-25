@@ -52,6 +52,7 @@ const availableSpecializations = [
 const ProviderDashboard = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [provider, setProvider] = useState(null);
   const [bookings, setBookings] = useState([]);
