@@ -39,7 +39,7 @@ class TestBookingDetailsEndpoint:
             "password": password
         })
         if response.status_code == 200:
-            return response.json().get("token")
+            return response.json().get("session_token")
         return None
     
     def test_provider_can_get_booking_details(self):
