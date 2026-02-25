@@ -61,6 +61,7 @@ const ProviderDashboard = () => {
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
   
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState({
