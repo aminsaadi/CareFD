@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 import uuid
 
 from app.database import db
-from app.models import NotificationType
+from app.models import NotificationType, UserRole
 from app.utils import get_current_user, send_email_async, create_notification
 
 router = APIRouter()
