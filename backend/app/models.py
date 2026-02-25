@@ -485,6 +485,7 @@ class Booking(BaseModel):
     provider_name: Optional[str] = None
     user_name: Optional[str] = None
     is_guest_booking: bool = False
+    change_requests: List[dict] = []
 
 class BookingCreate(BaseModel):
     service_id: str
@@ -572,6 +573,7 @@ class NotificationType:
     OFFER_NEW = "offer_new"
     OFFER_ACCEPTED = "offer_accepted"
     REVIEW_NEW = "review_new"
+    BOOKING_CHANGE_REQUESTED = "booking_change_requested"
     SYSTEM = "system"
 
 class Notification(BaseModel):
