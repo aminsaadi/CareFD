@@ -759,8 +759,8 @@ const BookService = () => {
 
           {/* ===== RIGHT: Sticky Summary ===== */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-carelink-teal sticky top-4" data-testid="order-summary">
-              <h3 className="font-bold text-lg text-carelink-navy mb-4">סיכום הזמנה</h3>
+            <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border-2 border-carelink-teal sticky top-4" data-testid="order-summary">
+              <h3 className="font-bold text-base sm:text-lg text-carelink-navy mb-4">סיכום הזמנה</h3>
               
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between"><span className="text-carelink-gray">שירות:</span><span className="font-medium text-carelink-navy">{service.name}</span></div>
