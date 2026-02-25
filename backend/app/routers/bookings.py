@@ -511,7 +511,7 @@ async def request_booking_change(
     if client_user and client_user.get("email"):
         await send_email_async(
             client_user["email"],
-            f"CareLink - בקשה לשינוי מועד הזמנה",
+            "CareLink - בקשה לשינוי מועד הזמנה",
             f"""
             <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <div style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 30px; border-radius: 15px 15px 0 0; text-align: center;">
