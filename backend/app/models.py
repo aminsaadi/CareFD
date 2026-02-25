@@ -325,6 +325,10 @@ class Service(BaseModel):
     shipping_cost: Optional[float] = None
     free_shipping_above: Optional[float] = None
     stock_quantity: Optional[int] = None
+    # Series specific
+    num_sessions: Optional[int] = None           # מספר מפגשים בסדרה
+    series_price: Optional[float] = None          # מחיר כולל לסדרה (אם שונה מ-price * num_sessions)
+    session_duration_minutes: Optional[int] = None # משך מפגש בודד
     is_active: bool = True
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
