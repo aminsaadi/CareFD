@@ -346,6 +346,9 @@ class ServiceCreate(BaseModel):
     weekend_price_addition: Optional[float] = None
     has_travel_cost: bool = False
     travel_cost: Optional[float] = None
+
+
+# ==================== REQUEST & OFFER MODELS ====================
     travel_cost_per_km: Optional[float] = None
     has_shipping: bool = False
     shipping_cost: Optional[float] = None
