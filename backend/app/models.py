@@ -513,6 +513,7 @@ class BookingCreate(BaseModel):
     selected_shift: Optional[str] = None
     platform: Optional[str] = None
     total_price: Optional[float] = None
+    num_sessions: Optional[int] = None
     notes: Optional[str] = None
     special_requirements: Optional[str] = None
     guest_booking: bool = False
