@@ -493,9 +493,11 @@ class BookingCreate(BaseModel):
     shipping_city: Optional[str] = None
     shipping_postal_code: Optional[str] = None
     hours_booked: Optional[float] = None
+    selected_shift: Optional[str] = None
+    platform: Optional[str] = None
+    total_price: Optional[float] = None
     notes: Optional[str] = None
     special_requirements: Optional[str] = None
-    guest_booking: bool = False
     guest_name: Optional[str] = None
     guest_email: Optional[str] = None
     guest_phone: Optional[str] = None
