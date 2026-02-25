@@ -156,12 +156,9 @@ const BookService = () => {
   const deliveryConfig = DELIVERY_TYPES[selectedDeliveryType] || {};
   const isHourly = category === 'hourly';
   const isSeries = category === 'series';
-  const isProduct = category === 'product';
-  const needsTimeSlots = !isProduct && !deliveryConfig.requiresShipping;
   const needsShifts = isHourly;
   const needsPlatform = deliveryConfig.showPlatformSelect;
   const needsAddress = deliveryConfig.requiresAddress;
-  const needsContact = deliveryConfig.requiresContact;
   const needsShipping = deliveryConfig.requiresShipping;
 
   // Calculate total price
