@@ -332,6 +332,9 @@ const BookService = () => {
         notes,
         delivery_type: service.service_type,
         hours_booked: selectedShift?.duration || customHours || null,
+        selected_shift: selectedShift?.id || null,
+        platform: selectedPlatform || null,
+        total_price: calculateTotalPrice(),
       };
 
       // Flatten address fields for backend
