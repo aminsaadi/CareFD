@@ -18,7 +18,7 @@ import requests
 import os
 from datetime import datetime, timedelta
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://carelink-search.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://dashboard-features-1.preview.emergentagent.com').rstrip('/')
 
 # Test service ID for home_visit service
 TEST_SERVICE_ID = "srv_2d5267fcaebb"

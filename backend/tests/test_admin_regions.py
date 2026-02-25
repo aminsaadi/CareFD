@@ -8,7 +8,7 @@ import os
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://carelink-search.preview.emergentagent.com"
+    BASE_URL = "https://dashboard-features-1.preview.emergentagent.com"
 
 # Admin credentials
 ADMIN_EMAIL = "admin@carelink.co.il"
