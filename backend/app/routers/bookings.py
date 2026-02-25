@@ -165,6 +165,7 @@ async def create_booking(
         hours_booked=hours_booked,
         selected_shift=booking_data.selected_shift,
         platform=booking_data.platform,
+        num_sessions=booking_data.num_sessions,
         notes=booking_data.notes,
         special_requirements=booking_data.special_requirements,
         base_price=service.get("price", 0),
