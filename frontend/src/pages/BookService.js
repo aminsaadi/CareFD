@@ -420,16 +420,20 @@ const BookService = () => {
           <div className="lg:col-span-2 space-y-5">
 
             {/* 1. SERVICE DETAILS */}
-            <div className="bg-white rounded-2xl shadow-lg p-5 border-2 border-carelink-teal" data-testid="service-header">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-carelink-teal-pale rounded-xl flex items-center justify-center flex-shrink-0">
-                  <CategoryIcon className="text-2xl text-carelink-teal" />
+            <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-5 border-2 border-carelink-teal" data-testid="service-header">
+              <div className="flex items-start gap-3 sm:gap-4">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-carelink-teal-pale rounded-xl flex items-center justify-center flex-shrink-0">
+                  <CategoryIcon className="text-xl sm:text-2xl text-carelink-teal" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-xl font-bold text-carelink-navy truncate">{service.name}</h1>
-                  <p className="text-carelink-gray text-sm">{provider.business_name} &bull; {categoryConfig.label}</p>
+                  <h1 className="text-base sm:text-xl font-bold text-carelink-navy leading-tight">{service.name}</h1>
+                  <p className="text-carelink-gray text-sm mt-0.5">{provider.business_name} &bull; {categoryConfig.label}</p>
+                  <div className="mt-2 sm:hidden">
+                    <span className="text-xl font-bold text-carelink-teal">₪{isSeries && service.series_price ? service.series_price : service.price}</span>
+                    <span className="text-xs text-carelink-gray mr-1">{isSeries && service.series_price ? 'לסדרה' : categoryConfig.pricingLabel}</span>
+                  </div>
                 </div>
-                <div className="text-left flex-shrink-0">
+                <div className="text-left flex-shrink-0 hidden sm:block">
                   <div className="text-2xl font-bold text-carelink-teal">₪{isSeries && service.series_price ? service.series_price : service.price}</div>
                   <span className="text-xs text-carelink-gray">{isSeries && service.series_price ? 'לסדרה' : categoryConfig.pricingLabel}</span>
                 </div>
