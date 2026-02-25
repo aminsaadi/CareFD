@@ -634,11 +634,32 @@ const BookService = () => {
                 </div>
               )}
 
-              {/* Clinic / Hospital → Just info */}
+              {/* Clinic / Hospital → Address + notes */}
               {(selectedDeliveryType === 'clinic' || selectedDeliveryType === 'hospital') && (
-                <div className="flex items-center gap-3 text-sm text-carelink-gray">
-                  <FaInfoCircle className="text-carelink-teal" />
-                  <span>הכתובת תישלח אליך לאחר אישור ההזמנה ע"י הספק</span>
+                <div>
+                  <p className="text-sm font-medium text-carelink-navy mb-3">
+                    {selectedDeliveryType === 'hospital' ? 'כתובת בית החולים / מוסד' : 'כתובת הקליניקה'}
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="sm:col-span-2">
+                      <input type="text" value={serviceAddress.street} placeholder="רחוב ומספר"
+                        onChange={(e) => setServiceAddress({...serviceAddress, street: e.target.value})}
+                        className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                        data-testid="location-street" />
+                    </div>
+                    <input type="text" value={serviceAddress.city} placeholder="עיר"
+                      onChange={(e) => setServiceAddress({...serviceAddress, city: e.target.value})}
+                      className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                      data-testid="location-city" />
+                    <input type="text" value={serviceAddress.floor} placeholder="קומה / מחלקה / חדר"
+                      onChange={(e) => setServiceAddress({...serviceAddress, floor: e.target.value})}
+                      className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
+                    <div className="sm:col-span-2">
+                      <textarea value={serviceAddress.specialInstructions} placeholder="הערות (כניסה, חניה, הנחיות מיוחדות...)"
+                        onChange={(e) => setServiceAddress({...serviceAddress, specialInstructions: e.target.value})}
+                        className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none resize-none text-sm" rows="2" />
+                    </div>
+                  </div>
                 </div>
               )}
 
