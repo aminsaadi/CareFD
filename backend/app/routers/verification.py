@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Header, Request
+from fastapi import APIRouter, HTTPException, Header, Request, UploadFile, File
 from typing import Optional, List
 from datetime import datetime, timezone
 import uuid
