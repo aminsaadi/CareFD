@@ -1051,6 +1051,7 @@ const Dashboard = () => {
           <div 
             className="bg-white rounded-2xl max-w-lg w-full p-6 max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
+            data-testid="user-booking-details-modal"
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-carelink-navy">פרטי ההזמנה</h3>
@@ -1067,6 +1068,9 @@ const Dashboard = () => {
               <div className="bg-carelink-teal-pale/30 rounded-xl p-4">
                 <h4 className="font-bold text-carelink-navy mb-2">{showBookingDetails.service_name || 'שירות'}</h4>
                 <p className="text-sm text-carelink-gray">{showBookingDetails.provider_name || 'ספק'}</p>
+                {showBookingDetails.booking_number && (
+                  <p className="text-xs text-carelink-gray mt-1">מספר הזמנה: {showBookingDetails.booking_number}</p>
+                )}
               </div>
 
               {/* Booking Details */}
@@ -1074,13 +1078,13 @@ const Dashboard = () => {
                 <div>
                   <p className="text-sm text-carelink-gray mb-1">תאריך</p>
                   <p className="font-medium text-carelink-navy">
-                    {new Date(showBookingDetails.booking_date).toLocaleDateString('he-IL')}
+                    {showBookingDetails.booking_date ? new Date(showBookingDetails.booking_date).toLocaleDateString('he-IL') : 'יתואם'}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-carelink-gray mb-1">שעה</p>
                   <p className="font-medium text-carelink-navy">
-                    {showBookingDetails.booking_time || new Date(showBookingDetails.booking_date).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
+                    {showBookingDetails.booking_time || 'לא צוין'}
                   </p>
                 </div>
               </div>
@@ -1094,34 +1098,49 @@ const Dashboard = () => {
               </div>
 
               {/* Price & Payment */}
-              {(showBookingDetails.price || showBookingDetails.total_price) && (
+              {(showBookingDetails.final_price || showBookingDetails.base_price || showBookingDetails.price) && (
                 <div className="bg-green-50 border border-green-200 rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <FaMoneyBillWave className="text-green-600" />
                     <p className="font-bold text-green-700">פרטי תשלום</p>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>
-                      <p className="text-carelink-gray">מחיר</p>
-                      <p className="font-bold text-green-700">₪{showBookingDetails.price || showBookingDetails.total_price}</p>
+                  <div className="space-y-1 text-sm">
+                    {showBookingDetails.base_price && (
+                      <div className="flex justify-between">
+                        <span className="text-carelink-gray">מחיר בסיס:</span>
+                        <span className="font-medium">&#8362;{showBookingDetails.base_price}</span>
+                      </div>
+                    )}
+                    {showBookingDetails.travel_cost > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-carelink-gray">עלות נסיעה:</span>
+                        <span className="font-medium">&#8362;{showBookingDetails.travel_cost}</span>
+                      </div>
+                    )}
+                    {showBookingDetails.weekend_addition > 0 && (
+                      <div className="flex justify-between">
+                        <span className="text-carelink-gray">תוספת סופ"ש:</span>
+                        <span className="font-medium">&#8362;{showBookingDetails.weekend_addition}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between pt-2 border-t border-green-300">
+                      <span className="font-bold text-green-700">סה"כ:</span>
+                      <span className="font-bold text-green-700">&#8362;{showBookingDetails.final_price || showBookingDetails.base_price || showBookingDetails.price}</span>
                     </div>
-                    {showBookingDetails.payment_method && (
-                      <div>
-                        <p className="text-carelink-gray">אמצעי תשלום</p>
-                        <p className="font-medium text-carelink-navy">
-                          {showBookingDetails.payment_method === 'cash' ? 'מזומן' : 
-                           showBookingDetails.payment_method === 'credit_card' ? 'כרטיס אשראי' :
-                           showBookingDetails.payment_method}
-                        </p>
-                      </div>
-                    )}
-                    {showBookingDetails.paid_by && (
-                      <div>
-                        <p className="text-carelink-gray">שולם ע"י</p>
-                        <p className="font-medium text-carelink-navy">{showBookingDetails.paid_by}</p>
-                      </div>
-                    )}
                   </div>
+                </div>
+              )}
+
+              {/* Location */}
+              {showBookingDetails.service_location && (
+                <div className="bg-orange-50 rounded-xl p-4">
+                  <p className="text-sm font-medium text-orange-700 flex items-center gap-1 mb-1">
+                    <FaMapMarkerAlt /> כתובת
+                  </p>
+                  <p className="text-sm text-carelink-navy">
+                    {showBookingDetails.service_location.address}
+                    {showBookingDetails.service_location.city && `, ${showBookingDetails.service_location.city}`}
+                  </p>
                 </div>
               )}
 
@@ -1130,6 +1149,77 @@ const Dashboard = () => {
                 <div>
                   <p className="text-sm text-carelink-gray mb-1">הערות</p>
                   <p className="text-carelink-slate bg-gray-50 p-3 rounded-xl">{showBookingDetails.notes}</p>
+                </div>
+              )}
+
+              {/* Change Requests */}
+              {showBookingDetails.change_requests && showBookingDetails.change_requests.length > 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                  <h4 className="font-bold text-amber-700 mb-3 flex items-center gap-2">
+                    <FaExchangeAlt />
+                    בקשות שינוי מועד
+                  </h4>
+                  <div className="space-y-2">
+                    {showBookingDetails.change_requests.map((cr, idx) => (
+                      <div key={idx} className="bg-white rounded-lg p-3 border border-amber-200">
+                        <div className="text-sm">
+                          <p className="font-medium text-carelink-navy mb-1">
+                            {cr.new_date && `תאריך חדש: ${cr.new_date}`}
+                            {cr.new_date && cr.new_time && ' | '}
+                            {cr.new_time && `שעה חדשה: ${cr.new_time}`}
+                          </p>
+                          {cr.reason && <p className="text-xs text-carelink-gray mb-2">{cr.reason}</p>}
+                          {cr.status === 'pending' && (
+                            <div className="flex gap-2 mt-2">
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    await api.put(`/bookings/${showBookingDetails.booking_id}/respond-change`, {
+                                      request_id: cr.request_id,
+                                      action: 'approve'
+                                    });
+                                    toast.success('שינוי המועד אושר!');
+                                    setShowBookingDetails(null);
+                                    fetchDashboardData();
+                                  } catch { toast.error('שגיאה באישור השינוי'); }
+                                }}
+                                className="bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-green-600 transition"
+                                data-testid={`approve-change-${cr.request_id}`}
+                              >
+                                <FaCheckCircle className="inline ml-1" />
+                                אשר שינוי
+                              </button>
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    await api.put(`/bookings/${showBookingDetails.booking_id}/respond-change`, {
+                                      request_id: cr.request_id,
+                                      action: 'reject'
+                                    });
+                                    toast.success('בקשת השינוי נדחתה');
+                                    setShowBookingDetails(null);
+                                    fetchDashboardData();
+                                  } catch { toast.error('שגיאה בדחיית השינוי'); }
+                                }}
+                                className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-red-600 transition"
+                                data-testid={`reject-change-${cr.request_id}`}
+                              >
+                                <FaTimes className="inline ml-1" />
+                                דחה שינוי
+                              </button>
+                            </div>
+                          )}
+                          {cr.status !== 'pending' && (
+                            <span className={`text-xs px-2 py-0.5 rounded ${
+                              cr.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                            }`}>
+                              {cr.status === 'approved' ? 'אושר' : 'נדחה'}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
