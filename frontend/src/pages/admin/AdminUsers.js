@@ -260,6 +260,7 @@ const AdminUsers = () => {
                   <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">תפקיד</th>
                   <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">תאריך הצטרפות</th>
                   <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">סטטוס</th>
+                  <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">אימות</th>
                   <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">פעולות</th>
                 </tr>
               </thead>
