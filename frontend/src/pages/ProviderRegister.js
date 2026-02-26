@@ -237,13 +237,13 @@ const ProviderRegister = () => {
                         minLength="6"
                         value={formData.password}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 pr-12 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
+                        className="w-full px-12 py-3 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
                         placeholder="לפחות 6 תווים"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition"
+                        className="absolute right-12 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition"
                         tabIndex={-1}
                       >
                         {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
