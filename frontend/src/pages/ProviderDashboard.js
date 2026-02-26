@@ -63,6 +63,7 @@ const ProviderDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [showPw, setShowPw] = useState({ current: false, new_pw: false, confirm: false });
   
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState({
