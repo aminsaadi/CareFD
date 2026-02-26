@@ -522,7 +522,7 @@ async def admin_update_provider(
     allowed_fields = [
         "business_name", "email", "phone", "address", "city", "bio",
         "experience_years", "years_experience", "specializations", "languages", "is_verified",
-        "is_recommended", "provider_type", "license_number", "location",
+        "is_recommended", "provider_type", "license_number", "location", "is_active",
         # Complete profile editing fields
         "profession_title", "gender", "about", "description", "profile_image", "profile_color",
         "expertise", "target_audience", "service_areas", "availability", "website",
