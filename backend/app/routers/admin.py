@@ -515,6 +515,39 @@ async def admin_get_all_providers(
     }
 
 
+@router.get("/admin/providers/{provider_id}")
+async def admin_get_provider_details(
+    provider_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get single provider details"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    provider = await db.providers.find_one({"provider_id": provider_id}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+    
+    # Count services
+    services_count = await db.services.count_documents({"provider_id": provider_id})
+    provider["services_count"] = services_count
+    
+    # Count bookings
+    bookings_count = await db.bookings.count_documents({"provider_id": provider_id})
+    provider["bookings_count"] = bookings_count
+    
+    # Get user info
+    if provider.get("user_id"):
+        user_doc = await db.users.find_one({"user_id": provider["user_id"]}, {"_id": 0, "password_hash": 0})
+        if user_doc:
+            provider["user_email"] = user_doc.get("email")
+            provider["user_name"] = user_doc.get("name")
+    
+    return provider
+
+
 @router.put("/admin/providers/{provider_id}")
 async def admin_update_provider(
     provider_id: str,
