@@ -624,13 +624,18 @@ const AdminUsers = () => {
             </p>
             <div className="mb-6">
               <label className="block text-sm font-medium text-carelink-navy mb-2">סיסמה חדשה</label>
-              <input
-                type="password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="הזן סיסמה חדשה (מינימום 6 תווים)"
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
-              />
+              <div className="relative">
+                <input
+                  type={showAdminPw ? 'text' : 'password'}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="הזן סיסמה חדשה (מינימום 6 תווים)"
+                  className="w-full px-4 py-3 pl-12 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                />
+                <button type="button" onClick={() => setShowAdminPw(!showAdminPw)} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                  {showAdminPw ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                </button>
+              </div>
             </div>
             <div className="flex gap-3">
               <button
