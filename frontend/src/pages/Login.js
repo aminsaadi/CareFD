@@ -41,7 +41,15 @@ const Login = () => {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError(err.response?.data?.detail || t('errorOccurred'));
+      if (err.response?.data?.detail) {
+        setError(err.response.data.detail);
+      } else if (err.response?.status) {
+        setError(`שגיאת שרת (${err.response.status}). נסה שוב מאוחר יותר.`);
+      } else if (err.code === 'ERR_NETWORK') {
+        setError('שגיאת תקשורת - לא ניתן להתחבר לשרת. בדוק את חיבור האינטרנט.');
+      } else {
+        setError('אירעה שגיאה לא צפויה. נסה שוב.');
+      }
     } finally {
       setLoading(false);
     }
