@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../components/Logo';
-import { FaEnvelope, FaLock, FaArrowLeft, FaUserMd, FaUsers, FaTimes } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaArrowLeft, FaUserMd, FaUsers, FaTimes, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import api from '../utils/api';
 import { toast } from 'sonner';

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../components/Logo';
-import { FaEnvelope, FaLock, FaUser, FaArrowLeft, FaUserMd, FaUsers, FaCheckCircle } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaUser, FaArrowLeft, FaUserMd, FaUsers, FaCheckCircle, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 
 const Register = () => {
