@@ -22,6 +22,7 @@ const AdminUsers = () => {
   const [showMessageModal, setShowMessageModal] = useState(null);
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(null);
   const [newPassword, setNewPassword] = useState('');
+  const [showAdminPw, setShowAdminPw] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0 });
