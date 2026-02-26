@@ -30,6 +30,7 @@ const ProviderRegister = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const providerTypes = [
     { value: 'individual', label: 'עצמאי', icon: FaUserMd, desc: 'מטפל/ת עצמאי/ת' },
@@ -223,14 +224,22 @@ const ProviderRegister = () => {
                       <FaLock className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
                       <input
                         name="password"
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         required
                         minLength="6"
                         value={formData.password}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 pr-12 rtl:pr-4 rtl:pl-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
+                        className="w-full px-4 py-3 pr-12 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
                         placeholder="לפחות 6 תווים"
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition"
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                      </button>
                     </div>
                   </div>
 
