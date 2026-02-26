@@ -969,33 +969,48 @@ const Dashboard = () => {
                         <div className="space-y-4 max-w-md">
                           <div>
                             <label className="block text-sm font-medium text-carelink-navy mb-2">סיסמה נוכחית</label>
-                            <input
-                              type="password"
-                              value={passwordForm.current_password}
-                              onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
-                              data-testid="current-password-input"
-                            />
+                            <div className="relative">
+                              <input
+                                type={showPw.current ? 'text' : 'password'}
+                                value={passwordForm.current_password}
+                                onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })}
+                                className="w-full px-4 py-3 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                data-testid="current-password-input"
+                              />
+                              <button type="button" onClick={() => setShowPw(p => ({...p, current: !p.current}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                                {showPw.current ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                              </button>
+                            </div>
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-carelink-navy mb-2">סיסמה חדשה</label>
-                            <input
-                              type="password"
-                              value={passwordForm.new_password}
-                              onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
-                              data-testid="new-password-input"
-                            />
+                            <div className="relative">
+                              <input
+                                type={showPw.new_pw ? 'text' : 'password'}
+                                value={passwordForm.new_password}
+                                onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
+                                className="w-full px-4 py-3 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                data-testid="new-password-input"
+                              />
+                              <button type="button" onClick={() => setShowPw(p => ({...p, new_pw: !p.new_pw}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                                {showPw.new_pw ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                              </button>
+                            </div>
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-carelink-navy mb-2">אישור סיסמה חדשה</label>
-                            <input
-                              type="password"
-                              value={passwordForm.confirm_password}
-                              onChange={(e) => setPasswordForm({ ...passwordForm, confirm_password: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
-                              data-testid="confirm-password-input"
-                            />
+                            <div className="relative">
+                              <input
+                                type={showPw.confirm ? 'text' : 'password'}
+                                value={passwordForm.confirm_password}
+                                onChange={(e) => setPasswordForm({ ...passwordForm, confirm_password: e.target.value })}
+                                className="w-full px-4 py-3 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                data-testid="confirm-password-input"
+                              />
+                              <button type="button" onClick={() => setShowPw(p => ({...p, confirm: !p.confirm}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                                {showPw.confirm ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                              </button>
+                            </div>
                           </div>
                           <button 
                             onClick={handleChangePassword}
