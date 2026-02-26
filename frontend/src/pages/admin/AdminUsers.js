@@ -267,13 +267,13 @@ const AdminUsers = () => {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center">
+                    <td colSpan={8} className="py-12 text-center">
                       <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
                     </td>
                   </tr>
                 ) : users.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-carelink-gray">
+                    <td colSpan={8} className="py-12 text-center text-carelink-gray">
                       לא נמצאו משתמשים
                     </td>
                   </tr>
