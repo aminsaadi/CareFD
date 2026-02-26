@@ -322,18 +322,31 @@ const AdminUsers = () => {
                       </td>
                       <td className="py-4 px-4">
                         {user.is_suspended ? (
-                          <span className="inline-flex items-center gap-1 text-red-500 text-sm">
-                            <FiSlash size={14} />
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700" data-testid={`user-status-${user.user_id}`}>
+                            <FiSlash size={12} />
                             מושעה
                           </span>
-                        ) : user.is_verified ? (
-                          <span className="inline-flex items-center gap-1 text-emerald-600 text-sm">
-                            <FiCheck size={14} />
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700" data-testid={`user-status-${user.user_id}`}>
+                            <FiCheckCircle size={12} />
+                            פעיל
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-4 px-4">
+                        {user.verification_status === 'verified' || user.is_verified ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700" data-testid={`user-verify-${user.user_id}`}>
+                            <FiCheck size={12} />
                             מאומת
                           </span>
+                        ) : user.verification_status === 'documents_submitted' ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700" data-testid={`user-verify-${user.user_id}`}>
+                            <FiClock size={12} />
+                            בתהליך
+                          </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-carelink-gray text-sm">
-                            <FiX size={14} />
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-500" data-testid={`user-verify-${user.user_id}`}>
+                            <FiX size={12} />
                             לא מאומת
                           </span>
                         )}
