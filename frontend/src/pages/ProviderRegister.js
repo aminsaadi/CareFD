@@ -6,7 +6,7 @@ import Logo from '../components/Logo';
 import { 
   FaEnvelope, FaLock, FaUser, FaArrowLeft, FaUserMd, FaBuilding, 
   FaPhone, FaMapMarkerAlt, FaCheckCircle, FaBriefcaseMedical,
-  FaUsers, FaCalendarCheck, FaChartLine
+  FaUsers, FaCalendarCheck, FaChartLine, FaEye, FaEyeSlash
 } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 
