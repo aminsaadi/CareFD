@@ -1,16 +1,11 @@
 # CareLink - Service Marketplace Platform
 
 ## Original Problem Statement
-A full-stack healthcare service marketplace platform (CareLink) allowing users to find and book services from providers. Hebrew-only, targeting carelink.co.il.
-
-## Tech Stack
-- Frontend: React, Tailwind CSS, Shadcn/UI, react-router-dom, sonner
-- Backend: Python, FastAPI, Motor (async MongoDB)
-- Database: MongoDB Atlas
+Full-stack healthcare service marketplace (React/FastAPI/MongoDB Atlas). Hebrew-only, targeting carelink.co.il.
 
 ## Architecture
-/app/backend/app/ - database.py, models.py, utils.py, main.py, routers/ (18 files)
-/app/frontend/src/ - context/ (Auth, Notification), components/, pages/
+Backend: /app/backend/app/ (database.py, models.py, utils.py, main.py, routers/ with 18 files)
+Frontend: /app/frontend/src/ (context/, components/, pages/)
 
 ## Implemented Features
 - User/Provider/Admin roles with document verification
@@ -22,12 +17,14 @@ A full-stack healthcare service marketplace platform (CareLink) allowing users t
 - User Dashboard: change request approve/reject
 - Real-time notification system (10s polling, toast popups)
 - Mobile responsive booking form
-- **Admin: Provider deactivation, password reset, user suspend → auto provider deactivation**
+- Admin: Provider deactivation, password reset, user suspend → auto provider deactivation
+- **Admin Users table: separate Status (פעיל/מושעה) and Verification (מאומת/לא מאומת/בתהליך) columns**
 
 ## Completed Tasks
 - Feb 24: Fixed booking button + chat bugs
-- Feb 25: Backend refactoring, Booking Model V2, Dashboard features, Real-time notifications, Mobile booking fix
-- Feb 26: **Admin bugs fixed**: provider deactivation (added is_active to allowed_fields), password reset (added bcrypt import), user suspension auto-deactivates provider
+- Feb 25: Backend refactoring, Booking Model V2, Dashboard features, Notifications, Mobile fix
+- Feb 26: Admin bugs (provider deactivation, password reset, auto-deactivate provider on user suspend)
+- Feb 26: **Admin Users table: split status/verification into 2 columns with badges**
 
 ## Mocked: PayPal, Subscription payments
 
@@ -40,7 +37,3 @@ A full-stack healthcare service marketplace platform (CareLink) allowing users t
 - P2: PayPal integration (blocked on API keys)
 - P3: Provider image gallery
 - P4: SMS reminders
-
-## Test Reports
-- iteration_28.json - Dashboard features (15/15)
-- iteration_29.json - Notification system (12/12)
