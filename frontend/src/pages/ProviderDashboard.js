@@ -2024,33 +2024,48 @@ const ProviderDashboard = () => {
                         <div className="space-y-4 max-w-md">
                           <div>
                             <label className="block text-sm font-medium text-carelink-navy mb-2">סיסמה נוכחית</label>
-                            <input
-                              type="password"
-                              value={userInfoForm.current_password}
-                              onChange={(e) => setUserInfoForm({ ...userInfoForm, current_password: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
-                              placeholder="הזן סיסמה נוכחית"
-                            />
+                            <div className="relative">
+                              <input
+                                type={showPw.current ? 'text' : 'password'}
+                                value={userInfoForm.current_password}
+                                onChange={(e) => setUserInfoForm({ ...userInfoForm, current_password: e.target.value })}
+                                className="w-full px-4 py-3 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                placeholder="הזן סיסמה נוכחית"
+                              />
+                              <button type="button" onClick={() => setShowPw(p => ({...p, current: !p.current}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                                {showPw.current ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                              </button>
+                            </div>
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-carelink-navy mb-2">סיסמה חדשה</label>
-                            <input
-                              type="password"
-                              value={userInfoForm.new_password}
-                              onChange={(e) => setUserInfoForm({ ...userInfoForm, new_password: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
-                              placeholder="הזן סיסמה חדשה (לפחות 6 תווים)"
-                            />
+                            <div className="relative">
+                              <input
+                                type={showPw.new_pw ? 'text' : 'password'}
+                                value={userInfoForm.new_password}
+                                onChange={(e) => setUserInfoForm({ ...userInfoForm, new_password: e.target.value })}
+                                className="w-full px-4 py-3 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                placeholder="הזן סיסמה חדשה (לפחות 6 תווים)"
+                              />
+                              <button type="button" onClick={() => setShowPw(p => ({...p, new_pw: !p.new_pw}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                                {showPw.new_pw ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                              </button>
+                            </div>
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-carelink-navy mb-2">אימות סיסמה חדשה</label>
-                            <input
-                              type="password"
-                              value={userInfoForm.confirm_password}
-                              onChange={(e) => setUserInfoForm({ ...userInfoForm, confirm_password: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
-                              placeholder="הזן שוב את הסיסמה החדשה"
-                            />
+                            <div className="relative">
+                              <input
+                                type={showPw.confirm ? 'text' : 'password'}
+                                value={userInfoForm.confirm_password}
+                                onChange={(e) => setUserInfoForm({ ...userInfoForm, confirm_password: e.target.value })}
+                                className="w-full px-4 py-3 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                placeholder="הזן שוב את הסיסמה החדשה"
+                              />
+                              <button type="button" onClick={() => setShowPw(p => ({...p, confirm: !p.confirm}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                                {showPw.confirm ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                              </button>
+                            </div>
                           </div>
                           <button
                             onClick={handleChangePassword}
