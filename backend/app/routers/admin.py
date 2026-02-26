@@ -222,6 +222,15 @@ async def admin_suspend_user(
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="User not found")
     
+    # When suspending a user, also deactivate their provider profile
+    if is_suspended:
+        provider = await db.providers.find_one({"user_id": user_id}, {"_id": 0})
+        if provider:
+            await db.providers.update_one(
+                {"user_id": user_id},
+                {"$set": {"is_active": False, "updated_at": datetime.now(timezone.utc).isoformat()}}
+            )
+    
     # Send notification to user
     action = "הושעה" if is_suspended else "שוחרר מהשעיה"
     await create_notification(
