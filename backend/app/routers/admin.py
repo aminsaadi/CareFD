@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Header, Request
 from typing import Optional, List
 from datetime import datetime, timezone, timedelta
 import uuid
+import bcrypt
 
 from app.database import db
 from app.models import *
