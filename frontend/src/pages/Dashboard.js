@@ -41,6 +41,7 @@ const Dashboard = () => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+  const [showPw, setShowPw] = useState({ current: false, new_pw: false, confirm: false });
   const fileInputRef = useRef(null);
   
   // User settings form
