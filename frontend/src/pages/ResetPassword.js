@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import Logo from '../components/Logo';
-import { FaLock, FaArrowLeft, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { FaLock, FaArrowLeft, FaCheckCircle, FaTimesCircle, FaEye, FaEyeSlash } from 'react-icons/fa';
 import api from '../utils/api';
 import { toast } from 'sonner';
 
@@ -13,6 +13,8 @@ const ResetPassword = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [validating, setValidating] = useState(true);
   const [tokenValid, setTokenValid] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
@@ -134,14 +136,17 @@ const ResetPassword = () => {
                   <div className="relative">
                     <FaLock className="absolute top-1/2 -translate-y-1/2 right-4 text-carelink-gray" />
                     <input
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-4 py-3 pr-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
+                      className="w-full px-4 py-3 pr-12 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
                       placeholder="לפחות 6 תווים"
                       required
                       minLength={6}
                     />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                      {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                    </button>
                   </div>
                 </div>
                 
@@ -150,13 +155,16 @@ const ResetPassword = () => {
                   <div className="relative">
                     <FaLock className="absolute top-1/2 -translate-y-1/2 right-4 text-carelink-gray" />
                     <input
-                      type="password"
+                      type={showConfirm ? 'text' : 'password'}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full px-4 py-3 pr-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
+                      className="w-full px-4 py-3 pr-12 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
                       placeholder="הזן שוב את הסיסמה"
                       required
                     />
+                    <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                      {showConfirm ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                    </button>
                   </div>
                 </div>
                 
