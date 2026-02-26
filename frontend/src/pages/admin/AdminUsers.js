@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import {
   FiSearch, FiFilter, FiEdit2, FiTrash2, FiMoreVertical,
   FiUser, FiMail, FiCalendar, FiShield, FiCheck, FiX,
-  FiUserPlus, FiDownload, FiEye, FiMessageSquare, FiSlash,
+  FiUserPlus, FiDownload, FiEye, FiEyeOff, FiMessageSquare, FiSlash,
   FiPhone, FiFileText, FiCheckCircle, FiXCircle, FiClock, FiKey
 } from 'react-icons/fi';
 
