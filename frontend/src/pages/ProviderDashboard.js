@@ -17,7 +17,7 @@ import {
   FaCalendarAlt, FaComments, FaFileAlt, FaStar, FaUser, FaCog,
   FaChevronLeft, FaPlus, FaMapMarkerAlt, FaClock, FaCheckCircle,
   FaHourglass, FaTimes, FaEdit, FaChartBar, FaMoneyBillWave,
-  FaUsers, FaEye, FaBriefcase, FaPhone, FaEnvelope, FaTrash,
+  FaUsers, FaEye, FaEyeSlash, FaBriefcase, FaPhone, FaEnvelope, FaTrash,
   FaHome, FaVideo, FaClinicMedical, FaPhoneAlt, FaSave, FaAward,
   FaWhatsapp, FaGlobe, FaUserTie, FaBell, FaCrown, FaBuilding
 } from 'react-icons/fa';
