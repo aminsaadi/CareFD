@@ -139,12 +139,12 @@ const ResetPassword = () => {
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-4 py-3 pr-12 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
+                      className="w-full px-12 py-3 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
                       placeholder="לפחות 6 תווים"
                       required
                       minLength={6}
                     />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-12 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
                       {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                     </button>
                   </div>
@@ -158,11 +158,11 @@ const ResetPassword = () => {
                       type={showConfirm ? 'text' : 'password'}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full px-4 py-3 pr-12 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
+                      className="w-full px-12 py-3 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
                       placeholder="הזן שוב את הסיסמה"
                       required
                     />
-                    <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                    <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-12 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
                       {showConfirm ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                     </button>
                   </div>
