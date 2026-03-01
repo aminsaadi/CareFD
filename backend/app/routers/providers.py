@@ -210,9 +210,12 @@ async def search_providers(
     """Advanced search for providers with filters"""
     query = {}
     
-    # IMPORTANT: Only show verified/approved providers in public search
-    query["verification_status"] = "verified"
-    query["is_verified"] = True
+    # Only show verified providers in public search
+    # Use $or to handle legacy data where only one field may be set
+    query["$or"] = [
+        {"is_verified": True},
+        {"verification_status": "verified"}
+    ]
     
     # Text search in business_name and description
     if search:
