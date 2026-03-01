@@ -72,8 +72,17 @@ const Providers = () => {
     if (searchParams.has('latitude') && searchParams.has('longitude')) {
       setLocationQuery('המיקום שלי');
     }
-    // Use local cities list
-    setCities(israeliLocalities);
+    // Fetch cities from backend (includes coordinates)
+    const fetchCities = async () => {
+      try {
+        const res = await api.get('/localities?limit=500');
+        setCities(res.data.localities || []);
+      } catch {
+        // Fallback to static list
+        setCities(israeliLocalities.map(c => ({ name: c.name, region: c.region })));
+      }
+    };
+    fetchCities();
   }, []);
 
   // Close dropdowns when clicking outside
