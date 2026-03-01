@@ -36,6 +36,15 @@ export const usePushNotifications = () => {
       if (supported) {
         setPermission(Notification.permission);
       }
+      
+      // iOS Safari specific: check if running as PWA
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
+                          window.navigator.standalone === true;
+      
+      if (isIOS && !isStandalone && !supported) {
+        setError('ב-Safari באייפון, יש להוסיף את האתר למסך הבית כדי לקבל התראות Push');
+      }
     };
     
     checkSupport();
