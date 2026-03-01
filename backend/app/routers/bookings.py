@@ -1143,6 +1143,12 @@ async def update_booking_status(
             message,
             {"booking_id": booking_id}
         )
+        await send_push_to_user(
+            booking["user_id"],
+            title,
+            message,
+            {"booking_id": booking_id, "type": f"booking_{new_status}"}
+        )
     
     return {"message": f"Booking status updated to {new_status}"}
 
