@@ -220,6 +220,22 @@ async def admin_approve_review(
         "תודה! חוות הדעת שלך אושרה ומוצגת כעת באתר.",
         {"review_id": review_id, "provider_id": review["provider_id"]}
     )
+    await send_push_to_user(
+        review["user_id"],
+        "חוות הדעת שלך אושרה",
+        "תודה! חוות הדעת שלך אושרה ומוצגת כעת באתר.",
+        {"review_id": review_id, "type": "review_approved"}
+    )
+    
+    # Notify provider about the approved review
+    provider = await db.providers.find_one({"provider_id": review["provider_id"]}, {"_id": 0})
+    if provider:
+        await send_push_to_user(
+            provider["user_id"],
+            "חוות דעת חדשה פורסמה!",
+            f"חוות דעת חדשה פורסמה בפרופיל שלך - דירוג: {review.get('rating', 'N/A')}",
+            {"review_id": review_id, "type": "review_published"}
+        )
     
     return {"message": "Review approved successfully"}
 
