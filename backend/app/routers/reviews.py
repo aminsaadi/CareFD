@@ -275,5 +275,11 @@ async def admin_reject_review(
         f"חוות הדעת שלך נדחתה. סיבה: {reason}",
         {"review_id": review_id}
     )
+    await send_push_to_user(
+        review["user_id"],
+        "חוות הדעת נדחתה",
+        f"חוות הדעת שלך נדחתה. סיבה: {reason}",
+        {"review_id": review_id, "type": "review_rejected"}
+    )
     
     return {"message": "Review rejected successfully"}
