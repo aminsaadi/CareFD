@@ -780,6 +780,12 @@ async def confirm_booking(
         f"הספק אישר את ההזמנה ל-{booking.get('service_name', 'שירות')} בתאריך {booking.get('booking_date', '')[:10]}",
         {"booking_id": booking_id}
     )
+    await send_push_to_user(
+        booking["user_id"],
+        "ההזמנה אושרה!",
+        f"הספק אישר את ההזמנה ל-{booking.get('service_name', 'שירות')} בתאריך {booking.get('booking_date', '')[:10]}",
+        {"booking_id": booking_id, "type": "booking_confirmed"}
+    )
     
     # Send email to client about confirmed booking
     client_user = await db.users.find_one({"user_id": booking["user_id"]}, {"_id": 0})
