@@ -443,7 +443,14 @@ const Providers = () => {
                                   type="button"
                                   onClick={() => {
                                     setLocationQuery(region.name);
-                                    setFilters(prev => ({ ...prev, city: region.name, useMyLocation: false, latitude: null, longitude: null }));
+                                    setFilters(prev => ({
+                                      ...prev,
+                                      city: region.name,
+                                      useMyLocation: false,
+                                      latitude: region.lat || null,
+                                      longitude: region.lng || null,
+                                      radius: null
+                                    }));
                                     setShowLocationDropdown(false);
                                   }}
                                   className="w-full text-right px-3 py-2.5 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carelink-navy"
