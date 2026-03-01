@@ -455,6 +455,16 @@ async def update_provider(
     if provider["user_id"] != user["user_id"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
+    # Auto-geocode location if city is provided but coordinates are missing
+    if "location" in updates and updates["location"]:
+        loc = updates["location"]
+        city_name = loc.get("city", "")
+        if city_name and (not loc.get("latitude") or not loc.get("longitude")):
+            coords = get_locality_coords(city_name)
+            if coords:
+                updates["location"]["latitude"] = coords["lat"]
+                updates["location"]["longitude"] = coords["lng"]
+    
     updates["updated_at"] = datetime.now(timezone.utc).isoformat()
     
     await db.providers.update_one(
