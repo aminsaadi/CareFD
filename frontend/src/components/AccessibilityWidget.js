@@ -78,9 +78,11 @@ const AccessibilityWidget = () => {
     // Hide images
     body.classList.toggle('a11y-hide-images', settings.hideImages);
 
-    // Save
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-  }, [settings]);
+    // Save only after initial load to prevent overwriting on mount
+    if (isLoaded) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    }
+  }, [settings, isLoaded]);
 
   // Reading guide mouse follower
   useEffect(() => {
