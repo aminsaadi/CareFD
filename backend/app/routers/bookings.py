@@ -605,6 +605,12 @@ async def respond_to_change_request(
                         f"הלקוח אישר את שינוי המועד ל-{booking.get('service_name', 'שירות')}",
                         {"booking_id": booking_id}
                     )
+                    await send_push_to_user(
+                        provider["user_id"],
+                        "בקשת השינוי אושרה!",
+                        f"הלקוח אישר את שינוי המועד ל-{booking.get('service_name', 'שירות')}",
+                        {"booking_id": booking_id, "type": "booking_change_approved"}
+                    )
             else:
                 await db.bookings.update_one(
                     {"booking_id": booking_id},
@@ -619,6 +625,12 @@ async def respond_to_change_request(
                         "בקשת השינוי נדחתה",
                         f"הלקוח דחה את בקשת שינוי המועד ל-{booking.get('service_name', 'שירות')}",
                         {"booking_id": booking_id}
+                    )
+                    await send_push_to_user(
+                        provider["user_id"],
+                        "בקשת השינוי נדחתה",
+                        f"הלקוח דחה את בקשת שינוי המועד ל-{booking.get('service_name', 'שירות')}",
+                        {"booking_id": booking_id, "type": "booking_change_rejected"}
                     )
             break
     
