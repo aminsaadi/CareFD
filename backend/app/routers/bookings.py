@@ -984,6 +984,12 @@ async def provider_complete_booking(
         f"הספק סימן שהשירות '{booking.get('service_name', '')}' הושלם. אנא אשר ודרג את השירות.",
         {"booking_id": booking_id, "provider_id": booking["provider_id"]}
     )
+    await send_push_to_user(
+        booking["user_id"],
+        "השירות הושלם - אנא אשר",
+        f"הספק סימן שהשירות '{booking.get('service_name', '')}' הושלם. אנא אשר ודרג.",
+        {"booking_id": booking_id, "type": "booking_provider_completed"}
+    )
     
     return {"message": "Booking marked as completed by provider"}
 
