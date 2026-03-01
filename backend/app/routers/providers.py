@@ -215,9 +215,21 @@ async def search_providers(
             ]
         })
     
-    # City filter
+    # City / Region filter
     if city:
-        query["location.city"] = {"$regex": city, "$options": "i"}
+        # Check if it's a region name first
+        region_info = get_region_info(city)
+        if region_info:
+            # It's a region - get all cities in this region
+            region_cities = get_cities_in_region(city)
+            if region_cities:
+                query["$and"].append({"location.city": {"$in": region_cities}})
+            else:
+                # Fallback to regex if no mapped cities
+                query["$and"].append({"location.city": {"$regex": city, "$options": "i"}})
+        else:
+            # It's a specific city name
+            query["$and"].append({"location.city": {"$regex": city, "$options": "i"}})
     
     # Specialization filter (single)
     if specialization:
