@@ -941,6 +941,12 @@ async def hold_booking(
         f"ההזמנה ל-{booking.get('service_name', 'שירות')} הושהתה. {('סיבה: ' + reason) if reason else ''}",
         {"booking_id": booking_id}
     )
+    await send_push_to_user(
+        booking["user_id"],
+        "ההזמנה הושהתה",
+        f"ההזמנה ל-{booking.get('service_name', 'שירות')} הושהתה",
+        {"booking_id": booking_id, "type": "booking_on_hold"}
+    )
     
     return {"message": "Booking put on hold successfully"}
 
