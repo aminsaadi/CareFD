@@ -5,6 +5,7 @@ import { NotificationProvider } from './context/NotificationContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AuthCallback from './components/AuthCallback';
 import CookieConsent from './components/CookieConsent';
+import AccessibilityWidget from './components/AccessibilityWidget';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
