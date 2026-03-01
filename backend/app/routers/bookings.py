@@ -1038,6 +1038,12 @@ async def client_confirm_booking(
             f"הלקוח אישר שהשירות '{booking.get('service_name', '')}' הושלם בהצלחה.",
             {"booking_id": booking_id}
         )
+        await send_push_to_user(
+            provider["user_id"],
+            "הלקוח אישר את השלמת השירות!",
+            f"הלקוח אישר שהשירות '{booking.get('service_name', '')}' הושלם בהצלחה.",
+            {"booking_id": booking_id, "type": "booking_completed"}
+        )
     
     return {"message": "Booking completed successfully"}
 
