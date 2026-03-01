@@ -208,22 +208,27 @@ async def search_providers(
     sort_order: Optional[str] = "desc"
 ):
     """Advanced search for providers with filters"""
-    query = {}
+    query = {"$and": []}
     
     # Only show verified providers in public search
     # Use $or to handle legacy data where only one field may be set
-    query["$or"] = [
-        {"is_verified": True},
-        {"verification_status": "verified"}
-    ]
+    query["$and"].append({
+        "$or": [
+            {"is_verified": True},
+            {"verification_status": "verified"}
+        ]
+    })
     
     # Text search in business_name and description
     if search:
-        query["$or"] = [
-            {"business_name": {"$regex": search, "$options": "i"}},
-            {"description": {"$regex": search, "$options": "i"}},
-            {"specializations": {"$in": [search]}}
-        ]
+        query["$and"].append({
+            "$or": [
+                {"business_name": {"$regex": search, "$options": "i"}},
+                {"description": {"$regex": search, "$options": "i"}},
+                {"specializations": {"$in": [search]}},
+                {"profession_title": {"$regex": search, "$options": "i"}}
+            ]
+        })
     
     # City filter
     if city:
