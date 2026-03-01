@@ -47,7 +47,8 @@ const Providers = () => {
     { value: 5, label: '5 ק"מ' },
     { value: 10, label: '10 ק"מ' },
     { value: 25, label: '25 ק"מ' },
-    { value: 50, label: '50 ק"מ' }
+    { value: 50, label: '50 ק"מ' },
+    { value: 100, label: '100 ק"מ' }
   ];
 
   const [filters, setFilters] = useState({
