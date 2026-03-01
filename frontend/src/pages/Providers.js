@@ -193,10 +193,26 @@ const Providers = () => {
     if (locationQuery && locationQuery !== 'המיקום שלי') {
       newFilters.city = locationQuery;
       newFilters.useMyLocation = false;
-      newFilters.latitude = null;
-      newFilters.longitude = null;
+      // Preserve coordinates if they were set by city selection (from dropdown with coords)
+      // Only clear if the user typed a new value that doesn't match the current filter city
+      if (locationQuery !== filters.city) {
+        // User typed a new city manually - try to find coords
+        const matchedCity = cities.find(c => c.name === locationQuery);
+        if (matchedCity && matchedCity.lat && matchedCity.lng) {
+          newFilters.latitude = matchedCity.lat;
+          newFilters.longitude = matchedCity.lng;
+          newFilters.radius = newFilters.radius || 25;
+        } else {
+          newFilters.latitude = null;
+          newFilters.longitude = null;
+          newFilters.radius = null;
+        }
+      }
     } else if (locationQuery === '' || !locationQuery) {
       newFilters.city = null;
+      newFilters.latitude = null;
+      newFilters.longitude = null;
+      newFilters.radius = null;
     }
     
     setFilters(newFilters);
