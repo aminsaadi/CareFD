@@ -68,6 +68,29 @@ async def create_review(
             f"משתמש {user.get('name', 'לקוח')} כתב חוות דעת חדשה",
             {"review_id": review.review_id, "provider_id": review_data.provider_id}
         )
+        await send_push_to_user(
+            admin["user_id"],
+            "חוות דעת חדשה ממתינה לאישור",
+            f"משתמש {user.get('name', 'לקוח')} כתב חוות דעת חדשה",
+            {"review_id": review.review_id, "type": "new_review"}
+        )
+    
+    # Notify provider about new review
+    provider = await db.providers.find_one({"provider_id": review_data.provider_id}, {"_id": 0})
+    if provider:
+        await create_notification(
+            provider["user_id"],
+            NotificationType.SYSTEM,
+            "חוות דעת חדשה!",
+            f"לקוח כתב חוות דעת חדשה על השירות שלך. ממתינה לאישור מנהל.",
+            {"review_id": review.review_id, "provider_id": review_data.provider_id}
+        )
+        await send_push_to_user(
+            provider["user_id"],
+            "חוות דעת חדשה!",
+            f"לקוח כתב חוות דעת חדשה על השירות שלך",
+            {"review_id": review.review_id, "type": "new_review_for_provider"}
+        )
     
     return {
         "message": "חוות הדעת נשלחה בהצלחה וממתינה לאישור מנהל",
