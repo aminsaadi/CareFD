@@ -153,6 +153,13 @@ async def send_message(
             f"{sender_name}: {message_data.content[:50]}{'...' if len(message_data.content) > 50 else ''}",
             {"room_id": message_data.room_id}
         )
+        # Send push notification to recipient's device
+        await send_push_to_user(
+            recipient_id,
+            f"הודעה חדשה מ{sender_name}",
+            message_data.content[:100],
+            {"room_id": message_data.room_id, "chat_room_id": message_data.room_id, "type": "chat_message"}
+        )
     
     return message.model_dump()
 
