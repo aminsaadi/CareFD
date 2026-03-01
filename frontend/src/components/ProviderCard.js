@@ -176,6 +176,12 @@ const ProviderCard = ({ provider, showContact = true }) => {
           <div className="flex items-center text-sm text-carelink-gray mb-4">
             <FaMapMarkerAlt className="text-carelink-teal ml-1" />
             <span>{provider.location.city}</span>
+            {provider.distance_km != null && (
+              <span className="mr-auto bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1" data-testid="distance-badge">
+                <FaMapMarkerAlt className="text-[10px]" />
+                {provider.distance_km} ק״מ
+              </span>
+            )}
           </div>
         )}
 
