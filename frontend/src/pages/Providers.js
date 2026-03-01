@@ -507,8 +507,8 @@ const Providers = () => {
                 </div>
               </div>
 
-              {/* Radius selector (appears when using GPS) */}
-              {filters.useMyLocation && (
+              {/* Radius selector (appears when using GPS or city with coordinates) */}
+              {(filters.useMyLocation || (filters.latitude && filters.longitude)) && (
                 <div className="flex items-center gap-3 pt-2 border-t border-carelink-teal-pale">
                   <span className="text-sm text-carelink-gray">רדיוס חיפוש:</span>
                   <div className="flex gap-2">
