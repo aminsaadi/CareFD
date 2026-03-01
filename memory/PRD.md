@@ -1,8 +1,8 @@
 # CareLink - Service Marketplace Platform
 
 ## Architecture
-Backend: /app/backend/app/ (database.py, models.py, utils.py, main.py, routers/ with 18 files)
-Frontend: /app/frontend/src/ (context/, components/, pages/)
+Backend: /app/backend/app/ (database.py, models.py, utils.py, localities.py, routers/ with 18 files)
+Frontend: /app/frontend/src/ (context/, components/, pages/, data/)
 
 ## Implemented Features
 - User/Provider/Admin roles with document verification
@@ -16,15 +16,19 @@ Frontend: /app/frontend/src/ (context/, components/, pages/)
 - Admin: Provider deactivation, password reset, user suspend → auto provider deactivation
 - Admin Users: separate Status + Verification columns
 - Admin Providers: Provider ID, User ID, Status, Verification columns + detailed modal
-- **Show/hide password toggle on ALL password fields across the site**
-- **Improved error messages for login/register (network, server, specific errors)**
+- Show/hide password toggle on ALL password fields across the site
+- Improved error messages for login/register (network, server, specific errors)
+- **Provider search by location/radius - FIXED & WORKING**
+- **Israeli localities database with 200+ cities and coordinates**
+- **Auto-geocoding for provider locations on profile update**
+- **Backend /api/localities endpoint for city search with coordinates**
 
 ## Completed Tasks
 - Feb 24: Fixed booking button + chat bugs
 - Feb 25: Backend refactoring, Booking Model V2, Dashboard features, Notifications, Mobile fix
 - Feb 26: Admin bugs, Admin Users/Providers table improvements
-- Feb 26: **Show password toggle (7 files: Login, Register, ProviderRegister, ResetPassword, Dashboard, ProviderDashboard, AdminUsers)**
-- Feb 26: **Improved error messages in Login/Register/ProviderRegister for better production debugging**
+- Feb 26: Show password toggle, Improved error messages
+- Mar 1: **Fixed provider search (double verification filter bug), added localities with coordinates, radius-based search working**
 
 ## Mocked: PayPal, Subscription payments
 
@@ -37,6 +41,7 @@ Frontend: /app/frontend/src/ (context/, components/, pages/)
 - P2: PayPal integration (blocked on API keys)
 - P3: Provider image gallery
 - P4: SMS reminders
+- Low: Refactor show-password into reusable PasswordInput component
 
 ## Known Issues
 - Production (carelink.co.il): Login/Register shows error - needs new deploy + Cloudflare cache clear
