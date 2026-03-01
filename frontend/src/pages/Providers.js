@@ -563,7 +563,14 @@ const Providers = () => {
                     type="button"
                     onClick={() => {
                       setLocationQuery(region.name);
-                      setFilters(prev => ({ ...prev, city: region.name, useMyLocation: false, latitude: null, longitude: null }));
+                      setFilters(prev => ({
+                        ...prev,
+                        city: region.name,
+                        useMyLocation: false,
+                        latitude: region.lat || null,
+                        longitude: region.lng || null,
+                        radius: null
+                      }));
                     }}
                     className={`text-sm px-3 py-1 rounded-full transition-colors ${
                       locationQuery === region.name
