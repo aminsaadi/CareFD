@@ -41,6 +41,29 @@ async def create_chat_room(
     
     await db.chat_rooms.insert_one(room_dict)
     
+    # Notify the other participant about new chat
+    creator_id = user["user_id"]
+    creator_name = user.get("name", "משתמש")
+    
+    if creator_id == room_data.get("user_id"):
+        # User created room -> notify provider
+        provider_doc = await db.providers.find_one({"provider_id": room_data.get("provider_id")}, {"_id": 0})
+        if provider_doc:
+            recipient_id = provider_doc.get("user_id")
+            await create_notification(
+                recipient_id,
+                "chat_message",
+                "שיחה חדשה",
+                f"{creator_name} פתח/ה שיחה חדשה",
+                {"room_id": chat_room.room_id}
+            )
+            await send_push_to_user(
+                recipient_id,
+                "שיחה חדשה",
+                f"{creator_name} פתח/ה שיחה חדשה",
+                {"chat_room_id": chat_room.room_id, "type": "new_chat"}
+            )
+    
     return chat_room.model_dump()
 
 @router.get("/chat/rooms")
