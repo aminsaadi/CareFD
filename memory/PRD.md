@@ -31,6 +31,7 @@ Frontend: /app/frontend/src/ (context/, components/, pages/, data/)
 - Feb 26: Admin bugs, Admin Users/Providers table improvements
 - Feb 26: Show password toggle, Improved error messages
 - Mar 1: **Fixed provider search (double verification filter bug), added localities with coordinates, radius-based search working**
+- Mar 1: **Region-based search: merged Tel Aviv into Center region, distance displayed on provider cards**
 
 ## Mocked: PayPal, Subscription payments
 
