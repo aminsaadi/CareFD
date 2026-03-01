@@ -681,6 +681,12 @@ async def cancel_booking(
                 f"הלקוח ביטל את ההזמנה ל-{booking.get('service_name', 'שירות')}",
                 {"booking_id": booking_id}
             )
+            await send_push_to_user(
+                target_provider["user_id"],
+                "הזמנה בוטלה",
+                f"הלקוח ביטל את ההזמנה ל-{booking.get('service_name', 'שירות')}",
+                {"booking_id": booking_id, "type": "booking_cancelled"}
+            )
             # Send email to provider
             provider_user = await db.users.find_one({"user_id": target_provider["user_id"]}, {"_id": 0})
             if provider_user and provider_user.get("email"):
@@ -709,6 +715,12 @@ async def cancel_booking(
             "הזמנה בוטלה",
             f"הספק ביטל את ההזמנה ל-{booking.get('service_name', 'שירות')}",
             {"booking_id": booking_id}
+        )
+        await send_push_to_user(
+            booking["user_id"],
+            "הזמנה בוטלה",
+            f"הספק ביטל את ההזמנה ל-{booking.get('service_name', 'שירות')}",
+            {"booking_id": booking_id, "type": "booking_cancelled"}
         )
         # Send email to client
         client_user = await db.users.find_one({"user_id": booking["user_id"]}, {"_id": 0})
