@@ -20,21 +20,28 @@ const defaultSettings = {
   hideImages: false,
 };
 
+// Load initial settings from localStorage synchronously
+const getInitialSettings = () => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return { ...defaultSettings, ...parsed };
+    }
+  } catch {}
+  return defaultSettings;
+};
+
 const AccessibilityWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [settings, setSettings] = useState(defaultSettings);
+  const [settings, setSettings] = useState(getInitialSettings);
+  const [isLoaded, setIsLoaded] = useState(false);
   const guideRef = useRef(null);
   const panelRef = useRef(null);
 
-  // Load saved settings
+  // Mark component as loaded after initial render
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setSettings(prev => ({ ...prev, ...parsed }));
-      }
-    } catch {}
+    setIsLoaded(true);
   }, []);
 
   // Apply all settings to document
