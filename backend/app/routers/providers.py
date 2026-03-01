@@ -474,5 +474,24 @@ async def update_provider(
     
     return {"message": "Provider updated successfully"}
 
+# ==================== LOCALITIES ROUTES ====================
+
+@router.get("/localities")
+async def get_localities(q: Optional[str] = None, limit: int = 50):
+    """Get list of Israeli localities with coordinates"""
+    if q:
+        results = search_localities(q, limit)
+    else:
+        results = ISRAEL_LOCALITIES[:limit]
+    return {"localities": results, "total": len(ISRAEL_LOCALITIES)}
+
+@router.get("/localities/{city_name}/coords")
+async def get_city_coords(city_name: str):
+    """Get coordinates for a specific city"""
+    coords = get_locality_coords(city_name)
+    if not coords:
+        raise HTTPException(status_code=404, detail="City not found")
+    return coords
+
 # ==================== SERVICE ROUTES ====================
 
