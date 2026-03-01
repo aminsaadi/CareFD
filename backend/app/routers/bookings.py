@@ -862,6 +862,12 @@ async def reject_booking(
         f"לצערנו, הספק דחה את ההזמנה ל-{booking.get('service_name', 'שירות')}. {('סיבה: ' + reason) if reason else ''}",
         {"booking_id": booking_id}
     )
+    await send_push_to_user(
+        booking["user_id"],
+        "ההזמנה נדחתה",
+        f"הספק דחה את ההזמנה ל-{booking.get('service_name', 'שירות')}",
+        {"booking_id": booking_id, "type": "booking_rejected"}
+    )
     
     # Send email to client
     client_user = await db.users.find_one({"user_id": booking["user_id"]}, {"_id": 0})
