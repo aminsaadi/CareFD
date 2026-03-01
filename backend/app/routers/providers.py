@@ -9,7 +9,7 @@ from app.database import db, UPLOAD_DIR
 from app.models import (Provider, ProviderRegister, VerificationDocument, VerificationStatus, NotificationType, UserRole,
     PROFESSION_TITLES, GENDER_OPTIONS, LANGUAGE_OPTIONS, TARGET_AUDIENCE_OPTIONS, SHIFT_DEFINITIONS)
 from app.utils import get_current_user, send_email_async, create_notification, calculate_distance
-from app.localities import ISRAEL_LOCALITIES, get_locality_coords, search_localities, REGION_CENTERS
+from app.localities import ISRAEL_LOCALITIES, get_locality_coords, search_localities, REGION_CENTERS, get_region_info, get_cities_in_region
 
 router = APIRouter()
 
