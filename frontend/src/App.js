@@ -390,6 +390,7 @@ function App() {
         <NotificationProvider>
           <AppRouter />
           <CookieConsent />
+          <AccessibilityWidget />
         </NotificationProvider>
       </BrowserRouter>
     </AuthProvider>
