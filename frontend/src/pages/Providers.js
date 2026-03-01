@@ -451,14 +451,25 @@ const Providers = () => {
                                   key={city.city_id || city.name}
                                   type="button"
                                   onClick={() => {
-                                    setLocationQuery(city.name || city.name_he);
-                                    setFilters(prev => ({ ...prev, city: city.name || city.name_he, useMyLocation: false, latitude: null, longitude: null }));
+                                    const cityName = city.name || city.name_he;
+                                    setLocationQuery(cityName);
+                                    // Use coordinates from localities for radius search
+                                    const hasCoords = city.lat && city.lng;
+                                    setFilters(prev => ({
+                                      ...prev,
+                                      city: cityName,
+                                      useMyLocation: false,
+                                      latitude: hasCoords ? city.lat : null,
+                                      longitude: hasCoords ? city.lng : null,
+                                      radius: hasCoords ? (prev.radius || 25) : null
+                                    }));
                                     setShowLocationDropdown(false);
                                   }}
                                   className="w-full text-right px-3 py-2.5 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carelink-navy"
                                 >
                                   <FaMapMarkerAlt className="text-carelink-gray text-sm" />
                                   <span>{city.name || city.name_he}</span>
+                                  {city.region && <span className="text-xs text-carelink-gray mr-auto">{city.region}</span>}
                                 </button>
                               ))}
                             </div>
