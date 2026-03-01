@@ -201,6 +201,12 @@ async def create_booking(
         f"{notification_client_name} הזמין {service.get('name', 'שירות')} לתאריך {booking_date_formatted}",
         {"booking_id": booking.booking_id, "service_id": service["service_id"]}
     )
+    await send_push_to_user(
+        provider["user_id"],
+        "הזמנה חדשה!",
+        f"{notification_client_name} הזמין {service.get('name', 'שירות')} לתאריך {booking_date_formatted}",
+        {"booking_id": booking.booking_id, "type": "booking_new"}
+    )
     
     # Format booking date nicely
     booking_time_str = booking_data.booking_time or "יתואם טלפונית"
@@ -504,6 +510,12 @@ async def request_booking_change(
         "בקשה לשינוי מועד",
         f"{provider_name} מבקש לשנות את מועד ההזמנה ל-{booking.get('service_name', 'שירות')}. {change_desc}. {('סיבה: ' + reason) if reason else ''}",
         {"booking_id": booking_id, "change_request": change_request}
+    )
+    await send_push_to_user(
+        booking["user_id"],
+        "בקשה לשינוי מועד",
+        f"{provider_name} מבקש לשנות את מועד ההזמנה. {change_desc}",
+        {"booking_id": booking_id, "type": "booking_change_requested"}
     )
     
     # Send email to client
