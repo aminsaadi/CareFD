@@ -135,9 +135,17 @@ const NotificationSettings = () => {
         )}
 
         {!isSupported && (
-          <div className="mt-3 p-3 bg-amber-50 text-amber-700 rounded-lg flex items-center gap-2">
-            <FiAlertCircle />
-            להתראות Push נדרש דפדפן מודרני (Chrome, Firefox, Safari)
+          <div className="mt-3 p-3 bg-amber-50 text-amber-700 rounded-lg flex items-center gap-2 text-sm">
+            <FiAlertCircle className="flex-shrink-0" />
+            <div>
+              <p className="font-medium">הדפדפן לא תומך בהתראות Push</p>
+              <p className="mt-1">
+                {/iPad|iPhone|iPod/.test(navigator.userAgent) 
+                  ? 'ב-Safari באייפון: לחצו על כפתור השיתוף ← "הוסף למסך הבית" ← פתחו את האפליקציה משם כדי לקבל התראות'
+                  : 'נסו להשתמש ב-Chrome, Firefox או Safari עדכני'
+                }
+              </p>
+            </div>
           </div>
         )}
       </div>
