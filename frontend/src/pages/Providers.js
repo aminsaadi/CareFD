@@ -627,8 +627,9 @@ const Providers = () => {
                 {filters.city && !filters.useMyLocation && (
                   <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-navy px-3 py-1 rounded-full text-sm">
                     <FaMapMarkerAlt /> {filters.city}
+                    {filters.radius && filters.latitude && ` (${filters.radius} ק"מ)`}
                     <button onClick={() => {
-                      setFilters(prev => ({ ...prev, city: null }));
+                      setFilters(prev => ({ ...prev, city: null, latitude: null, longitude: null, radius: null }));
                       setLocationQuery('');
                     }}><FaTimes className="text-xs" /></button>
                   </span>
