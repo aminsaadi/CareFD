@@ -22,6 +22,8 @@ Frontend: /app/frontend/src/ (context/, components/, pages/, data/)
 - **Israeli localities database with 200+ cities and coordinates**
 - **Auto-geocoding for provider locations on profile update**
 - **Backend /api/localities endpoint for city search with coordinates**
+- **Region-based search: "מרכז" includes Tel Aviv and Sharon area**
+- **Distance display on provider cards when searching by location/region**
 
 ## Completed Tasks
 - Feb 24: Fixed booking button + chat bugs
