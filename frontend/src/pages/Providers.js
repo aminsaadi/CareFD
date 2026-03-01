@@ -579,7 +579,7 @@ const Providers = () => {
                 >
                   <option value="rating">מיון: דירוג</option>
                   <option value="reviews">מיון: ביקורות</option>
-                  {filters.useMyLocation && <option value="distance">מיון: מרחק</option>}
+                  {(filters.useMyLocation || (filters.latitude && filters.longitude)) && <option value="distance">מיון: מרחק</option>}
                 </select>
               </div>
 
