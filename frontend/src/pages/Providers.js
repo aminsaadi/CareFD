@@ -272,7 +272,7 @@ const Providers = () => {
     const newFilters = { ...filters, radius };
     setFilters(newFilters);
     
-    if (filters.useMyLocation) {
+    if (filters.useMyLocation || (filters.latitude && filters.longitude)) {
       const newParams = new URLSearchParams(searchParams);
       newParams.set('radius_km', radius);
       setSearchParams(newParams);
