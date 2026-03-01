@@ -214,16 +214,48 @@ ISRAEL_LOCALITIES = [
 
 # Region coordinates for fallback
 REGION_CENTERS = {
-    "צפון": {"lat": 32.9, "lng": 35.3},
-    "חיפה": {"lat": 32.8, "lng": 35.0},
-    "שרון": {"lat": 32.3, "lng": 34.9},
-    "מרכז": {"lat": 32.0, "lng": 34.85},
-    "תל אביב": {"lat": 32.08, "lng": 34.78},
-    "ירושלים": {"lat": 31.77, "lng": 35.21},
-    "דרום": {"lat": 31.25, "lng": 34.79},
-    "שומרון": {"lat": 32.15, "lng": 35.15},
-    "גולן": {"lat": 33.0, "lng": 35.75},
+    "צפון": {"lat": 32.9, "lng": 35.3, "radius_km": 60},
+    "חיפה והקריות": {"lat": 32.8, "lng": 35.0, "radius_km": 30},
+    "השרון": {"lat": 32.3, "lng": 34.9, "radius_km": 30},
+    "מרכז": {"lat": 32.07, "lng": 34.82, "radius_km": 40},
+    "תל אביב": {"lat": 32.08, "lng": 34.78, "radius_km": 20},
+    "ירושלים והסביבה": {"lat": 31.77, "lng": 35.21, "radius_km": 40},
+    "דרום": {"lat": 31.25, "lng": 34.79, "radius_km": 80},
+    "יהודה ושומרון": {"lat": 32.1, "lng": 35.15, "radius_km": 50},
+    "גולן": {"lat": 33.0, "lng": 35.75, "radius_km": 30},
+    # Legacy names
+    "חיפה": {"lat": 32.8, "lng": 35.0, "radius_km": 30},
+    "שרון": {"lat": 32.3, "lng": 34.9, "radius_km": 30},
+    "שומרון": {"lat": 32.15, "lng": 35.15, "radius_km": 50},
+    "ירושלים": {"lat": 31.77, "lng": 35.21, "radius_km": 40},
 }
+
+# Region name mappings - which locality regions belong to each search region
+REGION_LOCALITY_MAPPING = {
+    "צפון": ["צפון"],
+    "חיפה והקריות": ["חיפה"],
+    "השרון": ["שרון"],
+    "מרכז": ["מרכז", "תל אביב", "שרון"],  # Center includes Tel Aviv and Sharon
+    "ירושלים והסביבה": ["ירושלים"],
+    "דרום": ["דרום"],
+    "יהודה ושומרון": ["שומרון"],
+    "גולן": ["גולן"],
+}
+
+def get_region_info(region_name: str):
+    """Get region center coordinates and radius. Returns None if not a region."""
+    return REGION_CENTERS.get(region_name)
+
+def get_cities_in_region(region_name: str):
+    """Get all city names that belong to a region"""
+    locality_regions = REGION_LOCALITY_MAPPING.get(region_name)
+    if not locality_regions:
+        return []
+    cities = []
+    for loc in ISRAEL_LOCALITIES:
+        if loc.get("region") in locality_regions:
+            cities.append(loc["name"])
+    return cities
 
 def get_locality_coords(name: str):
     """Get coordinates for a locality name"""
