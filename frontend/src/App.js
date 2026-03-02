@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AuthCallback from './components/AuthCallback';
@@ -60,6 +60,17 @@ import GenericPage from './pages/GenericPage';
 import './i18n';
 import './App.css';
 
+const RoleRedirect = ({ children, providerPath, adminPath }) => {
+  const { user } = useAuth();
+  if (user?.role === 'provider' && providerPath) {
+    return <Navigate to={providerPath + (window.location.search || '')} replace />;
+  }
+  if (user?.role === 'admin' && adminPath) {
+    return <Navigate to={adminPath} replace />;
+  }
+  return children;
+};
+
 function AppRouter() {
   const location = useLocation();
   
@@ -93,7 +104,9 @@ function AppRouter() {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <RoleRedirect providerPath="/provider/dashboard" adminPath="/admin/overview">
+              <Dashboard />
+            </RoleRedirect>
           </ProtectedRoute>
         }
       />
