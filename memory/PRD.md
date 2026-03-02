@@ -39,6 +39,7 @@ Frontend: /app/frontend/src/ (context/, components/, pages/, data/)
 - Mar 2: **Fixed notification routing - click navigates to correct page/tab based on user role**
 - Mar 2: **Fixed user settings - profile_color saves, ?tab= URL param works in dashboards**
 - Mar 2: **Fixed /admin/overview route, fixed CORS/withCredentials login bug**
+- Mar 2: **Chat: archive, delete (per-user soft delete), fixed-height scrollable window, date dividers**
 
 ## Mocked: PayPal, Subscription payments
 
