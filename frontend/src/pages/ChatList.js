@@ -1,31 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
-import { format, isToday, isYesterday, formatDistanceToNow } from 'date-fns';
-import { he } from 'date-fns/locale';
+import { format, isToday, isYesterday } from 'date-fns';
+import { toast } from 'sonner';
 import { 
-  FaComments, FaCircle, FaSearch, FaEllipsisV, FaUserMd,
-  FaSpinner, FaCheckDouble, FaCheck
+  FaComments, FaSearch, FaUserMd, FaSpinner, FaCheckDouble, FaCheck,
+  FaArchive, FaTrash, FaEllipsisV, FaInbox, FaUndoAlt, FaTimes
 } from 'react-icons/fa';
 
 const ChatList = () => {
-  const { t } = useTranslation();
   const { user } = useAuth();
   const [rooms, setRooms] = useState([]);
+  const [archivedRooms, setArchivedRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('active');
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const menuRef = useRef(null);
 
   useEffect(() => {
     fetchRooms();
-    
-    // Poll for new messages every 10 seconds
     const interval = setInterval(fetchRooms, 10000);
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'archived') fetchArchivedRooms();
+  }, [activeTab]);
+
+  // Close menu on outside click
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
   const fetchRooms = async () => {
@@ -39,24 +54,211 @@ const ChatList = () => {
     }
   };
 
-  const formatLastMessageTime = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    
-    if (isToday(date)) {
-      return format(date, 'HH:mm');
-    } else if (isYesterday(date)) {
-      return 'אתמול';
-    } else {
-      return format(date, 'dd/MM');
+  const fetchArchivedRooms = async () => {
+    try {
+      const response = await api.get('/chat/rooms?archived=true');
+      setArchivedRooms(response.data.rooms || []);
+    } catch (error) {
+      console.error('Failed to fetch archived rooms:', error);
     }
   };
 
-  const filteredRooms = rooms.filter(room => {
+  const handleArchive = async (roomId, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await api.put(`/chat/rooms/${roomId}/archive`);
+      setRooms(prev => prev.filter(r => r.room_id !== roomId));
+      setOpenMenuId(null);
+      toast.success('השיחה הועברה לארכיון');
+    } catch {
+      toast.error('שגיאה בהעברה לארכיון');
+    }
+  };
+
+  const handleUnarchive = async (roomId, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await api.put(`/chat/rooms/${roomId}/unarchive`);
+      setArchivedRooms(prev => prev.filter(r => r.room_id !== roomId));
+      fetchRooms();
+      setOpenMenuId(null);
+      toast.success('השיחה שוחזרה');
+    } catch {
+      toast.error('שגיאה בשחזור');
+    }
+  };
+
+  const handleDelete = async (roomId, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await api.delete(`/chat/rooms/${roomId}`);
+      setRooms(prev => prev.filter(r => r.room_id !== roomId));
+      setArchivedRooms(prev => prev.filter(r => r.room_id !== roomId));
+      setConfirmDelete(null);
+      setOpenMenuId(null);
+      toast.success('השיחה נמחקה');
+    } catch {
+      toast.error('שגיאה במחיקה');
+    }
+  };
+
+  const formatLastMessageTime = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isToday(date)) return format(date, 'HH:mm');
+    if (isYesterday(date)) return 'אתמול';
+    return format(date, 'dd/MM');
+  };
+
+  const currentRooms = activeTab === 'archived' ? archivedRooms : rooms;
+  const filteredRooms = currentRooms.filter(room => {
     if (!searchQuery) return true;
     const name = room.other_user?.name || room.other_user?.business_name || '';
     return name.toLowerCase().includes(searchQuery.toLowerCase());
   });
+
+  const RoomItem = ({ room, index, isArchived }) => {
+    const otherUser = room.other_user;
+    const name = otherUser?.name || otherUser?.business_name || 'משתמש';
+    const initial = name[0] || '?';
+    const hasUnread = room.unread_count > 0;
+    const lastMessage = room.last_message?.content || '';
+    const isLastFromMe = room.last_message?.sender_id === user?.user_id;
+
+    return (
+      <div
+        className={`relative group ${index !== filteredRooms.length - 1 ? 'border-b border-carelink-teal-pale' : ''}`}
+        data-testid={`chat-room-${room.room_id}`}
+      >
+        <Link
+          to={`/chat/${room.room_id}`}
+          className="block hover:bg-carelink-teal-pale/30 transition"
+        >
+          <div className="p-4 flex items-center gap-4">
+            {/* Avatar */}
+            <div className="relative flex-shrink-0">
+              <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-xl ${
+                hasUnread ? 'bg-carelink-teal' : 'bg-carelink-navy'
+              }`}>
+                {initial}
+              </div>
+              {!isArchived && (
+                <span className="absolute bottom-0 left-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white"></span>
+              )}
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className={`font-bold truncate ${hasUnread ? 'text-carelink-navy' : 'text-carelink-slate'}`}>
+                  {name}
+                </h3>
+                <span className={`text-xs flex-shrink-0 mr-2 ${hasUnread ? 'text-carelink-teal font-bold' : 'text-carelink-gray'}`}>
+                  {formatLastMessageTime(room.last_message_at)}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {isLastFromMe && (
+                  <span className="text-carelink-teal flex-shrink-0">
+                    {room.last_message?.read_at ? (
+                      <FaCheckDouble className="text-sm" />
+                    ) : (
+                      <FaCheck className="text-sm text-carelink-gray" />
+                    )}
+                  </span>
+                )}
+                <p className={`text-sm truncate ${hasUnread ? 'text-carelink-navy font-medium' : 'text-carelink-gray'}`}>
+                  {lastMessage || 'לחץ להתחיל שיחה'}
+                </p>
+              </div>
+            </div>
+
+            {/* Unread Badge */}
+            {hasUnread && (
+              <div className="flex-shrink-0">
+                <span className="bg-carelink-teal text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">
+                  {room.unread_count > 9 ? '9+' : room.unread_count}
+                </span>
+              </div>
+            )}
+
+            {/* Menu Button */}
+            <div className="flex-shrink-0 relative" ref={openMenuId === room.room_id ? menuRef : null}>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setOpenMenuId(openMenuId === room.room_id ? null : room.room_id);
+                  setConfirmDelete(null);
+                }}
+                className="p-2 rounded-full hover:bg-gray-200 transition opacity-0 group-hover:opacity-100 focus:opacity-100"
+                data-testid={`chat-menu-${room.room_id}`}
+              >
+                <FaEllipsisV className="text-carelink-gray text-sm" />
+              </button>
+
+              {openMenuId === room.room_id && (
+                <div className="absolute left-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 min-w-[180px] z-20">
+                  {isArchived ? (
+                    <button
+                      onClick={(e) => handleUnarchive(room.room_id, e)}
+                      className="w-full text-right px-4 py-2.5 hover:bg-carelink-teal-pale text-carelink-navy text-sm flex items-center gap-3"
+                      data-testid={`unarchive-${room.room_id}`}
+                    >
+                      <FaUndoAlt className="text-carelink-teal" />
+                      שחזר מארכיון
+                    </button>
+                  ) : (
+                    <button
+                      onClick={(e) => handleArchive(room.room_id, e)}
+                      className="w-full text-right px-4 py-2.5 hover:bg-carelink-teal-pale text-carelink-navy text-sm flex items-center gap-3"
+                      data-testid={`archive-${room.room_id}`}
+                    >
+                      <FaArchive className="text-amber-500" />
+                      העבר לארכיון
+                    </button>
+                  )}
+                  
+                  {confirmDelete === room.room_id ? (
+                    <div className="px-4 py-2.5 border-t border-gray-100">
+                      <p className="text-xs text-red-500 mb-2 font-medium">בטוח למחוק?</p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={(e) => handleDelete(room.room_id, e)}
+                          className="flex-1 text-center py-1.5 bg-red-500 text-white rounded-lg text-xs font-medium hover:bg-red-600"
+                          data-testid={`confirm-delete-${room.room_id}`}
+                        >
+                          מחק
+                        </button>
+                        <button
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmDelete(null); }}
+                          className="flex-1 text-center py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-200"
+                        >
+                          ביטול
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirmDelete(room.room_id); }}
+                      className="w-full text-right px-4 py-2.5 hover:bg-red-50 text-red-500 text-sm flex items-center gap-3"
+                      data-testid={`delete-${room.room_id}`}
+                    >
+                      <FaTrash />
+                      מחק שיחה
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </Link>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
@@ -89,8 +291,36 @@ const ChatList = () => {
           )}
         </div>
 
+        {/* Tabs: Active / Archived */}
+        <div className="flex gap-2 mb-4">
+          <button
+            onClick={() => setActiveTab('active')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition ${
+              activeTab === 'active'
+                ? 'bg-carelink-teal text-white'
+                : 'bg-white text-carelink-navy hover:bg-carelink-teal-pale border border-carelink-teal-pale'
+            }`}
+            data-testid="tab-active"
+          >
+            <FaInbox />
+            שיחות ({rooms.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('archived')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition ${
+              activeTab === 'archived'
+                ? 'bg-amber-500 text-white'
+                : 'bg-white text-carelink-navy hover:bg-amber-50 border border-carelink-teal-pale'
+            }`}
+            data-testid="tab-archived"
+          >
+            <FaArchive />
+            ארכיון {archivedRooms.length > 0 && `(${archivedRooms.length})`}
+          </button>
+        </div>
+
         {/* Search */}
-        {rooms.length > 3 && (
+        {currentRooms.length > 3 && (
           <div className="relative mb-6">
             <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
             <input
@@ -99,26 +329,38 @@ const ChatList = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="חפש שיחה..."
               className="w-full pr-12 pl-4 py-3 bg-white border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
+              data-testid="chat-search"
             />
           </div>
         )}
 
-        {rooms.length === 0 ? (
+        {currentRooms.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-lg p-12 text-center border-2 border-carelink-teal-pale">
             <div className="w-24 h-24 bg-carelink-teal-pale rounded-full flex items-center justify-center mx-auto mb-6">
-              <FaComments className="text-4xl text-carelink-teal" />
+              {activeTab === 'archived' ? (
+                <FaArchive className="text-4xl text-amber-500" />
+              ) : (
+                <FaComments className="text-4xl text-carelink-teal" />
+              )}
             </div>
-            <h2 className="text-xl font-bold text-carelink-navy mb-2">עדיין אין שיחות</h2>
+            <h2 className="text-xl font-bold text-carelink-navy mb-2">
+              {activeTab === 'archived' ? 'אין שיחות בארכיון' : 'עדיין אין שיחות'}
+            </h2>
             <p className="text-carelink-gray mb-6">
-              התחל שיחה עם ספק שירותים כדי לקבל מידע נוסף
+              {activeTab === 'archived'
+                ? 'שיחות שתעביר לארכיון יופיעו כאן'
+                : 'התחל שיחה עם ספק שירותים כדי לקבל מידע נוסף'
+              }
             </p>
-            <Link
-              to="/providers"
-              className="inline-flex items-center gap-2 bg-carelink-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition"
-            >
-              <FaUserMd />
-              מצא ספקים
-            </Link>
+            {activeTab === 'active' && (
+              <Link
+                to="/providers"
+                className="inline-flex items-center gap-2 bg-carelink-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition"
+              >
+                <FaUserMd />
+                מצא ספקים
+              </Link>
+            )}
           </div>
         ) : (
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-carelink-teal-pale">
@@ -127,81 +369,23 @@ const ChatList = () => {
                 לא נמצאו שיחות עבור "{searchQuery}"
               </div>
             ) : (
-              filteredRooms.map((room, index) => {
-                const otherUser = room.other_user;
-                const name = otherUser?.name || otherUser?.business_name || 'משתמש';
-                const initial = name[0] || '?';
-                const hasUnread = room.unread_count > 0;
-                const lastMessage = room.last_message?.content || '';
-                const isLastFromMe = room.last_message?.sender_id === user?.user_id;
-                
-                return (
-                  <Link
-                    key={room.room_id}
-                    to={`/chat/${room.room_id}`}
-                    className={`block hover:bg-carelink-teal-pale/30 transition ${
-                      index !== filteredRooms.length - 1 ? 'border-b border-carelink-teal-pale' : ''
-                    }`}
-                    data-testid={`chat-room-${room.room_id}`}
-                  >
-                    <div className="p-4 flex items-center gap-4">
-                      {/* Avatar */}
-                      <div className="relative flex-shrink-0">
-                        <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-xl ${
-                          hasUnread ? 'bg-carelink-teal' : 'bg-carelink-navy'
-                        }`}>
-                          {initial}
-                        </div>
-                        <span className="absolute bottom-0 left-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white"></span>
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <h3 className={`font-bold truncate ${hasUnread ? 'text-carelink-navy' : 'text-carelink-slate'}`}>
-                            {name}
-                          </h3>
-                          <span className={`text-xs flex-shrink-0 ${hasUnread ? 'text-carelink-teal font-bold' : 'text-carelink-gray'}`}>
-                            {formatLastMessageTime(room.last_message_at)}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {isLastFromMe && (
-                            <span className="text-carelink-teal flex-shrink-0">
-                              {room.last_message?.read_at ? (
-                                <FaCheckDouble className="text-sm" />
-                              ) : (
-                                <FaCheck className="text-sm text-carelink-gray" />
-                              )}
-                            </span>
-                          )}
-                          <p className={`text-sm truncate ${hasUnread ? 'text-carelink-navy font-medium' : 'text-carelink-gray'}`}>
-                            {lastMessage || 'לחץ להתחיל שיחה'}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Unread Badge */}
-                      {hasUnread && (
-                        <div className="flex-shrink-0">
-                          <span className="bg-carelink-teal text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">
-                            {room.unread_count > 9 ? '9+' : room.unread_count}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                );
-              })
+              filteredRooms.map((room, index) => (
+                <RoomItem
+                  key={room.room_id}
+                  room={room}
+                  index={index}
+                  isArchived={activeTab === 'archived'}
+                />
+              ))
             )}
           </div>
         )}
 
         {/* Quick Tips */}
-        {rooms.length > 0 && (
+        {activeTab === 'active' && rooms.length > 0 && (
           <div className="mt-6 bg-carelink-teal-pale/30 rounded-xl p-4">
             <p className="text-sm text-carelink-navy">
-              <strong>טיפ:</strong> לחץ Enter כדי לשלוח הודעה, Shift+Enter למעבר שורה
+              <strong>טיפ:</strong> העבר שיחות לארכיון כדי לשמור על סדר. לחץ על ⋮ ליד כל שיחה.
             </p>
           </div>
         )}

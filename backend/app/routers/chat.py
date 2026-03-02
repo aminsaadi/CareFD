@@ -69,7 +69,8 @@ async def create_chat_room(
 @router.get("/chat/rooms")
 async def get_chat_rooms(
     authorization: Optional[str] = Header(None),
-    request: Request = None
+    request: Request = None,
+    archived: bool = False
 ):
     """Get user's chat rooms"""
     user = await get_current_user(authorization, request)
@@ -81,6 +82,18 @@ async def get_chat_rooms(
         query = {"provider_id": provider["provider_id"]}
     else:
         query = {"user_id": user["user_id"]}
+    
+    # Filter out deleted rooms for this user
+    query["deleted_by"] = {"$nin": [user["user_id"]]}
+    
+    # Filter by archive status
+    if archived:
+        query["archived_by"] = user["user_id"]
+    else:
+        query["$or"] = [
+            {"archived_by": {"$exists": False}},
+            {"archived_by": {"$nin": [user["user_id"]]}}
+        ]
     
     rooms = await db.chat_rooms.find(query, {"_id": 0}).sort("last_message_at", -1).to_list(100)
     
@@ -224,5 +237,101 @@ async def get_messages(
     )
     
     return {"messages": messages}
+
+# ==================== ARCHIVE & DELETE ====================
+
+@router.put("/chat/rooms/{room_id}/archive")
+async def archive_chat_room(
+    room_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Archive a chat room"""
+    user = await get_current_user(authorization, request)
+    room = await db.chat_rooms.find_one({"room_id": room_id}, {"_id": 0})
+    if not room:
+        raise HTTPException(status_code=404, detail="Chat room not found")
+    
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    is_participant = (
+        room["user_id"] == user["user_id"] or 
+        (provider and room["provider_id"] == provider["provider_id"])
+    )
+    if not is_participant:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Track per-user archive status
+    archived_by = room.get("archived_by", [])
+    if user["user_id"] not in archived_by:
+        archived_by.append(user["user_id"])
+    
+    await db.chat_rooms.update_one(
+        {"room_id": room_id},
+        {"$set": {"archived_by": archived_by}}
+    )
+    return {"message": "Chat archived"}
+
+@router.put("/chat/rooms/{room_id}/unarchive")
+async def unarchive_chat_room(
+    room_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Unarchive a chat room"""
+    user = await get_current_user(authorization, request)
+    room = await db.chat_rooms.find_one({"room_id": room_id}, {"_id": 0})
+    if not room:
+        raise HTTPException(status_code=404, detail="Chat room not found")
+    
+    await db.chat_rooms.update_one(
+        {"room_id": room_id},
+        {"$pull": {"archived_by": user["user_id"]}}
+    )
+    return {"message": "Chat unarchived"}
+
+@router.delete("/chat/rooms/{room_id}")
+async def delete_chat_room(
+    room_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Delete a chat room (soft delete per user)"""
+    user = await get_current_user(authorization, request)
+    room = await db.chat_rooms.find_one({"room_id": room_id}, {"_id": 0})
+    if not room:
+        raise HTTPException(status_code=404, detail="Chat room not found")
+    
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    is_participant = (
+        room["user_id"] == user["user_id"] or 
+        (provider and room["provider_id"] == provider["provider_id"])
+    )
+    if not is_participant:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Soft delete per user
+    deleted_by = room.get("deleted_by", [])
+    if user["user_id"] not in deleted_by:
+        deleted_by.append(user["user_id"])
+    
+    await db.chat_rooms.update_one(
+        {"room_id": room_id},
+        {"$set": {"deleted_by": deleted_by}}
+    )
+    
+    # If both participants deleted, remove messages too
+    all_participants = [room["user_id"]]
+    if provider:
+        all_participants.append(provider.get("user_id", ""))
+    prov_doc = await db.providers.find_one({"provider_id": room["provider_id"]}, {"_id": 0})
+    if prov_doc:
+        all_participants.append(prov_doc.get("user_id", ""))
+    all_participants = list(set(all_participants))
+    
+    if all(p in deleted_by for p in all_participants if p):
+        await db.messages.delete_many({"room_id": room_id})
+        await db.chat_rooms.delete_one({"room_id": room_id})
+    
+    return {"message": "Chat deleted"}
 
 # ==================== NOTIFICATIONS ROUTES ====================

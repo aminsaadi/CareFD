@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import api from '../utils/api';
-import { format, isToday, isYesterday, formatDistanceToNow } from 'date-fns';
+import { format, isToday, isYesterday } from 'date-fns';
 import { he } from 'date-fns/locale';
+import { toast } from 'sonner';
 import { 
-  FaPaperPlane, FaArrowRight, FaPhone, FaVideo, FaEllipsisV,
-  FaCheckDouble, FaCheck, FaClock, FaImage, FaSmile, FaUserMd,
-  FaSpinner, FaCircle
+  FaPaperPlane, FaArrowRight, FaEllipsisV,
+  FaCheckDouble, FaCheck, FaClock, FaUserMd,
+  FaSpinner, FaArchive, FaTrash
 } from 'react-icons/fa';
 
 const ChatRoom = () => {
-  const { t } = useTranslation();
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -22,9 +21,9 @@ const ChatRoom = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [roomInfo, setRoomInfo] = useState(null);
-  const [isTyping, setIsTyping] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const pollIntervalRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -32,17 +31,13 @@ const ChatRoom = () => {
     fetchRoomInfo();
     fetchMessages();
     
-    // Poll for new messages every 3 seconds
     pollIntervalRef.current = setInterval(() => {
       fetchMessages(true);
     }, 3000);
 
     return () => {
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current);
-      }
+      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]);
 
   useEffect(() => {
@@ -53,7 +48,12 @@ const ChatRoom = () => {
     try {
       const response = await api.get('/chat/rooms');
       const room = response.data.rooms?.find(r => r.room_id === roomId);
-      if (room) {
+      // Also check archived
+      if (!room) {
+        const archivedRes = await api.get('/chat/rooms?archived=true');
+        const archivedRoom = archivedRes.data.rooms?.find(r => r.room_id === roomId);
+        if (archivedRoom) setRoomInfo(archivedRoom);
+      } else {
         setRoomInfo(room);
       }
     } catch (error) {
@@ -80,7 +80,6 @@ const ChatRoom = () => {
     const messageContent = newMessage.trim();
     setNewMessage('');
     
-    // Optimistic update
     const tempMessage = {
       message_id: `temp_${Date.now()}`,
       sender_id: user?.user_id,
@@ -92,19 +91,34 @@ const ChatRoom = () => {
 
     try {
       setSending(true);
-      await api.post('/chat/messages', {
-        room_id: roomId,
-        content: messageContent
-      });
+      await api.post('/chat/messages', { room_id: roomId, content: messageContent });
       fetchMessages(true);
     } catch (error) {
-      console.error('Failed to send message:', error);
-      // Remove temp message on error
       setMessages(prev => prev.filter(m => m.message_id !== tempMessage.message_id));
       setNewMessage(messageContent);
-      alert(t('errorOccurred'));
+      toast.error('שגיאה בשליחת ההודעה');
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleArchive = async () => {
+    try {
+      await api.put(`/chat/rooms/${roomId}/archive`);
+      toast.success('השיחה הועברה לארכיון');
+      navigate('/chats');
+    } catch {
+      toast.error('שגיאה בהעברה לארכיון');
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/chat/rooms/${roomId}`);
+      toast.success('השיחה נמחקה');
+      navigate('/chats');
+    } catch {
+      toast.error('שגיאה במחיקה');
     }
   };
 
@@ -114,42 +128,28 @@ const ChatRoom = () => {
 
   const formatMessageDate = (dateString) => {
     const date = new Date(dateString);
-    if (isToday(date)) {
-      return format(date, 'HH:mm');
-    } else if (isYesterday(date)) {
-      return `אתמול ${format(date, 'HH:mm')}`;
-    } else {
-      return format(date, 'dd/MM HH:mm');
-    }
+    if (isToday(date)) return format(date, 'HH:mm');
+    if (isYesterday(date)) return `אתמול ${format(date, 'HH:mm')}`;
+    return format(date, 'dd/MM HH:mm');
   };
 
   const formatDateDivider = (dateString) => {
     const date = new Date(dateString);
-    if (isToday(date)) {
-      return 'היום';
-    } else if (isYesterday(date)) {
-      return 'אתמול';
-    } else {
-      return format(date, 'dd בMMMM yyyy', { locale: he });
-    }
+    if (isToday(date)) return 'היום';
+    if (isYesterday(date)) return 'אתמול';
+    return format(date, 'dd בMMMM yyyy', { locale: he });
   };
 
   const shouldShowDateDivider = (message, index) => {
     if (index === 0) return true;
-    const prevMessage = messages[index - 1];
-    const currentDate = new Date(message.created_at).toDateString();
-    const prevDate = new Date(prevMessage.created_at).toDateString();
-    return currentDate !== prevDate;
+    const prevDate = new Date(messages[index - 1].created_at).toDateString();
+    return new Date(message.created_at).toDateString() !== prevDate;
   };
 
   const getMessageStatus = (message) => {
-    if (message.status === 'sending') {
-      return <FaClock className="text-gray-400" />;
-    } else if (message.read_at) {
-      return <FaCheckDouble className="text-blue-400" />;
-    } else {
-      return <FaCheck className="text-gray-400" />;
-    }
+    if (message.status === 'sending') return <FaClock className="text-gray-400" />;
+    if (message.read_at) return <FaCheckDouble className="text-blue-400" />;
+    return <FaCheck className="text-gray-400" />;
   };
 
   const otherUser = roomInfo?.other_user;
@@ -158,9 +158,9 @@ const ChatRoom = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-carelink-navy to-carelink-teal">
+      <div className="h-screen flex flex-col bg-gradient-to-b from-carelink-navy to-carelink-teal">
         <Navbar />
-        <div className="flex items-center justify-center h-[calc(100vh-80px)]">
+        <div className="flex-1 flex items-center justify-center">
           <FaSpinner className="animate-spin text-4xl text-white" />
         </div>
       </div>
@@ -168,12 +168,12 @@ const ChatRoom = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-carelink-navy to-carelink-teal flex flex-col">
+    <div className="h-screen flex flex-col bg-gradient-to-b from-carelink-navy to-carelink-teal" data-testid="chat-room">
       <Navbar />
       
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
-        {/* Chat Header */}
-        <div className="bg-white/10 backdrop-blur-md border-b border-white/20 px-4 py-3">
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full min-h-0">
+        {/* Chat Header - Fixed */}
+        <div className="bg-white/10 backdrop-blur-md border-b border-white/20 px-4 py-3 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
@@ -193,46 +193,43 @@ const ChatRoom = () => {
                 </div>
                 <div>
                   <h2 className="font-bold text-white text-lg">{otherUserName}</h2>
-                  <p className="text-xs text-white/70">
-                    {isTyping ? (
-                      <span className="flex items-center gap-1">
-                        <span className="animate-pulse">מקליד...</span>
-                      </span>
-                    ) : (
-                      'פעיל עכשיו'
-                    )}
-                  </p>
+                  <p className="text-xs text-white/70">פעיל עכשיו</p>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-2">
-              <button className="text-white hover:bg-white/20 p-2.5 rounded-full transition" title="שיחת וידאו">
-                <FaVideo />
-              </button>
-              <button className="text-white hover:bg-white/20 p-2.5 rounded-full transition" title="התקשר">
-                <FaPhone />
-              </button>
               <div className="relative">
                 <button 
                   onClick={() => setShowOptions(!showOptions)}
                   className="text-white hover:bg-white/20 p-2.5 rounded-full transition"
+                  data-testid="chat-options-btn"
                 >
                   <FaEllipsisV />
                 </button>
                 {showOptions && (
-                  <div className="absolute left-0 top-full mt-2 bg-white rounded-xl shadow-xl py-2 min-w-[160px] z-10">
+                  <div className="absolute left-0 top-full mt-2 bg-white rounded-xl shadow-xl py-2 min-w-[180px] z-10">
                     <Link 
                       to={`/providers/${roomInfo?.provider_id}`}
-                      className="block px-4 py-2 hover:bg-carelink-teal-pale text-carelink-navy text-sm"
+                      className="block px-4 py-2.5 hover:bg-carelink-teal-pale text-carelink-navy text-sm"
                     >
                       צפה בפרופיל
                     </Link>
-                    <button className="w-full text-right px-4 py-2 hover:bg-carelink-teal-pale text-carelink-navy text-sm">
-                      נקה שיחה
+                    <button
+                      onClick={handleArchive}
+                      className="w-full text-right px-4 py-2.5 hover:bg-amber-50 text-carelink-navy text-sm flex items-center gap-3"
+                      data-testid="archive-chat-btn"
+                    >
+                      <FaArchive className="text-amber-500" />
+                      העבר לארכיון
                     </button>
-                    <button className="w-full text-right px-4 py-2 hover:bg-red-50 text-red-500 text-sm">
-                      חסום משתמש
+                    <button
+                      onClick={handleDelete}
+                      className="w-full text-right px-4 py-2.5 hover:bg-red-50 text-red-500 text-sm flex items-center gap-3"
+                      data-testid="delete-chat-btn"
+                    >
+                      <FaTrash />
+                      מחק שיחה
                     </button>
                   </div>
                 )}
@@ -241,11 +238,12 @@ const ChatRoom = () => {
           </div>
         </div>
 
-        {/* Messages Area */}
+        {/* Messages Area - Scrollable, fixed height */}
         <div 
-          className="flex-1 overflow-y-auto p-4 space-y-1"
+          ref={messagesContainerRef}
+          className="flex-1 overflow-y-auto p-4 space-y-1 min-h-0"
           style={{ 
-            backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
+            backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.05\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")',
           }}
           data-testid="messages-container"
         >
@@ -294,9 +292,7 @@ const ChatRoom = () => {
                             {formatMessageDate(message.created_at)}
                           </span>
                           {isOwn && (
-                            <span className="text-xs">
-                              {getMessageStatus(message)}
-                            </span>
+                            <span className="text-xs">{getMessageStatus(message)}</span>
                           )}
                         </div>
                       </div>
@@ -309,37 +305,9 @@ const ChatRoom = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Typing Indicator */}
-        {isTyping && (
-          <div className="px-4 py-2">
-            <div className="flex items-center gap-2 text-white/70 text-sm">
-              <div className="flex gap-1">
-                <span className="w-2 h-2 bg-white/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                <span className="w-2 h-2 bg-white/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                <span className="w-2 h-2 bg-white/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-              </div>
-              <span>{otherUserName} מקליד...</span>
-            </div>
-          </div>
-        )}
-
-        {/* Message Input */}
-        <div className="bg-white/10 backdrop-blur-md border-t border-white/20 p-4">
+        {/* Message Input - Fixed at bottom */}
+        <div className="bg-white/10 backdrop-blur-md border-t border-white/20 p-4 flex-shrink-0">
           <form onSubmit={handleSendMessage} className="flex items-end gap-3">
-            <button
-              type="button"
-              className="text-white/70 hover:text-white p-2 transition"
-              title="הוסף תמונה"
-            >
-              <FaImage className="text-xl" />
-            </button>
-            <button
-              type="button"
-              className="text-white/70 hover:text-white p-2 transition"
-              title="אימוג'י"
-            >
-              <FaSmile className="text-xl" />
-            </button>
             <div className="flex-1 relative">
               <textarea
                 ref={inputRef}
@@ -362,7 +330,7 @@ const ChatRoom = () => {
             <button
               type="submit"
               disabled={sending || !newMessage.trim()}
-              className="bg-white text-carelink-teal p-3 rounded-full hover:bg-carelink-teal-pale transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="bg-white text-carelink-teal p-3 rounded-full hover:bg-carelink-teal-pale transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
               data-testid="send-message-btn"
             >
               {sending ? (
