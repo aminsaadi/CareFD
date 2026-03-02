@@ -9,7 +9,7 @@ import { he } from 'date-fns/locale';
 import { 
   FaBell, FaCheck, FaTrash, FaCalendarCheck, FaComments, 
   FaStar, FaBullhorn, FaCheckCircle, FaTimes, FaFilter,
-  FaEnvelope, FaEnvelopeOpen, FaExchangeAlt
+  FaEnvelope, FaEnvelopeOpen, FaExchangeAlt, FaShieldAlt
 } from 'react-icons/fa';
 
 const notificationIcons = {
@@ -97,22 +97,56 @@ const Notifications = () => {
 
   const getNotificationLink = (notification) => {
     const data = notification.data || {};
+    const isProvider = user?.role === 'PROVIDER';
+    const isAdmin = user?.role === 'ADMIN';
+    
     switch (notification.type) {
+      // Bookings - navigate to bookings tab in dashboard
       case 'booking_new':
       case 'booking_confirmed':
       case 'booking_cancelled':
       case 'booking_completed':
-        return data.booking_id ? `/bookings/${data.booking_id}` : '/bookings';
+      case 'booking_provider_completed':
+      case 'booking_change_requested':
+        if (isAdmin) return '/admin/bookings';
+        return isProvider ? '/provider/dashboard?tab=bookings' : '/dashboard?tab=bookings';
+      
+      // Chat messages
       case 'message_new':
       case 'chat_message':
         return data.room_id ? `/chat/${data.room_id}` : '/chats';
+      
+      // Requests & Offers
       case 'offer_new':
       case 'offer_accepted':
         return data.request_id ? `/requests/${data.request_id}` : '/requests';
+      
+      // Reviews
       case 'review_new':
-        return data.provider_id ? `/providers/${data.provider_id}` : '/dashboard';
+        if (isAdmin) return '/admin/reviews';
+        return isProvider ? '/provider/dashboard?tab=reviews' : '/dashboard?tab=reviews';
+      
+      // Verification / Account
+      case 'provider_verified':
+      case 'provider_rejected':
+      case 'provider_documents_submitted':
+      case 'provider_new_registration':
+        if (isAdmin) return '/admin/providers';
+        return isProvider ? '/provider/dashboard?tab=settings' : '/dashboard?tab=settings';
+      
+      // System notifications
+      case 'system':
+        if (data.booking_id) {
+          return isProvider ? '/provider/dashboard?tab=bookings' : '/dashboard?tab=bookings';
+        }
+        if (data.review_id) {
+          if (isAdmin) return '/admin/reviews';
+          return isProvider ? '/provider/dashboard?tab=reviews' : '/dashboard?tab=reviews';
+        }
+        return isAdmin ? '/admin/overview' : '/dashboard';
+      
       default:
-        return '/dashboard';
+        return isAdmin ? '/admin/overview' : '/dashboard';
     }
   };
 
@@ -132,7 +166,12 @@ const Notifications = () => {
     // Type filter
     if (typeFilter === 'bookings' && !n.type.startsWith('booking')) return false;
     if (typeFilter === 'messages' && !['message_new', 'chat_message'].includes(n.type)) return false;
-    if (typeFilter === 'reviews' && n.type !== 'review_new') return false;
+    if (typeFilter === 'reviews' && !['review_new', 'system'].includes(n.type)) {
+      // For system type, check if it's review-related
+      if (n.type === 'system' && n.data?.review_id) return true;
+      return false;
+    }
+    if (typeFilter === 'verification' && !['provider_verified', 'provider_rejected', 'provider_documents_submitted', 'provider_new_registration'].includes(n.type)) return false;
     
     return true;
   });
@@ -206,6 +245,7 @@ const Notifications = () => {
                 { value: 'bookings', label: 'הזמנות', icon: FaCalendarCheck },
                 { value: 'messages', label: 'הודעות', icon: FaComments },
                 { value: 'reviews', label: 'ביקורות', icon: FaStar },
+                { value: 'verification', label: 'אימות', icon: FaShieldAlt },
               ].map(option => (
                 <button
                   key={option.value}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
@@ -53,7 +53,8 @@ const ProviderDashboard = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
   const [provider, setProvider] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [services, setServices] = useState([]);

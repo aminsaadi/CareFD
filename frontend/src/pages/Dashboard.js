@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
@@ -29,7 +29,8 @@ const PROFILE_COLORS = [
 const Dashboard = () => {
   const { t } = useTranslation();
   const { user, setUser } = useAuth();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
   const [bookings, setBookings] = useState([]);
   const [requests, setRequests] = useState([]);
   const [chats, setChats] = useState([]);

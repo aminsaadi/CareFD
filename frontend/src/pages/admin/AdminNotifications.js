@@ -95,14 +95,23 @@ const AdminNotifications = () => {
       case 'booking_confirmed':
       case 'booking_cancelled':
       case 'booking_completed':
+      case 'booking_provider_completed':
+      case 'booking_change_requested':
         return '/admin/bookings';
       case 'message_new':
       case 'chat_message':
         return data.room_id ? `/chat/${data.room_id}` : '/admin/messages';
-      case 'provider_registered':
-        return '/admin/verification';
-      case 'review_new':
+      case 'provider_new_registration':
+      case 'provider_documents_submitted':
+      case 'provider_verified':
+      case 'provider_rejected':
         return '/admin/providers';
+      case 'review_new':
+        return '/admin/reviews';
+      case 'system':
+        if (data.booking_id) return '/admin/bookings';
+        if (data.review_id) return '/admin/reviews';
+        return '/admin/overview';
       default:
         return '/admin/overview';
     }

@@ -560,7 +560,7 @@ async def update_user_info(
     
     allowed_fields = [
         "first_name", "last_name", "phone", "address", "city", 
-        "profile_image", "date_of_birth", "gender"
+        "profile_image", "profile_color", "date_of_birth", "gender"
     ]
     update_data = {}
     

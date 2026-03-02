@@ -4,6 +4,7 @@ import {
   FaBell, FaTimes, FaCheck, FaCalendarCheck, FaComments, 
   FaStar, FaBullhorn, FaCheckCircle, FaTrash, FaExchangeAlt
 } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationContext';
 import { formatDistanceToNow } from 'date-fns';
 import { he } from 'date-fns/locale';
@@ -40,6 +41,7 @@ const notificationColors = {
 
 const NotificationBell = () => {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -65,6 +67,9 @@ const NotificationBell = () => {
 
   const getNotificationLink = (notification) => {
     const data = notification.data || {};
+    const isProvider = user?.role === 'PROVIDER';
+    const isAdmin = user?.role === 'ADMIN';
+    
     switch (notification.type) {
       case 'booking_new':
       case 'booking_confirmed':
@@ -72,17 +77,40 @@ const NotificationBell = () => {
       case 'booking_completed':
       case 'booking_provider_completed':
       case 'booking_change_requested':
-        return '/dashboard';
+        if (isAdmin) return '/admin/bookings';
+        return isProvider ? '/provider/dashboard?tab=bookings' : '/dashboard?tab=bookings';
+      
       case 'message_new':
       case 'chat_message':
         return data.room_id ? `/chat/${data.room_id}` : '/chats';
+      
       case 'offer_new':
       case 'offer_accepted':
         return data.request_id ? `/requests/${data.request_id}` : '/requests';
+      
       case 'review_new':
-        return data.provider_id ? `/providers/${data.provider_id}` : '/dashboard';
+        if (isAdmin) return '/admin/reviews';
+        return isProvider ? '/provider/dashboard?tab=reviews' : '/dashboard?tab=reviews';
+      
+      case 'provider_verified':
+      case 'provider_rejected':
+      case 'provider_documents_submitted':
+      case 'provider_new_registration':
+        if (isAdmin) return '/admin/providers';
+        return isProvider ? '/provider/dashboard?tab=settings' : '/dashboard?tab=settings';
+      
+      case 'system':
+        if (data.booking_id) {
+          return isProvider ? '/provider/dashboard?tab=bookings' : '/dashboard?tab=bookings';
+        }
+        if (data.review_id) {
+          if (isAdmin) return '/admin/reviews';
+          return isProvider ? '/provider/dashboard?tab=reviews' : '/dashboard?tab=reviews';
+        }
+        return isAdmin ? '/admin/overview' : '/dashboard';
+      
       default:
-        return '/dashboard';
+        return isAdmin ? '/admin/overview' : '/dashboard';
     }
   };
 
