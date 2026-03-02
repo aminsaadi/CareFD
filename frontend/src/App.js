@@ -210,6 +210,14 @@ function AppRouter() {
         }
       />
       <Route
+        path="/admin/overview"
+        element={
+          <ProtectedRoute>
+            <AdminOverview />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/admin/old"
         element={
           <ProtectedRoute>
