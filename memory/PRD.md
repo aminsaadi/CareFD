@@ -35,6 +35,10 @@ Frontend: /app/frontend/src/ (context/, components/, pages/, data/)
 - Mar 1: **Fixed provider search (double verification filter bug), added localities with coordinates, radius-based search working**
 - Mar 1: **Region-based search: merged Tel Aviv into Center region, distance displayed on provider cards**
 - Mar 1: **Website Accessibility (IS 5568): floating button + 11 features (font size, contrast, grayscale, link highlight, readable font, stop animations, big cursor, reading guide, focus highlight, hide images, reset)**
+- Mar 2: **Push notifications for all events (bookings, reviews, chat) to both provider and client**
+- Mar 2: **Fixed notification routing - click navigates to correct page/tab based on user role**
+- Mar 2: **Fixed user settings - profile_color saves, ?tab= URL param works in dashboards**
+- Mar 2: **Fixed /admin/overview route, fixed CORS/withCredentials login bug**
 
 ## Mocked: PayPal, Subscription payments
 
