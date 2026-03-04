@@ -515,6 +515,38 @@ async def admin_get_all_providers(
     }
 
 
+@router.get("/admin/providers/pending")
+async def admin_get_pending_providers(
+    authorization: Optional[str] = Header(None),
+    request: Request = None,
+    skip: int = 0,
+    limit: int = 50
+):
+    """Admin: Get providers pending verification"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    query = {
+        "$or": [
+            {"verification_status": VerificationStatus.PENDING},
+            {"verification_status": VerificationStatus.DOCUMENTS_SUBMITTED},
+            {"is_verified": False, "verification_status": {"$exists": False}}
+        ]
+    }
+    
+    providers = await db.providers.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.providers.count_documents(query)
+    
+    # Enrich with user data
+    for provider in providers:
+        provider_user = await db.users.find_one({"user_id": provider["user_id"]}, {"_id": 0, "password_hash": 0})
+        if provider_user:
+            provider["user_info"] = provider_user
+    
+    return {"providers": providers, "total": total, "skip": skip, "limit": limit}
+
+
 @router.get("/admin/providers/{provider_id}")
 async def admin_get_provider_details(
     provider_id: str,
@@ -740,37 +772,6 @@ async def admin_reject_provider(
         )
     
     return {"message": "Provider verification rejected"}
-
-@router.get("/admin/providers/pending")
-async def admin_get_pending_providers(
-    authorization: Optional[str] = Header(None),
-    request: Request = None,
-    skip: int = 0,
-    limit: int = 50
-):
-    """Admin: Get providers pending verification"""
-    user = await get_current_user(authorization, request)
-    if user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="Admin access required")
-    
-    query = {
-        "$or": [
-            {"verification_status": VerificationStatus.PENDING},
-            {"verification_status": VerificationStatus.DOCUMENTS_SUBMITTED},
-            {"is_verified": False, "verification_status": {"$exists": False}}
-        ]
-    }
-    
-    providers = await db.providers.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
-    total = await db.providers.count_documents(query)
-    
-    # Enrich with user data
-    for provider in providers:
-        provider_user = await db.users.find_one({"user_id": provider["user_id"]}, {"_id": 0, "password_hash": 0})
-        if provider_user:
-            provider["user_info"] = provider_user
-    
-    return {"providers": providers, "total": total, "skip": skip, "limit": limit}
 
 @router.put("/admin/providers/{provider_id}/documents/{document_id}/approve")
 async def admin_approve_document(

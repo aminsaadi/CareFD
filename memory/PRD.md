@@ -40,6 +40,14 @@ Frontend: /app/frontend/src/ (context/, components/, pages/, data/)
 - Mar 2: **Fixed user settings - profile_color saves, ?tab= URL param works in dashboards**
 - Mar 2: **Fixed /admin/overview route, fixed CORS/withCredentials login bug**
 - Mar 2: **Chat: archive, delete (per-user soft delete), fixed-height scrollable window, date dividers**
+- Mar 4: **Admin Panel Overhaul:**
+  - Added delete button on ALL reviews (not just pending)
+  - Fixed AdminSubscriptions page (added AdminLayout wrapper)
+  - Fixed DEFAULT_PLANS bug (NameError crash on empty DB) - moved to subscriptions.py
+  - Fixed /admin/providers/pending route 404 (route ordering conflict with {provider_id})
+  - Removed duplicate "finance" sidebar section
+  - Dynamic sidebar badge counts (pending reviews + verifications)
+  - Dynamic AdminOverview recent activity (real bookings/reviews instead of hardcoded)
 
 ## Mocked: PayPal, Subscription payments
 
