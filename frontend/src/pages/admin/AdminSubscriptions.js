@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../utils/api';
 import { toast } from 'sonner';
 import {
@@ -86,13 +87,16 @@ const AdminSubscriptions = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="w-10 h-10 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
-      </div>
+      <AdminLayout>
+        <div className="flex justify-center py-20">
+          <div className="w-10 h-10 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      </AdminLayout>
     );
   }
 
   return (
+    <AdminLayout>
     <div className="space-y-6" data-testid="admin-subscriptions">
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -296,6 +300,7 @@ const AdminSubscriptions = () => {
         </div>
       )}
     </div>
+    </AdminLayout>
   );
 };
 

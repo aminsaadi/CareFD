@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import api from '../../utils/api';
 import {
   FiHome, FiUsers, FiBriefcase, FiCalendar, FiGrid, FiMapPin,
   FiFileText, FiImage, FiSettings, FiMessageSquare, FiBell,
@@ -14,6 +15,25 @@ const AdminLayout = ({ children }) => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [expandedMenus, setExpandedMenus] = useState(['content', 'management']);
+  const [badgeCounts, setBadgeCounts] = useState({ pendingReviews: 0, pendingVerifications: 0 });
+
+  React.useEffect(() => {
+    const fetchBadgeCounts = async () => {
+      try {
+        const [reviewsRes, providersRes] = await Promise.all([
+          api.get('/admin/reviews?status=pending'),
+          api.get('/admin/providers/pending')
+        ]);
+        setBadgeCounts({
+          pendingReviews: reviewsRes.data.reviews?.length || 0,
+          pendingVerifications: providersRes.data.total || 0
+        });
+      } catch (e) {}
+    };
+    fetchBadgeCounts();
+    const interval = setInterval(fetchBadgeCounts, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const menuItems = [
     {
@@ -29,9 +49,9 @@ const AdminLayout = ({ children }) => {
       submenu: [
         { id: 'users', label: 'משתמשים', icon: FiUsers, path: '/admin/users' },
         { id: 'providers', label: 'ספקים', icon: FiBriefcase, path: '/admin/providers' },
-        { id: 'verification', label: 'אימות ספקים', icon: FiShield, path: '/admin/verification', badge: true },
+        { id: 'verification', label: 'אימות ספקים', icon: FiShield, path: '/admin/verification', badgeKey: 'pendingVerifications' },
         { id: 'bookings', label: 'הזמנות', icon: FiCalendar, path: '/admin/bookings' },
-        { id: 'reviews', label: 'ביקורות', icon: FiStar, path: '/admin/reviews', badge: true },
+        { id: 'reviews', label: 'ביקורות', icon: FiStar, path: '/admin/reviews', badgeKey: 'pendingReviews' },
         { id: 'services', label: 'שירותים', icon: FiTag, path: '/admin/services' },
       ]
     },
@@ -80,14 +100,6 @@ const AdminLayout = ({ children }) => {
         { id: 'notifications', label: 'הודעות מערכת', icon: FiBell, path: '/admin/notifications' },
         { id: 'push', label: 'התראות Push', icon: FiBell, path: '/admin/push-notifications' },
         { id: 'messages', label: 'הודעות', icon: FiMessageSquare, path: '/admin/messages' },
-      ]
-    },
-    {
-      id: 'finance',
-      label: 'כספים',
-      icon: FiDollarSign,
-      submenu: [
-        { id: 'subscriptions', label: 'מנויים ותשלומים', icon: FiDollarSign, path: '/admin/subscriptions' },
       ]
     },
     {
@@ -180,9 +192,9 @@ const AdminLayout = ({ children }) => {
                         >
                           <subItem.icon size={16} />
                           <span>{subItem.label}</span>
-                          {subItem.badge && (
+                          {subItem.badgeKey && badgeCounts[subItem.badgeKey] > 0 && (
                             <span className="mr-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-                              3
+                              {badgeCounts[subItem.badgeKey]}
                             </span>
                           )}
                         </Link>

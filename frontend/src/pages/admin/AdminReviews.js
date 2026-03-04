@@ -4,7 +4,7 @@ import api from '../../utils/api';
 import { toast } from 'sonner';
 import {
   FiStar, FiCheck, FiX, FiUser, FiBriefcase, FiMessageSquare,
-  FiThumbsUp, FiThumbsDown, FiFilter, FiClock, FiEye
+  FiThumbsUp, FiThumbsDown, FiFilter, FiClock, FiEye, FiTrash2
 } from 'react-icons/fi';
 
 const AdminReviews = () => {
@@ -54,6 +54,17 @@ const AdminReviews = () => {
       fetchReviews();
     } catch (error) {
       toast.error('שגיאה בדחיית הביקורת');
+    }
+  };
+
+  const handleDelete = async (reviewId) => {
+    if (!window.confirm('האם אתה בטוח שברצונך למחוק את חוות הדעת? פעולה זו בלתי הפיכה.')) return;
+    try {
+      await api.delete(`/admin/reviews/${reviewId}`);
+      toast.success('חוות הדעת נמחקה בהצלחה');
+      fetchReviews();
+    } catch (error) {
+      toast.error('שגיאה במחיקת חוות הדעת');
     }
   };
 
@@ -219,26 +230,36 @@ const AdminReviews = () => {
                   </div>
 
                   {/* Actions */}
-                  {review.status === 'pending' && (
-                    <div className="flex md:flex-col gap-2 shrink-0">
-                      <button
-                        onClick={() => handleApprove(review.review_id)}
-                        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
-                        data-testid={`approve-review-${review.review_id}`}
-                      >
-                        <FiCheck className="w-4 h-4" />
-                        אשר
-                      </button>
-                      <button
-                        onClick={() => setShowRejectModal(review.review_id)}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-medium"
-                        data-testid={`reject-review-${review.review_id}`}
-                      >
-                        <FiX className="w-4 h-4" />
-                        דחה
-                      </button>
-                    </div>
-                  )}
+                  <div className="flex md:flex-col gap-2 shrink-0">
+                    {review.status === 'pending' && (
+                      <>
+                        <button
+                          onClick={() => handleApprove(review.review_id)}
+                          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
+                          data-testid={`approve-review-${review.review_id}`}
+                        >
+                          <FiCheck className="w-4 h-4" />
+                          אשר
+                        </button>
+                        <button
+                          onClick={() => setShowRejectModal(review.review_id)}
+                          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-medium"
+                          data-testid={`reject-review-${review.review_id}`}
+                        >
+                          <FiX className="w-4 h-4" />
+                          דחה
+                        </button>
+                      </>
+                    )}
+                    <button
+                      onClick={() => handleDelete(review.review_id)}
+                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-red-600 rounded-lg hover:bg-red-50 hover:text-red-700 transition text-sm font-medium border border-gray-200"
+                      data-testid={`delete-review-${review.review_id}`}
+                    >
+                      <FiTrash2 className="w-4 h-4" />
+                      מחק
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

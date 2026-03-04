@@ -283,3 +283,44 @@ async def admin_reject_review(
     )
     
     return {"message": "Review rejected successfully"}
+
+
+@router.delete("/admin/reviews/{review_id}")
+async def delete_review(
+    review_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Delete a review (admin only)"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    review = await db.reviews.find_one({"review_id": review_id}, {"_id": 0})
+    if not review:
+        raise HTTPException(status_code=404, detail="Review not found")
+    
+    # Update provider rating
+    provider_id = review.get("provider_id")
+    await db.reviews.delete_one({"review_id": review_id})
+    
+    # Recalculate provider rating
+    if provider_id:
+        remaining = await db.reviews.find(
+            {"provider_id": provider_id, "status": "approved"},
+            {"_id": 0, "rating": 1}
+        ).to_list(1000)
+        
+        if remaining:
+            avg_rating = sum(r["rating"] for r in remaining) / len(remaining)
+            await db.providers.update_one(
+                {"provider_id": provider_id},
+                {"$set": {"rating": round(avg_rating, 1), "review_count": len(remaining)}}
+            )
+        else:
+            await db.providers.update_one(
+                {"provider_id": provider_id},
+                {"$set": {"rating": 0, "review_count": 0}}
+            )
+    
+    return {"message": "Review deleted successfully"}

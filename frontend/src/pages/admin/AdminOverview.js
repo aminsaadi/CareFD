@@ -20,14 +20,32 @@ const AdminOverview = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const statsRes = await api.get('/admin/stats');
+      const [statsRes, bookingsRes, reviewsRes] = await Promise.all([
+        api.get('/admin/stats'),
+        api.get('/admin/bookings?limit=5'),
+        api.get('/admin/reviews?status=pending')
+      ]);
       setStats(statsRes.data);
       
-      setRecentActivity([
-        { id: 1, type: 'booking', message: 'הזמנה חדשה מ-יוסי כהן', time: '5 דקות' },
-        { id: 2, type: 'provider', message: 'ספק חדש נרשם - ד"ר שרה לוי', time: '12 דקות' },
-        { id: 3, type: 'review', message: 'ביקורת חדשה (5 כוכבים)', time: '30 דקות' },
-        { id: 4, type: 'user', message: 'משתמש חדש נרשם', time: '1 שעה' },
+      const activities = [];
+      (bookingsRes.data.bookings || []).slice(0, 3).forEach(b => {
+        activities.push({
+          id: b.booking_id,
+          type: 'booking',
+          message: `הזמנה ${b.status === 'pending' ? 'חדשה' : b.status === 'confirmed' ? 'אושרה' : b.status === 'completed' ? 'הושלמה' : 'בוטלה'} - ${b.client_name || b.user_name || 'לקוח'}`,
+          time: b.created_at ? new Date(b.created_at).toLocaleDateString('he-IL') : ''
+        });
+      });
+      (reviewsRes.data.reviews || []).slice(0, 2).forEach(r => {
+        activities.push({
+          id: r.review_id,
+          type: 'review',
+          message: `ביקורת חדשה (${r.rating} כוכבים) ממתינה לאישור`,
+          time: r.created_at ? new Date(r.created_at).toLocaleDateString('he-IL') : ''
+        });
+      });
+      setRecentActivity(activities.length > 0 ? activities : [
+        { id: 'empty', type: 'user', message: 'אין פעילות אחרונה', time: '' }
       ]);
     } catch (error) {
       console.error('Failed to fetch stats:', error);
