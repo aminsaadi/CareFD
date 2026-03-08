@@ -48,6 +48,11 @@ Frontend: /app/frontend/src/ (context/, components/, pages/, data/)
   - Removed duplicate "finance" sidebar section
   - Dynamic sidebar badge counts (pending reviews + verifications)
   - Dynamic AdminOverview recent activity (real bookings/reviews instead of hardcoded)
+- Mar 4: **Bookings Accordion + Sort:**
+  - Client + Provider dashboards: accordion-style expandable booking cards
+  - Sort dropdown: newest first (default), oldest, by status, by price
+  - Expand shows details grid (date, time, price, type) + action buttons
+  - Overview sections sorted newest first
 
 ## Mocked: PayPal, Subscription payments
 
