@@ -10,6 +10,53 @@ from app.utils import get_current_user, send_email_async, create_notification, s
 
 router = APIRouter()
 
+from app.utils import SMTP_USER, SMTP_PASSWORD, SENDER_EMAIL as _SENDER_EMAIL
+
+
+@router.post("/admin/test-email")
+async def admin_test_email(
+    data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Send a test email to verify SMTP configuration"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    recipient = data.get("email", user.get("email"))
+    if not recipient:
+        raise HTTPException(status_code=400, detail="Email address required")
+    
+    smtp_status = {
+        "smtp_user_configured": bool(SMTP_USER),
+        "smtp_password_configured": bool(SMTP_PASSWORD),
+        "sender_email": _SENDER_EMAIL
+    }
+    
+    if not SMTP_USER or not SMTP_PASSWORD:
+        return {"success": False, "error": "SMTP not configured", "smtp_status": smtp_status}
+    
+    result = await send_email_async(
+        recipient,
+        "CareLink - בדיקת שליחת מייל",
+        f"""
+        <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #19B8BA;">בדיקת שליחת מייל</h2>
+            <p>מייל זה נשלח כבדיקה מהמערכת.</p>
+            <p>אם קיבלת את המייל הזה, שליחת המיילים עובדת כראוי.</p>
+            <p>בברכה,<br>צוות CareLink</p>
+        </div>
+        """
+    )
+    
+    return {
+        "success": result is not None,
+        "recipient": recipient,
+        "smtp_status": smtp_status
+    }
+
+
 @router.get("/admin/users")
 async def admin_get_users(
     authorization: Optional[str] = Header(None),

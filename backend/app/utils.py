@@ -73,7 +73,7 @@ async def get_current_user(authorization: Optional[str] = Header(None), request:
 
 def send_email_smtp(recipient: str, subject: str, html_content: str):
     if not SMTP_USER or not SMTP_PASSWORD:
-        logger.warning("SMTP not configured, skipping email")
+        logger.error(f"SMTP not configured! SMTP_USER={'set' if SMTP_USER else 'EMPTY'}, SMTP_PASSWORD={'set' if SMTP_PASSWORD else 'EMPTY'} - Cannot send email to {recipient}")
         return None
     try:
         msg = MIMEMultipart('alternative')
@@ -86,10 +86,10 @@ def send_email_smtp(recipient: str, subject: str, html_content: str):
             server.starttls()
             server.login(SMTP_USER, SMTP_PASSWORD)
             server.sendmail(SENDER_EMAIL, recipient, msg.as_string())
-        logger.info(f"Email sent successfully to {recipient}")
+        logger.info(f"Email sent successfully to {recipient} - Subject: {subject}")
         return {"success": True, "recipient": recipient}
     except Exception as e:
-        logger.error(f"Failed to send email to {recipient}: {str(e)}")
+        logger.error(f"Failed to send email to {recipient} - Subject: {subject} - Error: {str(e)}")
         return None
 
 async def send_email_async(recipient: str, subject: str, html_content: str):

@@ -58,6 +58,8 @@ Frontend: /app/frontend/src/ (context/, components/, pages/, data/)
   - Fixed `NameError: name 'create_notification' is not defined` in contact.py - contact form crashing
   - Fixed missing `os` import in uploads.py - file uploads failing
   - Fixed missing `create_notification` import in push.py
+  - Improved email error logging for production debugging
+  - Added admin test-email endpoint (POST /admin/test-email) + UI button in settings
 
 ## Mocked: PayPal, Subscription payments
 

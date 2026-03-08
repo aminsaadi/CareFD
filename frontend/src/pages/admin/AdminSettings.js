@@ -538,6 +538,41 @@ const AdminSettings = () => {
                     נקה מטמון
                   </button>
                 </div>
+
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="text-carelink-navy font-medium mb-2">בדיקת שליחת מיילים</h3>
+                  <p className="text-carelink-slate text-sm mb-3">שלח מייל בדיקה כדי לוודא שהגדרות ה-SMTP עובדות</p>
+                  <div className="flex gap-2">
+                    <input
+                      type="email"
+                      id="test-email-input"
+                      placeholder="כתובת מייל לבדיקה..."
+                      className="flex-1 bg-white border border-gray-200 rounded-lg px-4 py-2 text-carelink-navy focus:border-carelink-teal outline-none text-sm"
+                      dir="ltr"
+                      data-testid="test-email-input"
+                    />
+                    <button 
+                      onClick={async () => {
+                        const emailInput = document.getElementById('test-email-input');
+                        const email = emailInput?.value;
+                        if (!email) { toast.error('הכנס כתובת מייל'); return; }
+                        try {
+                          const res = await api.post('/admin/test-email', { email });
+                          if (res.data.success) {
+                            toast.success(`מייל בדיקה נשלח ל-${email}`);
+                          } else {
+                            toast.error(`שליחת מייל נכשלה: ${res.data.error || 'שגיאה לא ידועה'}`);
+                          }
+                        } catch (err) { toast.error('שגיאה בשליחת מייל בדיקה'); }
+                      }}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                      data-testid="send-test-email-btn"
+                    >
+                      <FiMail className="inline ml-1" />
+                      שלח בדיקה
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>
