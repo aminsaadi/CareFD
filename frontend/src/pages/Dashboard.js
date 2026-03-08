@@ -13,7 +13,8 @@ import {
   FaChevronLeft, FaPlus, FaMapMarkerAlt, FaClock, FaCheckCircle,
   FaHourglass, FaTimes, FaEdit, FaBell, FaHeart, FaCamera, FaTrash,
   FaPhone, FaEnvelope, FaHome, FaLock, FaIdCard, FaShieldAlt,
-  FaMoneyBillWave, FaUserCircle, FaExchangeAlt, FaEye, FaEyeSlash
+  FaMoneyBillWave, FaUserCircle, FaExchangeAlt, FaEye, FaEyeSlash,
+  FaSort, FaSortAmountDown, FaSortAmountUp, FaChevronDown, FaChevronUp
 } from 'react-icons/fa';
 
 // Profile gradient colors
@@ -39,6 +40,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showCompletionDialog, setShowCompletionDialog] = useState(null);
   const [showBookingDetails, setShowBookingDetails] = useState(null);
+  const [expandedBookings, setExpandedBookings] = useState({});
+  const [bookingSortBy, setBookingSortBy] = useState('date_desc');
   const [uploadingImage, setUploadingImage] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
@@ -181,6 +184,24 @@ const Dashboard = () => {
 
   const getBookingStatusConfig = (status) => {
     return bookingStatusConfig[status] || bookingStatusConfig.pending;
+  };
+
+  const toggleBookingExpand = (bookingId) => {
+    setExpandedBookings(prev => ({ ...prev, [bookingId]: !prev[bookingId] }));
+  };
+
+  const getSortedBookings = () => {
+    const sorted = [...bookings];
+    switch (bookingSortBy) {
+      case 'date_desc': return sorted.sort((a, b) => new Date(b.created_at || b.booking_date) - new Date(a.created_at || a.booking_date));
+      case 'date_asc': return sorted.sort((a, b) => new Date(a.created_at || a.booking_date) - new Date(b.created_at || b.booking_date));
+      case 'status': {
+        const order = { pending: 0, confirmed: 1, in_progress: 2, provider_completed: 3, on_hold: 4, completed: 5, cancelled: 6, rejected: 7 };
+        return sorted.sort((a, b) => (order[a.status] ?? 99) - (order[b.status] ?? 99));
+      }
+      case 'price_desc': return sorted.sort((a, b) => (b.price || b.final_price || 0) - (a.price || a.final_price || 0));
+      default: return sorted;
+    }
   };
 
   const handleSaveSettings = async () => {
@@ -483,7 +504,7 @@ const Dashboard = () => {
                           </div>
                         ) : (
                           <div className="space-y-3">
-                            {bookings.slice(0, 3).map((booking) => {
+                            {[...bookings].sort((a, b) => new Date(b.created_at || b.booking_date) - new Date(a.created_at || a.booking_date)).slice(0, 3).map((booking) => {
                               const StatusIcon = getStatusIcon(booking.status);
                               return (
                                 <div 
@@ -515,15 +536,31 @@ const Dashboard = () => {
                   {/* Bookings Tab */}
                   {activeTab === 'bookings' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <div className="flex items-center justify-between mb-6">
+                      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                         <h3 className="text-xl font-bold text-carelink-navy">ההזמנות שלי</h3>
-                        <Link
-                          to="/providers"
-                          className="bg-carelink-teal text-white px-4 py-2 rounded-xl font-medium hover:bg-carelink-teal-medium transition flex items-center gap-2"
-                        >
-                          <FaPlus />
-                          הזמן תור חדש
-                        </Link>
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <select
+                              value={bookingSortBy}
+                              onChange={(e) => setBookingSortBy(e.target.value)}
+                              className="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 pr-10 text-sm font-medium text-carelink-navy cursor-pointer hover:border-carelink-teal transition focus:outline-none focus:ring-2 focus:ring-carelink-teal/30"
+                              data-testid="booking-sort-select"
+                            >
+                              <option value="date_desc">חדש ← ישן</option>
+                              <option value="date_asc">ישן ← חדש</option>
+                              <option value="status">לפי סטטוס</option>
+                              <option value="price_desc">לפי מחיר</option>
+                            </select>
+                            <FaSort className="absolute left-3 top-1/2 -translate-y-1/2 text-carelink-gray pointer-events-none text-xs" />
+                          </div>
+                          <Link
+                            to="/providers"
+                            className="bg-carelink-teal text-white px-4 py-2 rounded-xl font-medium hover:bg-carelink-teal-medium transition flex items-center gap-2 text-sm"
+                          >
+                            <FaPlus />
+                            הזמן תור חדש
+                          </Link>
+                        </div>
                       </div>
                       {bookings.length === 0 ? (
                         <div className="text-center py-12 text-carelink-gray">
@@ -534,78 +571,111 @@ const Dashboard = () => {
                           </Link>
                         </div>
                       ) : (
-                        <div className="space-y-4">
-                          {bookings.map((booking) => {
+                        <div className="space-y-3">
+                          {getSortedBookings().map((booking) => {
                             const statusConfig = getBookingStatusConfig(booking.status);
                             const StatusIcon = statusConfig.icon;
+                            const isExpanded = expandedBookings[booking.booking_id];
                             return (
                               <div 
                                 key={booking.booking_id} 
-                                className="border-2 border-carelink-teal-pale rounded-xl p-4 hover:border-carelink-teal transition cursor-pointer"
-                                onClick={() => setShowBookingDetails(booking)}
+                                className={`border-2 rounded-xl transition-all duration-200 overflow-hidden ${isExpanded ? 'border-carelink-teal shadow-md' : 'border-carelink-teal-pale hover:border-carelink-teal/40'}`}
                                 data-testid={`booking-card-${booking.booking_id}`}
                               >
-                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                  <div className="flex items-center gap-4">
-                                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${statusConfig.color}`}>
-                                      <StatusIcon className="text-xl" />
+                                {/* Collapsed Header - Always Visible */}
+                                <div
+                                  className="flex items-center justify-between gap-3 p-4 cursor-pointer select-none"
+                                  onClick={() => toggleBookingExpand(booking.booking_id)}
+                                  data-testid={`booking-toggle-${booking.booking_id}`}
+                                >
+                                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${statusConfig.color}`}>
+                                      <StatusIcon className="text-base" />
                                     </div>
-                                    <div>
-                                      <h4 className="font-bold text-carelink-navy">{booking.service_name || 'שירות'}</h4>
-                                      <p className="text-sm text-carelink-gray">{booking.provider_name || 'ספק'}</p>
+                                    <div className="min-w-0 flex-1">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <h4 className="font-bold text-carelink-navy text-sm">{booking.service_name || 'שירות'}</h4>
+                                        <span className="text-xs text-carelink-gray">•</span>
+                                        <span className="text-xs text-carelink-gray">{booking.provider_name || 'ספק'}</span>
+                                      </div>
+                                      <div className="flex items-center gap-3 mt-0.5 text-xs text-carelink-gray">
+                                        <span>{new Date(booking.booking_date).toLocaleDateString('he-IL')}</span>
+                                        {booking.booking_time && <span>{booking.booking_time}</span>}
+                                      </div>
                                     </div>
                                   </div>
-                                  <div className="flex flex-wrap items-center gap-3">
-                                    <div className="text-right">
-                                      <p className="font-medium text-carelink-navy">
-                                        {new Date(booking.booking_date).toLocaleDateString('he-IL')}
-                                      </p>
-                                      <p className="text-sm text-carelink-gray">
-                                        {booking.booking_time || new Date(booking.booking_date).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' })}
-                                      </p>
-                                    </div>
-                                    {booking.price && (
-                                      <div className="bg-green-100 text-green-700 px-3 py-1 rounded-lg text-sm font-medium">
-                                        ₪{booking.price}
-                                      </div>
-                                    )}
-                                    <span className={`px-4 py-2 rounded-xl text-sm font-medium ${statusConfig.color}`}>
+                                  <div className="flex items-center gap-2 flex-shrink-0">
+                                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusConfig.color}`}>
                                       {statusConfig.label}
                                     </span>
-                                    {/* Show confirm button only when provider completed */}
-                                    {booking.status === 'provider_completed' && (
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setShowCompletionDialog(booking);
-                                        }}
-                                        className="bg-carelink-teal text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-carelink-teal-medium transition"
-                                        data-testid={`confirm-booking-${booking.booking_id}`}
-                                      >
-                                        אשר השלמה
-                                      </button>
-                                    )}
-                                    {/* Show write review button only when completed and no review */}
-                                    {booking.status === 'completed' && !booking.has_review && (
-                                      <Link
-                                        to={`/review/${booking.booking_id}`}
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="bg-amber-500 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-amber-600 transition flex items-center gap-2"
-                                        data-testid={`write-review-${booking.booking_id}`}
-                                      >
-                                        <FaStar />
-                                        כתוב חוות דעת
-                                      </Link>
-                                    )}
-                                    {/* Show review written badge */}
-                                    {booking.has_review && (
-                                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-lg text-xs font-medium flex items-center gap-1">
-                                        <FaCheckCircle />
-                                        חוות דעת נכתבה
-                                      </span>
-                                    )}
+                                    {isExpanded ? <FaChevronUp className="text-carelink-gray text-xs" /> : <FaChevronDown className="text-carelink-gray text-xs" />}
                                   </div>
                                 </div>
+
+                                {/* Expanded Content */}
+                                {isExpanded && (
+                                  <div className="px-4 pb-4 border-t border-gray-100 pt-3 animate-in slide-in-from-top-1 duration-200">
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                                      <div className="bg-gray-50 rounded-lg p-3 text-center">
+                                        <p className="text-xs text-carelink-gray">תאריך</p>
+                                        <p className="font-medium text-sm text-carelink-navy">{new Date(booking.booking_date).toLocaleDateString('he-IL')}</p>
+                                      </div>
+                                      <div className="bg-gray-50 rounded-lg p-3 text-center">
+                                        <p className="text-xs text-carelink-gray">שעה</p>
+                                        <p className="font-medium text-sm text-carelink-navy">{booking.booking_time || 'יתואם'}</p>
+                                      </div>
+                                      <div className="bg-gray-50 rounded-lg p-3 text-center">
+                                        <p className="text-xs text-carelink-gray">מחיר</p>
+                                        <p className="font-medium text-sm text-green-600">{booking.price || booking.final_price ? `₪${booking.price || booking.final_price}` : 'יתואם'}</p>
+                                      </div>
+                                      <div className="bg-gray-50 rounded-lg p-3 text-center">
+                                        <p className="text-xs text-carelink-gray">סוג שירות</p>
+                                        <p className="font-medium text-sm text-carelink-navy">{booking.delivery_method || booking.service_type || '-'}</p>
+                                      </div>
+                                    </div>
+                                    {booking.notes && (
+                                      <div className="bg-blue-50 rounded-lg p-3 mb-4 text-sm text-carelink-navy">
+                                        <span className="font-medium">הערות: </span>{booking.notes}
+                                      </div>
+                                    )}
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      <button
+                                        onClick={(e) => { e.stopPropagation(); setShowBookingDetails(booking); }}
+                                        className="bg-carelink-navy/10 text-carelink-navy px-4 py-2 rounded-xl text-xs font-medium hover:bg-carelink-navy/20 transition flex items-center gap-1.5"
+                                        data-testid={`view-details-${booking.booking_id}`}
+                                      >
+                                        <FaEye />
+                                        פרטים מלאים
+                                      </button>
+                                      {booking.status === 'provider_completed' && (
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); setShowCompletionDialog(booking); }}
+                                          className="bg-carelink-teal text-white px-4 py-2 rounded-xl text-xs font-medium hover:bg-carelink-teal-medium transition"
+                                          data-testid={`confirm-booking-${booking.booking_id}`}
+                                        >
+                                          אשר השלמה
+                                        </button>
+                                      )}
+                                      {booking.status === 'completed' && !booking.has_review && (
+                                        <Link
+                                          to={`/review/${booking.booking_id}`}
+                                          onClick={(e) => e.stopPropagation()}
+                                          className="bg-amber-500 text-white px-4 py-2 rounded-xl text-xs font-medium hover:bg-amber-600 transition flex items-center gap-1.5"
+                                          data-testid={`write-review-${booking.booking_id}`}
+                                        >
+                                          <FaStar />
+                                          כתוב חוות דעת
+                                        </Link>
+                                      )}
+                                      {booking.has_review && (
+                                        <span className="bg-green-100 text-green-700 px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1">
+                                          <FaCheckCircle />
+                                          חוות דעת נכתבה
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             );
                           })}
