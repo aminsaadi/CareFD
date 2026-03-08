@@ -42,6 +42,8 @@ const AdminSettings = () => {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
   const [newFooterLink, setNewFooterLink] = useState({ label: '', url: '' });
+  const [testEmail, setTestEmail] = useState('');
+  const [sendingTestEmail, setSendingTestEmail] = useState(false);
   const { confirmState, confirm, closeConfirm } = useConfirm();
 
   useEffect(() => {
@@ -545,31 +547,36 @@ const AdminSettings = () => {
                   <div className="flex gap-2">
                     <input
                       type="email"
-                      id="test-email-input"
+                      value={testEmail}
+                      onChange={(e) => setTestEmail(e.target.value)}
                       placeholder="כתובת מייל לבדיקה..."
                       className="flex-1 bg-white border border-gray-200 rounded-lg px-4 py-2 text-carelink-navy focus:border-carelink-teal outline-none text-sm"
                       dir="ltr"
                       data-testid="test-email-input"
                     />
                     <button 
+                      type="button"
+                      disabled={sendingTestEmail}
                       onClick={async () => {
-                        const emailInput = document.getElementById('test-email-input');
-                        const email = emailInput?.value;
-                        if (!email) { toast.error('הכנס כתובת מייל'); return; }
+                        if (!testEmail) { toast.error('הכנס כתובת מייל'); return; }
+                        setSendingTestEmail(true);
                         try {
-                          const res = await api.post('/admin/test-email', { email });
+                          const res = await api.post('/admin/test-email', { email: testEmail });
                           if (res.data.success) {
-                            toast.success(`מייל בדיקה נשלח ל-${email}`);
+                            toast.success('מייל בדיקה נשלח בהצלחה! בדוק את תיבת הדואר');
                           } else {
-                            toast.error(`שליחת מייל נכשלה: ${res.data.error || 'שגיאה לא ידועה'}`);
+                            toast.error('שליחת מייל נכשלה: ' + (res.data.error || 'שגיאה'));
                           }
-                        } catch (err) { toast.error('שגיאה בשליחת מייל בדיקה'); }
+                        } catch (err) {
+                          toast.error('שגיאה בשליחת מייל: ' + (err.response?.data?.detail || err.message));
+                        } finally {
+                          setSendingTestEmail(false);
+                        }
                       }}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                       data-testid="send-test-email-btn"
                     >
-                      <FiMail className="inline ml-1" />
-                      שלח בדיקה
+                      {sendingTestEmail ? 'שולח...' : 'שלח בדיקה'}
                     </button>
                   </div>
                 </div>

@@ -10,7 +10,35 @@ from app.utils import get_current_user, send_email_async, create_notification, s
 
 router = APIRouter()
 
-from app.utils import SMTP_USER, SMTP_PASSWORD, SENDER_EMAIL as _SENDER_EMAIL
+from app.utils import SMTP_USER, SMTP_PASSWORD, SENDER_EMAIL as _SENDER_EMAIL, SMTP_HOST, SMTP_PORT
+
+
+@router.get("/admin/smtp-check")
+async def check_smtp_status():
+    """Public diagnostic endpoint to check SMTP configuration"""
+    import smtplib
+    smtp_configured = bool(SMTP_USER and SMTP_PASSWORD)
+    smtp_login_ok = False
+    smtp_error = None
+    
+    if smtp_configured:
+        try:
+            with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10) as server:
+                server.starttls()
+                server.login(SMTP_USER, SMTP_PASSWORD)
+                smtp_login_ok = True
+        except Exception as e:
+            smtp_error = str(e)
+    
+    return {
+        "smtp_user_set": bool(SMTP_USER),
+        "smtp_password_set": bool(SMTP_PASSWORD),
+        "smtp_host": SMTP_HOST,
+        "smtp_port": SMTP_PORT,
+        "sender_email": _SENDER_EMAIL,
+        "smtp_login_ok": smtp_login_ok,
+        "smtp_error": smtp_error
+    }
 
 
 @router.post("/admin/test-email")
