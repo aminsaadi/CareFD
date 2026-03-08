@@ -10,32 +10,93 @@ from app.utils import get_current_user, send_email_async, create_notification, s
 
 router = APIRouter()
 
-from app.utils import SMTP_USER, SMTP_PASSWORD, SENDER_EMAIL as _SENDER_EMAIL, SMTP_HOST, SMTP_PORT
+from app.utils import SMTP_USER, SMTP_PASSWORD, SENDER_EMAIL as _SENDER_EMAIL, SMTP_HOST, SMTP_PORT, _get_smtp_settings
+
+
+@router.get("/admin/smtp-settings")
+async def get_smtp_settings(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get current SMTP settings"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    db_settings = await db.smtp_settings.find_one({"_id": "smtp_config"}, {"_id": 0})
+    
+    return {
+        "source": "database" if db_settings else "environment",
+        "sender_email": db_settings.get("sender_email", _SENDER_EMAIL) if db_settings else _SENDER_EMAIL,
+        "smtp_host": db_settings.get("smtp_host", SMTP_HOST) if db_settings else SMTP_HOST,
+        "smtp_port": db_settings.get("smtp_port", SMTP_PORT) if db_settings else SMTP_PORT,
+        "smtp_user": db_settings.get("smtp_user", SMTP_USER) if db_settings else SMTP_USER,
+        "smtp_password_set": bool(db_settings.get("smtp_password") if db_settings else SMTP_PASSWORD),
+    }
+
+
+@router.put("/admin/smtp-settings")
+async def update_smtp_settings(
+    data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update SMTP settings in database"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    settings = {
+        "_id": "smtp_config",
+        "sender_email": data.get("sender_email", ""),
+        "smtp_host": data.get("smtp_host", "smtp.gmail.com"),
+        "smtp_port": int(data.get("smtp_port", 587)),
+        "smtp_user": data.get("smtp_user", ""),
+        "smtp_password": data.get("smtp_password", ""),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "updated_by": user.get("user_id")
+    }
+    
+    await db.smtp_settings.replace_one({"_id": "smtp_config"}, settings, upsert=True)
+    
+    # Clear cache so new settings take effect immediately
+    from app.utils import _smtp_cache
+    _smtp_cache["settings"] = None
+    _smtp_cache["fetched_at"] = None
+    
+    return {"message": "SMTP settings updated successfully"}
 
 
 @router.get("/admin/smtp-check")
-async def check_smtp_status():
-    """Public diagnostic endpoint to check SMTP configuration"""
+async def check_smtp_status(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Check SMTP configuration and test connection"""
+    user = await get_current_user(authorization, request)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
     import smtplib
-    smtp_configured = bool(SMTP_USER and SMTP_PASSWORD)
+    smtp_cfg = await _get_smtp_settings()
     smtp_login_ok = False
     smtp_error = None
     
-    if smtp_configured:
+    if smtp_cfg["smtp_user"] and smtp_cfg["smtp_password"]:
         try:
-            with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10) as server:
+            with smtplib.SMTP(smtp_cfg["smtp_host"], smtp_cfg["smtp_port"], timeout=10) as server:
                 server.starttls()
-                server.login(SMTP_USER, SMTP_PASSWORD)
+                server.login(smtp_cfg["smtp_user"], smtp_cfg["smtp_password"])
                 smtp_login_ok = True
         except Exception as e:
             smtp_error = str(e)
     
     return {
-        "smtp_user_set": bool(SMTP_USER),
-        "smtp_password_set": bool(SMTP_PASSWORD),
-        "smtp_host": SMTP_HOST,
-        "smtp_port": SMTP_PORT,
-        "sender_email": _SENDER_EMAIL,
+        "sender_email": smtp_cfg["sender_email"],
+        "smtp_host": smtp_cfg["smtp_host"],
+        "smtp_port": smtp_cfg["smtp_port"],
+        "smtp_user_set": bool(smtp_cfg["smtp_user"]),
+        "smtp_password_set": bool(smtp_cfg["smtp_password"]),
         "smtp_login_ok": smtp_login_ok,
         "smtp_error": smtp_error
     }
@@ -56,19 +117,12 @@ async def admin_test_email(
     if not recipient:
         raise HTTPException(status_code=400, detail="Email address required")
     
-    smtp_status = {
-        "smtp_user_configured": bool(SMTP_USER),
-        "smtp_password_configured": bool(SMTP_PASSWORD),
-        "sender_email": _SENDER_EMAIL
-    }
-    
-    if not SMTP_USER or not SMTP_PASSWORD:
-        return {"success": False, "error": "SMTP not configured", "smtp_status": smtp_status}
+    smtp_cfg = await _get_smtp_settings()
     
     result = await send_email_async(
         recipient,
         "CareLink - בדיקת שליחת מייל",
-        f"""
+        """
         <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #19B8BA;">בדיקת שליחת מייל</h2>
             <p>מייל זה נשלח כבדיקה מהמערכת.</p>
@@ -81,7 +135,11 @@ async def admin_test_email(
     return {
         "success": result is not None,
         "recipient": recipient,
-        "smtp_status": smtp_status
+        "smtp_status": {
+            "smtp_user_configured": bool(smtp_cfg["smtp_user"]),
+            "smtp_password_configured": bool(smtp_cfg["smtp_password"]),
+            "sender_email": smtp_cfg["sender_email"]
+        }
     }
 
 

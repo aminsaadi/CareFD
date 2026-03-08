@@ -60,6 +60,10 @@ Frontend: /app/frontend/src/ (context/, components/, pages/, data/)
   - Fixed missing `create_notification` import in push.py
   - Improved email error logging for production debugging
   - Added admin test-email endpoint (POST /admin/test-email) + UI button in settings
+  - **ROOT CAUSE FOUND:** Production Emergent Deploy has different env vars (SENDER_EMAIL=onboarding@resend.dev)
+  - **FIX:** Built DB-based SMTP settings system - admin can configure SMTP from admin panel
+  - SMTP settings stored in MongoDB (shared between preview & production) override env vars
+  - Added admin SMTP config UI: sender email, host, port, user, password, connection test
 
 ## Mocked: PayPal, Subscription payments
 

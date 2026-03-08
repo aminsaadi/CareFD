@@ -44,10 +44,16 @@ const AdminSettings = () => {
   const [newFooterLink, setNewFooterLink] = useState({ label: '', url: '' });
   const [testEmail, setTestEmail] = useState('');
   const [sendingTestEmail, setSendingTestEmail] = useState(false);
+  const [smtpSettings, setSmtpSettings] = useState({
+    sender_email: '', smtp_host: 'smtp.gmail.com', smtp_port: 587, smtp_user: '', smtp_password: ''
+  });
+  const [smtpLoading, setSmtpLoading] = useState(false);
+  const [smtpStatus, setSmtpStatus] = useState(null);
   const { confirmState, confirm, closeConfirm } = useConfirm();
 
   useEffect(() => {
     fetchSettings();
+    fetchSmtpSettings();
   }, []);
 
   const fetchSettings = async () => {
@@ -140,6 +146,44 @@ const AdminSettings = () => {
 
   const updateSetting = (key, value) => {
     setSettings(prev => ({ ...prev, [key]: value }));
+  };
+
+  const fetchSmtpSettings = async () => {
+    try {
+      const res = await api.get('/admin/smtp-settings');
+      const d = res.data;
+      setSmtpSettings({
+        sender_email: d.sender_email || '',
+        smtp_host: d.smtp_host || 'smtp.gmail.com',
+        smtp_port: d.smtp_port || 587,
+        smtp_user: d.smtp_user || '',
+        smtp_password: ''
+      });
+    } catch (e) {}
+  };
+
+  const saveSmtpSettings = async () => {
+    setSmtpLoading(true);
+    try {
+      const payload = { ...smtpSettings };
+      if (!payload.smtp_password) delete payload.smtp_password;
+      await api.put('/admin/smtp-settings', payload);
+      toast.success('הגדרות SMTP נשמרו בהצלחה');
+      checkSmtpConnection();
+    } catch (e) {
+      toast.error('שגיאה בשמירת הגדרות SMTP');
+    } finally {
+      setSmtpLoading(false);
+    }
+  };
+
+  const checkSmtpConnection = async () => {
+    try {
+      const res = await api.get('/admin/smtp-check');
+      setSmtpStatus(res.data);
+    } catch (e) {
+      setSmtpStatus({ smtp_login_ok: false, smtp_error: 'שגיאת חיבור' });
+    }
   };
 
   const addFooterLink = () => {
@@ -506,41 +550,75 @@ const AdminSettings = () => {
               <div className="space-y-6">
                 <h2 className="text-lg font-semibold text-carelink-navy mb-4">הגדרות מתקדמות</h2>
                 
-                <div className="flex items-center justify-between p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <div>
-                    <p className="text-red-700 font-medium">מצב תחזוקה</p>
-                    <p className="text-red-600 text-sm">השבת גישה לאתר למשתמשים</p>
+                {/* SMTP Configuration */}
+                <div className="p-5 bg-white border-2 border-blue-100 rounded-xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-carelink-navy font-bold text-base">הגדרות שליחת מיילים (SMTP)</h3>
+                    {smtpStatus && (
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${smtpStatus.smtp_login_ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        {smtpStatus.smtp_login_ok ? 'מחובר' : 'לא מחובר'}
+                      </span>
+                    )}
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={settings.maintenance_mode}
-                      onChange={(e) => updateSetting('maintenance_mode', e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
-                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-sm text-carelink-slate mb-1">אימייל שולח</label>
+                      <input type="email" value={smtpSettings.sender_email}
+                        onChange={(e) => setSmtpSettings(p => ({...p, sender_email: e.target.value}))}
+                        placeholder="carelink.co.il@gmail.com" dir="ltr"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carelink-teal outline-none"
+                        data-testid="smtp-sender-email" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-carelink-slate mb-1">שרת SMTP</label>
+                      <input type="text" value={smtpSettings.smtp_host}
+                        onChange={(e) => setSmtpSettings(p => ({...p, smtp_host: e.target.value}))}
+                        placeholder="smtp.gmail.com" dir="ltr"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carelink-teal outline-none"
+                        data-testid="smtp-host" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-carelink-slate mb-1">שם משתמש SMTP</label>
+                      <input type="text" value={smtpSettings.smtp_user}
+                        onChange={(e) => setSmtpSettings(p => ({...p, smtp_user: e.target.value}))}
+                        placeholder="carelink.co.il@gmail.com" dir="ltr"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carelink-teal outline-none"
+                        data-testid="smtp-user" />
+                    </div>
+                    <div>
+                      <label className="block text-sm text-carelink-slate mb-1">פורט</label>
+                      <input type="number" value={smtpSettings.smtp_port}
+                        onChange={(e) => setSmtpSettings(p => ({...p, smtp_port: parseInt(e.target.value) || 587}))}
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carelink-teal outline-none"
+                        data-testid="smtp-port" />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm text-carelink-slate mb-1">סיסמת SMTP (App Password)</label>
+                      <input type="password" value={smtpSettings.smtp_password}
+                        onChange={(e) => setSmtpSettings(p => ({...p, smtp_password: e.target.value}))}
+                        placeholder="השאר ריק אם לא רוצה לשנות"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carelink-teal outline-none"
+                        data-testid="smtp-password" />
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={saveSmtpSettings} disabled={smtpLoading}
+                      className="px-4 py-2 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal/90 transition text-sm font-medium disabled:opacity-50"
+                      data-testid="save-smtp-btn">
+                      {smtpLoading ? 'שומר...' : 'שמור הגדרות SMTP'}
+                    </button>
+                    <button onClick={checkSmtpConnection}
+                      className="px-4 py-2 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition text-sm font-medium"
+                      data-testid="check-smtp-btn">
+                      בדוק חיבור
+                    </button>
+                  </div>
+                  {smtpStatus && !smtpStatus.smtp_login_ok && smtpStatus.smtp_error && (
+                    <p className="mt-3 text-sm text-red-600 bg-red-50 p-2 rounded-lg">{smtpStatus.smtp_error}</p>
+                  )}
                 </div>
 
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h3 className="text-carelink-navy font-medium mb-2">גיבוי נתונים</h3>
-                  <p className="text-carelink-slate text-sm mb-3">הורד גיבוי מלא של כל הנתונים</p>
-                  <button className="px-4 py-2 bg-white border border-gray-200 text-carelink-navy rounded-lg hover:bg-gray-100 transition">
-                    הורד גיבוי
-                  </button>
-                </div>
-
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h3 className="text-carelink-navy font-medium mb-2">נקה מטמון</h3>
-                  <p className="text-carelink-slate text-sm mb-3">נקה את כל הנתונים השמורים במטמון</p>
-                  <button 
-                    onClick={clearCache}
-                    className="px-4 py-2 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal-medium transition"
-                  >
-                    נקה מטמון
-                  </button>
-                </div>
-
+                {/* Test Email */}
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                   <h3 className="text-carelink-navy font-medium mb-2">בדיקת שליחת מיילים</h3>
                   <p className="text-carelink-slate text-sm mb-3">שלח מייל בדיקה כדי לוודא שהגדרות ה-SMTP עובדות</p>
@@ -579,6 +657,42 @@ const AdminSettings = () => {
                       {sendingTestEmail ? 'שולח...' : 'שלח בדיקה'}
                     </button>
                   </div>
+                </div>
+
+                {/* Maintenance Mode */}
+                <div className="flex items-center justify-between p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div>
+                    <p className="text-red-700 font-medium">מצב תחזוקה</p>
+                    <p className="text-red-600 text-sm">השבת גישה לאתר למשתמשים</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings.maintenance_mode}
+                      onChange={(e) => updateSetting('maintenance_mode', e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                  </label>
+                </div>
+
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="text-carelink-navy font-medium mb-2">גיבוי נתונים</h3>
+                  <p className="text-carelink-slate text-sm mb-3">הורד גיבוי מלא של כל הנתונים</p>
+                  <button className="px-4 py-2 bg-white border border-gray-200 text-carelink-navy rounded-lg hover:bg-gray-100 transition">
+                    הורד גיבוי
+                  </button>
+                </div>
+
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="text-carelink-navy font-medium mb-2">נקה מטמון</h3>
+                  <p className="text-carelink-slate text-sm mb-3">נקה את כל הנתונים השמורים במטמון</p>
+                  <button 
+                    onClick={clearCache}
+                    className="px-4 py-2 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal-medium transition"
+                  >
+                    נקה מטמון
+                  </button>
                 </div>
               </div>
             )}

@@ -71,6 +71,65 @@ async def get_current_user(authorization: Optional[str] = Header(None), request:
     return user_doc
 
 
+_smtp_cache = {"settings": None, "fetched_at": None}
+
+async def _get_smtp_settings():
+    """Get SMTP settings from DB (admin-configurable), fallback to env vars"""
+    import time
+    now = time.time()
+    if _smtp_cache["settings"] and _smtp_cache["fetched_at"] and (now - _smtp_cache["fetched_at"]) < 300:
+        return _smtp_cache["settings"]
+    
+    db_settings = await db.smtp_settings.find_one({"_id": "smtp_config"}, {"_id": 0})
+    if db_settings and db_settings.get("smtp_user") and db_settings.get("smtp_password"):
+        settings = {
+            "sender_email": db_settings.get("sender_email", SENDER_EMAIL),
+            "smtp_host": db_settings.get("smtp_host", SMTP_HOST),
+            "smtp_port": int(db_settings.get("smtp_port", SMTP_PORT)),
+            "smtp_user": db_settings.get("smtp_user", SMTP_USER),
+            "smtp_password": db_settings.get("smtp_password", SMTP_PASSWORD),
+        }
+    else:
+        settings = {
+            "sender_email": SENDER_EMAIL,
+            "smtp_host": SMTP_HOST,
+            "smtp_port": SMTP_PORT,
+            "smtp_user": SMTP_USER,
+            "smtp_password": SMTP_PASSWORD,
+        }
+    _smtp_cache["settings"] = settings
+    _smtp_cache["fetched_at"] = now
+    return settings
+
+
+def send_email_smtp_with_config(recipient: str, subject: str, html_content: str, smtp_cfg: dict):
+    smtp_user = smtp_cfg["smtp_user"]
+    smtp_password = smtp_cfg["smtp_password"]
+    sender = smtp_cfg["sender_email"]
+    host = smtp_cfg["smtp_host"]
+    port = smtp_cfg["smtp_port"]
+    
+    if not smtp_user or not smtp_password:
+        logger.error(f"SMTP not configured! Cannot send email to {recipient}")
+        return None
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From'] = sender
+        msg['To'] = recipient
+        html_part = MIMEText(html_content, 'html', 'utf-8')
+        msg.attach(html_part)
+        with smtplib.SMTP(host, port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_password)
+            server.sendmail(sender, recipient, msg.as_string())
+        logger.info(f"Email sent successfully to {recipient} via {host} - Subject: {subject}")
+        return {"success": True, "recipient": recipient}
+    except Exception as e:
+        logger.error(f"Failed to send email to {recipient} via {host} - Error: {str(e)}")
+        return None
+
+
 def send_email_smtp(recipient: str, subject: str, html_content: str):
     if not SMTP_USER or not SMTP_PASSWORD:
         logger.error(f"SMTP not configured! SMTP_USER={'set' if SMTP_USER else 'EMPTY'}, SMTP_PASSWORD={'set' if SMTP_PASSWORD else 'EMPTY'} - Cannot send email to {recipient}")
@@ -94,7 +153,8 @@ def send_email_smtp(recipient: str, subject: str, html_content: str):
 
 async def send_email_async(recipient: str, subject: str, html_content: str):
     try:
-        result = await asyncio.to_thread(send_email_smtp, recipient, subject, html_content)
+        smtp_cfg = await _get_smtp_settings()
+        result = await asyncio.to_thread(send_email_smtp_with_config, recipient, subject, html_content, smtp_cfg)
         return result
     except Exception as e:
         logger.error(f"Failed to send email: {str(e)}")
