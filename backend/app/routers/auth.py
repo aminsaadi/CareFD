@@ -3,6 +3,7 @@ from typing import Optional, List
 from datetime import datetime, timezone, timedelta
 import uuid
 import secrets
+import os
 
 from app.database import db
 from app.models import User, UserRegister, UserLogin, UserSession, UserRole, Provider, ProviderRegister, NotificationType, VerificationStatus

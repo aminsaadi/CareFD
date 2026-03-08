@@ -5,7 +5,7 @@ import uuid
 
 from app.database import db
 from app.models import *
-from app.utils import get_current_user, send_push_notification, send_push_to_user, VAPID_PUBLIC_KEY
+from app.utils import get_current_user, send_push_notification, send_push_to_user, create_notification, VAPID_PUBLIC_KEY
 
 router = APIRouter()
 

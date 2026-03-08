@@ -53,6 +53,11 @@ Frontend: /app/frontend/src/ (context/, components/, pages/, data/)
   - Sort dropdown: newest first (default), oldest, by status, by price
   - Expand shows details grid (date, time, price, type) + action buttons
   - Overview sections sorted newest first
+- Mar 4: **Email Sending Bug Fix (Critical):**
+  - Fixed `NameError: name 'os' is not defined` in auth.py - forgot-password emails not sending
+  - Fixed `NameError: name 'create_notification' is not defined` in contact.py - contact form crashing
+  - Fixed missing `os` import in uploads.py - file uploads failing
+  - Fixed missing `create_notification` import in push.py
 
 ## Mocked: PayPal, Subscription payments
 

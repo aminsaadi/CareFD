@@ -4,6 +4,7 @@ from typing import Optional
 from datetime import datetime, timezone
 import uuid
 import shutil
+import os
 from pathlib import Path
 
 from app.database import db, UPLOAD_DIR

@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import uuid
 
 from app.database import db
-from app.utils import send_email_async
+from app.utils import send_email_async, create_notification
 
 router = APIRouter()
 
