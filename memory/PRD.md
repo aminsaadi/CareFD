@@ -64,6 +64,12 @@ Frontend: /app/frontend/src/ (context/, components/, pages/, data/)
   - **FIX:** Built DB-based SMTP settings system - admin can configure SMTP from admin panel
   - SMTP settings stored in MongoDB (shared between preview & production) override env vars
   - Added admin SMTP config UI: sender email, host, port, user, password, connection test
+- Mar 4: **Email Verification on Registration:**
+  - New users must verify email before login (verification link sent to email, valid 24h)
+  - Existing users and admins exempt from verification
+  - Frontend: verification sent screen after registration, blocked login warning with resend option
+  - New pages: /verify-email (handles token from email link)
+  - Backend: /auth/verify-email, /auth/resend-verification endpoints
 
 ## Mocked: PayPal, Subscription payments
 
