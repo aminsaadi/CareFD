@@ -53,14 +53,17 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     const response = await api.post('/auth/register', userData);
-    const { user: newUser, session_token } = response.data;
+    const { email_verification_required } = response.data;
     
+    if (email_verification_required) {
+      return { email_verification_required: true, email: userData.email };
+    }
+    
+    const { user: newUser, session_token } = response.data;
     localStorage.setItem('session_token', session_token);
     localStorage.setItem('user', JSON.stringify(newUser));
-    
     setUser(newUser);
     setIsAuthenticated(true);
-    
     return newUser;
   };
 

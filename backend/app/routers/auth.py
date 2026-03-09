@@ -14,18 +14,17 @@ router = APIRouter()
 @router.post("/auth/register")
 async def register(user_data: UserRegister):
     """Register new user with email/password"""
-    # Check if user exists
     existing_user = await db.users.find_one({"email": user_data.email}, {"_id": 0})
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    # Create user
     user = User(
         email=user_data.email,
         name=user_data.name,
         password_hash=hash_password(user_data.password),
         role=user_data.role,
-        language_preference=user_data.language_preference
+        language_preference=user_data.language_preference,
+        email_verified=False
     )
     
     user_dict = user.model_dump()
@@ -33,13 +32,12 @@ async def register(user_data: UserRegister):
     
     await db.users.insert_one(user_dict)
     
-    # If registering as a provider, create the provider profile automatically
     provider_id = None
     if user_data.role == UserRole.PROVIDER:
         provider = Provider(
             user_id=user.user_id,
-            provider_type="individual",  # Default type
-            business_name=user.name,  # Use user's name as initial business name
+            provider_type="individual",
+            business_name=user.name,
             email=user.email,
             verification_status=VerificationStatus.PENDING,
             is_verified=False
@@ -52,10 +50,8 @@ async def register(user_data: UserRegister):
         await db.providers.insert_one(provider_dict)
         provider_id = provider.provider_id
         
-        # Notify all admins about new provider registration
         admins = await db.users.find({"role": "admin"}, {"_id": 0, "user_id": 1, "email": 1}).to_list(100)
         for admin in admins:
-            # In-app notification
             await create_notification(
                 admin["user_id"],
                 NotificationType.PROVIDER_NEW_REGISTRATION,
@@ -63,162 +59,105 @@ async def register(user_data: UserRegister):
                 f"ספק חדש נרשם למערכת: {user.name}. נדרש אימות.",
                 {"provider_id": provider.provider_id, "user_id": user.user_id}
             )
-            # Email notification to admin
             admin_link = f"https://carelink.co.il/admin/verification"
             await send_email_async(
                 admin.get("email"),
-                f"🆕 ספק חדש נרשם: {user.name}",
+                f"ספק חדש נרשם: {user.name}",
                 f"""
                 <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                     <div style="text-align: center; margin-bottom: 30px;">
                         <h1 style="color: #1E4D5F;">ספק חדש נרשם!</h1>
                     </div>
-                    
                     <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
                         <h3 style="color: #19B8BA; margin-top: 0;">פרטי הספק:</h3>
                         <p><strong>שם:</strong> {user.name}</p>
                         <p><strong>אימייל:</strong> {user.email}</p>
                         <p><strong>מספר ספק:</strong> {provider.provider_number}</p>
-                        <p><strong>תאריך הרשמה:</strong> {datetime.now(timezone.utc).strftime('%d/%m/%Y %H:%M')}</p>
                     </div>
-                    
-                    <p style="font-size: 16px; color: #4C6D7F;">
-                        נדרש אימות לפני שהספק יוכל להציע שירותים בפלטפורמה.
-                    </p>
-                    
                     <div style="text-align: center; margin: 30px 0;">
                         <a href="{admin_link}" style="background-color: #19B8BA; color: white; padding: 15px 40px; text-decoration: none; border-radius: 30px; font-size: 18px; font-weight: bold; display: inline-block;">
-                            עבור לאימות ספקים ➜
+                            עבור לאימות ספקים
                         </a>
-                    </div>
-                    
-                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">
-                        <p>מערכת CareLink</p>
                     </div>
                 </div>
                 """
             )
-        
-        # Send welcome email to new provider with profile completion link
-        profile_link = f"https://carelink.co.il/provider/edit"
-        await send_email_async(
-            user.email,
-            "ברוכים הבאים ל-CareLink - השלימו את הפרופיל שלכם! 🎉",
-            f"""
-            <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <h1 style="color: #19B8BA;">ברוכים הבאים ל-CareLink!</h1>
-                </div>
-                
-                <p style="font-size: 16px; color: #1E4D5F;">שלום {user.name},</p>
-                
-                <p style="font-size: 16px; color: #4C6D7F;">
-                    תודה שנרשמת כספק שירותים בפלטפורמה שלנו! 
-                    אנחנו שמחים לקבל אותך למשפחת CareLink.
-                </p>
-                
-                <div style="background: linear-gradient(135deg, #19B8BA 0%, #1E4D5F 100%); padding: 25px; border-radius: 15px; margin: 25px 0;">
-                    <h2 style="color: white; margin-top: 0;">📋 הצעדים הבאים:</h2>
-                    <ol style="color: white; font-size: 15px; line-height: 2;">
-                        <li>השלימו את פרטי הפרופיל שלכם</li>
-                        <li>הוסיפו תמונת פרופיל מקצועית</li>
-                        <li>הגדירו את שעות הזמינות שלכם</li>
-                        <li>העלו מסמכי אימות (תעודות, רישיונות)</li>
-                        <li>הוסיפו את השירותים שאתם מציעים</li>
-                    </ol>
-                </div>
-                
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="{profile_link}" style="background-color: #19B8BA; color: white; padding: 15px 40px; text-decoration: none; border-radius: 30px; font-size: 18px; font-weight: bold; display: inline-block;">
-                        השלימו את הפרופיל עכשיו ➜
-                    </a>
-                </div>
-                
-                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 25px;">
-                    <h3 style="color: #1E4D5F; margin-top: 0;">💡 טיפ חשוב:</h3>
-                    <p style="color: #4C6D7F; margin-bottom: 0;">
-                        ספקים עם פרופיל מלא ומאומת מקבלים יותר הזמנות! 
-                        השלימו את כל הפרטים כדי להגדיל את החשיפה שלכם.
-                    </p>
-                </div>
-                
-                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">
-                    <p>צוות CareLink</p>
-                    <p style="font-size: 12px;">אם יש לכם שאלות, אנחנו כאן לעזור!</p>
-                </div>
-            </div>
-            """
-        )
-    else:
-        # Send regular welcome email to users
-        await send_email_async(
-            user.email,
-            "ברוכים הבאים ל-CareLink! 🎉",
-            f"""
-            <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <h1 style="color: #19B8BA;">ברוכים הבאים ל-CareLink!</h1>
-                </div>
-                
-                <p style="font-size: 16px; color: #1E4D5F;">שלום {user.name},</p>
-                
-                <p style="font-size: 16px; color: #4C6D7F;">
-                    תודה שנרשמת לפלטפורמה שלנו! 
-                    כעת תוכלו לחפש ולהזמין שירותי בריאות מהספקים המובילים.
-                </p>
-                
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="https://carelink.co.il/providers" style="background-color: #19B8BA; color: white; padding: 15px 40px; text-decoration: none; border-radius: 30px; font-size: 18px; font-weight: bold; display: inline-block;">
-                        חפשו ספקים עכשיו ➜
-                    </a>
-                </div>
-                
-                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">
-                    <p>צוות CareLink</p>
-                </div>
-            </div>
-            """
-        )
     
-    # Create session
-    session_token = create_jwt_token(user.user_id, user.email)
-    session = UserSession(
-        user_id=user.user_id,
-        session_token=session_token,
-        expires_at=datetime.now(timezone.utc) + timedelta(days=7)
+    # Send email verification link
+    verification_token = secrets.token_urlsafe(32)
+    await db.email_verifications.insert_one({
+        "token": verification_token,
+        "user_id": user.user_id,
+        "email": user.email,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "expires_at": (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()
+    })
+    
+    frontend_url = os.environ.get('FRONTEND_URL', os.environ.get('REACT_APP_BACKEND_URL', 'https://carelink.co.il'))
+    verify_link = f"{frontend_url}/verify-email?token={verification_token}"
+    
+    await send_email_async(
+        user.email,
+        "CareLink - אימות כתובת הדואר האלקטרוני",
+        f"""
+        <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #19B8BA;">אימות כתובת דואר אלקטרוני</h1>
+            </div>
+            
+            <p style="font-size: 16px; color: #1E4D5F;">שלום {user.name},</p>
+            
+            <p style="font-size: 16px; color: #4C6D7F;">
+                תודה שנרשמת ל-CareLink!
+                כדי להשלים את ההרשמה ולהפעיל את החשבון שלך, אנא אמת את כתובת הדואר האלקטרוני שלך.
+            </p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{verify_link}" style="background-color: #19B8BA; color: white; padding: 15px 40px; text-decoration: none; border-radius: 30px; font-size: 18px; font-weight: bold; display: inline-block;">
+                    אמת את המייל שלי
+                </a>
+            </div>
+            
+            <p style="font-size: 14px; color: #888; text-align: center;">
+                הלינק תקף ל-24 שעות. אם לא ביקשת הרשמה, התעלם מהודעה זו.
+            </p>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">
+                <p>צוות CareLink</p>
+            </div>
+        </div>
+        """
     )
     
-    session_dict = session.model_dump()
-    session_dict['created_at'] = session_dict['created_at'].isoformat()
-    session_dict['expires_at'] = session_dict['expires_at'].isoformat()
-    
-    await db.user_sessions.insert_one(session_dict)
-    
     return {
-        "message": "Registration successful",
+        "message": "Registration successful. Please verify your email.",
+        "email_verification_required": True,
         "user": {
             "user_id": user.user_id,
             "email": user.email,
             "name": user.name,
             "role": user.role,
             "provider_id": provider_id
-        },
-        "session_token": session_token
+        }
     }
 
 @router.post("/auth/login")
 async def login(credentials: UserLogin, response: Response):
     """Login with email/password"""
-    # Find user
     user_doc = await db.users.find_one({"email": credentials.email}, {"_id": 0})
     if not user_doc:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    # Verify password
     if not user_doc.get("password_hash") or not verify_password(credentials.password, user_doc["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    # Create session
+    # Check email verification (admins and existing users without the field are exempt)
+    if user_doc.get("role") != "admin" and user_doc.get("email_verified") == False and "email_verified" in user_doc:
+        raise HTTPException(
+            status_code=403, 
+            detail="email_not_verified"
+        )
+    
     session_token = create_jwt_token(user_doc["user_id"], user_doc["email"])
     session = UserSession(
         user_id=user_doc["user_id"],
@@ -232,7 +171,6 @@ async def login(credentials: UserLogin, response: Response):
     
     await db.user_sessions.insert_one(session_dict)
     
-    # Set cookie
     response.set_cookie(
         key="session_token",
         value=session_token,
@@ -254,6 +192,81 @@ async def login(credentials: UserLogin, response: Response):
         },
         "session_token": session_token
     }
+
+
+@router.get("/auth/verify-email")
+async def verify_email(token: str):
+    """Verify email address using the token from the verification link"""
+    verification = await db.email_verifications.find_one({"token": token}, {"_id": 0})
+    if not verification:
+        raise HTTPException(status_code=400, detail="invalid_token")
+    
+    if datetime.fromisoformat(verification["expires_at"]) < datetime.now(timezone.utc):
+        await db.email_verifications.delete_one({"token": token})
+        raise HTTPException(status_code=400, detail="token_expired")
+    
+    await db.users.update_one(
+        {"user_id": verification["user_id"]},
+        {"$set": {"email_verified": True}}
+    )
+    
+    await db.email_verifications.delete_many({"user_id": verification["user_id"]})
+    
+    return {"message": "Email verified successfully", "email": verification["email"]}
+
+
+@router.post("/auth/resend-verification")
+async def resend_verification(data: dict):
+    """Resend email verification link"""
+    email = data.get("email")
+    if not email:
+        raise HTTPException(status_code=400, detail="Email required")
+    
+    user_doc = await db.users.find_one({"email": email}, {"_id": 0})
+    if not user_doc:
+        return {"message": "If the email exists, a verification link has been sent"}
+    
+    if user_doc.get("email_verified"):
+        return {"message": "Email already verified"}
+    
+    await db.email_verifications.delete_many({"user_id": user_doc["user_id"]})
+    
+    verification_token = secrets.token_urlsafe(32)
+    await db.email_verifications.insert_one({
+        "token": verification_token,
+        "user_id": user_doc["user_id"],
+        "email": email,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "expires_at": (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()
+    })
+    
+    frontend_url = os.environ.get('FRONTEND_URL', os.environ.get('REACT_APP_BACKEND_URL', 'https://carelink.co.il'))
+    verify_link = f"{frontend_url}/verify-email?token={verification_token}"
+    
+    await send_email_async(
+        email,
+        "CareLink - אימות כתובת הדואר האלקטרוני",
+        f"""
+        <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #19B8BA;">אימות כתובת דואר אלקטרוני</h1>
+            </div>
+            <p style="font-size: 16px; color: #1E4D5F;">שלום {user_doc.get('name', '')},</p>
+            <p style="font-size: 16px; color: #4C6D7F;">לחץ על הכפתור למטה כדי לאמת את כתובת הדואר האלקטרוני שלך.</p>
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{verify_link}" style="background-color: #19B8BA; color: white; padding: 15px 40px; text-decoration: none; border-radius: 30px; font-size: 18px; font-weight: bold; display: inline-block;">
+                    אמת את המייל שלי
+                </a>
+            </div>
+            <p style="font-size: 14px; color: #888; text-align: center;">הלינק תקף ל-24 שעות.</p>
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">
+                <p>צוות CareLink</p>
+            </div>
+        </div>
+        """
+    )
+    
+    return {"message": "Verification email sent"}
 
 @router.post("/auth/setup-admin")
 async def setup_admin(body: dict):

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import api from '../utils/api';
 import Logo from '../components/Logo';
 import { FaEnvelope, FaLock, FaUser, FaArrowLeft, FaUserMd, FaUsers, FaCheckCircle, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
@@ -20,6 +21,8 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,11 +34,20 @@ const Register = () => {
     setLoading(true);
 
     try {
-      await register(formData);
-      navigate('/dashboard');
+      const result = await register(formData);
+      if (result?.email_verification_required) {
+        setVerificationSent(true);
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       if (err.response?.data?.detail) {
-        setError(err.response.data.detail);
+        const detail = err.response.data.detail;
+        if (detail === 'Email already registered') {
+          setError('כתובת המייל כבר רשומה במערכת');
+        } else {
+          setError(detail);
+        }
       } else if (err.response?.status) {
         setError(`שגיאת שרת (${err.response.status}). נסה שוב מאוחר יותר.`);
       } else if (err.code === 'ERR_NETWORK') {
@@ -46,6 +58,15 @@ const Register = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleResendVerification = async () => {
+    setResending(true);
+    try {
+      await api.post('/auth/resend-verification', { email: formData.email });
+      setError('');
+    } catch (e) {}
+    setResending(false);
   };
 
   const handleGoogleRegister = () => {
@@ -73,6 +94,36 @@ const Register = () => {
               <Logo />
             </Link>
           </div>
+
+          {verificationSent ? (
+            <div className="bg-white rounded-3xl shadow-2xl p-8 text-center" data-testid="verification-sent">
+              <div className="w-20 h-20 bg-carelink-teal/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <FaEnvelope className="text-4xl text-carelink-teal" />
+              </div>
+              <h2 className="text-2xl font-bold text-carelink-navy mb-3">בדוק את תיבת הדואר שלך</h2>
+              <p className="text-carelink-gray mb-2">
+                שלחנו לינק אימות לכתובת:
+              </p>
+              <p className="font-bold text-carelink-navy text-lg mb-6" dir="ltr">{formData.email}</p>
+              <p className="text-sm text-carelink-gray mb-6">
+                לחץ על הלינק במייל כדי לאמת את החשבון שלך ולהתחיל להשתמש ב-CareLink.
+                <br />הלינק תקף ל-24 שעות.
+              </p>
+              <button
+                onClick={handleResendVerification}
+                disabled={resending}
+                className="text-carelink-teal font-medium hover:underline disabled:opacity-50 text-sm"
+                data-testid="resend-verification-btn"
+              >
+                {resending ? 'שולח...' : 'לא קיבלת? שלח שוב'}
+              </button>
+              <div className="mt-6 pt-4 border-t border-gray-100">
+                <Link to="/login" className="text-carelink-teal font-medium hover:underline">
+                  חזור להתחברות
+                </Link>
+              </div>
+            </div>
+          ) : (
 
           <div className="bg-white rounded-3xl shadow-2xl p-8" data-testid="register-form">
             <div className="text-center mb-8">
@@ -197,6 +248,7 @@ const Register = () => {
               </Link>
             </div>
           </div>
+          )}
 
           {/* Back to Home */}
           <div className="text-center mt-6">

@@ -10,6 +10,7 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ResetPassword from './pages/ResetPassword';
+import VerifyEmail from './pages/VerifyEmail';
 import ProviderRegister from './pages/ProviderRegister';
 import Dashboard from './pages/Dashboard';
 import Providers from './pages/Providers';
@@ -88,6 +89,7 @@ function AppRouter() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/register/provider" element={<ProviderRegister />} />
       <Route path="/providers" element={<Providers />} />
       <Route path="/services" element={<Services />} />

@@ -39,6 +39,7 @@ class User(BaseModel):
     verification_documents: List[dict] = []
     verification_notes: Optional[str] = None
     verification_submitted_at: Optional[datetime] = None
+    email_verified: bool = False
 
 class UserRegister(BaseModel):
     email: EmailStr

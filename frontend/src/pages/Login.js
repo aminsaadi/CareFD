@@ -20,19 +20,22 @@ const Login = () => {
   const [forgotEmail, setForgotEmail] = useState('');
   const [sendingReset, setSendingReset] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [emailNotVerified, setEmailNotVerified] = useState(false);
+  const [resendingVerification, setResendingVerification] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setEmailNotVerified(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setEmailNotVerified(false);
     setLoading(true);
 
     try {
       const userData = await login(formData.email, formData.password);
-      // Navigate based on user role
       if (userData?.role === 'admin') {
         navigate('/admin');
       } else if (userData?.role === 'provider') {
@@ -41,8 +44,16 @@ const Login = () => {
         navigate('/dashboard');
       }
     } catch (err) {
-      if (err.response?.data?.detail) {
-        setError(err.response.data.detail);
+      if (err.response?.data?.detail === 'email_not_verified') {
+        setEmailNotVerified(true);
+        setError('');
+      } else if (err.response?.data?.detail) {
+        const detail = err.response.data.detail;
+        if (detail === 'Invalid credentials') {
+          setError('אימייל או סיסמה לא נכונים');
+        } else {
+          setError(detail);
+        }
       } else if (err.response?.status) {
         setError(`שגיאת שרת (${err.response.status}). נסה שוב מאוחר יותר.`);
       } else if (err.code === 'ERR_NETWORK') {
@@ -53,6 +64,17 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleResendVerification = async () => {
+    setResendingVerification(true);
+    try {
+      await api.post('/auth/resend-verification', { email: formData.email });
+      toast.success('קישור אימות חדש נשלח למייל שלך');
+    } catch (e) {
+      toast.error('שגיאה בשליחת קישור אימות');
+    }
+    setResendingVerification(false);
   };
 
   const handleGoogleLogin = () => {
@@ -138,6 +160,22 @@ const Login = () => {
             {error && (
               <div className="bg-red-50 border-2 border-red-200 text-red-600 px-4 py-3 rounded-xl mb-6 text-center" data-testid="error-message">
                 {error}
+              </div>
+            )}
+
+            {emailNotVerified && (
+              <div className="bg-amber-50 border-2 border-amber-200 px-4 py-4 rounded-xl mb-6 text-center" data-testid="email-not-verified-message">
+                <p className="text-amber-800 font-medium mb-2">כתובת הדואר שלך עדיין לא אומתה</p>
+                <p className="text-amber-600 text-sm mb-3">בדוק את תיבת הדואר שלך (גם בספאם) ולחץ על קישור האימות.</p>
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  disabled={resendingVerification}
+                  className="text-carelink-teal font-medium hover:underline text-sm disabled:opacity-50"
+                  data-testid="resend-verification-login-btn"
+                >
+                  {resendingVerification ? 'שולח...' : 'שלח קישור אימות מחדש'}
+                </button>
               </div>
             )}
 
