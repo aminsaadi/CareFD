@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 
 from app.database import db, UPLOAD_DIR
-from app.utils import get_current_user
+from app.utils import get_current_user, get_site_url
 
 router = APIRouter()
 
@@ -43,7 +43,7 @@ async def upload_file(
         f.write(content)
     
     # Generate URL
-    base_url = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')
+    base_url = await get_site_url()
     file_url = f"{base_url}/api/files/{unique_filename}"
     
     return {
@@ -84,7 +84,7 @@ async def upload_image(
         f.write(content)
     
     # Generate URL
-    base_url = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:8001')
+    base_url = await get_site_url()
     file_url = f"{base_url}/api/files/{unique_filename}"
     
     return {

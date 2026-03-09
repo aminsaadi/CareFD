@@ -7,7 +7,7 @@ import os
 
 from app.database import db
 from app.models import User, UserRegister, UserLogin, UserSession, UserRole, Provider, ProviderRegister, NotificationType, VerificationStatus
-from app.utils import get_current_user, send_email_async, create_notification, hash_password, verify_password, create_jwt_token
+from app.utils import get_current_user, send_email_async, create_notification, get_site_url, hash_password, verify_password, create_jwt_token
 
 router = APIRouter()
 
@@ -93,7 +93,7 @@ async def register(user_data: UserRegister):
         "expires_at": (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()
     })
     
-    frontend_url = os.environ.get('FRONTEND_URL', os.environ.get('REACT_APP_BACKEND_URL', 'https://carelink.co.il'))
+    frontend_url = await get_site_url()
     verify_link = f"{frontend_url}/verify-email?token={verification_token}"
     
     await send_email_async(
@@ -240,7 +240,7 @@ async def resend_verification(data: dict):
         "expires_at": (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat()
     })
     
-    frontend_url = os.environ.get('FRONTEND_URL', os.environ.get('REACT_APP_BACKEND_URL', 'https://carelink.co.il'))
+    frontend_url = await get_site_url()
     verify_link = f"{frontend_url}/verify-email?token={verification_token}"
     
     await send_email_async(
@@ -458,9 +458,7 @@ async def forgot_password(data: dict):
     
     # In production, send email here
     # For now, log the reset link
-    frontend_url = os.environ.get('FRONTEND_URL', os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:3000'))
-    if '/api' in frontend_url:
-        frontend_url = frontend_url.replace('/api', '')
+    frontend_url = await get_site_url()
     reset_url = f"{frontend_url}/reset-password?token={reset_token}"
     print(f"Password reset link for {email}: {reset_url}")
     

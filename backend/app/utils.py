@@ -28,6 +28,14 @@ VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', '')
 VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY', '')
 VAPID_CLAIMS_EMAIL = os.environ.get('VAPID_CLAIMS_EMAIL', 'admin@carelink.co.il')
 
+SITE_URL = "https://carelink.co.il"
+
+
+async def get_site_url():
+    """Get the frontend site URL from DB settings, fallback to constant"""
+    settings = await db.site_settings.find_one({}, {"_id": 0, "site_url": 1})
+    return (settings or {}).get("site_url") or SITE_URL
+
 
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
