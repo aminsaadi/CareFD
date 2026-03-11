@@ -1,0 +1,25 @@
+[phases.setup]
+nixPkgs = ["..#nodejs_20", "..#python311", "..#yarn"]
+
+[phases.frontend]
+dependsOn = ["setup"]
+cmds = [
+    "cd frontend && yarn install --frozen-lockfile || cd frontend && yarn install",
+    "cd frontend && yarn build"
+]
+
+[phases.backend]
+dependsOn = ["setup"]
+cmds = [
+    "pip install -r backend/requirements.txt"
+]
+
+[phases.copy]
+dependsOn = ["frontend", "backend"]
+cmds = [
+    "mkdir -p backend/static",
+    "cp -r frontend/build/* backend/static/"
+]
+
+[start]
+cmd = "cd backend && python -m uvicorn server:app --host 0.0.0.0 --port ${PORT:-8000}"
