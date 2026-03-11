@@ -1,0 +1,27 @@
+# Stage 1: Build frontend
+FROM node:20-slim AS frontend-build
+WORKDIR /app/frontend
+COPY frontend/package.json frontend/yarn.lock* ./
+RUN yarn install --network-timeout 120000
+COPY frontend/ ./
+RUN yarn build
+
+# Stage 2: Production
+FROM python:3.11-slim
+WORKDIR /app
+
+# Install backend dependencies
+COPY backend/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy backend code
+COPY backend/ ./backend/
+
+# Copy frontend build to backend static
+COPY --from=frontend-build /app/frontend/build ./backend/static/
+
+# Expose port
+EXPOSE 8000
+
+# Start server
+CMD ["python", "-m", "uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000", "--app-dir", "backend"]
