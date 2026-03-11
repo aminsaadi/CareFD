@@ -3,8 +3,8 @@ from typing import Optional, List
 from datetime import datetime, timezone
 import uuid
 
-from app.database import db
-from app.models import NotificationType, UserRole
+from app.database import db, UPLOAD_DIR
+from app.models import NotificationType, UserRole, VerificationStatus
 from app.utils import get_current_user, send_email_async, create_notification
 
 router = APIRouter()

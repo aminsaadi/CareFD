@@ -6,6 +6,7 @@ import uuid
 from app.database import db
 from app.models import Service, ServiceCreate, ServiceCategory
 from app.utils import get_current_user, send_email_async, create_notification
+from app.routers.subscriptions import DEFAULT_PLANS
 
 router = APIRouter()
 

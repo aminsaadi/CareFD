@@ -4,10 +4,14 @@ from datetime import datetime, timezone, timedelta
 import uuid
 import secrets
 import os
+import httpx
+import logging
 
 from app.database import db
 from app.models import User, UserRegister, UserLogin, UserSession, UserRole, Provider, ProviderRegister, NotificationType, VerificationStatus
 from app.utils import get_current_user, send_email_async, create_notification, get_site_url, hash_password, verify_password, create_jwt_token
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -273,8 +277,9 @@ async def setup_admin(body: dict):
     """One-time setup endpoint to create initial admin user"""
     setup_key = body.get("setup_key")
     
-    # Security: require a setup key
-    if setup_key != "carelink_admin_setup_2026":
+    # Security: require a setup key from environment variable
+    expected_key = os.environ.get("ADMIN_SETUP_KEY", "")
+    if not expected_key or setup_key != expected_key:
         raise HTTPException(status_code=403, detail="Invalid setup key")
     
     email = body.get("email", "admin@carelink.co.il")
@@ -311,7 +316,6 @@ async def setup_admin(body: dict):
     return {
         "message": "Admin user created successfully",
         "email": email,
-        "password": password,
         "note": "Please change the password after first login"
     }
 
@@ -460,7 +464,7 @@ async def forgot_password(data: dict):
     # For now, log the reset link
     frontend_url = await get_site_url()
     reset_url = f"{frontend_url}/reset-password?token={reset_token}"
-    print(f"Password reset link for {email}: {reset_url}")
+    logger.info(f"Password reset requested for {email}")
     
     # Send password reset email
     await send_email_async(
@@ -542,8 +546,8 @@ async def reset_password(data: dict):
         raise HTTPException(status_code=400, detail="Token has expired")
     
     # Hash new password
-    password_hash = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-    
+    password_hash = hash_password(new_password)
+
     # Update user password
     await db.users.update_one(
         {"user_id": reset_doc["user_id"]},
@@ -599,7 +603,7 @@ async def update_user_info(
     # Get updated user
     updated_user = await db.users.find_one(
         {"user_id": user["user_id"]},
-        {"_id": 0, "password": 0}
+        {"_id": 0, "password_hash": 0}
     )
     
     return {"message": "User info updated successfully", "user": updated_user}
