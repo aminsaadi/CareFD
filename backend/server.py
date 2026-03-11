@@ -47,6 +47,12 @@ api_router.include_router(uploads.router)
 api_router.include_router(verification.router)
 api_router.include_router(contact.router)
 
+# Health check endpoint
+@api_router.get("")
+@api_router.get("/")
+async def health_check():
+    return {"status": "ok"}
+
 # Include the api router in the main app
 app.include_router(api_router)
 
