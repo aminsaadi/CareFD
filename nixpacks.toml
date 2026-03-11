@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs_20", "python311", "yarn"]
+nixPkgs = ["...", "nodejs_20", "python311", "yarn"]
 
 [phases.frontend]
 dependsOn = ["setup"]
