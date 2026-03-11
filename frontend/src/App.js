@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-route
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import AuthCallback from './components/AuthCallback';
 import CookieConsent from './components/CookieConsent';
 import AccessibilityWidget from './components/AccessibilityWidget';
 import Landing from './pages/Landing';
@@ -75,12 +74,6 @@ const RoleRedirect = ({ children, providerPath, adminPath }) => {
 function AppRouter() {
   const location = useLocation();
   
-  // Check URL fragment (not query params) for session_id
-  // This must happen during render, not in useEffect, to avoid race conditions
-  if (location.hash?.includes('session_id=')) {
-    return <AuthCallback />;
-  }
-  
   return (
     <>
     <ScrollToTop />
@@ -94,8 +87,6 @@ function AppRouter() {
       <Route path="/providers" element={<Providers />} />
       <Route path="/services" element={<Services />} />
       <Route path="/providers/:providerId" element={<ProviderProfile />} />
-      <Route path="/auth/callback" element={<AuthCallback />} />
-      
       {/* Static Pages */}
       <Route path="/about" element={<About />} />
       <Route path="/privacy" element={<Privacy />} />

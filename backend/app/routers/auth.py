@@ -4,7 +4,6 @@ from datetime import datetime, timezone, timedelta
 import uuid
 import secrets
 import os
-import httpx
 import logging
 
 from app.database import db
@@ -317,88 +316,6 @@ async def setup_admin(body: dict):
         "message": "Admin user created successfully",
         "email": email,
         "note": "Please change the password after first login"
-    }
-
-@router.get("/auth/session")
-async def google_auth_session(session_id: str = Header(None, alias="X-Session-ID"), response: Response = None):
-    """Handle Google OAuth session - get user data from Emergent Auth"""
-    if not session_id:
-        raise HTTPException(status_code=400, detail="Session ID required")
-    
-    # Call Emergent Auth API
-    async with httpx.AsyncClient() as client:
-        auth_response = await client.get(
-            "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
-            headers={"X-Session-ID": session_id}
-        )
-        
-        if auth_response.status_code != 200:
-            raise HTTPException(status_code=401, detail="Invalid session")
-        
-        auth_data = auth_response.json()
-    
-    # Check if user exists
-    user_doc = await db.users.find_one({"email": auth_data["email"]}, {"_id": 0})
-    
-    if user_doc:
-        # Update user data
-        await db.users.update_one(
-            {"email": auth_data["email"]},
-            {"$set": {
-                "name": auth_data.get("name", user_doc["name"]),
-                "picture": auth_data.get("picture")
-            }}
-        )
-        user_id = user_doc["user_id"]
-    else:
-        # Create new user
-        user = User(
-            email=auth_data["email"],
-            name=auth_data.get("name", ""),
-            picture=auth_data.get("picture"),
-            role=UserRole.PATIENT,
-            is_verified=True
-        )
-        
-        user_dict = user.model_dump()
-        user_dict['created_at'] = user_dict['created_at'].isoformat()
-        
-        await db.users.insert_one(user_dict)
-        user_id = user.user_id
-    
-    # Create session
-    session_token = auth_data.get("session_token") or create_jwt_token(user_id, auth_data["email"])
-    session = UserSession(
-        user_id=user_id,
-        session_token=session_token,
-        expires_at=datetime.now(timezone.utc) + timedelta(days=7)
-    )
-    
-    session_dict = session.model_dump()
-    session_dict['created_at'] = session_dict['created_at'].isoformat()
-    session_dict['expires_at'] = session_dict['expires_at'].isoformat()
-    
-    await db.user_sessions.insert_one(session_dict)
-    
-    # Set cookie
-    if response:
-        response.set_cookie(
-            key="session_token",
-            value=session_token,
-            httponly=True,
-            secure=True,
-            samesite="none",
-            max_age=7*24*60*60,
-            path="/"
-        )
-    
-    # Get updated user
-    user_doc = await db.users.find_one({"user_id": user_id}, {"_id": 0, "password_hash": 0})
-    
-    return {
-        "message": "Authentication successful",
-        "user": user_doc,
-        "session_token": session_token
     }
 
 @router.get("/auth/me")

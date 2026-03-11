@@ -5,8 +5,6 @@ import { useAuth } from '../context/AuthContext';
 import api from '../utils/api';
 import Logo from '../components/Logo';
 import { FaEnvelope, FaLock, FaUser, FaArrowLeft, FaUserMd, FaUsers, FaCheckCircle, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { FcGoogle } from 'react-icons/fc';
-
 const Register = () => {
   const { t } = useTranslation();
   const { register } = useAuth();
@@ -67,13 +65,6 @@ const Register = () => {
       setError('');
     } catch (e) {}
     setResending(false);
-  };
-
-  const handleGoogleRegister = () => {
-    // Use custom domain if set, otherwise use current origin
-    const baseUrl = process.env.REACT_APP_SITE_URL || window.location.origin;
-    const redirectUrl = baseUrl + '/auth/callback';
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
   const benefits = [
