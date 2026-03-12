@@ -24,4 +24,4 @@ COPY --from=frontend-build /app/frontend/build ./backend/static/
 EXPOSE 8000
 
 # Start server (use PORT env variable from Railway, default to 8000)
-CMD python -m uvicorn server:app --host 0.0.0.0 --port ${PORT:-8000} --app-dir backend
+CMD ["python", "backend/server.py"]
