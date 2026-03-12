@@ -6,7 +6,7 @@ from pathlib import Path
 import os
 import logging
 
-from app.database import client
+from app.database import client, check_db_connection
 from app.routers import (
     auth, providers, services, requests, bookings,
     reviews, favorites, chat, notifications, admin,
@@ -51,7 +51,11 @@ api_router.include_router(contact.router)
 @api_router.get("")
 @api_router.get("/")
 async def health_check():
-    return {"status": "ok"}
+    db_connected = await check_db_connection()
+    return {
+        "status": "ok" if db_connected else "degraded",
+        "database": "connected" if db_connected else "disconnected"
+    }
 
 # Include the api router in the main app
 app.include_router(api_router)
@@ -76,6 +80,18 @@ if STATIC_DIR.exists():
         if file_path.is_file():
             return FileResponse(str(file_path))
         return FileResponse(str(STATIC_DIR / "index.html"))
+
+
+@app.on_event("startup")
+async def startup_db_client():
+    """Verify database connection on startup."""
+    logger.info("Checking MongoDB connection on startup...")
+    connected = await check_db_connection()
+    if not connected:
+        logger.warning("WARNING: Application started but MongoDB is NOT connected!")
+        logger.warning("Check MONGO_URL and DB_NAME environment variables on Railway")
+    else:
+        logger.info("MongoDB connection verified successfully on startup")
 
 
 @app.on_event("shutdown")
