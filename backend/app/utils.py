@@ -18,7 +18,17 @@ from app.models import Notification
 
 logger = logging.getLogger(__name__)
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production')
+ENVIRONMENT = os.environ.get('ENVIRONMENT', 'production')
+IS_PRODUCTION = ENVIRONMENT == 'production'
+
+# SECRET_KEY is required in production - no insecure defaults
+SECRET_KEY = os.environ.get('SECRET_KEY', '')
+if not SECRET_KEY:
+    if IS_PRODUCTION:
+        raise RuntimeError("SECRET_KEY environment variable is required in production!")
+    SECRET_KEY = 'dev-secret-key-not-for-production'
+    logger.warning("Using insecure default SECRET_KEY - for development only!")
+
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'carelink.co.il@gmail.com')
 SMTP_HOST = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
 SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
@@ -28,7 +38,7 @@ VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', '')
 VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY', '')
 VAPID_CLAIMS_EMAIL = os.environ.get('VAPID_CLAIMS_EMAIL', 'admin@carelink.co.il')
 
-SITE_URL = "https://carelink.co.il"
+SITE_URL = os.environ.get('SITE_URL', 'https://carelink.co.il')
 
 
 async def get_site_url():

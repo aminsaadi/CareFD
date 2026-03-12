@@ -62,7 +62,8 @@ async def register(user_data: UserRegister):
                 f"ספק חדש נרשם למערכת: {user.name}. נדרש אימות.",
                 {"provider_id": provider.provider_id, "user_id": user.user_id}
             )
-            admin_link = f"https://carelink.co.il/admin/verification"
+            frontend_url = await get_site_url()
+            admin_link = f"{frontend_url}/admin/verification"
             await send_email_async(
                 admin.get("email"),
                 f"ספק חדש נרשם: {user.name}",
@@ -281,8 +282,13 @@ async def setup_admin(body: dict):
     if not expected_key or setup_key != expected_key:
         raise HTTPException(status_code=403, detail="Invalid setup key")
     
-    email = body.get("email", "admin@carelink.co.il")
-    password = body.get("password", "Admin123!")
+    email = body.get("email")
+    password = body.get("password")
+
+    if not email or not password:
+        raise HTTPException(status_code=400, detail="Email and password are required")
+    if len(password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
     name = body.get("name", "מנהל המערכת")
     
     # Check if admin already exists

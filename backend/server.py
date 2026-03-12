@@ -7,6 +7,7 @@ import os
 import logging
 
 from app.database import client, check_db_connection
+from app.utils import ENVIRONMENT, IS_PRODUCTION
 from app.routers import (
     auth, providers, services, requests, bookings,
     reviews, favorites, chat, notifications, admin,
@@ -21,8 +22,9 @@ app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
 # Configure logging
+log_level = logging.DEBUG if not IS_PRODUCTION else logging.INFO
 logging.basicConfig(
-    level=logging.INFO,
+    level=log_level,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
@@ -60,10 +62,20 @@ async def health_check():
 # Include the api router in the main app
 app.include_router(api_router)
 
+# CORS: In production, require explicit origins. In staging/dev, allow all.
+cors_origins_env = os.environ.get('CORS_ORIGINS', '')
+if cors_origins_env:
+    cors_origins = [origin.strip() for origin in cors_origins_env.split(',')]
+elif IS_PRODUCTION:
+    cors_origins = ["https://carelink.co.il", "https://www.carelink.co.il"]
+    logger.warning("CORS_ORIGINS not set in production, using default: carelink.co.il")
+else:
+    cors_origins = ["*"]
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -84,14 +96,33 @@ if STATIC_DIR.exists():
 
 @app.on_event("startup")
 async def startup_db_client():
-    """Verify database connection on startup."""
+    """Verify database connection and environment on startup."""
+    logger.info(f"Starting Carelink in {ENVIRONMENT} mode")
+
+    # Verify database connection
     logger.info("Checking MongoDB connection on startup...")
     connected = await check_db_connection()
     if not connected:
-        logger.warning("WARNING: Application started but MongoDB is NOT connected!")
-        logger.warning("Check MONGO_URL and DB_NAME environment variables on Railway")
+        logger.error("Application started but MongoDB is NOT connected!")
+        logger.error("Check MONGO_URL and DB_NAME environment variables on Railway")
     else:
-        logger.info("MongoDB connection verified successfully on startup")
+        logger.info("MongoDB connection verified successfully")
+
+    # Warn about missing optional config
+    missing = []
+    if not os.environ.get('SMTP_USER'):
+        missing.append('SMTP_USER/SMTP_PASSWORD (email sending)')
+    if not os.environ.get('VAPID_PRIVATE_KEY'):
+        missing.append('VAPID keys (push notifications)')
+    if not os.environ.get('ADMIN_SETUP_KEY'):
+        missing.append('ADMIN_SETUP_KEY')
+    if not os.environ.get('CORS_ORIGINS'):
+        missing.append('CORS_ORIGINS')
+    if not os.environ.get('SITE_URL'):
+        missing.append('SITE_URL')
+
+    if missing:
+        logger.warning(f"Missing optional env vars: {', '.join(missing)}")
 
 
 @app.on_event("shutdown")
