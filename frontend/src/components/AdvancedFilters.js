@@ -49,7 +49,7 @@ const radiusOptions = [
   { value: 100, label: '100 ק"מ' }
 ];
 
-const cities = ['תל אביב', 'ירושלים', 'חיפה', 'באר שבע', 'רמת גן', 'הרצליה', 'פתח תקווה', 'נתניה', 'אשדוד', 'ראשון לציון'];
+import CitySelect from './CitySelect';
 
 const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile = false, onClose }) => {
   const [expandedSections, setExpandedSections] = useState({
@@ -188,16 +188,13 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
           {/* City Select */}
           <div>
             <label className="block text-sm font-medium text-carelink-navy mb-2">או בחר עיר</label>
-            <select
+            <CitySelect
+              name="city"
               value={filters.city || ''}
               onChange={(e) => onFilterChange({ ...filters, city: e.target.value || null })}
-              className="w-full px-4 py-2 rounded-xl border-2 border-carelink-teal-pale focus:border-carelink-teal focus:outline-none"
-            >
-              <option value="">כל הערים</option>
-              {cities.map((city) => (
-                <option key={city} value={city}>{city}</option>
-              ))}
-            </select>
+              placeholder="כל הערים"
+              inputClassName="w-full px-4 py-2 rounded-xl border-2 border-carelink-teal-pale focus:border-carelink-teal focus:outline-none"
+            />
           </div>
         </div>
       </FilterSection>

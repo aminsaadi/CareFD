@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { X, User, Phone, Mail, MapPin, MessageSquare, Calendar, Clock, CheckCircle, AlertCircle, Copy, Sparkles } from 'lucide-react';
 import MapPicker from './MapPicker';
+import CitySelect from './CitySelect';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -357,13 +358,11 @@ const BookingForm = ({ service, provider, onClose, onSuccess }) => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">עיר *</label>
-                  <input
-                    type="text"
+                  <CitySelect
                     name="service_city"
                     value={formData.service_city}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                     data-testid="service-city-input"
                   />
                 </div>

@@ -6,6 +6,7 @@ import Navbar from '../components/Navbar';
 import MapPicker from '../components/MapPicker';
 import api from '../utils/api';
 import { FaPlus, FaTrash } from 'react-icons/fa';
+import CitySelect from '../components/CitySelect';
 
 const ProviderSetup = () => {
   const { t } = useTranslation();
@@ -217,12 +218,12 @@ const ProviderSetup = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   עיר
                 </label>
-                <input
-                  type="text"
+                <CitySelect
                   name="city"
                   value={formData.location.city}
                   onChange={handleLocationChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder="בחר עיר..."
+                  inputClassName="w-full px-3 py-2 border border-gray-300 rounded-md"
                   data-testid="city-input"
                 />
               </div>
