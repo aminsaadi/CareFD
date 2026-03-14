@@ -11,6 +11,7 @@ import ProviderSubscription from '../components/provider/ProviderSubscription';
 import ProviderClinics from '../components/provider/ProviderClinics';
 import ProviderTeam from '../components/provider/ProviderTeam';
 import BookingDetailsModal from '../components/provider/BookingDetailsModal';
+import CitySelect from '../components/CitySelect';
 import api from '../utils/api';
 import { toast } from 'sonner';
 import { 
@@ -2056,12 +2057,12 @@ const ProviderDashboard = () => {
                         <div className="grid md:grid-cols-2 gap-6">
                           <div>
                             <label className="block text-sm font-medium text-carelink-navy mb-2">עיר</label>
-                            <input
-                              type="text"
+                            <CitySelect
+                              name="personal_city"
                               value={userInfoForm.personal_city}
                               onChange={(e) => setUserInfoForm({ ...userInfoForm, personal_city: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
-                              placeholder="תל אביב"
+                              placeholder="בחר עיר..."
+                              inputClassName="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
                             />
                           </div>
                           <div>

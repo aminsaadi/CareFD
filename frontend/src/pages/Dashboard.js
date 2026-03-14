@@ -6,6 +6,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import CompletionConfirmDialog from '../components/CompletionConfirmDialog';
 import NotificationSettings from '../components/NotificationSettings';
+import CitySelect from '../components/CitySelect';
 import api from '../utils/api';
 import { toast } from 'sonner';
 import { 
@@ -988,12 +989,12 @@ const Dashboard = () => {
                         <div className="grid md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-sm font-medium text-carelink-navy mb-2">עיר</label>
-                            <input
-                              type="text"
+                            <CitySelect
+                              name="city"
                               value={userForm.city}
                               onChange={(e) => setUserForm({ ...userForm, city: e.target.value })}
-                              placeholder="הכנס עיר"
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              placeholder="בחר עיר..."
+                              inputClassName="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
                               data-testid="city-input"
                             />
                           </div>
