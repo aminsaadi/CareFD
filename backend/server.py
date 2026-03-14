@@ -81,7 +81,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 # CORS: In production, require explicit origins. In staging/dev, allow all.
 cors_origins_env = os.environ.get('CORS_ORIGINS', '')
 if cors_origins_env:
-    cors_origins = [origin.strip() for origin in cors_origins_env.split(',')]
+    cors_origins = [origin.strip().rstrip('/') for origin in cors_origins_env.split(',')]
 elif IS_PRODUCTION:
     # Include Railway URLs alongside the main domain
     cors_origins = [
