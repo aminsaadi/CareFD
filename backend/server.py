@@ -136,9 +136,18 @@ async def startup_db_client():
     else:
         logger.info("MongoDB connection verified successfully")
 
+    # Check SMTP configuration
+    smtp_user = os.environ.get('SMTP_USER', '')
+    smtp_password = os.environ.get('SMTP_PASSWORD', '')
+    smtp_port_raw = os.environ.get('SMTP_PORT', '587')
+    if smtp_user and smtp_password:
+        logger.info(f"SMTP: Configured via env vars (user={smtp_user[:3]}***, port={smtp_port_raw})")
+    else:
+        logger.warning("SMTP: SMTP_USER/SMTP_PASSWORD not set in env vars. Checking DB settings on first email...")
+
     # Warn about missing optional config
     missing = []
-    if not os.environ.get('SMTP_USER'):
+    if not smtp_user:
         missing.append('SMTP_USER/SMTP_PASSWORD (email sending)')
     if not os.environ.get('VAPID_PRIVATE_KEY'):
         missing.append('VAPID keys (push notifications)')
