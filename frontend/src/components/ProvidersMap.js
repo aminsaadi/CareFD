@@ -3,78 +3,105 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Fix for default marker icons in webpack
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-});
+// Custom SVG provider marker (teal)
+const createProviderIcon = () => {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="50" viewBox="0 0 40 50">
+      <defs>
+        <filter id="pshadow" x="-20%" y="-10%" width="140%" height="130%">
+          <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
+        </filter>
+      </defs>
+      <path d="M20 0C9 0 0 9 0 20c0 14 20 30 20 30s20-16 20-30C40 9 31 0 20 0z"
+            fill="#0d9488" filter="url(#pshadow)"/>
+      <circle cx="20" cy="18" r="6" fill="none" stroke="#fff" stroke-width="2"/>
+      <path d="M20 24c-5 0-9 2.5-9 5.5V31h18v-1.5C29 26.5 25 24 20 24z"
+            fill="#fff" opacity="0.9"/>
+      <circle cx="20" cy="18" r="4.5" fill="#fff" opacity="0.9"/>
+    </svg>`;
+  return new L.DivIcon({
+    html: svg,
+    className: 'custom-map-marker',
+    iconSize: [40, 50],
+    iconAnchor: [20, 50],
+    popupAnchor: [0, -50],
+  });
+};
 
-// Custom provider marker icon
-const providerIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+// Custom SVG user location marker (blue pulse)
+const createUserIcon = () => {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+      <circle cx="20" cy="20" r="18" fill="#3b82f6" opacity="0.15">
+        <animate attributeName="r" values="14;18;14" dur="2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="20" cy="20" r="10" fill="#3b82f6" opacity="0.2"/>
+      <circle cx="20" cy="20" r="7" fill="#fff" stroke="#3b82f6" stroke-width="3"/>
+      <circle cx="20" cy="20" r="3.5" fill="#3b82f6"/>
+    </svg>`;
+  return new L.DivIcon({
+    html: svg,
+    className: 'custom-map-marker',
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+    popupAnchor: [0, -20],
+  });
+};
 
-// User location marker icon
-const userIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+const providerIcon = createProviderIcon();
+const userIcon = createUserIcon();
 
 // Component to fit bounds when providers change
 const FitBounds = ({ providers, userLocation }) => {
   const map = useMap();
-  
+
   useEffect(() => {
     if (providers.length === 0 && !userLocation) return;
-    
+
     const bounds = [];
-    
+
     if (userLocation) {
       bounds.push([userLocation.lat, userLocation.lng]);
     }
-    
+
     providers.forEach(p => {
       if (p.location?.coordinates?.lat && p.location?.coordinates?.lng) {
         bounds.push([p.location.coordinates.lat, p.location.coordinates.lng]);
       }
     });
-    
+
     if (bounds.length > 0) {
       map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
     }
   }, [providers, userLocation, map]);
-  
+
   return null;
 };
 
-const ProvidersMap = ({ 
-  providers = [], 
-  userLocation = null, 
+const ProvidersMap = ({
+  providers = [],
+  userLocation = null,
   onProviderClick = null,
   height = '400px',
   className = ''
 }) => {
   // Default center - Israel
   const defaultCenter = [31.7683, 35.2137]; // Jerusalem
-  
+
   // Filter providers with valid coordinates
   const validProviders = providers.filter(
     p => p.location?.coordinates?.lat && p.location?.coordinates?.lng
   );
-  
+
   return (
-    <div className={`rounded-xl overflow-hidden border border-gray-200 ${className}`} style={{ height }}>
+    <div className={`rounded-xl overflow-hidden border border-gray-200 shadow-sm ${className}`} style={{ height }}>
+      <style>{`
+        .custom-map-marker {
+          background: none !important;
+          border: none !important;
+        }
+      `}</style>
       <MapContainer
         center={userLocation ? [userLocation.lat, userLocation.lng] : defaultCenter}
         zoom={10}
@@ -82,12 +109,12 @@ const ProvidersMap = ({
         scrollWheelZoom={true}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
         />
-        
+
         <FitBounds providers={validProviders} userLocation={userLocation} />
-        
+
         {/* User location marker */}
         {userLocation && (
           <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
@@ -98,7 +125,7 @@ const ProvidersMap = ({
             </Popup>
           </Marker>
         )}
-        
+
         {/* Provider markers */}
         {validProviders.map((provider) => (
           <Marker
@@ -113,8 +140,8 @@ const ProvidersMap = ({
               <div className="min-w-[200px]" dir="rtl">
                 <div className="flex items-center gap-2 mb-2">
                   {provider.profile_image ? (
-                    <img 
-                      src={provider.profile_image} 
+                    <img
+                      src={provider.profile_image}
                       alt={provider.name}
                       className="w-10 h-10 rounded-full object-cover"
                     />
@@ -128,7 +155,7 @@ const ProvidersMap = ({
                     <p className="text-xs text-carelink-slate">{provider.profession}</p>
                   </div>
                 </div>
-                
+
                 <div className="text-sm space-y-1">
                   {provider.location?.city && (
                     <p className="text-carelink-slate">📍 {provider.location.city}</p>
@@ -144,8 +171,8 @@ const ProvidersMap = ({
                     </p>
                   )}
                 </div>
-                
-                <a 
+
+                <a
                   href={`/providers/${provider.provider_id}`}
                   className="block mt-3 text-center bg-carelink-teal text-carelink-navy py-1.5 px-3 rounded-lg text-sm font-medium hover:bg-carelink-teal/80 transition"
                 >

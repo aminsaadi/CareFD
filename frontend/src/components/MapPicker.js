@@ -3,13 +3,30 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Fix for default marker icon
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+// Custom SVG marker icon
+const createCustomIcon = () => {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="46" viewBox="0 0 36 46">
+      <defs>
+        <filter id="shadow" x="-20%" y="-10%" width="140%" height="130%">
+          <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.3"/>
+        </filter>
+      </defs>
+      <path d="M18 0C8.06 0 0 8.06 0 18c0 12.6 18 28 18 28s18-15.4 18-28C36 8.06 27.94 0 18 0z"
+            fill="#0d9488" filter="url(#shadow)"/>
+      <circle cx="18" cy="18" r="8" fill="#fff"/>
+      <circle cx="18" cy="18" r="4" fill="#0d9488"/>
+    </svg>`;
+  return new L.DivIcon({
+    html: svg,
+    className: 'custom-map-marker',
+    iconSize: [36, 46],
+    iconAnchor: [18, 46],
+    popupAnchor: [0, -46],
+  });
+};
+
+const locationIcon = createCustomIcon();
 
 function LocationMarker({ position, setPosition }) {
   useMapEvents({
@@ -18,7 +35,7 @@ function LocationMarker({ position, setPosition }) {
     },
   });
 
-  return position ? <Marker position={position} /> : null;
+  return position ? <Marker position={position} icon={locationIcon} /> : null;
 }
 
 const MapPicker = ({ location, setLocation }) => {
@@ -46,15 +63,21 @@ const MapPicker = ({ location, setLocation }) => {
   if (!position) return <div>Loading map...</div>;
 
   return (
-    <div className="h-64 rounded-lg overflow-hidden border border-gray-300">
+    <div className="h-64 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+      <style>{`
+        .custom-map-marker {
+          background: none !important;
+          border: none !important;
+        }
+      `}</style>
       <MapContainer
         center={position}
         zoom={13}
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
         />
         <LocationMarker position={position} setPosition={setPosition} />
       </MapContainer>
