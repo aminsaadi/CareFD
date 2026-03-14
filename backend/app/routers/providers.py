@@ -9,7 +9,7 @@ from app.database import db, UPLOAD_DIR
 from app.models import (Provider, ProviderRegister, VerificationDocument, VerificationStatus, NotificationType, UserRole,
     PROFESSION_TITLES, GENDER_OPTIONS, LANGUAGE_OPTIONS, TARGET_AUDIENCE_OPTIONS, SHIFT_DEFINITIONS)
 from app.utils import get_current_user, send_email_async, create_notification, calculate_distance
-from app.localities import ISRAEL_LOCALITIES, get_locality_coords, search_localities, REGION_CENTERS, get_region_info, get_cities_in_region
+from app.localities import ISRAEL_LOCALITIES, ALL_LOCALITIES, get_locality_coords, search_localities, get_all_localities, REGION_CENTERS, get_region_info, get_cities_in_region
 
 router = APIRouter()
 
@@ -475,13 +475,14 @@ async def update_provider(
 # ==================== LOCALITIES ROUTES ====================
 
 @router.get("/localities")
-async def get_localities(q: Optional[str] = None, limit: int = 50):
+async def get_localities(q: Optional[str] = None, limit: int = 500):
     """Get list of Israeli localities with coordinates"""
+    all_locs = get_all_localities()
     if q:
         results = search_localities(q, limit)
     else:
-        results = ISRAEL_LOCALITIES[:limit]
-    return {"localities": results, "total": len(ISRAEL_LOCALITIES)}
+        results = all_locs[:limit]
+    return {"localities": results, "total": len(all_locs)}
 
 @router.get("/localities/{city_name}/coords")
 async def get_city_coords(city_name: str):
