@@ -30,7 +30,11 @@ if not SECRET_KEY:
 
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'carelink.co.il@gmail.com')
 SMTP_HOST = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
-SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
+try:
+    SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
+except (ValueError, TypeError):
+    SMTP_PORT = 587
+    logger.warning("Invalid SMTP_PORT value, defaulting to 587")
 SMTP_USER = os.environ.get('SMTP_USER', '')
 SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
 VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', '')

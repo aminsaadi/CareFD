@@ -17,19 +17,31 @@ async def create_chat_room(
 ):
     """Create a chat room"""
     user = await get_current_user(authorization, request)
-    
+
+    # Verify the authenticated user is one of the participants
+    requested_user_id = room_data.get("user_id")
+    requested_provider_id = room_data.get("provider_id")
+
+    # Check if current user is either the patient or the provider
+    is_patient = user["user_id"] == requested_user_id
+    provider_doc = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    is_provider = provider_doc and provider_doc["provider_id"] == requested_provider_id
+
+    if not is_patient and not is_provider:
+        raise HTTPException(status_code=403, detail="You can only create chat rooms you participate in")
+
     # Check if room already exists
     existing = await db.chat_rooms.find_one({
-        "user_id": room_data.get("user_id"),
-        "provider_id": room_data.get("provider_id")
+        "user_id": requested_user_id,
+        "provider_id": requested_provider_id
     }, {"_id": 0})
-    
+
     if existing:
         return existing
-    
+
     chat_room = ChatRoom(
-        user_id=room_data.get("user_id"),
-        provider_id=room_data.get("provider_id"),
+        user_id=requested_user_id,
+        provider_id=requested_provider_id,
         request_id=room_data.get("request_id"),
         booking_id=room_data.get("booking_id")
     )

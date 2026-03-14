@@ -14,6 +14,30 @@ router = APIRouter()
 
 ALLOWED_EXTENSIONS = {'pdf', 'jpg', 'jpeg', 'png', 'webp', 'gif'}
 
+# Magic bytes for file type verification
+FILE_SIGNATURES = {
+    b'\x89PNG\r\n\x1a\n': 'png',
+    b'\xff\xd8\xff': 'jpg',
+    b'%PDF': 'pdf',
+    b'RIFF': 'webp',  # WebP starts with RIFF....WEBP
+    b'GIF87a': 'gif',
+    b'GIF89a': 'gif',
+}
+
+
+def _verify_file_magic(content: bytes, claimed_ext: str) -> bool:
+    """Verify file content matches claimed type using magic bytes."""
+    for signature, file_type in FILE_SIGNATURES.items():
+        if content[:len(signature)] == signature:
+            if file_type == 'jpg' and claimed_ext in ('jpg', 'jpeg'):
+                return True
+            if file_type == claimed_ext:
+                return True
+            # WebP: check for WEBP after RIFF header
+            if file_type == 'webp' and claimed_ext == 'webp' and len(content) >= 12 and content[8:12] == b'WEBP':
+                return True
+    return False
+
 
 def _sanitize_extension(filename: str, default: str = 'bin') -> str:
     """Extract and validate file extension."""
@@ -46,6 +70,11 @@ async def upload_file(
     
     # Generate unique filename with sanitized extension
     ext = _sanitize_extension(file.filename, 'bin')
+
+    # Verify file content matches claimed type
+    if ext != 'bin' and not _verify_file_magic(content, ext):
+        raise HTTPException(status_code=400, detail="File content does not match file type")
+
     unique_filename = f"{uuid.uuid4().hex}.{ext}"
     file_path = UPLOAD_DIR / unique_filename
 
@@ -87,6 +116,11 @@ async def upload_image(
 
     # Generate unique filename with sanitized extension
     ext = _sanitize_extension(file.filename, 'jpg')
+
+    # Verify file content matches claimed type
+    if not _verify_file_magic(content, ext):
+        raise HTTPException(status_code=400, detail="File content does not match image type")
+
     unique_filename = f"img_{uuid.uuid4().hex}.{ext}"
     file_path = UPLOAD_DIR / unique_filename
 

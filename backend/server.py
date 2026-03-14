@@ -2,6 +2,8 @@ from fastapi import FastAPI, APIRouter, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response as StarletteResponse
 from pathlib import Path
 import os
 import logging
@@ -62,6 +64,20 @@ async def health_check():
 # Include the api router in the main app
 app.include_router(api_router)
 
+# Security headers middleware
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        if IS_PRODUCTION:
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
+
 # CORS: In production, require explicit origins. In staging/dev, allow all.
 cors_origins_env = os.environ.get('CORS_ORIGINS', '')
 if cors_origins_env:
@@ -97,7 +113,10 @@ if STATIC_DIR.exists():
     @app.get("/{full_path:path}")
     async def serve_frontend(request: Request, full_path: str):
         """Serve React frontend for all non-API routes."""
-        file_path = STATIC_DIR / full_path
+        file_path = (STATIC_DIR / full_path).resolve()
+        # Prevent path traversal - ensure resolved path is within STATIC_DIR
+        if not str(file_path).startswith(str(STATIC_DIR.resolve())):
+            return FileResponse(str(STATIC_DIR / "index.html"))
         if file_path.is_file():
             return FileResponse(str(file_path))
         return FileResponse(str(STATIC_DIR / "index.html"))
