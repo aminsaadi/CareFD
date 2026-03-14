@@ -906,7 +906,18 @@ const ProviderEdit = () => {
                     />
                   </div>
                 </div>
-                
+
+                {/* Map + Radius */}
+                <div>
+                  <label className="block text-sm font-medium text-carelink-navy mb-2">מיקום במפה ורדיוס כיסוי</label>
+                  <p className="text-sm text-carelink-gray mb-2">לחץ על המפה לבחירת מיקום. הרדיוס מוצג בקו מקווקו.</p>
+                  <MapPicker
+                    location={location}
+                    setLocation={setLocation}
+                    height="h-80"
+                  />
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-carelink-navy mb-2">אזורי מתן שירות</label>
                   <p className="text-sm text-carelink-gray mb-3">בחר אזור שלם או חפש והוסף ערים בודדות</p>

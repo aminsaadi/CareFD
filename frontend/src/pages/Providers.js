@@ -749,6 +749,7 @@ const Providers = () => {
                     <ProvidersMap
                       providers={providers}
                       userLocation={filters.latitude && filters.longitude ? { lat: filters.latitude, lng: filters.longitude } : null}
+                      radiusKm={filters.radius}
                       height="500px"
                     />
                   </Suspense>

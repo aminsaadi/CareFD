@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -82,6 +82,7 @@ const FitBounds = ({ providers, userLocation }) => {
 const ProvidersMap = ({
   providers = [],
   userLocation = null,
+  radiusKm = null,
   onProviderClick = null,
   height = '400px',
   className = ''
@@ -109,8 +110,9 @@ const ProvidersMap = ({
         scrollWheelZoom={true}
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+          url="https://tile-{s}.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="https://www.hotosm.org/">HOT</a>'
+          subdomains="abc"
         />
 
         <FitBounds providers={validProviders} userLocation={userLocation} />
@@ -124,6 +126,21 @@ const ProvidersMap = ({
               </div>
             </Popup>
           </Marker>
+        )}
+
+        {/* Search radius circle */}
+        {userLocation && radiusKm && (
+          <Circle
+            center={[userLocation.lat, userLocation.lng]}
+            radius={radiusKm * 1000}
+            pathOptions={{
+              color: '#3b82f6',
+              fillColor: '#3b82f6',
+              fillOpacity: 0.06,
+              weight: 2,
+              dashArray: '8, 4',
+            }}
+          />
         )}
 
         {/* Provider markers */}
@@ -152,7 +169,7 @@ const ProvidersMap = ({
                   )}
                   <div>
                     <strong className="text-carelink-navy">{provider.name}</strong>
-                    <p className="text-xs text-carelink-slate">{provider.profession}</p>
+                    <p className="text-xs text-carelink-slate">{provider.profession_name || provider.profession}</p>
                   </div>
                 </div>
 
@@ -174,7 +191,7 @@ const ProvidersMap = ({
 
                 <a
                   href={`/providers/${provider.provider_id}`}
-                  className="block mt-3 text-center bg-carelink-teal text-carelink-navy py-1.5 px-3 rounded-lg text-sm font-medium hover:bg-carelink-teal/80 transition"
+                  className="block mt-3 text-center bg-carelink-teal text-white py-1.5 px-3 rounded-lg text-sm font-medium hover:bg-carelink-teal/90 transition"
                 >
                   צפה בפרופיל
                 </a>
