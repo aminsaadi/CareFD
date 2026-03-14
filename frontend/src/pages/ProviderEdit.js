@@ -12,6 +12,7 @@ import {
   FaWhatsapp, FaEnvelope, FaFileAlt, FaUpload, FaEye, FaEyeSlash
 } from 'react-icons/fa';
 import CitySelect, { sortedCities } from '../components/CitySelect';
+import { israeliRegions } from '../data/searchData';
 
 // Options data
 const PROFESSION_OPTIONS = [
@@ -764,7 +765,45 @@ const ProviderEdit = () => {
                 
                 <div>
                   <label className="block text-sm font-medium text-carelink-navy mb-2">אזורי מתן שירות</label>
-                  <p className="text-sm text-carelink-gray mb-3">חפש והוסף את האזורים בהם אתה מספק שירות</p>
+                  <p className="text-sm text-carelink-gray mb-3">בחר אזור שלם או חפש והוסף ערים בודדות</p>
+
+                  {/* Region quick-select buttons */}
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {israeliRegions.map(region => {
+                      const regionTag = `אזור: ${region.name}`;
+                      const isSelected = formData.service_areas.includes(regionTag);
+                      return (
+                        <button
+                          key={region.id}
+                          type="button"
+                          onClick={() => {
+                            const current = formData.service_areas || [];
+                            if (isSelected) {
+                              // Remove region tag and its cities
+                              const regionCities = region.cities || [];
+                              const filtered = current.filter(a => a !== regionTag && !regionCities.includes(a));
+                              setFormData({ ...formData, service_areas: filtered });
+                            } else {
+                              // Add region tag and all its cities (avoid duplicates)
+                              const regionCities = region.cities || [];
+                              const merged = [...new Set([...current, regionTag, ...regionCities])];
+                              setFormData({ ...formData, service_areas: merged });
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-full text-sm border transition flex items-center gap-1 ${
+                            isSelected
+                              ? 'bg-carelink-navy text-white border-carelink-navy'
+                              : 'bg-white text-carelink-navy border-gray-300 hover:border-carelink-teal'
+                          }`}
+                        >
+                          <FaMapMarkerAlt className="text-xs" />
+                          {region.name}
+                          {isSelected && <FaCheck className="text-xs" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+
                   <CitySelect
                     name="service_area_add"
                     value=""
@@ -781,9 +820,26 @@ const ProviderEdit = () => {
                       {formData.service_areas.map(area => (
                         <button
                           key={area}
-                          onClick={() => toggleMultiSelect('service_areas', area)}
-                          className="px-4 py-2 rounded-full text-sm transition bg-carelink-teal text-white flex items-center gap-1"
+                          onClick={() => {
+                            if (area.startsWith('אזור: ')) {
+                              // Removing a region tag - also remove its cities
+                              const regionName = area.replace('אזור: ', '');
+                              const region = israeliRegions.find(r => r.name === regionName);
+                              const regionCities = region?.cities || [];
+                              const current = formData.service_areas || [];
+                              const filtered = current.filter(a => a !== area && !regionCities.includes(a));
+                              setFormData({ ...formData, service_areas: filtered });
+                            } else {
+                              toggleMultiSelect('service_areas', area);
+                            }
+                          }}
+                          className={`px-4 py-2 rounded-full text-sm transition flex items-center gap-1 ${
+                            area.startsWith('אזור: ')
+                              ? 'bg-carelink-navy text-white'
+                              : 'bg-carelink-teal text-white'
+                          }`}
                         >
+                          {area.startsWith('אזור: ') && <FaMapMarkerAlt className="text-xs" />}
                           {area}
                           <FaTimes className="text-xs" />
                         </button>
