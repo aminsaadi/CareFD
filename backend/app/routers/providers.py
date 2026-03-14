@@ -216,21 +216,29 @@ async def search_providers(
             ]
         })
     
-    # City / Region filter
+    # City / Region filter - check both provider location AND service_areas
     if city:
-        # Check if it's a region name first
         region_info = get_region_info(city)
         if region_info:
-            # It's a region - get all cities in this region
+            # It's a region - match provider's city OR service_areas
             region_cities = get_cities_in_region(city)
+            region_tag = f"אזור: {city}"
             if region_cities:
-                query["$and"].append({"location.city": {"$in": region_cities}})
+                query["$and"].append({"$or": [
+                    {"location.city": {"$in": region_cities}},
+                    {"service_areas": {"$in": region_cities + [region_tag]}},
+                ]})
             else:
-                # Fallback to regex if no mapped cities
-                query["$and"].append({"location.city": {"$regex": re.escape(city), "$options": "i"}})
+                query["$and"].append({"$or": [
+                    {"location.city": {"$regex": re.escape(city), "$options": "i"}},
+                    {"service_areas": {"$regex": re.escape(city), "$options": "i"}},
+                ]})
         else:
-            # It's a specific city name
-            query["$and"].append({"location.city": {"$regex": re.escape(city), "$options": "i"}})
+            # It's a specific city name - match location OR service_areas
+            query["$and"].append({"$or": [
+                {"location.city": {"$regex": re.escape(city), "$options": "i"}},
+                {"service_areas": city},
+            ]})
     
     # Specialization filter (single)
     if specialization:
