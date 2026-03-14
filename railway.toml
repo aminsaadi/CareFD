@@ -1,9 +1,0 @@
-[build]
-builder = "dockerfile"
-dockerfilePath = "Dockerfile"
-
-[deploy]
-startCommand = "python backend/server.py"
-healthcheckPath = "/api"
-restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 3

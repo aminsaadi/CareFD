@@ -88,7 +88,7 @@ async def update_clinic(
     if not provider:
         raise HTTPException(status_code=404, detail="Provider not found")
     
-    clinic = await db.clinics.find_one({"clinic_id": clinic_id, "provider_id": provider["provider_id"]})
+    clinic = await db.clinics.find_one({"clinic_id": clinic_id, "provider_id": provider["provider_id"]}, {"_id": 0})
     if not clinic:
         raise HTTPException(status_code=404, detail="Clinic not found")
     

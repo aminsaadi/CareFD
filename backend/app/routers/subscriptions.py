@@ -302,7 +302,7 @@ async def cancel_subscription(
     )
     
     # Reset provider tier to free
-    provider = await db.providers.find_one({"user_id": user["user_id"]})
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
     if provider:
         await db.providers.update_one(
             {"user_id": user["user_id"]},
