@@ -67,8 +67,17 @@ cors_origins_env = os.environ.get('CORS_ORIGINS', '')
 if cors_origins_env:
     cors_origins = [origin.strip() for origin in cors_origins_env.split(',')]
 elif IS_PRODUCTION:
-    cors_origins = ["https://carelink.co.il", "https://www.carelink.co.il"]
-    logger.warning("CORS_ORIGINS not set in production, using default: carelink.co.il")
+    # Include Railway URLs alongside the main domain
+    cors_origins = [
+        "https://carelink.co.il",
+        "https://www.carelink.co.il",
+        "https://carelinkproduction.up.railway.app",
+    ]
+    # Also include RAILWAY_PUBLIC_DOMAIN if set
+    railway_domain = os.environ.get('RAILWAY_PUBLIC_DOMAIN')
+    if railway_domain:
+        cors_origins.append(f"https://{railway_domain}")
+    logger.warning(f"CORS_ORIGINS not set in production, using defaults: {cors_origins}")
 else:
     cors_origins = ["*"]
 
