@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Default to same-origin (empty string) if REACT_APP_BACKEND_URL is not set
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
+const BACKEND_URL = (process.env.REACT_APP_BACKEND_URL || '').replace(/\/+$/, '');
 const API = `${BACKEND_URL}/api`;
 
 // Create axios instance
