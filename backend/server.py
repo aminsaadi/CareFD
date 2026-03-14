@@ -61,6 +61,11 @@ async def health_check():
         "database": "connected" if db_connected else "disconnected"
     }
 
+# Debug: test POST endpoint
+@api_router.post("/debug/test-post")
+async def test_post():
+    return {"message": "POST works!", "cors_origins": cors_origins_env[:50] if cors_origins_env else "not set"}
+
 # Include the api router in the main app
 app.include_router(api_router)
 
@@ -126,6 +131,15 @@ if STATIC_DIR.exists():
 async def startup_db_client():
     """Verify database connection and environment on startup."""
     logger.info(f"Starting Carelink in {ENVIRONMENT} mode")
+
+    # Log all registered routes for debugging
+    logger.info("=== Registered Routes ===")
+    for route in app.routes:
+        if hasattr(route, 'methods') and hasattr(route, 'path'):
+            logger.info(f"  {route.methods} {route.path}")
+        elif hasattr(route, 'path'):
+            logger.info(f"  MOUNT {route.path}")
+    logger.info(f"=== Total: {len(app.routes)} routes ===")
 
     # Verify database connection
     logger.info("Checking MongoDB connection on startup...")
