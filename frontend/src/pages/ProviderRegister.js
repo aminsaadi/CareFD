@@ -3,11 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../components/Logo';
-import { 
-  FaEnvelope, FaLock, FaUser, FaArrowLeft, FaUserMd, FaBuilding, 
+import {
+  FaEnvelope, FaLock, FaUser, FaArrowLeft, FaUserMd, FaBuilding,
   FaPhone, FaMapMarkerAlt, FaCheckCircle, FaBriefcaseMedical,
   FaUsers, FaCalendarCheck, FaChartLine, FaEye, FaEyeSlash
 } from 'react-icons/fa';
+import CitySelect from '../components/CitySelect';
 const ProviderRegister = () => {
   const { t } = useTranslation();
   const { register } = useAuth();
@@ -313,14 +314,13 @@ const ProviderRegister = () => {
                   <div>
                     <label className="block text-sm font-semibold text-carelink-navy mb-2">עיר</label>
                     <div className="relative">
-                      <FaMapMarkerAlt className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
-                      <input
+                      <FaMapMarkerAlt className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carelink-gray z-10 pointer-events-none" />
+                      <CitySelect
                         name="city"
-                        type="text"
                         value={formData.city}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 pr-12 rtl:pr-4 rtl:pl-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
-                        placeholder="תל אביב"
+                        placeholder="בחר עיר..."
+                        inputClassName="w-full px-4 py-3 pr-12 rtl:pr-4 rtl:pl-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
                       />
                     </div>
                   </div>

@@ -61,6 +61,11 @@ async def health_check():
         "database": "connected" if db_connected else "disconnected"
     }
 
+# Debug: test POST endpoint
+@api_router.post("/debug/test-post")
+async def test_post():
+    return {"message": "POST works!", "cors_origins": cors_origins_env[:50] if cors_origins_env else "not set"}
+
 # Include the api router in the main app
 app.include_router(api_router)
 
@@ -81,7 +86,7 @@ app.add_middleware(SecurityHeadersMiddleware)
 # CORS: In production, require explicit origins. In staging/dev, allow all.
 cors_origins_env = os.environ.get('CORS_ORIGINS', '')
 if cors_origins_env:
-    cors_origins = [origin.strip() for origin in cors_origins_env.split(',')]
+    cors_origins = [origin.strip().rstrip('/') for origin in cors_origins_env.split(',')]
 elif IS_PRODUCTION:
     # Include Railway URLs alongside the main domain
     cors_origins = [
@@ -127,6 +132,15 @@ async def startup_db_client():
     """Verify database connection and environment on startup."""
     logger.info(f"Starting Carelink in {ENVIRONMENT} mode")
 
+    # Log all registered routes for debugging
+    logger.info("=== Registered Routes ===")
+    for route in app.routes:
+        if hasattr(route, 'methods') and hasattr(route, 'path'):
+            logger.info(f"  {route.methods} {route.path}")
+        elif hasattr(route, 'path'):
+            logger.info(f"  MOUNT {route.path}")
+    logger.info(f"=== Total: {len(app.routes)} routes ===")
+
     # Verify database connection
     logger.info("Checking MongoDB connection on startup...")
     connected = await check_db_connection()
@@ -136,9 +150,18 @@ async def startup_db_client():
     else:
         logger.info("MongoDB connection verified successfully")
 
+    # Check SMTP configuration
+    smtp_user = os.environ.get('SMTP_USER', '')
+    smtp_password = os.environ.get('SMTP_PASSWORD', '')
+    smtp_port_raw = os.environ.get('SMTP_PORT', '587')
+    if smtp_user and smtp_password:
+        logger.info(f"SMTP: Configured via env vars (user={smtp_user[:3]}***, port={smtp_port_raw})")
+    else:
+        logger.warning("SMTP: SMTP_USER/SMTP_PASSWORD not set in env vars. Checking DB settings on first email...")
+
     # Warn about missing optional config
     missing = []
-    if not os.environ.get('SMTP_USER'):
+    if not smtp_user:
         missing.append('SMTP_USER/SMTP_PASSWORD (email sending)')
     if not os.environ.get('VAPID_PRIVATE_KEY'):
         missing.append('VAPID keys (push notifications)')

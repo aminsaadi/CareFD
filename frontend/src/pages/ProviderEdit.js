@@ -5,12 +5,13 @@ import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import MapPicker from '../components/MapPicker';
 import api from '../utils/api';
-import { 
+import {
   FaPlus, FaTrash, FaSave, FaCamera, FaUser, FaMapMarkerAlt,
   FaClock, FaLanguage, FaUsers, FaBriefcase, FaGraduationCap,
   FaInfoCircle, FaCheck, FaTimes, FaAward, FaCreditCard, FaPhone,
   FaWhatsapp, FaEnvelope, FaFileAlt, FaUpload, FaEye, FaEyeSlash
 } from 'react-icons/fa';
+import CitySelect, { sortedCities } from '../components/CitySelect';
 
 // Options data
 const PROFESSION_OPTIONS = [
@@ -53,11 +54,7 @@ const TARGET_AUDIENCE_OPTIONS = [
   { value: 'postpartum', label: 'יולדות' },
 ];
 
-const SERVICE_AREAS = [
-  'תל אביב', 'ירושלים', 'חיפה', 'באר שבע', 'רמת גן', 'הרצליה', 
-  'פתח תקווה', 'ראשון לציון', 'נתניה', 'אשדוד', 'חולון', 'בני ברק',
-  'רעננה', 'כפר סבא', 'מודיעין', 'אשקלון', 'רחובות', 'בת ים'
-];
+const SERVICE_AREAS = sortedCities;
 
 // New options for enhanced profile
 const HEALTH_FUNDS = [
@@ -755,37 +752,44 @@ const ProviderEdit = () => {
                   
                   <div>
                     <label className="block text-sm font-medium text-carelink-navy mb-2">עיר</label>
-                    <select
+                    <CitySelect
+                      name="city"
                       value={location.city}
                       onChange={(e) => setLocation({ ...location, city: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none bg-white"
-                    >
-                      <option value="">בחר עיר</option>
-                      {SERVICE_AREAS.map(city => (
-                        <option key={city} value={city}>{city}</option>
-                      ))}
-                    </select>
+                      placeholder="בחר עיר..."
+                      inputClassName="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none bg-white"
+                    />
                   </div>
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-carelink-navy mb-2">אזורי מתן שירות</label>
-                  <p className="text-sm text-carelink-gray mb-3">בחר את האזורים בהם אתה מספק שירות</p>
-                  <div className="flex flex-wrap gap-2">
-                    {SERVICE_AREAS.map(area => (
-                      <button
-                        key={area}
-                        onClick={() => toggleMultiSelect('service_areas', area)}
-                        className={`px-4 py-2 rounded-full text-sm transition ${
-                          formData.service_areas.includes(area)
-                            ? 'bg-carelink-teal text-white'
-                            : 'bg-gray-100 text-carelink-gray hover:bg-gray-200'
-                        }`}
-                      >
-                        {area}
-                      </button>
-                    ))}
-                  </div>
+                  <p className="text-sm text-carelink-gray mb-3">חפש והוסף את האזורים בהם אתה מספק שירות</p>
+                  <CitySelect
+                    name="service_area_add"
+                    value=""
+                    onChange={(e) => {
+                      if (e.target.value && !formData.service_areas.includes(e.target.value)) {
+                        toggleMultiSelect('service_areas', e.target.value);
+                      }
+                    }}
+                    placeholder="חפש עיר להוספה..."
+                    inputClassName="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none bg-white mb-3"
+                  />
+                  {formData.service_areas.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {formData.service_areas.map(area => (
+                        <button
+                          key={area}
+                          onClick={() => toggleMultiSelect('service_areas', area)}
+                          className="px-4 py-2 rounded-full text-sm transition bg-carelink-teal text-white flex items-center gap-1"
+                        >
+                          {area}
+                          <FaTimes className="text-xs" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 
                 <div>

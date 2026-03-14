@@ -18,9 +18,9 @@ router = APIRouter()
 @router.post("/auth/register")
 async def register(user_data: UserRegister, request: Request = None):
     """Register new user with email/password"""
-    # Rate limit: 5 registrations per IP per 15 minutes
+    # Rate limit: 10 registrations per IP per 15 minutes
     if request:
-        rate_limiter.check(f"register:{get_client_ip(request)}", max_requests=5, window_seconds=900)
+        rate_limiter.check(f"register:{get_client_ip(request)}", max_requests=10, window_seconds=900)
     existing_user = await db.users.find_one({"email": user_data.email}, {"_id": 0})
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -152,9 +152,9 @@ async def register(user_data: UserRegister, request: Request = None):
 @router.post("/auth/login")
 async def login(credentials: UserLogin, request: Request = None, response: Response = None):
     """Login with email/password"""
-    # Rate limit: 10 login attempts per IP per 15 minutes
+    # Rate limit: 30 login attempts per IP per 15 minutes
     if request:
-        rate_limiter.check(f"login:{get_client_ip(request)}", max_requests=10, window_seconds=900)
+        rate_limiter.check(f"login:{get_client_ip(request)}", max_requests=30, window_seconds=900)
     user_doc = await db.users.find_one({"email": credentials.email}, {"_id": 0})
     if not user_doc:
         raise HTTPException(status_code=401, detail="Invalid credentials")

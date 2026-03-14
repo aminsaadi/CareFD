@@ -124,7 +124,13 @@ async def admin_test_email(
         raise HTTPException(status_code=400, detail="Email address required")
     
     smtp_cfg = await _get_smtp_settings()
-    
+
+    if not smtp_cfg["smtp_user"] or not smtp_cfg["smtp_password"]:
+        raise HTTPException(
+            status_code=400,
+            detail="SMTP לא מוגדר. הגדר SMTP_USER ו-SMTP_PASSWORD בהגדרות או ב-env vars."
+        )
+
     result = await send_email_async(
         recipient,
         "CareLink - בדיקת שליחת מייל",
@@ -137,13 +143,20 @@ async def admin_test_email(
         </div>
         """
     )
-    
+
+    if not result:
+        raise HTTPException(
+            status_code=500,
+            detail="שליחת המייל נכשלה. בדוק את הלוגים לפרטים נוספים. אם משתמש ב-Gmail, ודא שאתה משתמש ב-App Password."
+        )
+
     return {
-        "success": result is not None,
+        "success": True,
         "recipient": recipient,
         "smtp_status": {
-            "smtp_user_configured": bool(smtp_cfg["smtp_user"]),
-            "smtp_password_configured": bool(smtp_cfg["smtp_password"]),
+            "source": "database" if (await db.smtp_settings.find_one({"_id": "smtp_config"})) else "environment",
+            "smtp_host": smtp_cfg["smtp_host"],
+            "smtp_port": smtp_cfg["smtp_port"],
             "sender_email": smtp_cfg["sender_email"]
         }
     }

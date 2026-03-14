@@ -16,9 +16,10 @@ class RateLimiter:
     def check(self, key: str, max_requests: int, window_seconds: int):
         self._cleanup(key, window_seconds)
         if len(self._requests[key]) >= max_requests:
+            minutes = window_seconds // 60
             raise HTTPException(
                 status_code=429,
-                detail="Too many requests. Please try again later."
+                detail=f"יותר מדי ניסיונות. נסה שוב בעוד {minutes} דקות."
             )
         self._requests[key].append(time.time())
 
