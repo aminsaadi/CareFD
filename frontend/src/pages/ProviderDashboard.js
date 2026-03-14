@@ -58,6 +58,7 @@ const ProviderDashboard = () => {
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
   const [provider, setProvider] = useState(null);
+  const [professions, setProfessions] = useState([]); // Admin hierarchy for service categories
   const [bookings, setBookings] = useState([]);
   const [services, setServices] = useState([]);
   const [requests, setRequests] = useState([]);
@@ -91,6 +92,7 @@ const ProviderDashboard = () => {
     duration_minutes: '',
     // New fields
     service_category: 'visit',
+    categories: [], // [{category_id, name, profession_id, profession_name}] - max 3
     delivery_types: [],
     pricing_type: 'fixed',
     minimum_hours: '',
@@ -149,7 +151,17 @@ const ProviderDashboard = () => {
   useEffect(() => {
     fetchDashboardData();
     fetchServiceAndDeliveryTypes();
+    fetchProfessions();
   }, []);
+
+  const fetchProfessions = async () => {
+    try {
+      const response = await api.get('/professions');
+      setProfessions(response.data.professions || []);
+    } catch (err) {
+      console.error('Failed to fetch professions:', err);
+    }
+  };
 
   const fetchServiceAndDeliveryTypes = async () => {
     try {
@@ -291,6 +303,7 @@ const ProviderDashboard = () => {
       price: '',
       duration_minutes: '',
       service_category: 'visit',
+      categories: [],
       delivery_types: [],
       pricing_type: 'fixed',
       minimum_hours: '',
@@ -314,6 +327,7 @@ const ProviderDashboard = () => {
       price: service.price || '',
       duration_minutes: service.duration_minutes || '',
       service_category: service.service_category || 'visit',
+      categories: service.categories || [],
       delivery_types: service.delivery_types || [],
       pricing_type: service.pricing_type || 'fixed',
       minimum_hours: service.minimum_hours || '',
@@ -350,6 +364,7 @@ const ProviderDashboard = () => {
         price: parseFloat(serviceForm.price),
         duration_minutes: serviceForm.duration_minutes ? parseInt(serviceForm.duration_minutes) : null,
         service_category: serviceForm.service_category,
+        categories: serviceForm.categories || [],
         delivery_types: serviceForm.delivery_types,
         pricing_type: serviceForm.pricing_type,
         minimum_hours: serviceForm.minimum_hours ? parseFloat(serviceForm.minimum_hours) : null,
@@ -1191,9 +1206,101 @@ const ProviderDashboard = () => {
                                 </div>
                               </div>
 
+                              {/* Categories from admin hierarchy (1-3) */}
+                              {professions.length > 0 && (() => {
+                                const allCategories = [];
+                                professions.forEach(prof => {
+                                  (prof.sub_professions || []).forEach(sub => {
+                                    (sub.categories || []).forEach(cat => {
+                                      allCategories.push({
+                                        ...cat,
+                                        profession_id: prof.profession_id,
+                                        profession_name: prof.name,
+                                        sub_name: sub.name,
+                                      });
+                                    });
+                                  });
+                                });
+
+                                if (allCategories.length === 0) return null;
+
+                                const selectedCats = serviceForm.categories || [];
+                                const isCatSelected = (catId) => selectedCats.some(c => c.category_id === catId);
+                                const toggleCat = (cat) => {
+                                  if (isCatSelected(cat.category_id)) {
+                                    setServiceForm({
+                                      ...serviceForm,
+                                      categories: selectedCats.filter(c => c.category_id !== cat.category_id)
+                                    });
+                                  } else if (selectedCats.length < 3) {
+                                    setServiceForm({
+                                      ...serviceForm,
+                                      categories: [...selectedCats, {
+                                        category_id: cat.category_id,
+                                        name: cat.name,
+                                        profession_id: cat.profession_id,
+                                        profession_name: cat.profession_name,
+                                      }]
+                                    });
+                                  }
+                                };
+
+                                // Group by profession
+                                const grouped = {};
+                                allCategories.forEach(cat => {
+                                  if (!grouped[cat.profession_name]) grouped[cat.profession_name] = [];
+                                  grouped[cat.profession_name].push(cat);
+                                });
+
+                                return (
+                                  <div className="bg-white p-4 rounded-xl">
+                                    <label className="block text-sm font-bold text-carelink-navy mb-2">
+                                      קטגוריות מקצועיות ({selectedCats.length}/3)
+                                    </label>
+                                    <p className="text-xs text-carelink-gray mb-3">בחר 1-3 קטגוריות שהשירות שייך אליהן</p>
+                                    {selectedCats.length > 0 && (
+                                      <div className="flex flex-wrap gap-2 mb-3">
+                                        {selectedCats.map(cat => (
+                                          <span key={cat.category_id} className="inline-flex items-center gap-1 px-3 py-1 bg-carelink-teal/10 text-carelink-teal border border-carelink-teal/30 rounded-full text-sm">
+                                            {cat.name}
+                                            <button onClick={() => toggleCat(cat)} className="mr-1 hover:text-red-500">×</button>
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
+                                    <div className="space-y-2">
+                                      {Object.entries(grouped).map(([profName, cats]) => (
+                                        <div key={profName}>
+                                          <p className="text-xs font-medium text-carelink-gray mb-1">{profName}</p>
+                                          <div className="flex flex-wrap gap-1.5">
+                                            {cats.map(cat => (
+                                              <button
+                                                key={cat.category_id}
+                                                type="button"
+                                                onClick={() => toggleCat(cat)}
+                                                disabled={!isCatSelected(cat.category_id) && selectedCats.length >= 3}
+                                                className={`px-3 py-1 rounded-full border text-xs transition ${
+                                                  isCatSelected(cat.category_id)
+                                                    ? 'bg-carelink-teal text-white border-carelink-teal'
+                                                    : selectedCats.length >= 3
+                                                      ? 'bg-gray-50 text-gray-400 border-gray-200'
+                                                      : 'bg-white text-carelink-navy border-gray-200 hover:border-carelink-teal'
+                                                }`}
+                                              >
+                                                {cat.name}
+                                              </button>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                );
+                              })()}
+
                               {/* Service Category */}
                               <div className="bg-white p-4 rounded-xl">
-                                <label className="block text-sm font-bold text-carelink-navy mb-3">קטגוריית שירות *</label>
+                                <label className="block text-sm font-bold text-carelink-navy mb-3">סוג שירות *</label>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                   {[
                                     { id: 'visit', name: 'שירות ביקור', icon: '🏠', desc: 'ביקור חד פעמי' },

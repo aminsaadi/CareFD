@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
+import {
   FaFilter, FaTimes, FaMapMarkerAlt, FaCrosshairs, FaStar,
   FaUserMd, FaBriefcase, FaHome, FaVideo, FaClinicMedical, FaPhoneAlt,
   FaCheckCircle, FaAward, FaClock, FaChevronDown, FaChevronUp,
@@ -7,10 +7,11 @@ import {
   FaSpinner
 } from 'react-icons/fa';
 import { israeliLocalities } from '../data/israeliLocalities';
-import { 
-  israeliRegions, healthcareProfessions, serviceCategories, serviceTypes,
-  genderOptions, languageOptions, healthFunds 
+import {
+  israeliRegions, healthcareProfessions, serviceCategories as defaultServiceCategories, serviceTypes,
+  genderOptions, languageOptions, healthFunds
 } from '../data/searchData';
+import api from '../utils/api';
 
 // Service type icons mapping
 const serviceTypeIcons = {
@@ -59,6 +60,27 @@ const UnifiedAdvancedFilters = ({
     badges: false
   });
   
+  // Categories from admin
+  const [serviceCategories, setServiceCategories] = useState(defaultServiceCategories);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await api.get('/professions');
+        const profs = response.data.professions || [];
+        if (profs.length > 0) {
+          setServiceCategories(profs.map(p => ({
+            id: p.profession_id,
+            name: p.name
+          })));
+        }
+      } catch (err) {
+        // Keep defaults on error
+      }
+    };
+    fetchCategories();
+  }, []);
+
   // Location search states
   const [locationSearch, setLocationSearch] = useState('');
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);

@@ -752,6 +752,9 @@ async def admin_update_provider(
         # Complete profile editing fields
         "profession_title", "gender", "about", "description", "profile_image", "profile_color",
         "expertise", "target_audience", "service_areas", "availability", "website",
+        # Profession hierarchy fields
+        "profession_id", "profession_name", "specialization_id", "specialization_name",
+        "service_categories",
         # New enhanced profile fields
         "health_funds", "payment_methods", "cancellation_policy", "cancellation_notice_hours",
         "show_phone", "show_email", "show_whatsapp", "whatsapp_number",

@@ -211,17 +211,20 @@ async def search_providers(
             {"business_name": {"$regex": safe_search, "$options": "i"}},
             {"description": {"$regex": safe_search, "$options": "i"}},
             {"specializations": {"$regex": safe_search, "$options": "i"}},
+            # Search in new hierarchy fields
+            {"profession_name": {"$regex": safe_search, "$options": "i"}},
+            {"specialization_name": {"$regex": safe_search, "$options": "i"}},
+            {"expertise": {"$regex": safe_search, "$options": "i"}},
+            {"service_categories.name": {"$regex": safe_search, "$options": "i"}},
         ]
 
-        # Map Hebrew search terms to profession_title values
+        # Map Hebrew search terms to profession_title values (legacy support)
         matched_profession_values = []
         search_lower = search.strip()
         for prof in PROFESSION_TITLES:
-            # Check against label
             if search_lower in prof["label"] or prof["label"] in search_lower:
                 matched_profession_values.append(prof["value"])
                 continue
-            # Check against search_terms
             for term in prof.get("search_terms", []):
                 if search_lower in term or term in search_lower:
                     matched_profession_values.append(prof["value"])
@@ -230,11 +233,10 @@ async def search_providers(
         if matched_profession_values:
             search_or.append({"profession_title": {"$in": matched_profession_values}})
 
-        # Also regex match profession_title directly (for English searches)
         search_or.append({"profession_title": {"$regex": safe_search, "$options": "i"}})
 
         query["$and"].append({"$or": search_or})
-    
+
     # City / Region filter - check both provider location AND service_areas
     if city:
         region_info = get_region_info(city)
@@ -261,25 +263,30 @@ async def search_providers(
     
     # Specialization filter (single)
     if specialization:
-        query["specializations"] = {"$in": [specialization]}
-    
+        query["$and"].append({"$or": [
+            {"specializations": {"$in": [specialization]}},
+            {"specialization_name": specialization},
+            {"specialization_id": specialization},
+        ]})
+
     # Multiple specializations filter
     if specializations:
         spec_list = [s.strip() for s in specializations.split(",")]
-        query["specializations"] = {"$in": spec_list}
-    
-    # Category filter (maps to specializations)
+        query["$and"].append({"$or": [
+            {"specializations": {"$in": spec_list}},
+            {"specialization_name": {"$in": spec_list}},
+        ]})
+
+    # Category filter - search by profession_id or profession_name
     if category:
-        category_mapping = {
-            "nursing": ["סיעוד", "סיעוד ביתי", "טיפול בקשישים"],
-            "physiotherapy": ["פיזיותרפיה", "שיקום", "שיקום לאחר ניתוח"],
-            "doctor": ["רפואת משפחה", "רפואה פנימית"],
-            "eldercare": ["גריאטריה", "טיפול בקשישים", "סיעוד"],
-            "therapy": ["ריפוי בעיסוק", "ריפוי בדיבור"],
-            "alternative": ["רפואה משלימה", "דיקור", "עיסוי רפואי"]
-        }
-        if category in category_mapping:
-            query["specializations"] = {"$in": category_mapping[category]}
+        query["$and"].append({"$or": [
+            {"profession_id": category},
+            {"profession_name": {"$regex": re.escape(category), "$options": "i"}},
+            {"service_categories.category_id": category},
+            {"service_categories.profession_id": category},
+            # Legacy fallback
+            {"specializations": {"$regex": re.escape(category), "$options": "i"}},
+        ]})
     
     # Provider type filter
     if provider_type:
@@ -373,19 +380,20 @@ async def get_filter_options():
     # Get unique specializations
     specializations = await db.providers.distinct("specializations")
     specializations = [s for s in specializations if s]
-    
+
     # Get unique provider types
     provider_types = await db.providers.distinct("provider_type")
-    
-    # Category options
-    categories = [
-        {"id": "nursing", "name": "סיעוד", "name_en": "Nursing"},
-        {"id": "physiotherapy", "name": "פיזיותרפיה", "name_en": "Physiotherapy"},
-        {"id": "doctor", "name": "רופא בבית", "name_en": "Doctor"},
-        {"id": "eldercare", "name": "טיפול בקשישים", "name_en": "Elder Care"},
-        {"id": "therapy", "name": "ריפוי בעיסוק", "name_en": "Occupational Therapy"},
-        {"id": "alternative", "name": "רפואה משלימה", "name_en": "Alternative Medicine"}
-    ]
+
+    # Categories from admin professions hierarchy
+    professions_data = await db.professions.find({}, {"_id": 0}).to_list(100)
+    categories = []
+    for prof in professions_data:
+        categories.append({
+            "id": prof.get("profession_id", ""),
+            "name": prof.get("name", ""),
+            "name_en": prof.get("name_en", ""),
+            "icon": prof.get("icon", "briefcase"),
+        })
     
     # Service types
     service_types = [
@@ -450,6 +458,7 @@ async def get_filter_options():
         "cities": sorted(cities) if cities else ["תל אביב", "ירושלים", "חיפה", "באר שבע", "רמת גן", "הרצליה", "פתח תקווה"],
         "specializations": sorted(specializations) if specializations else [],
         "categories": categories,
+        "professions": professions_data,  # Full hierarchy for provider forms
         "service_types": service_types,
         "provider_types": provider_type_options,
         "rating_options": rating_options,

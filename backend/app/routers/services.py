@@ -75,7 +75,7 @@ async def update_service(
     
     # Build update data
     allowed_fields = [
-        "name", "description", "service_category", "delivery_types",
+        "name", "description", "service_category", "categories", "delivery_types",
         "pricing_type", "price", "minimum_hours", "duration_minutes",
         "weekend_pricing_type", "weekend_price_addition",
         "has_travel_cost", "travel_cost", "travel_cost_per_km",

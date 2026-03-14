@@ -200,9 +200,18 @@ class Provider(BaseModel):
     about: Optional[str] = None
     profile_image: Optional[str] = None
     gender: Optional[str] = None
+    # Profession hierarchy (linked to admin professions collection)
+    profession_id: Optional[str] = None          # מקצוע - e.g. "prof_nursing"
+    profession_name: Optional[str] = None         # cached name - e.g. "סיעוד"
+    specialization_id: Optional[str] = None       # התמחות - e.g. "sub_home_care"
+    specialization_name: Optional[str] = None     # cached name - e.g. "סיעוד ביתי"
+    expertise: List[str] = []                     # מומחיות - free text specific skills
+    # Legacy fields (kept for backward compatibility)
     specializations: List[str] = []
-    expertise: List[str] = []
     services: List[str] = []
+    profession_title: Optional[str] = None
+    # Service categories from admin hierarchy (what services the provider offers)
+    service_categories: List[dict] = []           # [{category_id, name, profession_id}]
     team_members: List[TeamMember] = []
     location: Optional[Location] = None
     service_areas: List[str] = []
@@ -224,7 +233,6 @@ class Provider(BaseModel):
     years_experience: Optional[int] = None
     service_types: List[str] = []
     views_count: int = 0
-    profession_title: Optional[str] = None
 
 PROFESSION_TITLES = [
     {"value": "doctor", "label": "רופא", "label_en": "Doctor",
@@ -325,6 +333,8 @@ class Service(BaseModel):
     name: str
     description: str
     service_category: str = ServiceCategory.VISIT
+    # Links to admin profession categories (1-3 required)
+    categories: List[dict] = []  # [{category_id, name, profession_id, profession_name}]
     delivery_types: List[str] = []
     pricing_type: str = PricingType.FIXED
     price: float
@@ -352,6 +362,7 @@ class ServiceCreate(BaseModel):
     name: str
     description: str
     service_category: str = ServiceCategory.VISIT
+    categories: List[dict] = []  # [{category_id, name, profession_id, profession_name}]
     delivery_types: List[str] = []
     pricing_type: str = PricingType.FIXED
     price: float

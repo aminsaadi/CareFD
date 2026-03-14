@@ -14,19 +14,7 @@ import {
 import CitySelect, { sortedCities } from '../components/CitySelect';
 import { israeliRegions } from '../data/searchData';
 
-// Options data
-const PROFESSION_OPTIONS = [
-  { value: 'doctor', label: 'רופא/ה' },
-  { value: 'nurse', label: 'אח/ות מוסמך/ת' },
-  { value: 'physiotherapist', label: 'פיזיותרפיסט/ית' },
-  { value: 'occupational_therapist', label: 'מרפא/ה בעיסוק' },
-  { value: 'student', label: 'סטודנט/ית' },
-  { value: 'caregiver', label: 'מטפל/ת' },
-  { value: 'psychologist', label: 'פסיכולוג/ית' },
-  { value: 'social_worker', label: 'עובד/ת סוציאלי/ת' },
-  { value: 'dietitian', label: 'דיאטן/ית' },
-  { value: 'speech_therapist', label: 'קלינאי/ת תקשורת' },
-];
+// Options data - professions loaded from API (admin-managed)
 
 const GENDER_OPTIONS = [
   { value: 'male', label: 'זכר' },
@@ -124,11 +112,18 @@ const ProviderEdit = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('basic');
+  const [professions, setProfessions] = useState([]); // From admin hierarchy
 
   // Form state
   const [formData, setFormData] = useState({
     business_name: '',
     profession_title: '',
+    // Profession hierarchy (from admin)
+    profession_id: '',
+    profession_name: '',
+    specialization_id: '',
+    specialization_name: '',
+    service_categories: [], // [{category_id, name, profession_id}]
     gender: '',
     years_experience: '',
     about: '',
@@ -183,14 +178,24 @@ const ProviderEdit = () => {
   const [availability, setAvailability] = useState([]);
 
   useEffect(() => {
+    fetchProfessions();
     fetchProvider();
   }, [providerId]);
+
+  const fetchProfessions = async () => {
+    try {
+      const response = await api.get('/professions');
+      setProfessions(response.data.professions || []);
+    } catch (err) {
+      console.error('Failed to fetch professions:', err);
+    }
+  };
 
   const fetchProvider = async () => {
     try {
       const response = await api.get(`/providers/${providerId}`);
       const data = response.data;
-      
+
       if (data.user_id !== user?.user_id && user?.role !== 'admin') {
         navigate('/dashboard');
         return;
@@ -199,6 +204,11 @@ const ProviderEdit = () => {
       setFormData({
         business_name: data.business_name || '',
         profession_title: data.profession_title || '',
+        profession_id: data.profession_id || '',
+        profession_name: data.profession_name || '',
+        specialization_id: data.specialization_id || '',
+        specialization_name: data.specialization_name || '',
+        service_categories: data.service_categories || [],
         gender: data.gender || '',
         years_experience: data.years_experience || '',
         about: data.about || '',
@@ -259,6 +269,7 @@ const ProviderEdit = () => {
         years_experience: formData.years_experience ? parseInt(formData.years_experience) : null,
         specializations: formData.specializations.filter(s => s.trim() !== ''),
         expertise: formData.expertise.filter(e => e.trim() !== ''),
+        service_categories: formData.service_categories || [],
         education: formData.education.filter(e => e.institution || e.degree),
         certifications: formData.certifications.filter(c => c.name || c.license_number),
         location,
@@ -567,15 +578,26 @@ const ProviderEdit = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">מקצוע</label>
+                    <label className="block text-sm font-medium text-carelink-navy mb-2">מקצוע *</label>
                     <select
-                      value={formData.profession_title}
-                      onChange={(e) => setFormData({ ...formData, profession_title: e.target.value })}
+                      value={formData.profession_id}
+                      onChange={(e) => {
+                        const prof = professions.find(p => p.profession_id === e.target.value);
+                        setFormData({
+                          ...formData,
+                          profession_id: e.target.value,
+                          profession_name: prof?.name || '',
+                          profession_title: prof?.name || '',
+                          specialization_id: '',
+                          specialization_name: '',
+                          service_categories: [],
+                        });
+                      }}
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none bg-white"
                     >
                       <option value="">בחר מקצוע</option>
-                      {PROFESSION_OPTIONS.map(opt => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      {professions.map(prof => (
+                        <option key={prof.profession_id} value={prof.profession_id}>{prof.name}</option>
                       ))}
                     </select>
                   </div>
@@ -674,39 +696,161 @@ const ProviderEdit = () => {
             {/* Expertise Tab */}
             {activeTab === 'expertise' && (
               <div className="space-y-6">
-                {/* Specializations */}
-                <div>
-                  <label className="block text-sm font-medium text-carelink-navy mb-2">התמחויות</label>
-                  <div className="space-y-2">
-                    {formData.specializations.map((spec, index) => (
-                      <div key={index} className="flex gap-2">
-                        <input
-                          type="text"
-                          value={spec}
-                          onChange={(e) => handleArrayFieldChange('specializations', index, e.target.value)}
-                          className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
-                          placeholder="לדוגמה: רפואת משפחה, כירורגיה..."
-                        />
-                        <button
-                          onClick={() => removeArrayField('specializations', index)}
-                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
-                    ))}
+                {/* Profession Selection Info */}
+                {!formData.profession_id && (
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 flex items-center gap-2">
+                    <FaInfoCircle /> יש לבחור מקצוע בטאב "פרטים בסיסיים" כדי לראות התמחויות וקטגוריות רלוונטיות
                   </div>
-                  <button
-                    onClick={() => addArrayField('specializations')}
-                    className="mt-2 text-carelink-teal hover:underline flex items-center gap-1 text-sm"
-                  >
-                    <FaPlus size={12} /> הוסף התמחות
-                  </button>
-                </div>
-                
-                {/* Expertise */}
+                )}
+
+                {/* Specialization (sub-profession) - dropdown from hierarchy */}
+                {formData.profession_id && (() => {
+                  const selectedProfession = professions.find(p => p.profession_id === formData.profession_id);
+                  const subProfessions = selectedProfession?.sub_professions || [];
+                  return (
+                    <div>
+                      <label className="block text-sm font-medium text-carelink-navy mb-2">
+                        <FaBriefcase className="inline ml-1" />
+                        התמחות
+                      </label>
+                      <p className="text-sm text-carelink-gray mb-2">בחר את תחום ההתמחות שלך בתוך {selectedProfession?.name}</p>
+                      {subProfessions.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {subProfessions.map(sub => (
+                            <button
+                              key={sub.sub_profession_id}
+                              onClick={() => setFormData({
+                                ...formData,
+                                specialization_id: sub.sub_profession_id,
+                                specialization_name: sub.name,
+                              })}
+                              className={`px-4 py-2 rounded-full border text-sm font-medium transition ${
+                                formData.specialization_id === sub.sub_profession_id
+                                  ? 'bg-carelink-teal text-white border-carelink-teal'
+                                  : 'bg-white text-carelink-navy border-gray-200 hover:border-carelink-teal hover:bg-carelink-teal/5'
+                              }`}
+                            >
+                              {formData.specialization_id === sub.sub_profession_id && <FaCheck className="inline ml-1" size={12} />}
+                              {sub.name}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-carelink-gray italic">אין התמחויות מוגדרות למקצוע זה</p>
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {/* Service Categories - multi-select from all professions hierarchy */}
+                {formData.profession_id && (() => {
+                  // Collect all categories from all professions
+                  const allCategories = [];
+                  professions.forEach(prof => {
+                    (prof.sub_professions || []).forEach(sub => {
+                      (sub.categories || []).forEach(cat => {
+                        allCategories.push({
+                          ...cat,
+                          profession_id: prof.profession_id,
+                          profession_name: prof.name,
+                          sub_profession_name: sub.name,
+                        });
+                      });
+                    });
+                  });
+
+                  const selectedCategories = formData.service_categories || [];
+                  const isSelected = (catId) => selectedCategories.some(c => c.category_id === catId);
+
+                  const toggleCategory = (cat) => {
+                    if (isSelected(cat.category_id)) {
+                      setFormData({
+                        ...formData,
+                        service_categories: selectedCategories.filter(c => c.category_id !== cat.category_id)
+                      });
+                    } else if (selectedCategories.length < 3) {
+                      setFormData({
+                        ...formData,
+                        service_categories: [...selectedCategories, {
+                          category_id: cat.category_id,
+                          name: cat.name,
+                          profession_id: cat.profession_id,
+                          profession_name: cat.profession_name,
+                        }]
+                      });
+                    }
+                  };
+
+                  // Group categories by profession
+                  const categoriesByProfession = {};
+                  allCategories.forEach(cat => {
+                    const key = cat.profession_name;
+                    if (!categoriesByProfession[key]) categoriesByProfession[key] = [];
+                    categoriesByProfession[key].push(cat);
+                  });
+
+                  return (
+                    <div>
+                      <label className="block text-sm font-medium text-carelink-navy mb-2">
+                        <FaGraduationCap className="inline ml-1" />
+                        קטגוריות שירות ({selectedCategories.length}/3)
+                      </label>
+                      <p className="text-sm text-carelink-gray mb-3">בחר עד 3 קטגוריות שירות שאתה מציע</p>
+
+                      {/* Selected categories */}
+                      {selectedCategories.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {selectedCategories.map(cat => (
+                            <span key={cat.category_id} className="inline-flex items-center gap-1 px-3 py-1.5 bg-carelink-teal/10 text-carelink-teal border border-carelink-teal/30 rounded-full text-sm font-medium">
+                              {cat.name}
+                              <span className="text-xs text-carelink-gray">({cat.profession_name})</span>
+                              <button onClick={() => toggleCategory(cat)} className="mr-1 hover:text-red-500">
+                                <FaTimes size={10} />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Available categories grouped by profession */}
+                      {Object.keys(categoriesByProfession).length > 0 ? (
+                        <div className="space-y-3">
+                          {Object.entries(categoriesByProfession).map(([profName, cats]) => (
+                            <div key={profName} className="border border-gray-100 rounded-lg p-3">
+                              <p className="text-sm font-medium text-carelink-navy mb-2">{profName}</p>
+                              <div className="flex flex-wrap gap-2">
+                                {cats.map(cat => (
+                                  <button
+                                    key={cat.category_id}
+                                    onClick={() => toggleCategory(cat)}
+                                    disabled={!isSelected(cat.category_id) && selectedCategories.length >= 3}
+                                    className={`px-3 py-1.5 rounded-full border text-sm transition ${
+                                      isSelected(cat.category_id)
+                                        ? 'bg-carelink-teal text-white border-carelink-teal'
+                                        : selectedCategories.length >= 3
+                                          ? 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'
+                                          : 'bg-white text-carelink-navy border-gray-200 hover:border-carelink-teal'
+                                    }`}
+                                  >
+                                    {isSelected(cat.category_id) && <FaCheck className="inline ml-1" size={10} />}
+                                    {cat.name}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-carelink-gray italic">אין קטגוריות שירות מוגדרות עדיין. ניתן להגדירן בפאנל האדמין.</p>
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {/* Free text expertise */}
                 <div>
                   <label className="block text-sm font-medium text-carelink-navy mb-2">מומחיויות ספציפיות</label>
+                  <p className="text-sm text-carelink-gray mb-2">הוסף מומחיויות ספציפיות שלא מופיעות ברשימה</p>
                   <div className="space-y-2">
                     {formData.expertise.map((exp, index) => (
                       <div key={index} className="flex gap-2">
