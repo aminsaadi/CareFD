@@ -156,18 +156,38 @@ def send_email_smtp_with_config(recipient: str, subject: str, html_content: str,
         msg['To'] = recipient
         html_part = MIMEText(html_content, 'html', 'utf-8')
         msg.attach(html_part)
-        with smtplib.SMTP(host, port, timeout=15) as server:
-            server.starttls()
-            server.login(smtp_user, smtp_password)
-            server.sendmail(sender, recipient, msg.as_string())
-        logger.info(f"Email sent successfully to {recipient} via {host} - Subject: {subject}")
+
+        if port == 465:
+            # SSL connection (port 465)
+            with smtplib.SMTP_SSL(host, port, timeout=15) as server:
+                server.login(smtp_user, smtp_password)
+                server.sendmail(sender, recipient, msg.as_string())
+        else:
+            # STARTTLS connection (port 587)
+            with smtplib.SMTP(host, port, timeout=15) as server:
+                server.starttls()
+                server.login(smtp_user, smtp_password)
+                server.sendmail(sender, recipient, msg.as_string())
+
+        logger.info(f"Email sent successfully to {recipient} via {host}:{port} - Subject: {subject}")
         return {"success": True, "recipient": recipient}
     except smtplib.SMTPAuthenticationError as e:
         logger.error(f"SMTP authentication failed for {smtp_user}@{host}:{port} - Error: {str(e)}")
         logger.error("If using Gmail, make sure to use an App Password (not your regular password)")
         return None
-    except smtplib.SMTPConnectError as e:
-        logger.error(f"Cannot connect to SMTP server {host}:{port} - Error: {str(e)}")
+    except (smtplib.SMTPConnectError, OSError) as e:
+        logger.error(f"Cannot connect to SMTP server {host}:{port} - {type(e).__name__}: {str(e)}")
+        # If port 587 failed, try 465 with SSL as fallback
+        if port != 465:
+            logger.info(f"Retrying with SSL on port 465...")
+            try:
+                with smtplib.SMTP_SSL(host, 465, timeout=15) as server:
+                    server.login(smtp_user, smtp_password)
+                    server.sendmail(sender, recipient, msg.as_string())
+                logger.info(f"Email sent successfully to {recipient} via {host}:465 (SSL fallback)")
+                return {"success": True, "recipient": recipient}
+            except Exception as e2:
+                logger.error(f"SSL fallback also failed: {type(e2).__name__}: {str(e2)}")
         return None
     except Exception as e:
         logger.error(f"Failed to send email to {recipient} via {host}:{port} - {type(e).__name__}: {str(e)}")
