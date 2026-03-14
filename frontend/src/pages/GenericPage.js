@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../utils/api';
@@ -37,7 +38,7 @@ const GenericPage = () => {
             <h1 className="text-3xl font-bold text-gray-900 mb-6">{page.title}</h1>
             <div 
               className="prose prose-lg max-w-none text-gray-700"
-              dangerouslySetInnerHTML={{ __html: page.content }}
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(page.content) }}
             />
           </div>
         ) : (
