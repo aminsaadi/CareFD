@@ -227,16 +227,26 @@ class Provider(BaseModel):
     profession_title: Optional[str] = None
 
 PROFESSION_TITLES = [
-    {"value": "doctor", "label": "רופא", "label_en": "Doctor"},
-    {"value": "nurse", "label": "אח/ות מוסמך/ת", "label_en": "Registered Nurse"},
-    {"value": "physiotherapist", "label": "פיזיותרפיסט", "label_en": "Physiotherapist"},
-    {"value": "occupational_therapist", "label": "מרפא/ה בעיסוק", "label_en": "Occupational Therapist"},
-    {"value": "student", "label": "סטודנט/ית", "label_en": "Student"},
-    {"value": "caregiver", "label": "מטפל/ת", "label_en": "Caregiver"},
-    {"value": "psychologist", "label": "פסיכולוג/ית", "label_en": "Psychologist"},
-    {"value": "social_worker", "label": "עובד/ת סוציאלי/ת", "label_en": "Social Worker"},
-    {"value": "dietitian", "label": "דיאטן/ית", "label_en": "Dietitian"},
-    {"value": "speech_therapist", "label": "קלינאי/ת תקשורת", "label_en": "Speech Therapist"},
+    {"value": "doctor", "label": "רופא", "label_en": "Doctor",
+     "search_terms": ["רופא", "רופאה", "דוקטור", "רופא משפחה", "רופא ילדים", "פדיאטר"]},
+    {"value": "nurse", "label": "אח/ות מוסמך/ת", "label_en": "Registered Nurse",
+     "search_terms": ["אחות", "אח", "אחות/אח", "סיעוד", "אחות מוסמכת", "אחות מעשית", "אח מוסמך"]},
+    {"value": "physiotherapist", "label": "פיזיותרפיסט", "label_en": "Physiotherapist",
+     "search_terms": ["פיזיותרפיה", "פיזיותרפיסט", "פיזיותרפיסטית", "שיקום"]},
+    {"value": "occupational_therapist", "label": "מרפא/ה בעיסוק", "label_en": "Occupational Therapist",
+     "search_terms": ["ריפוי בעיסוק", "מרפא בעיסוק", "מרפאה בעיסוק"]},
+    {"value": "student", "label": "סטודנט/ית", "label_en": "Student",
+     "search_terms": ["סטודנט", "סטודנטית"]},
+    {"value": "caregiver", "label": "מטפל/ת", "label_en": "Caregiver",
+     "search_terms": ["מטפל", "מטפלת", "מטפל סיעודי", "מטפלת סיעודית", "טיפול סיעודי"]},
+    {"value": "psychologist", "label": "פסיכולוג/ית", "label_en": "Psychologist",
+     "search_terms": ["פסיכולוג", "פסיכולוגית", "פסיכולוגיה", "טיפול נפשי"]},
+    {"value": "social_worker", "label": "עובד/ת סוציאלי/ת", "label_en": "Social Worker",
+     "search_terms": ["עובד סוציאלי", "עובדת סוציאלית", "עבודה סוציאלית"]},
+    {"value": "dietitian", "label": "דיאטן/ית", "label_en": "Dietitian",
+     "search_terms": ["דיאטן", "דיאטנית", "דיאטה", "תזונה", "יועץ תזונה"]},
+    {"value": "speech_therapist", "label": "קלינאי/ת תקשורת", "label_en": "Speech Therapist",
+     "search_terms": ["קלינאי תקשורת", "קלינאית תקשורת", "דיבור", "תקשורת"]},
 ]
 
 GENDER_OPTIONS = [

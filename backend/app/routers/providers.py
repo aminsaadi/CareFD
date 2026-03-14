@@ -204,17 +204,36 @@ async def search_providers(
         ]
     })
     
-    # Text search in business_name and description
+    # Text search in business_name, description, profession, and specializations
     if search:
         safe_search = re.escape(search)
-        query["$and"].append({
-            "$or": [
-                {"business_name": {"$regex": safe_search, "$options": "i"}},
-                {"description": {"$regex": safe_search, "$options": "i"}},
-                {"specializations": {"$in": [search]}},
-                {"profession_title": {"$regex": safe_search, "$options": "i"}}
-            ]
-        })
+        search_or = [
+            {"business_name": {"$regex": safe_search, "$options": "i"}},
+            {"description": {"$regex": safe_search, "$options": "i"}},
+            {"specializations": {"$regex": safe_search, "$options": "i"}},
+        ]
+
+        # Map Hebrew search terms to profession_title values
+        matched_profession_values = []
+        search_lower = search.strip()
+        for prof in PROFESSION_TITLES:
+            # Check against label
+            if search_lower in prof["label"] or prof["label"] in search_lower:
+                matched_profession_values.append(prof["value"])
+                continue
+            # Check against search_terms
+            for term in prof.get("search_terms", []):
+                if search_lower in term or term in search_lower:
+                    matched_profession_values.append(prof["value"])
+                    break
+
+        if matched_profession_values:
+            search_or.append({"profession_title": {"$in": matched_profession_values}})
+
+        # Also regex match profession_title directly (for English searches)
+        search_or.append({"profession_title": {"$regex": safe_search, "$options": "i"}})
+
+        query["$and"].append({"$or": search_or})
     
     # City / Region filter - check both provider location AND service_areas
     if city:
