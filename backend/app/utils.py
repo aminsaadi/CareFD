@@ -11,6 +11,7 @@ from fastapi import HTTPException, Header, Request
 from jose import jwt
 import bcrypt
 from pywebpush import webpush, WebPushException
+import resend
 import math
 
 from app.database import db
@@ -40,6 +41,11 @@ SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
 VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', '')
 VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY', '')
 VAPID_CLAIMS_EMAIL = os.environ.get('VAPID_CLAIMS_EMAIL', 'admin@carelink.co.il')
+
+# Resend API (preferred over SMTP on Railway where SMTP ports are blocked)
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
+if RESEND_API_KEY:
+    resend.api_key = RESEND_API_KEY
 
 SITE_URL = os.environ.get('SITE_URL', 'https://carelink.co.il')
 
@@ -168,8 +174,35 @@ def send_email_smtp_with_config(recipient: str, subject: str, html_content: str,
         return None
 
 
+def _send_email_resend(recipient: str, subject: str, html_content: str, sender: str):
+    """Send email via Resend API (works on Railway where SMTP is blocked)."""
+    try:
+        logger.info(f"Sending email via Resend to {recipient} - Subject: {subject}")
+        params = {
+            "from": sender,
+            "to": [recipient],
+            "subject": subject,
+            "html": html_content,
+        }
+        result = resend.Emails.send(params)
+        logger.info(f"Email sent via Resend to {recipient} - ID: {result.get('id', 'unknown')}")
+        return {"success": True, "recipient": recipient, "provider": "resend"}
+    except Exception as e:
+        logger.error(f"Resend failed for {recipient} - {type(e).__name__}: {str(e)}")
+        return None
+
+
 async def send_email_async(recipient: str, subject: str, html_content: str):
     try:
+        # Prefer Resend API (works on Railway where SMTP ports are blocked)
+        if RESEND_API_KEY:
+            sender = f"CareLink <{SENDER_EMAIL}>"
+            result = await asyncio.to_thread(_send_email_resend, recipient, subject, html_content, sender)
+            if result:
+                return result
+            logger.warning("Resend failed, falling back to SMTP...")
+
+        # Fallback to SMTP
         smtp_cfg = await _get_smtp_settings()
         result = await asyncio.to_thread(send_email_smtp_with_config, recipient, subject, html_content, smtp_cfg)
         return result
