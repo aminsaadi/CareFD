@@ -18,7 +18,16 @@ from app.models import Notification
 
 logger = logging.getLogger(__name__)
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-change-in-production')
+ENVIRONMENT = os.environ.get('ENVIRONMENT', 'production')
+IS_PRODUCTION = ENVIRONMENT == 'production'
+
+# SECRET_KEY for JWT signing
+SECRET_KEY = os.environ.get('SECRET_KEY', '')
+if not SECRET_KEY:
+    import secrets
+    SECRET_KEY = secrets.token_hex(32)
+    logger.warning("SECRET_KEY not set! Generated a random key. Sessions will NOT survive restarts. Set SECRET_KEY in Railway variables.")
+
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'carelink.co.il@gmail.com')
 SMTP_HOST = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
 SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
@@ -28,7 +37,7 @@ VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', '')
 VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY', '')
 VAPID_CLAIMS_EMAIL = os.environ.get('VAPID_CLAIMS_EMAIL', 'admin@carelink.co.il')
 
-SITE_URL = "https://carelink.co.il"
+SITE_URL = os.environ.get('SITE_URL', 'https://carelink.co.il')
 
 
 async def get_site_url():

@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../components/Logo';
 import { FaEnvelope, FaLock, FaArrowLeft, FaUserMd, FaUsers, FaTimes, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { FcGoogle } from 'react-icons/fc';
 import api from '../utils/api';
 import { toast } from 'sonner';
 
@@ -75,13 +74,6 @@ const Login = () => {
       toast.error('שגיאה בשליחת קישור אימות');
     }
     setResendingVerification(false);
-  };
-
-  const handleGoogleLogin = () => {
-    // Use custom domain if set, otherwise use current origin
-    const baseUrl = process.env.REACT_APP_SITE_URL || window.location.origin;
-    const redirectUrl = baseUrl + '/auth/callback';
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
   const handleForgotPassword = async (e) => {

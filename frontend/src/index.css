@@ -4,15 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Hide Emergent badge */
-#emergent-badge,
-a[href*="emergent-badge"],
-a[href*="app.emergent.sh"] {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-}
-
 body {
     margin: 0;
     font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;

@@ -8,8 +8,6 @@ import {
   FaPhone, FaMapMarkerAlt, FaCheckCircle, FaBriefcaseMedical,
   FaUsers, FaCalendarCheck, FaChartLine, FaEye, FaEyeSlash
 } from 'react-icons/fa';
-import { FcGoogle } from 'react-icons/fc';
-
 const ProviderRegister = () => {
   const { t } = useTranslation();
   const { register } = useAuth();
@@ -83,13 +81,6 @@ const ProviderRegister = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleGoogleRegister = () => {
-    // Use custom domain if set, otherwise use current origin
-    const baseUrl = process.env.REACT_APP_SITE_URL || window.location.origin;
-    const redirectUrl = baseUrl + '/auth/callback';
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
   const benefits = [

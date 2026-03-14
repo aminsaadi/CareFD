@@ -2,15 +2,21 @@ from fastapi import APIRouter, HTTPException, Header, Request
 from typing import Optional, List
 from datetime import datetime, timezone, timedelta
 import uuid
-import bcrypt
+import re
 
 from app.database import db
-from app.models import *
-from app.utils import get_current_user, send_email_async, create_notification, send_push_to_user
+from app.models import (
+    UserRole, NotificationType, VerificationStatus, BookingStatus,
+    SubscriptionTier, SubscriptionPlan
+)
+from app.utils import (
+    get_current_user, send_email_async, create_notification,
+    send_push_to_user, hash_password,
+    SMTP_USER, SMTP_PASSWORD, SENDER_EMAIL as _SENDER_EMAIL,
+    SMTP_HOST, SMTP_PORT, _get_smtp_settings
+)
 
 router = APIRouter()
-
-from app.utils import SMTP_USER, SMTP_PASSWORD, SENDER_EMAIL as _SENDER_EMAIL, SMTP_HOST, SMTP_PORT, _get_smtp_settings
 
 
 @router.get("/admin/smtp-settings")
@@ -161,9 +167,10 @@ async def admin_get_users(
     if role:
         query["role"] = role
     if search:
+        safe_search = re.escape(search)
         query["$or"] = [
-            {"name": {"$regex": search, "$options": "i"}},
-            {"email": {"$regex": search, "$options": "i"}}
+            {"name": {"$regex": safe_search, "$options": "i"}},
+            {"email": {"$regex": safe_search, "$options": "i"}}
         ]
     
     users = await db.users.find(
@@ -247,8 +254,7 @@ async def admin_get_user_details(
     bookings_count = await db.bookings.count_documents({"user_id": user_id})
     
     # Get user's messages count
-    messages = await db.messages.find({"sender_id": user_id}).to_list(1000)
-    messages_count = len(messages)
+    messages_count = await db.messages.count_documents({"sender_id": user_id})
     
     return {
         "user": user,
@@ -307,7 +313,7 @@ async def admin_reset_user_password(
         raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
     
     # Hash the new password
-    password_hash = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    password_hash = hash_password(new_password)
     
     result = await db.users.update_one(
         {"user_id": user_id},

@@ -347,9 +347,6 @@ class ServiceCreate(BaseModel):
     weekend_price_addition: Optional[float] = None
     has_travel_cost: bool = False
     travel_cost: Optional[float] = None
-
-
-# ==================== REQUEST & OFFER MODELS ====================
     travel_cost_per_km: Optional[float] = None
     has_shipping: bool = False
     shipping_cost: Optional[float] = None
@@ -358,6 +355,9 @@ class ServiceCreate(BaseModel):
     num_sessions: Optional[int] = None
     series_price: Optional[float] = None
     session_duration_minutes: Optional[int] = None
+
+
+# ==================== REQUEST & OFFER MODELS ====================
 
 class RequestStatus:
     OPEN = "open"

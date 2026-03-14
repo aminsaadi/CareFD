@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Header, Request, UploadFile, File
 from typing import Optional, List
 from datetime import datetime, timezone, timedelta
 import uuid
-import shutil
+import re
 from pathlib import Path
 
 from app.database import db, UPLOAD_DIR
@@ -206,12 +206,13 @@ async def search_providers(
     
     # Text search in business_name and description
     if search:
+        safe_search = re.escape(search)
         query["$and"].append({
             "$or": [
-                {"business_name": {"$regex": search, "$options": "i"}},
-                {"description": {"$regex": search, "$options": "i"}},
+                {"business_name": {"$regex": safe_search, "$options": "i"}},
+                {"description": {"$regex": safe_search, "$options": "i"}},
                 {"specializations": {"$in": [search]}},
-                {"profession_title": {"$regex": search, "$options": "i"}}
+                {"profession_title": {"$regex": safe_search, "$options": "i"}}
             ]
         })
     
@@ -226,10 +227,10 @@ async def search_providers(
                 query["$and"].append({"location.city": {"$in": region_cities}})
             else:
                 # Fallback to regex if no mapped cities
-                query["$and"].append({"location.city": {"$regex": city, "$options": "i"}})
+                query["$and"].append({"location.city": {"$regex": re.escape(city), "$options": "i"}})
         else:
             # It's a specific city name
-            query["$and"].append({"location.city": {"$regex": city, "$options": "i"}})
+            query["$and"].append({"location.city": {"$regex": re.escape(city), "$options": "i"}})
     
     # Specialization filter (single)
     if specialization:
