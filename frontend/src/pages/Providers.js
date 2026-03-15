@@ -356,6 +356,7 @@ const Providers = () => {
                     onFocus={() => setShowSearchDropdown(true)}
                     placeholder="מקצוע, התמחות, שם ספק..."
                     className="w-full px-4 py-3 pr-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
+                    aria-label="חיפוש לפי מקצוע, התמחות או שם ספק"
                     data-testid="search-input"
                   />
                   
@@ -407,6 +408,7 @@ const Providers = () => {
                       onFocus={() => setShowLocationDropdown(true)}
                       placeholder="עיר או אזור"
                       className="w-full px-4 py-3 pr-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
+                      aria-label="חיפוש לפי עיר או אזור"
                       data-testid="location-input"
                     />
                     
@@ -620,6 +622,8 @@ const Providers = () => {
                   onClick={() => setViewMode('grid')}
                   className={`px-3 py-2 ${viewMode === 'grid' ? 'bg-carelink-teal text-white' : 'bg-white text-carelink-gray'}`}
                   title="תצוגת רשת"
+                  aria-label="תצוגת רשת"
+                  aria-pressed={viewMode === 'grid'}
                 >
                   <FaThLarge />
                 </button>
@@ -627,6 +631,8 @@ const Providers = () => {
                   onClick={() => setViewMode('list')}
                   className={`px-3 py-2 ${viewMode === 'list' ? 'bg-carelink-teal text-white' : 'bg-white text-carelink-gray'}`}
                   title="תצוגת רשימה"
+                  aria-label="תצוגת רשימה"
+                  aria-pressed={viewMode === 'list'}
                 >
                   <FaList />
                 </button>
@@ -634,6 +640,8 @@ const Providers = () => {
                   onClick={() => setViewMode('map')}
                   className={`px-3 py-2 ${viewMode === 'map' ? 'bg-carelink-teal text-white' : 'bg-white text-carelink-gray'}`}
                   title="תצוגת מפה"
+                  aria-label="תצוגת מפה"
+                  aria-pressed={viewMode === 'map'}
                   data-testid="map-view-btn"
                 >
                   <FaMap />
@@ -723,19 +731,48 @@ const Providers = () => {
               </div>
 
               {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="w-12 h-12 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+                <div className="grid md:grid-cols-2 gap-6" aria-label="טוען ספקים">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="bg-white p-6 rounded-2xl shadow-md border-2 border-carelink-teal-pale animate-pulse">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="h-6 bg-gray-200 rounded-lg w-3/4 mb-2"></div>
+                          <div className="h-4 bg-gray-200 rounded-lg w-1/2 mb-1"></div>
+                          <div className="h-4 bg-gray-200 rounded-lg w-1/3"></div>
+                        </div>
+                        <div className="h-8 w-20 bg-gray-200 rounded-full"></div>
+                      </div>
+                      <div className="h-10 bg-gray-200 rounded-lg mb-4"></div>
+                      <div className="flex gap-2 mb-4">
+                        <div className="h-6 w-20 bg-gray-200 rounded-lg"></div>
+                        <div className="h-6 w-20 bg-gray-200 rounded-lg"></div>
+                      </div>
+                      <div className="flex gap-2">
+                        <div className="h-10 flex-1 bg-gray-200 rounded-xl"></div>
+                        <div className="h-10 w-10 bg-gray-200 rounded-xl"></div>
+                        <div className="h-10 w-10 bg-gray-200 rounded-xl"></div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : providers.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-2xl shadow-lg">
                   <FaSearch className="text-5xl text-carelink-teal-pale mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-carelink-navy mb-2">לא נמצאו ספקים</h3>
                   <p className="text-carelink-gray mb-4">נסו לשנות את הסינון או מילות החיפוש</p>
+                  <div className="space-y-3 max-w-md mx-auto text-sm text-carelink-slate mb-6">
+                    <p>הנה כמה טיפים לשיפור החיפוש:</p>
+                    <ul className="text-right list-disc list-inside space-y-1">
+                      <li>נסו להרחיב את אזור החיפוש</li>
+                      <li>שנו את מילות החיפוש</li>
+                      <li>הסירו חלק מהפילטרים</li>
+                    </ul>
+                  </div>
                   <button
                     onClick={handleResetFilters}
-                    className="text-carelink-teal font-medium hover:underline"
+                    className="px-6 py-2 bg-carelink-teal text-white rounded-lg font-medium hover:bg-carelink-teal-medium transition"
                   >
-                    נקה סינון
+                    נקה סינון והצג הכל
                   </button>
                 </div>
               ) : viewMode === 'map' ? (
