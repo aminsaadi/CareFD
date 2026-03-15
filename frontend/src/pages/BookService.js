@@ -16,7 +16,7 @@ import {
   FaWhatsapp, FaExternalLinkAlt, FaFileContract,
   FaInfoCircle, FaUserFriends, FaStickyNote,
   FaStethoscope, FaSyringe, FaRedoAlt, FaHospital, FaClinicMedical,
-  FaLaptopMedical, FaBoxOpen
+  FaLaptopMedical, FaBoxOpen, FaChevronLeft, FaChevronRight
 } from 'react-icons/fa';
 
 // ==================== CONSTANTS ====================
@@ -394,7 +394,10 @@ const BookService = () => {
                   <div className="flex items-center justify-between">
                     {steps.map((step, idx) => (
                       <React.Fragment key={step.num}>
-                        <div className="flex flex-col items-center min-w-0">
+                        <div
+                          className={`flex flex-col items-center min-w-0 ${step.num < currentStep ? 'cursor-pointer' : ''}`}
+                          onClick={() => step.num < currentStep && setCurrentStep(step.num)}
+                        >
                           <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold transition-colors ${
                             step.num < currentStep
                               ? 'bg-green-500 text-white'
@@ -463,7 +466,8 @@ const BookService = () => {
               </div>
             )}
 
-            {/* 1. SERVICE DETAILS */}
+            {/* ===== STEP 1: SERVICE TYPE & DELIVERY ===== */}
+            {currentStep === 1 && (<>
             <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-5 border-2 border-carelink-teal" data-testid="service-header">
               <div className="flex items-start gap-3 sm:gap-4">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-carelink-teal-pale rounded-xl flex items-center justify-center flex-shrink-0">
@@ -525,7 +529,10 @@ const BookService = () => {
                 </div>
               )}
             </FormSection>
+            </>)}
 
+            {/* ===== STEP 2: DATE & TIME ===== */}
+            {currentStep === 2 && (<>
             {/* 3. WHEN - DATE & TIME */}
             <FormSection icon={FaCalendarAlt} title="בחר מועד" testId="datetime-section">
               {/* Shift for hourly */}
@@ -595,7 +602,10 @@ const BookService = () => {
                 </>
               )}
             </FormSection>
+            </>)}
 
+            {/* ===== STEP 3: DETAILS (Location + Notes) ===== */}
+            {currentStep === 3 && (<>
             {/* 4. LOCATION - Address / Platform */}
             <FormSection 
               icon={isVirtual ? FaLaptopMedical : FaMapMarkerAlt} 
@@ -722,7 +732,10 @@ const BookService = () => {
               )}
             </FormSection>
 
-            {/* 5. WHO - Contact & Requester */}
+            </>)}
+
+            {/* ===== STEP 4: REQUESTER DETAILS ===== */}
+            {currentStep === 4 && (<>
             <FormSection icon={FaUserFriends} title="למי - פרטי מזמין ואיש קשר" testId="contact-section">
               <div className="flex justify-between items-center mb-4">
                 <p className="text-sm font-medium text-carelink-navy">פרטי המזמין</p>
@@ -774,7 +787,10 @@ const BookService = () => {
                 placeholder="הערות מיוחדות, בקשות, מידע רפואי רלוונטי..."
                 data-testid="booking-notes" />
             </FormSection>
+            </>)}
 
+            {/* ===== STEP 5: SUMMARY & CONFIRMATION ===== */}
+            {currentStep === 5 && (<>
             {/* 7. TERMS */}
             <FormSection icon={FaFileContract} title="תנאים ואישורים" testId="terms-section">
               <label className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl mb-3 cursor-pointer hover:bg-carelink-teal-pale/20 transition">
@@ -799,6 +815,30 @@ const BookService = () => {
                 </div>
               </label>
             </FormSection>
+            </>)}
+
+            {/* ===== STEP NAVIGATION BUTTONS ===== */}
+            <div className="flex justify-between items-center mt-2">
+              {currentStep > 1 ? (
+                <button
+                  onClick={() => setCurrentStep(currentStep - 1)}
+                  className="flex items-center gap-2 px-5 py-3 bg-white border-2 border-gray-200 text-carelink-navy rounded-xl font-medium hover:border-carelink-teal hover:bg-carelink-teal-pale/20 transition"
+                >
+                  <FaChevronRight size={12} />
+                  הקודם
+                </button>
+              ) : <div />}
+
+              {currentStep < 5 ? (
+                <button
+                  onClick={() => setCurrentStep(currentStep + 1)}
+                  className="flex items-center gap-2 px-6 py-3 bg-carelink-teal text-white rounded-xl font-bold hover:bg-carelink-teal-medium transition shadow-md"
+                >
+                  הבא
+                  <FaChevronLeft size={12} />
+                </button>
+              ) : null}
+            </div>
           </div>
 
           {/* ===== RIGHT: Sticky Summary ===== */}
