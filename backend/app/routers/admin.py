@@ -1822,13 +1822,25 @@ async def admin_delete_delivery_type(
 
 # ==================== PUBLIC PROFESSIONS ====================
 
+async def _ensure_professions_initialized():
+    """Initialize default professions if collection is empty. Returns the professions list."""
+    professions = await db.professions.find({}, {"_id": 0}).to_list(100)
+    if professions:
+        return professions
+    # Trigger initialization via the admin logic
+    ts = datetime.now(timezone.utc).isoformat()
+    default_professions = _get_default_professions(ts)
+    if default_professions:
+        await db.professions.insert_many(default_professions)
+        professions = default_professions
+    return professions
+
 @router.get("/professions")
 async def get_public_professions():
     """Get all professions for public use (dropdowns, filters, etc.)"""
-    professions = await db.professions.find({}, {"_id": 0}).to_list(100)
-    
+    professions = await _ensure_professions_initialized()
+
     if not professions:
-        # Return empty list if not initialized
         return {"professions": []}
     
     # Return simplified structure for public use
@@ -1874,7 +1886,17 @@ async def admin_get_professions(
     if not professions:
         # Initialize default professions and save to DB
         ts = datetime.now(timezone.utc).isoformat()
-        default_professions = [
+        default_professions = _get_default_professions(ts)
+        if default_professions:
+            await db.professions.insert_many(default_professions)
+            professions = default_professions
+
+    return {"professions": professions}
+
+
+def _get_default_professions(ts: str):
+    """Return the default professions data for initialization."""
+    return [
             # ==================== רפואה ====================
             {
                 "profession_id": "prof_medicine",
@@ -2242,12 +2264,8 @@ async def admin_get_professions(
                 ],
                 "created_at": ts
             },
-        ]
-        # Save to database
-        await db.professions.insert_many(default_professions)
-        professions = default_professions
-    
-    return {"professions": professions}
+    ]
+
 
 @router.post("/admin/professions")
 async def admin_create_profession(
