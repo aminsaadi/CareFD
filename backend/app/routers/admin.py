@@ -5,6 +5,7 @@ import uuid
 import re
 
 from app.database import db
+from app.localities import ISRAEL_LOCALITIES
 from app.models import (
     UserRole, NotificationType, VerificationStatus, BookingStatus,
     SubscriptionTier, SubscriptionPlan
@@ -752,6 +753,9 @@ async def admin_update_provider(
         # Complete profile editing fields
         "profession_title", "gender", "about", "description", "profile_image", "profile_color",
         "expertise", "target_audience", "service_areas", "availability", "website",
+        # Profession hierarchy fields
+        "profession_id", "profession_name", "specialization_id", "specialization_name",
+        "service_categories",
         # New enhanced profile fields
         "health_funds", "payment_methods", "cancellation_policy", "cancellation_notice_hours",
         "show_phone", "show_email", "show_whatsapp", "whatsapp_number",
@@ -988,172 +992,54 @@ async def admin_reject_document(
 
 # ==================== REGIONS MANAGEMENT ====================
 
+_REGION_META = {
+    "תל אביב": {"region_id": "tel_aviv", "name_en": "Tel Aviv"},
+    "מרכז": {"region_id": "center", "name_en": "Center"},
+    "חיפה": {"region_id": "haifa", "name_en": "Haifa Area"},
+    "צפון": {"region_id": "north", "name_en": "North"},
+    "השרון": {"region_id": "sharon", "name_en": "Sharon"},
+    "ירושלים": {"region_id": "jerusalem", "name_en": "Jerusalem Area"},
+    "דרום": {"region_id": "south", "name_en": "South"},
+    "יהודה ושומרון": {"region_id": "judea_samaria", "name_en": "Judea & Samaria"},
+    "גולן": {"region_id": "golan", "name_en": "Golan Heights"},
+}
+
+def _build_default_regions_from_localities():
+    """Build default regions from the comprehensive ISRAEL_LOCALITIES database."""
+    from collections import defaultdict
+    grouped = defaultdict(list)
+    for loc in ISRAEL_LOCALITIES:
+        region = loc.get("region", "")
+        if region:
+            grouped[region].append({
+                "name": loc["name"],
+                "name_en": loc.get("name_en", ""),
+                "lat": loc.get("lat", 0),
+                "lng": loc.get("lng", 0),
+            })
+
+    regions = []
+    for region_name, meta in _REGION_META.items():
+        cities = grouped.get(region_name, [])
+        if cities:
+            regions.append({
+                "region_id": meta["region_id"],
+                "name": region_name,
+                "name_en": meta["name_en"],
+                "cities": cities,
+            })
+    return regions
+
+
 @router.get("/regions")
 async def get_regions():
     """Get all regions with cities"""
     regions = await db.regions.find({}, {"_id": 0}).to_list(100)
-    
-    # Return default regions if none exist - all cities in Israel
+
+    # Return default regions if none exist - build from comprehensive localities database
     if not regions:
-        default_regions = [
-            {
-                "region_id": "north",
-                "name": "צפון",
-                "name_en": "North",
-                "cities": [
-                    {"name": "חיפה", "name_en": "Haifa", "lat": 32.7940, "lng": 34.9896},
-                    {"name": "נהריה", "name_en": "Nahariya", "lat": 33.0072, "lng": 35.0942},
-                    {"name": "עכו", "name_en": "Acre", "lat": 32.9279, "lng": 35.0756},
-                    {"name": "כרמיאל", "name_en": "Karmiel", "lat": 32.9136, "lng": 35.2961},
-                    {"name": "צפת", "name_en": "Safed", "lat": 32.9646, "lng": 35.4960},
-                    {"name": "טבריה", "name_en": "Tiberias", "lat": 32.7922, "lng": 35.5312},
-                    {"name": "קריית שמונה", "name_en": "Kiryat Shmona", "lat": 33.2075, "lng": 35.5697},
-                    {"name": "נצרת", "name_en": "Nazareth", "lat": 32.6996, "lng": 35.3035},
-                    {"name": "נצרת עילית", "name_en": "Nazareth Illit", "lat": 32.7260, "lng": 35.3280},
-                    {"name": "עפולה", "name_en": "Afula", "lat": 32.6074, "lng": 35.2893},
-                    {"name": "בית שאן", "name_en": "Beit She'an", "lat": 32.4975, "lng": 35.4965},
-                    {"name": "קריית ביאליק", "name_en": "Kiryat Bialik", "lat": 32.8333, "lng": 35.0833},
-                    {"name": "קריית מוצקין", "name_en": "Kiryat Motzkin", "lat": 32.8389, "lng": 35.0750},
-                    {"name": "קריית ים", "name_en": "Kiryat Yam", "lat": 32.8500, "lng": 35.0667},
-                    {"name": "קריית אתא", "name_en": "Kiryat Ata", "lat": 32.8000, "lng": 35.1000},
-                    {"name": "יקנעם", "name_en": "Yokneam", "lat": 32.6594, "lng": 35.1086},
-                    {"name": "מגדל העמק", "name_en": "Migdal HaEmek", "lat": 32.6744, "lng": 35.2406},
-                    {"name": "מעלות-תרשיחא", "name_en": "Ma'alot-Tarshiha", "lat": 33.0167, "lng": 35.2667},
-                    {"name": "שלומי", "name_en": "Shlomi", "lat": 33.0747, "lng": 35.1428}
-                ]
-            },
-            {
-                "region_id": "haifa",
-                "name": "חיפה והקריות",
-                "name_en": "Haifa Area",
-                "cities": [
-                    {"name": "חיפה", "name_en": "Haifa", "lat": 32.7940, "lng": 34.9896},
-                    {"name": "קריית ביאליק", "name_en": "Kiryat Bialik", "lat": 32.8333, "lng": 35.0833},
-                    {"name": "קריית מוצקין", "name_en": "Kiryat Motzkin", "lat": 32.8389, "lng": 35.0750},
-                    {"name": "קריית ים", "name_en": "Kiryat Yam", "lat": 32.8500, "lng": 35.0667},
-                    {"name": "קריית אתא", "name_en": "Kiryat Ata", "lat": 32.8000, "lng": 35.1000},
-                    {"name": "נשר", "name_en": "Nesher", "lat": 32.7700, "lng": 35.0400},
-                    {"name": "טירת כרמל", "name_en": "Tirat Carmel", "lat": 32.7589, "lng": 34.9714}
-                ]
-            },
-            {
-                "region_id": "sharon",
-                "name": "השרון",
-                "name_en": "Sharon",
-                "cities": [
-                    {"name": "נתניה", "name_en": "Netanya", "lat": 32.3286, "lng": 34.8567},
-                    {"name": "הרצליה", "name_en": "Herzliya", "lat": 32.1663, "lng": 34.8463},
-                    {"name": "רעננה", "name_en": "Ra'anana", "lat": 32.1836, "lng": 34.8708},
-                    {"name": "כפר סבא", "name_en": "Kfar Saba", "lat": 32.1753, "lng": 34.9065},
-                    {"name": "הוד השרון", "name_en": "Hod HaSharon", "lat": 32.1500, "lng": 34.8833},
-                    {"name": "רמת השרון", "name_en": "Ramat HaSharon", "lat": 32.1464, "lng": 34.8397},
-                    {"name": "חדרה", "name_en": "Hadera", "lat": 32.4340, "lng": 34.9196},
-                    {"name": "כפר יונה", "name_en": "Kfar Yona", "lat": 32.3167, "lng": 34.9333},
-                    {"name": "פרדס חנה-כרכור", "name_en": "Pardes Hanna-Karkur", "lat": 32.4700, "lng": 34.9700},
-                    {"name": "זכרון יעקב", "name_en": "Zikhron Ya'akov", "lat": 32.5714, "lng": 34.9522},
-                    {"name": "בנימינה", "name_en": "Binyamina", "lat": 32.5167, "lng": 34.9500},
-                    {"name": "אור עקיבא", "name_en": "Or Akiva", "lat": 32.5081, "lng": 34.9181},
-                    {"name": "קיסריה", "name_en": "Caesarea", "lat": 32.5000, "lng": 34.9000}
-                ]
-            },
-            {
-                "region_id": "center",
-                "name": "מרכז",
-                "name_en": "Center",
-                "cities": [
-                    {"name": "תל אביב-יפו", "name_en": "Tel Aviv-Yafo", "lat": 32.0853, "lng": 34.7818},
-                    {"name": "רמת גן", "name_en": "Ramat Gan", "lat": 32.0700, "lng": 34.8236},
-                    {"name": "גבעתיים", "name_en": "Givatayim", "lat": 32.0714, "lng": 34.8122},
-                    {"name": "בני ברק", "name_en": "Bnei Brak", "lat": 32.0833, "lng": 34.8333},
-                    {"name": "פתח תקווה", "name_en": "Petah Tikva", "lat": 32.0841, "lng": 34.8878},
-                    {"name": "חולון", "name_en": "Holon", "lat": 32.0158, "lng": 34.7875},
-                    {"name": "בת ים", "name_en": "Bat Yam", "lat": 32.0231, "lng": 34.7503},
-                    {"name": "ראשון לציון", "name_en": "Rishon LeZion", "lat": 31.9730, "lng": 34.7925},
-                    {"name": "רחובות", "name_en": "Rehovot", "lat": 31.8928, "lng": 34.8113},
-                    {"name": "נס ציונה", "name_en": "Ness Ziona", "lat": 31.9314, "lng": 34.7989},
-                    {"name": "לוד", "name_en": "Lod", "lat": 31.9514, "lng": 34.8953},
-                    {"name": "רמלה", "name_en": "Ramla", "lat": 31.9275, "lng": 34.8622},
-                    {"name": "יבנה", "name_en": "Yavne", "lat": 31.8767, "lng": 34.7394},
-                    {"name": "ראש העין", "name_en": "Rosh HaAyin", "lat": 32.0956, "lng": 34.9567},
-                    {"name": "אלעד", "name_en": "Elad", "lat": 32.0522, "lng": 34.9508},
-                    {"name": "גני תקווה", "name_en": "Ganei Tikva", "lat": 32.0597, "lng": 34.8714},
-                    {"name": "קריית אונו", "name_en": "Kiryat Ono", "lat": 32.0633, "lng": 34.8556},
-                    {"name": "אור יהודה", "name_en": "Or Yehuda", "lat": 32.0300, "lng": 34.8536},
-                    {"name": "יהוד-מונוסון", "name_en": "Yehud-Monosson", "lat": 32.0333, "lng": 34.8833},
-                    {"name": "כפר קאסם", "name_en": "Kafr Qasim", "lat": 32.1142, "lng": 34.9778},
-                    {"name": "טייבה", "name_en": "Tayibe", "lat": 32.2667, "lng": 35.0000},
-                    {"name": "קלנסווה", "name_en": "Qalansawe", "lat": 32.2833, "lng": 34.9833},
-                    {"name": "טירה", "name_en": "Tira", "lat": 32.2333, "lng": 34.9500}
-                ]
-            },
-            {
-                "region_id": "jerusalem",
-                "name": "ירושלים והסביבה",
-                "name_en": "Jerusalem Area",
-                "cities": [
-                    {"name": "ירושלים", "name_en": "Jerusalem", "lat": 31.7683, "lng": 35.2137},
-                    {"name": "בית שמש", "name_en": "Beit Shemesh", "lat": 31.7514, "lng": 34.9886},
-                    {"name": "מודיעין-מכבים-רעות", "name_en": "Modi'in-Maccabim-Re'ut", "lat": 31.8978, "lng": 35.0100},
-                    {"name": "מעלה אדומים", "name_en": "Ma'ale Adumim", "lat": 31.7781, "lng": 35.3031},
-                    {"name": "גבעת זאב", "name_en": "Giv'at Ze'ev", "lat": 31.8622, "lng": 35.1706},
-                    {"name": "ביתר עילית", "name_en": "Beitar Illit", "lat": 31.6953, "lng": 35.1128},
-                    {"name": "מבשרת ציון", "name_en": "Mevaseret Zion", "lat": 31.8028, "lng": 35.1525},
-                    {"name": "אבו גוש", "name_en": "Abu Ghosh", "lat": 31.8081, "lng": 35.1108},
-                    {"name": "צור הדסה", "name_en": "Tzur Hadassa", "lat": 31.7231, "lng": 35.0717}
-                ]
-            },
-            {
-                "region_id": "south",
-                "name": "דרום",
-                "name_en": "South",
-                "cities": [
-                    {"name": "באר שבע", "name_en": "Be'er Sheva", "lat": 31.2518, "lng": 34.7913},
-                    {"name": "אשדוד", "name_en": "Ashdod", "lat": 31.8044, "lng": 34.6553},
-                    {"name": "אשקלון", "name_en": "Ashkelon", "lat": 31.6688, "lng": 34.5743},
-                    {"name": "אילת", "name_en": "Eilat", "lat": 29.5577, "lng": 34.9519},
-                    {"name": "דימונה", "name_en": "Dimona", "lat": 31.0697, "lng": 35.0333},
-                    {"name": "קריית גת", "name_en": "Kiryat Gat", "lat": 31.6061, "lng": 34.7717},
-                    {"name": "שדרות", "name_en": "Sderot", "lat": 31.5247, "lng": 34.5967},
-                    {"name": "אופקים", "name_en": "Ofakim", "lat": 31.3142, "lng": 34.6183},
-                    {"name": "נתיבות", "name_en": "Netivot", "lat": 31.4222, "lng": 34.5892},
-                    {"name": "ערד", "name_en": "Arad", "lat": 31.2614, "lng": 35.2128},
-                    {"name": "ירוחם", "name_en": "Yeruham", "lat": 30.9897, "lng": 34.9300},
-                    {"name": "מצפה רמון", "name_en": "Mitzpe Ramon", "lat": 30.6100, "lng": 34.8017},
-                    {"name": "רהט", "name_en": "Rahat", "lat": 31.3928, "lng": 34.7542}
-                ]
-            },
-            {
-                "region_id": "shfela",
-                "name": "שפלה",
-                "name_en": "Shfela",
-                "cities": [
-                    {"name": "אשדוד", "name_en": "Ashdod", "lat": 31.8044, "lng": 34.6553},
-                    {"name": "אשקלון", "name_en": "Ashkelon", "lat": 31.6688, "lng": 34.5743},
-                    {"name": "קריית מלאכי", "name_en": "Kiryat Malakhi", "lat": 31.7308, "lng": 34.7472},
-                    {"name": "גדרה", "name_en": "Gedera", "lat": 31.8147, "lng": 34.7783},
-                    {"name": "קריית עקרון", "name_en": "Kiryat Ekron", "lat": 31.8589, "lng": 34.8247},
-                    {"name": "מזכרת בתיה", "name_en": "Mazkeret Batya", "lat": 31.8500, "lng": 34.8500},
-                    {"name": "גן יבנה", "name_en": "Gan Yavne", "lat": 31.7833, "lng": 34.7000}
-                ]
-            },
-            {
-                "region_id": "judea_samaria",
-                "name": "יהודה ושומרון",
-                "name_en": "Judea and Samaria",
-                "cities": [
-                    {"name": "אריאל", "name_en": "Ariel", "lat": 32.1064, "lng": 35.1731},
-                    {"name": "מעלה אדומים", "name_en": "Ma'ale Adumim", "lat": 31.7781, "lng": 35.3031},
-                    {"name": "ביתר עילית", "name_en": "Beitar Illit", "lat": 31.6953, "lng": 35.1128},
-                    {"name": "מודיעין עילית", "name_en": "Modi'in Illit", "lat": 31.9333, "lng": 35.0439},
-                    {"name": "גבעת זאב", "name_en": "Giv'at Ze'ev", "lat": 31.8622, "lng": 35.1706},
-                    {"name": "אלפי מנשה", "name_en": "Alfei Menashe", "lat": 32.1667, "lng": 35.0333},
-                    {"name": "קרני שומרון", "name_en": "Karnei Shomron", "lat": 32.1667, "lng": 35.0833},
-                    {"name": "עמנואל", "name_en": "Immanuel", "lat": 32.1556, "lng": 35.1589},
-                    {"name": "קדומים", "name_en": "Kedumim", "lat": 32.1833, "lng": 35.1833},
-                    {"name": "אפרת", "name_en": "Efrat", "lat": 31.6547, "lng": 35.1422}
-                ]
-            }
-        ]
+        default_regions = _build_default_regions_from_localities()
+        # NOTE: old hardcoded 101 cities replaced with dynamic build from localities.py
         # Insert defaults
         await db.regions.insert_many(default_regions)
         # Remove MongoDB _id from each region for JSON serialization
@@ -1799,13 +1685,25 @@ async def admin_delete_delivery_type(
 
 # ==================== PUBLIC PROFESSIONS ====================
 
+async def _ensure_professions_initialized():
+    """Initialize default professions if collection is empty. Returns the professions list."""
+    professions = await db.professions.find({}, {"_id": 0}).to_list(100)
+    if professions:
+        return professions
+    # Trigger initialization via the admin logic
+    ts = datetime.now(timezone.utc).isoformat()
+    default_professions = _get_default_professions(ts)
+    if default_professions:
+        await db.professions.insert_many(default_professions)
+        professions = default_professions
+    return professions
+
 @router.get("/professions")
 async def get_public_professions():
     """Get all professions for public use (dropdowns, filters, etc.)"""
-    professions = await db.professions.find({}, {"_id": 0}).to_list(100)
-    
+    professions = await _ensure_professions_initialized()
+
     if not professions:
-        # Return empty list if not initialized
         return {"professions": []}
     
     # Return simplified structure for public use
@@ -1850,80 +1748,387 @@ async def admin_get_professions(
     
     if not professions:
         # Initialize default professions and save to DB
-        default_professions = [
+        ts = datetime.now(timezone.utc).isoformat()
+        default_professions = _get_default_professions(ts)
+        if default_professions:
+            await db.professions.insert_many(default_professions)
+            professions = default_professions
+
+    return {"professions": professions}
+
+
+def _get_default_professions(ts: str):
+    """Return the default professions data for initialization."""
+    return [
+            # ==================== רפואה ====================
             {
                 "profession_id": "prof_medicine",
                 "name": "רפואה",
                 "name_en": "Medicine",
                 "icon": "stethoscope",
-                "specializations": ["רפואת משפחה", "רפואה פנימית", "רפואת ילדים", "גריאטריה"],
+                "specializations": ["רפואת משפחה", "רפואה פנימית", "רפואת ילדים", "גריאטריה", "כירורגיה", "אורתופדיה", "קרדיולוגיה", "נוירולוגיה", "אורולוגיה", "גינקולוגיה", "עור ומין", "אף אוזן גרון", "רפואת עיניים", "אונקולוגיה", "אנדוקרינולוגיה", "גסטרואנטרולוגיה", "ריאות", "ראומטולוגיה", "רפואה דחופה", "הרדמה", "רדיולוגיה", "פתולוגיה", "רפואת ספורט", "רפואת כאב", "רפואה פיזיקלית ושיקום"],
                 "sub_professions": [
-                    {"sub_profession_id": "sub_family", "name": "רפואת משפחה", "name_en": "Family Medicine", "categories": [
+                    {"sub_profession_id": "sub_family_med", "name": "רפואת משפחה", "name_en": "Family Medicine", "categories": [
                         {"category_id": "cat_home_visit", "name": "ביקור בית", "name_en": "Home Visit"},
-                        {"category_id": "cat_checkup", "name": "בדיקה כללית", "name_en": "General Checkup"}
+                        {"category_id": "cat_checkup", "name": "בדיקה כללית", "name_en": "General Checkup"},
+                        {"category_id": "cat_prescription", "name": "מתן מרשם", "name_en": "Prescription"},
+                        {"category_id": "cat_referral", "name": "הפניה לבדיקות", "name_en": "Referral"},
+                        {"category_id": "cat_chronic", "name": "ניהול מחלות כרוניות", "name_en": "Chronic Disease Management"},
                     ]},
-                    {"sub_profession_id": "sub_pediatrics", "name": "ילדים", "name_en": "Pediatrics", "categories": []},
-                    {"sub_profession_id": "sub_geriatrics", "name": "גריאטריה", "name_en": "Geriatrics", "categories": []}
+                    {"sub_profession_id": "sub_internal", "name": "רפואה פנימית", "name_en": "Internal Medicine", "categories": [
+                        {"category_id": "cat_internal_consult", "name": "ייעוץ פנימי", "name_en": "Internal Consultation"},
+                        {"category_id": "cat_internal_followup", "name": "מעקב מחלות כרוניות", "name_en": "Chronic Follow-up"},
+                    ]},
+                    {"sub_profession_id": "sub_pediatrics", "name": "רפואת ילדים", "name_en": "Pediatrics", "categories": [
+                        {"category_id": "cat_child_checkup", "name": "בדיקת ילדים", "name_en": "Child Checkup"},
+                        {"category_id": "cat_vaccination", "name": "חיסונים", "name_en": "Vaccination"},
+                        {"category_id": "cat_child_development", "name": "מעקב התפתחות", "name_en": "Development Follow-up"},
+                    ]},
+                    {"sub_profession_id": "sub_geriatrics", "name": "גריאטריה", "name_en": "Geriatrics", "categories": [
+                        {"category_id": "cat_geriatric_assess", "name": "הערכה גריאטרית", "name_en": "Geriatric Assessment"},
+                        {"category_id": "cat_dementia", "name": "טיפול בדמנציה", "name_en": "Dementia Care"},
+                        {"category_id": "cat_fall_prevention", "name": "מניעת נפילות", "name_en": "Fall Prevention"},
+                    ]},
+                    {"sub_profession_id": "sub_surgery", "name": "כירורגיה", "name_en": "Surgery", "categories": [
+                        {"category_id": "cat_pre_surgery", "name": "ייעוץ לפני ניתוח", "name_en": "Pre-Surgery Consultation"},
+                        {"category_id": "cat_post_surgery", "name": "מעקב אחרי ניתוח", "name_en": "Post-Surgery Follow-up"},
+                    ]},
+                    {"sub_profession_id": "sub_orthopedics", "name": "אורתופדיה", "name_en": "Orthopedics", "categories": [
+                        {"category_id": "cat_ortho_consult", "name": "ייעוץ אורתופדי", "name_en": "Orthopedic Consultation"},
+                        {"category_id": "cat_joint_injection", "name": "הזרקה למפרק", "name_en": "Joint Injection"},
+                        {"category_id": "cat_ortho_rehab", "name": "שיקום אורתופדי", "name_en": "Orthopedic Rehab"},
+                    ]},
+                    {"sub_profession_id": "sub_cardiology", "name": "קרדיולוגיה", "name_en": "Cardiology", "categories": [
+                        {"category_id": "cat_cardio_consult", "name": "ייעוץ קרדיולוגי", "name_en": "Cardiology Consultation"},
+                        {"category_id": "cat_ecg", "name": "בדיקת אק\"ג", "name_en": "ECG Test"},
+                        {"category_id": "cat_holter", "name": "הולטר", "name_en": "Holter Monitor"},
+                    ]},
+                    {"sub_profession_id": "sub_neurology", "name": "נוירולוגיה", "name_en": "Neurology", "categories": [
+                        {"category_id": "cat_neuro_consult", "name": "ייעוץ נוירולוגי", "name_en": "Neurology Consultation"},
+                        {"category_id": "cat_eeg", "name": "בדיקת EEG", "name_en": "EEG Test"},
+                    ]},
+                    {"sub_profession_id": "sub_dermatology", "name": "עור ומין", "name_en": "Dermatology", "categories": [
+                        {"category_id": "cat_skin_consult", "name": "ייעוץ עור", "name_en": "Skin Consultation"},
+                        {"category_id": "cat_mole_check", "name": "בדיקת שומות", "name_en": "Mole Check"},
+                        {"category_id": "cat_skin_treatment", "name": "טיפול עורי", "name_en": "Skin Treatment"},
+                    ]},
+                    {"sub_profession_id": "sub_ent", "name": "אף אוזן גרון", "name_en": "ENT", "categories": [
+                        {"category_id": "cat_ent_consult", "name": "ייעוץ אא\"ג", "name_en": "ENT Consultation"},
+                        {"category_id": "cat_hearing_test", "name": "בדיקת שמיעה", "name_en": "Hearing Test"},
+                    ]},
+                    {"sub_profession_id": "sub_ophthalmology", "name": "רפואת עיניים", "name_en": "Ophthalmology", "categories": [
+                        {"category_id": "cat_eye_exam", "name": "בדיקת עיניים", "name_en": "Eye Exam"},
+                        {"category_id": "cat_eye_pressure", "name": "בדיקת לחץ תוך עיני", "name_en": "Eye Pressure Test"},
+                    ]},
+                    {"sub_profession_id": "sub_urology", "name": "אורולוגיה", "name_en": "Urology", "categories": [
+                        {"category_id": "cat_uro_consult", "name": "ייעוץ אורולוגי", "name_en": "Urology Consultation"},
+                    ]},
+                    {"sub_profession_id": "sub_gynecology", "name": "גינקולוגיה ומיילדות", "name_en": "Gynecology & Obstetrics", "categories": [
+                        {"category_id": "cat_gyn_consult", "name": "ייעוץ גינקולוגי", "name_en": "Gynecology Consultation"},
+                        {"category_id": "cat_pregnancy", "name": "מעקב הריון", "name_en": "Pregnancy Follow-up"},
+                        {"category_id": "cat_ultrasound", "name": "אולטרסאונד", "name_en": "Ultrasound"},
+                    ]},
+                    {"sub_profession_id": "sub_oncology", "name": "אונקולוגיה", "name_en": "Oncology", "categories": [
+                        {"category_id": "cat_onco_consult", "name": "ייעוץ אונקולוגי", "name_en": "Oncology Consultation"},
+                        {"category_id": "cat_onco_followup", "name": "מעקב אונקולוגי", "name_en": "Oncology Follow-up"},
+                    ]},
+                    {"sub_profession_id": "sub_endocrine", "name": "אנדוקרינולוגיה", "name_en": "Endocrinology", "categories": [
+                        {"category_id": "cat_diabetes", "name": "ניהול סוכרת", "name_en": "Diabetes Management"},
+                        {"category_id": "cat_thyroid", "name": "בעיות בלוטת התריס", "name_en": "Thyroid Disorders"},
+                    ]},
+                    {"sub_profession_id": "sub_gastro", "name": "גסטרואנטרולוגיה", "name_en": "Gastroenterology", "categories": [
+                        {"category_id": "cat_gastro_consult", "name": "ייעוץ גסטרו", "name_en": "Gastro Consultation"},
+                    ]},
+                    {"sub_profession_id": "sub_pulmonology", "name": "ריאות", "name_en": "Pulmonology", "categories": [
+                        {"category_id": "cat_pulmo_consult", "name": "ייעוץ ריאות", "name_en": "Pulmonology Consultation"},
+                        {"category_id": "cat_spirometry", "name": "בדיקת תפקודי ריאות", "name_en": "Spirometry"},
+                    ]},
+                    {"sub_profession_id": "sub_rheumatology", "name": "ראומטולוגיה", "name_en": "Rheumatology", "categories": [
+                        {"category_id": "cat_rheuma_consult", "name": "ייעוץ ראומטולוגי", "name_en": "Rheumatology Consultation"},
+                    ]},
+                    {"sub_profession_id": "sub_sports_med", "name": "רפואת ספורט", "name_en": "Sports Medicine", "categories": [
+                        {"category_id": "cat_sports_consult", "name": "ייעוץ רפואת ספורט", "name_en": "Sports Medicine Consultation"},
+                        {"category_id": "cat_sports_rehab", "name": "שיקום ספורטיבי", "name_en": "Sports Rehabilitation"},
+                    ]},
+                    {"sub_profession_id": "sub_pain", "name": "רפואת כאב", "name_en": "Pain Medicine", "categories": [
+                        {"category_id": "cat_pain_consult", "name": "ייעוץ כאב", "name_en": "Pain Consultation"},
+                        {"category_id": "cat_pain_injection", "name": "הזרקות כאב", "name_en": "Pain Injections"},
+                    ]},
+                    {"sub_profession_id": "sub_emergency", "name": "רפואה דחופה", "name_en": "Emergency Medicine", "categories": [
+                        {"category_id": "cat_urgent_visit", "name": "ביקור דחוף", "name_en": "Urgent Visit"},
+                    ]},
+                    {"sub_profession_id": "sub_pmr", "name": "רפואה פיזיקלית ושיקום", "name_en": "Physical Medicine & Rehabilitation", "categories": [
+                        {"category_id": "cat_rehab_plan", "name": "תכנית שיקום", "name_en": "Rehabilitation Plan"},
+                        {"category_id": "cat_disability_eval", "name": "הערכת נכות", "name_en": "Disability Evaluation"},
+                    ]},
                 ],
-                "created_at": datetime.now(timezone.utc).isoformat()
+                "created_at": ts
             },
+            # ==================== סיעוד ====================
             {
                 "profession_id": "prof_nursing",
                 "name": "סיעוד",
                 "name_en": "Nursing",
                 "icon": "heart-pulse",
-                "specializations": ["סיעוד ביתי", "טיפול בקשישים", "סיעוד אחרי ניתוח", "טיפול פליאטיבי"],
+                "specializations": ["סיעוד ביתי", "טיפול בקשישים", "סיעוד אחרי ניתוח", "טיפול פליאטיבי", "סיעוד ילדים", "סיעוד נפשי", "סיעוד אונקולוגי"],
                 "sub_professions": [
-                    {"sub_profession_id": "sub_home_care", "name": "סיעוד ביתי", "name_en": "Home Care", "categories": []},
-                    {"sub_profession_id": "sub_elderly_care", "name": "טיפול בקשישים", "name_en": "Elderly Care", "categories": []},
-                    {"sub_profession_id": "sub_post_op", "name": "סיעוד אחרי ניתוח", "name_en": "Post-Op Care", "categories": []}
+                    {"sub_profession_id": "sub_home_care", "name": "סיעוד ביתי", "name_en": "Home Care", "categories": [
+                        {"category_id": "cat_daily_care", "name": "טיפול יומיומי", "name_en": "Daily Care"},
+                        {"category_id": "cat_wound_care", "name": "טיפול בפצעים", "name_en": "Wound Care"},
+                        {"category_id": "cat_iv_therapy", "name": "עירוי תוך ורידי", "name_en": "IV Therapy"},
+                        {"category_id": "cat_injections", "name": "הזרקות", "name_en": "Injections"},
+                        {"category_id": "cat_catheter", "name": "טיפול בקטטר", "name_en": "Catheter Care"},
+                        {"category_id": "cat_blood_test", "name": "בדיקות דם", "name_en": "Blood Tests"},
+                        {"category_id": "cat_vitals", "name": "מדידת סימנים חיוניים", "name_en": "Vital Signs"},
+                    ]},
+                    {"sub_profession_id": "sub_elderly_care", "name": "טיפול בקשישים", "name_en": "Elderly Care", "categories": [
+                        {"category_id": "cat_elderly_daily", "name": "סיוע יומיומי לקשיש", "name_en": "Daily Elderly Care"},
+                        {"category_id": "cat_elderly_night", "name": "שמירת לילה", "name_en": "Night Watch"},
+                        {"category_id": "cat_medication_mgmt", "name": "ניהול תרופות", "name_en": "Medication Management"},
+                        {"category_id": "cat_companion", "name": "ליווי וחברה", "name_en": "Companion Care"},
+                    ]},
+                    {"sub_profession_id": "sub_post_op", "name": "סיעוד אחרי ניתוח", "name_en": "Post-Op Care", "categories": [
+                        {"category_id": "cat_post_op_care", "name": "טיפול אחרי ניתוח", "name_en": "Post-Op Care"},
+                        {"category_id": "cat_drain_care", "name": "טיפול בנקזים", "name_en": "Drain Care"},
+                        {"category_id": "cat_stoma_care", "name": "טיפול בסטומה", "name_en": "Stoma Care"},
+                    ]},
+                    {"sub_profession_id": "sub_palliative", "name": "טיפול פליאטיבי", "name_en": "Palliative Care", "categories": [
+                        {"category_id": "cat_palliative_care", "name": "טיפול תומך", "name_en": "Supportive Care"},
+                        {"category_id": "cat_pain_mgmt", "name": "ניהול כאב", "name_en": "Pain Management"},
+                    ]},
+                    {"sub_profession_id": "sub_child_nursing", "name": "סיעוד ילדים", "name_en": "Pediatric Nursing", "categories": [
+                        {"category_id": "cat_child_care", "name": "טיפול סיעודי לילדים", "name_en": "Pediatric Care"},
+                        {"category_id": "cat_child_chronic", "name": "ליווי ילד כרוני", "name_en": "Chronic Child Care"},
+                    ]},
                 ],
-                "created_at": datetime.now(timezone.utc).isoformat()
+                "created_at": ts
             },
+            # ==================== רפואת שיניים ====================
+            {
+                "profession_id": "prof_dental",
+                "name": "רפואת שיניים",
+                "name_en": "Dentistry",
+                "icon": "tooth",
+                "specializations": ["רפואת שיניים כללית", "אורתודונטיה", "פריודונטיה", "אנדודונטיה", "כירורגיית פה ולסת", "רפואת שיניים לילדים", "שיקום הפה", "אסתטיקה דנטלית"],
+                "sub_professions": [
+                    {"sub_profession_id": "sub_general_dental", "name": "רפואת שיניים כללית", "name_en": "General Dentistry", "categories": [
+                        {"category_id": "cat_dental_checkup", "name": "בדיקת שיניים", "name_en": "Dental Checkup"},
+                        {"category_id": "cat_filling", "name": "סתימה", "name_en": "Filling"},
+                        {"category_id": "cat_cleaning", "name": "ניקוי אבנית", "name_en": "Dental Cleaning"},
+                        {"category_id": "cat_extraction", "name": "עקירת שן", "name_en": "Tooth Extraction"},
+                    ]},
+                    {"sub_profession_id": "sub_orthodontics", "name": "אורתודונטיה", "name_en": "Orthodontics", "categories": [
+                        {"category_id": "cat_braces", "name": "יישור שיניים", "name_en": "Braces"},
+                        {"category_id": "cat_invisalign", "name": "קשתיות שקופות", "name_en": "Clear Aligners"},
+                    ]},
+                    {"sub_profession_id": "sub_periodontics", "name": "פריודונטיה", "name_en": "Periodontics", "categories": [
+                        {"category_id": "cat_gum_treatment", "name": "טיפול בחניכיים", "name_en": "Gum Treatment"},
+                        {"category_id": "cat_implant", "name": "השתלת שיניים", "name_en": "Dental Implant"},
+                    ]},
+                    {"sub_profession_id": "sub_endodontics", "name": "אנדודונטיה", "name_en": "Endodontics", "categories": [
+                        {"category_id": "cat_root_canal", "name": "טיפול שורש", "name_en": "Root Canal"},
+                    ]},
+                    {"sub_profession_id": "sub_child_dental", "name": "רפואת שיניים לילדים", "name_en": "Pediatric Dentistry", "categories": [
+                        {"category_id": "cat_child_dental", "name": "טיפול שיניים לילדים", "name_en": "Children Dental Care"},
+                    ]},
+                    {"sub_profession_id": "sub_dental_aesthetic", "name": "אסתטיקה דנטלית", "name_en": "Dental Aesthetics", "categories": [
+                        {"category_id": "cat_whitening", "name": "הלבנת שיניים", "name_en": "Teeth Whitening"},
+                        {"category_id": "cat_veneers", "name": "ציפויי חרסינה", "name_en": "Veneers"},
+                    ]},
+                ],
+                "created_at": ts
+            },
+            # ==================== טיפולי שיקום ====================
             {
                 "profession_id": "prof_therapy",
-                "name": "טיפולים",
-                "name_en": "Therapy",
+                "name": "טיפולי שיקום",
+                "name_en": "Rehabilitation Therapy",
                 "icon": "activity",
-                "specializations": ["פיזיותרפיה", "ריפוי בעיסוק", "קלינאות תקשורת", "טיפול רגשי"],
+                "specializations": ["פיזיותרפיה", "ריפוי בעיסוק", "קלינאות תקשורת", "פודיאטריה", "כירופרקטיקה"],
                 "sub_professions": [
-                    {"sub_profession_id": "sub_physio", "name": "פיזיותרפיה", "name_en": "Physiotherapy", "categories": []},
-                    {"sub_profession_id": "sub_occupational", "name": "ריפוי בעיסוק", "name_en": "Occupational Therapy", "categories": []},
-                    {"sub_profession_id": "sub_speech", "name": "קלינאות תקשורת", "name_en": "Speech Therapy", "categories": []}
+                    {"sub_profession_id": "sub_physio", "name": "פיזיותרפיה", "name_en": "Physiotherapy", "categories": [
+                        {"category_id": "cat_physio_ortho", "name": "פיזיותרפיה אורתופדית", "name_en": "Orthopedic Physiotherapy"},
+                        {"category_id": "cat_physio_neuro", "name": "פיזיותרפיה נוירולוגית", "name_en": "Neurological Physiotherapy"},
+                        {"category_id": "cat_physio_sport", "name": "פיזיותרפיה ספורטיבית", "name_en": "Sports Physiotherapy"},
+                        {"category_id": "cat_physio_resp", "name": "פיזיותרפיה נשימתית", "name_en": "Respiratory Physiotherapy"},
+                        {"category_id": "cat_physio_pelvic", "name": "פיזיותרפיה של רצפת האגן", "name_en": "Pelvic Floor Physiotherapy"},
+                        {"category_id": "cat_physio_child", "name": "פיזיותרפיה לילדים", "name_en": "Pediatric Physiotherapy"},
+                    ]},
+                    {"sub_profession_id": "sub_occupational", "name": "ריפוי בעיסוק", "name_en": "Occupational Therapy", "categories": [
+                        {"category_id": "cat_ot_child", "name": "ריפוי בעיסוק לילדים", "name_en": "Pediatric OT"},
+                        {"category_id": "cat_ot_adult", "name": "ריפוי בעיסוק למבוגרים", "name_en": "Adult OT"},
+                        {"category_id": "cat_ot_sensory", "name": "טיפול סנסורי", "name_en": "Sensory Therapy"},
+                        {"category_id": "cat_ot_hand", "name": "ריפוי בעיסוק - יד", "name_en": "Hand Therapy"},
+                    ]},
+                    {"sub_profession_id": "sub_speech", "name": "קלינאות תקשורת", "name_en": "Speech Therapy", "categories": [
+                        {"category_id": "cat_speech_child", "name": "טיפול בדיבור לילדים", "name_en": "Children Speech Therapy"},
+                        {"category_id": "cat_speech_adult", "name": "טיפול בדיבור למבוגרים", "name_en": "Adult Speech Therapy"},
+                        {"category_id": "cat_swallowing", "name": "טיפול בבעיות בליעה", "name_en": "Swallowing Therapy"},
+                        {"category_id": "cat_stuttering", "name": "טיפול בגמגום", "name_en": "Stuttering Therapy"},
+                    ]},
+                    {"sub_profession_id": "sub_podiatry", "name": "פודיאטריה", "name_en": "Podiatry", "categories": [
+                        {"category_id": "cat_foot_care", "name": "טיפול כפות רגליים", "name_en": "Foot Care"},
+                        {"category_id": "cat_orthotics", "name": "מדרסים", "name_en": "Orthotics"},
+                    ]},
+                    {"sub_profession_id": "sub_chiropractic", "name": "כירופרקטיקה", "name_en": "Chiropractic", "categories": [
+                        {"category_id": "cat_spinal_adjust", "name": "יישור עמוד שדרה", "name_en": "Spinal Adjustment"},
+                        {"category_id": "cat_back_pain", "name": "טיפול בכאבי גב", "name_en": "Back Pain Treatment"},
+                    ]},
                 ],
-                "created_at": datetime.now(timezone.utc).isoformat()
+                "created_at": ts
             },
+            # ==================== בריאות הנפש ====================
             {
                 "profession_id": "prof_mental",
                 "name": "בריאות הנפש",
                 "name_en": "Mental Health",
                 "icon": "brain",
-                "specializations": ["פסיכולוגיה", "פסיכיאטריה", "טיפול קוגניטיבי", "טיפול משפחתי"],
+                "specializations": ["פסיכולוגיה קלינית", "פסיכיאטריה", "פסיכותרפיה", "ייעוץ זוגי ומשפחתי", "טיפול בהתמכרויות", "נוירופסיכולוגיה", "טיפול קוגניטיבי-התנהגותי"],
                 "sub_professions": [
-                    {"sub_profession_id": "sub_psychology", "name": "פסיכולוגיה", "name_en": "Psychology", "categories": []},
-                    {"sub_profession_id": "sub_psychiatry", "name": "פסיכיאטריה", "name_en": "Psychiatry", "categories": []}
+                    {"sub_profession_id": "sub_clinical_psych", "name": "פסיכולוגיה קלינית", "name_en": "Clinical Psychology", "categories": [
+                        {"category_id": "cat_psych_assess", "name": "אבחון פסיכולוגי", "name_en": "Psychological Assessment"},
+                        {"category_id": "cat_psych_therapy", "name": "טיפול פסיכולוגי", "name_en": "Psychological Therapy"},
+                        {"category_id": "cat_anxiety", "name": "טיפול בחרדה", "name_en": "Anxiety Treatment"},
+                        {"category_id": "cat_depression", "name": "טיפול בדיכאון", "name_en": "Depression Treatment"},
+                        {"category_id": "cat_trauma", "name": "טיפול בטראומה", "name_en": "Trauma Treatment"},
+                    ]},
+                    {"sub_profession_id": "sub_psychiatry", "name": "פסיכיאטריה", "name_en": "Psychiatry", "categories": [
+                        {"category_id": "cat_psych_consult", "name": "ייעוץ פסיכיאטרי", "name_en": "Psychiatric Consultation"},
+                        {"category_id": "cat_med_mgmt", "name": "ניהול תרופתי", "name_en": "Medication Management"},
+                    ]},
+                    {"sub_profession_id": "sub_couple_family", "name": "טיפול זוגי ומשפחתי", "name_en": "Couple & Family Therapy", "categories": [
+                        {"category_id": "cat_couple_therapy", "name": "טיפול זוגי", "name_en": "Couple Therapy"},
+                        {"category_id": "cat_family_therapy", "name": "טיפול משפחתי", "name_en": "Family Therapy"},
+                    ]},
+                    {"sub_profession_id": "sub_child_psych", "name": "פסיכולוגיית ילדים", "name_en": "Child Psychology", "categories": [
+                        {"category_id": "cat_child_therapy", "name": "טיפול רגשי לילדים", "name_en": "Child Emotional Therapy"},
+                        {"category_id": "cat_adhd", "name": "אבחון וטיפול ADHD", "name_en": "ADHD Diagnosis & Treatment"},
+                        {"category_id": "cat_autism", "name": "טיפול בספקטרום האוטיזם", "name_en": "Autism Spectrum Treatment"},
+                    ]},
+                    {"sub_profession_id": "sub_addiction", "name": "טיפול בהתמכרויות", "name_en": "Addiction Treatment", "categories": [
+                        {"category_id": "cat_addiction_consult", "name": "ייעוץ התמכרויות", "name_en": "Addiction Counseling"},
+                    ]},
+                    {"sub_profession_id": "sub_social_work", "name": "עבודה סוציאלית", "name_en": "Social Work", "categories": [
+                        {"category_id": "cat_social_consult", "name": "ייעוץ סוציאלי", "name_en": "Social Counseling"},
+                        {"category_id": "cat_rights", "name": "מיצוי זכויות", "name_en": "Rights Advocacy"},
+                    ]},
                 ],
-                "created_at": datetime.now(timezone.utc).isoformat()
+                "created_at": ts
             },
+            # ==================== תזונה ודיאטה ====================
+            {
+                "profession_id": "prof_nutrition",
+                "name": "תזונה ודיאטה",
+                "name_en": "Nutrition & Dietetics",
+                "icon": "apple",
+                "specializations": ["תזונה קלינית", "תזונת ספורט", "תזונת ילדים", "הפרעות אכילה", "תזונה לנשים בהריון"],
+                "sub_professions": [
+                    {"sub_profession_id": "sub_clinical_diet", "name": "דיאטה קלינית", "name_en": "Clinical Dietetics", "categories": [
+                        {"category_id": "cat_diet_plan", "name": "תכנית תזונה", "name_en": "Nutrition Plan"},
+                        {"category_id": "cat_diet_diabetes", "name": "תזונה לסוכרתיים", "name_en": "Diabetic Diet"},
+                        {"category_id": "cat_weight_mgmt", "name": "ניהול משקל", "name_en": "Weight Management"},
+                    ]},
+                    {"sub_profession_id": "sub_sports_nutrition", "name": "תזונת ספורט", "name_en": "Sports Nutrition", "categories": [
+                        {"category_id": "cat_sport_diet", "name": "תכנית תזונה לספורטאים", "name_en": "Sports Nutrition Plan"},
+                    ]},
+                    {"sub_profession_id": "sub_eating_disorders", "name": "הפרעות אכילה", "name_en": "Eating Disorders", "categories": [
+                        {"category_id": "cat_eating_therapy", "name": "טיפול בהפרעות אכילה", "name_en": "Eating Disorder Therapy"},
+                    ]},
+                ],
+                "created_at": ts
+            },
+            # ==================== רפואה משלימה ====================
             {
                 "profession_id": "prof_alternative",
                 "name": "רפואה משלימה",
-                "name_en": "Alternative Medicine",
+                "name_en": "Alternative & Complementary Medicine",
                 "icon": "leaf",
-                "specializations": ["דיקור סיני", "נטורופתיה", "הומאופתיה", "עיסוי רפואי"],
+                "specializations": ["דיקור סיני", "נטורופתיה", "הומאופתיה", "עיסוי רפואי", "רפלקסולוגיה", "אוסטאופתיה"],
                 "sub_professions": [
-                    {"sub_profession_id": "sub_acupuncture", "name": "דיקור סיני", "name_en": "Acupuncture", "categories": []},
-                    {"sub_profession_id": "sub_naturopathy", "name": "נטורופתיה", "name_en": "Naturopathy", "categories": []},
-                    {"sub_profession_id": "sub_massage", "name": "עיסוי רפואי", "name_en": "Medical Massage", "categories": []}
+                    {"sub_profession_id": "sub_acupuncture", "name": "דיקור סיני", "name_en": "Acupuncture", "categories": [
+                        {"category_id": "cat_acupuncture", "name": "טיפול בדיקור", "name_en": "Acupuncture Treatment"},
+                        {"category_id": "cat_cupping", "name": "כוסות רוח", "name_en": "Cupping Therapy"},
+                    ]},
+                    {"sub_profession_id": "sub_naturopathy", "name": "נטורופתיה", "name_en": "Naturopathy", "categories": [
+                        {"category_id": "cat_naturo_consult", "name": "ייעוץ נטורופתי", "name_en": "Naturopathic Consultation"},
+                        {"category_id": "cat_herbal", "name": "רפואה בצמחים", "name_en": "Herbal Medicine"},
+                    ]},
+                    {"sub_profession_id": "sub_massage", "name": "עיסוי רפואי", "name_en": "Medical Massage", "categories": [
+                        {"category_id": "cat_therapeutic_massage", "name": "עיסוי טיפולי", "name_en": "Therapeutic Massage"},
+                        {"category_id": "cat_shiatsu", "name": "שיאצו", "name_en": "Shiatsu"},
+                        {"category_id": "cat_reflexology", "name": "רפלקסולוגיה", "name_en": "Reflexology"},
+                    ]},
+                    {"sub_profession_id": "sub_osteopathy", "name": "אוסטאופתיה", "name_en": "Osteopathy", "categories": [
+                        {"category_id": "cat_osteo_treatment", "name": "טיפול אוסטאופתי", "name_en": "Osteopathic Treatment"},
+                    ]},
+                    {"sub_profession_id": "sub_homeopathy", "name": "הומאופתיה", "name_en": "Homeopathy", "categories": [
+                        {"category_id": "cat_homeo_consult", "name": "ייעוץ הומאופתי", "name_en": "Homeopathic Consultation"},
+                    ]},
                 ],
-                "created_at": datetime.now(timezone.utc).isoformat()
-            }
-        ]
-        # Save to database
-        await db.professions.insert_many(default_professions)
-        professions = default_professions
-    
-    return {"professions": professions}
+                "created_at": ts
+            },
+            # ==================== אופטומטריה ====================
+            {
+                "profession_id": "prof_optometry",
+                "name": "אופטומטריה",
+                "name_en": "Optometry",
+                "icon": "eye",
+                "specializations": ["בדיקות ראייה", "התאמת עדשות מגע", "ראייה ילדים"],
+                "sub_professions": [
+                    {"sub_profession_id": "sub_optometry_general", "name": "אופטומטריה כללית", "name_en": "General Optometry", "categories": [
+                        {"category_id": "cat_vision_test", "name": "בדיקת ראייה", "name_en": "Vision Test"},
+                        {"category_id": "cat_glasses", "name": "התאמת משקפיים", "name_en": "Glasses Fitting"},
+                        {"category_id": "cat_contacts", "name": "התאמת עדשות מגע", "name_en": "Contact Lens Fitting"},
+                    ]},
+                ],
+                "created_at": ts
+            },
+            # ==================== מיילדות ====================
+            {
+                "profession_id": "prof_midwifery",
+                "name": "מיילדות",
+                "name_en": "Midwifery",
+                "icon": "baby",
+                "specializations": ["ליווי הריון", "ליווי לידה", "ליווי לאחר לידה", "ייעוץ הנקה"],
+                "sub_professions": [
+                    {"sub_profession_id": "sub_pregnancy", "name": "ליווי הריון", "name_en": "Pregnancy Support", "categories": [
+                        {"category_id": "cat_prenatal", "name": "הכנה ללידה", "name_en": "Prenatal Preparation"},
+                        {"category_id": "cat_pregnancy_support", "name": "ליווי הריון", "name_en": "Pregnancy Companion"},
+                    ]},
+                    {"sub_profession_id": "sub_birth", "name": "ליווי לידה", "name_en": "Birth Support", "categories": [
+                        {"category_id": "cat_doula", "name": "דולה", "name_en": "Doula"},
+                        {"category_id": "cat_home_birth", "name": "לידה בבית", "name_en": "Home Birth"},
+                    ]},
+                    {"sub_profession_id": "sub_postpartum", "name": "לאחר לידה", "name_en": "Postpartum", "categories": [
+                        {"category_id": "cat_postpartum_care", "name": "טיפול לאחר לידה", "name_en": "Postpartum Care"},
+                        {"category_id": "cat_breastfeeding", "name": "ייעוץ הנקה", "name_en": "Breastfeeding Counseling"},
+                    ]},
+                ],
+                "created_at": ts
+            },
+            # ==================== טיפולי סיוע ====================
+            {
+                "profession_id": "prof_caregiving",
+                "name": "טיפול וסיוע",
+                "name_en": "Caregiving & Assistance",
+                "icon": "helping-hand",
+                "specializations": ["מטפל סיעודי", "עזרה בבית", "ליווי רפואי", "שמירה פרטית"],
+                "sub_professions": [
+                    {"sub_profession_id": "sub_caregiver", "name": "מטפל/ת סיעודי/ת", "name_en": "Caregiver", "categories": [
+                        {"category_id": "cat_daily_assist", "name": "סיוע יומיומי", "name_en": "Daily Assistance"},
+                        {"category_id": "cat_night_shift", "name": "שמירת לילה", "name_en": "Night Shift"},
+                        {"category_id": "cat_bathing", "name": "עזרה ברחצה והלבשה", "name_en": "Bathing & Dressing"},
+                        {"category_id": "cat_mobility", "name": "סיוע בניידות", "name_en": "Mobility Assistance"},
+                    ]},
+                    {"sub_profession_id": "sub_medical_escort", "name": "ליווי רפואי", "name_en": "Medical Escort", "categories": [
+                        {"category_id": "cat_hospital_escort", "name": "ליווי לבית חולים", "name_en": "Hospital Escort"},
+                        {"category_id": "cat_doctor_escort", "name": "ליווי לרופא", "name_en": "Doctor Escort"},
+                    ]},
+                ],
+                "created_at": ts
+            },
+    ]
+
 
 @router.post("/admin/professions")
 async def admin_create_profession(

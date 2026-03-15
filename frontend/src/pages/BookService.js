@@ -16,7 +16,7 @@ import {
   FaWhatsapp, FaExternalLinkAlt, FaFileContract,
   FaInfoCircle, FaUserFriends, FaStickyNote,
   FaStethoscope, FaSyringe, FaRedoAlt, FaHospital, FaClinicMedical,
-  FaLaptopMedical, FaBoxOpen
+  FaLaptopMedical, FaBoxOpen, FaChevronLeft, FaChevronRight
 } from 'react-icons/fa';
 
 // ==================== CONSTANTS ====================
@@ -98,10 +98,14 @@ const BookService = () => {
   });
   const [contactPerson, setContactPerson] = useState({ name: '', phone: '', relationship: '' });
   
-  // Guest
-  const [showAuth, setShowAuth] = useState(false);
+  // Guest & Auth
   const [guestMode, setGuestMode] = useState(false);
   const [guestDetails, setGuestDetails] = useState({ name: '', email: '', phone: '' });
+  const [authChecked, setAuthChecked] = useState(false);
+
+  // UX: stepper & confirmation
+  const [currentStep, setCurrentStep] = useState(1);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   useEffect(() => {
     fetchServiceDetails();
@@ -171,7 +175,18 @@ const BookService = () => {
     }
     if (selectedDate) {
       const day = selectedDate.getDay();
-      if ((day === 5 || day === 6) && service.weekend_pricing_type !== 'none' && service.weekend_price_addition) {
+      // Friday: only apply weekend pricing after 14:00; Saturday: always
+      let isWeekendSlot = false;
+      if (day === 6) {
+        isWeekendSlot = true;
+      } else if (day === 5) {
+        const timeStr = selectedTime || (selectedShift ? selectedShift.hours.split('-')[0] : '');
+        if (timeStr) {
+          const hour = parseInt(timeStr.split(':')[0], 10);
+          if (hour >= 14) isWeekendSlot = true;
+        }
+      }
+      if (isWeekendSlot && service.weekend_pricing_type !== 'none' && service.weekend_price_addition) {
         if (service.weekend_pricing_type === 'percentage') total += total * (service.weekend_price_addition / 100);
         else total += service.weekend_price_addition;
       }
@@ -204,17 +219,23 @@ const BookService = () => {
     return true;
   };
 
-  const handleSubmit = async () => {
+  // Show confirmation summary instead of submitting immediately
+  const handleSubmit = () => {
     if (!isAuthenticated && !guestMode) {
-      setShowAuth(true);
+      toast.error('יש להתחבר או להמשיך כאורח לפני השלמת ההזמנה');
       return;
     }
     if (!validateForm()) return;
-    
+    setShowConfirmation(true);
+  };
+
+  // Actual API submission after user confirms
+  const handleConfirmedSubmit = async () => {
     try {
       setBooking(true);
+      setShowConfirmation(false);
       let bookingDate, bookingTime = null;
-      
+
       if (skipTimeSelection) {
         bookingDate = new Date().toISOString();
       } else if (selectedDate && selectedTime) {
@@ -227,7 +248,7 @@ const BookService = () => {
       } else if (selectedDate) {
         bookingDate = new Date(`${format(selectedDate, 'yyyy-MM-dd')}T00:00:00`).toISOString();
       }
-      
+
       const data = {
         service_id: serviceId,
         booking_date: bookingDate,
@@ -347,66 +368,6 @@ const BookService = () => {
     );
   }
 
-  // ==================== AUTH MODAL ====================
-
-  if (showAuth && !isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale">
-        <Navbar />
-        <div className="max-w-lg mx-auto px-4 py-12">
-          <div className="bg-white rounded-2xl shadow-xl p-8 border-2 border-carelink-teal-pale">
-            {!guestMode ? (
-              <>
-                <h2 className="text-xl font-bold text-carelink-navy mb-6 text-center">כדי להשלים את ההזמנה</h2>
-                <div className="grid gap-4">
-                  <Link to={`/login?redirect=/book/${serviceId}`}
-                    className="bg-carelink-teal text-white p-5 rounded-xl hover:bg-carelink-teal-medium transition text-center">
-                    <FaSignInAlt className="text-2xl mx-auto mb-2" />
-                    <div className="font-bold">התחבר לחשבון</div>
-                  </Link>
-                  <button onClick={() => setGuestMode(true)}
-                    className="bg-white border-2 border-carelink-teal text-carelink-teal p-5 rounded-xl hover:bg-carelink-teal-pale transition text-center">
-                    <FaUser className="text-2xl mx-auto mb-2" />
-                    <div className="font-bold">המשך כאורח</div>
-                  </button>
-                </div>
-                <button onClick={() => setShowAuth(false)} className="w-full mt-4 text-carelink-gray hover:text-carelink-navy text-sm">
-                  <FaArrowRight className="inline ml-1" /> חזור לטופס
-                </button>
-              </>
-            ) : (
-              <>
-                <h2 className="text-xl font-bold text-carelink-navy mb-6">פרטי אורח</h2>
-                <div className="space-y-4">
-                  <input type="text" value={guestDetails.name} placeholder="שם מלא *"
-                    onChange={(e) => setGuestDetails({...guestDetails, name: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none" />
-                  <input type="email" value={guestDetails.email} placeholder="אימייל *"
-                    onChange={(e) => setGuestDetails({...guestDetails, email: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none" />
-                  <input type="tel" value={guestDetails.phone} placeholder="טלפון *"
-                    onChange={(e) => setGuestDetails({...guestDetails, phone: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none" />
-                </div>
-                <button onClick={() => {
-                  if (!guestDetails.name || !guestDetails.email || !guestDetails.phone) {
-                    toast.error('אנא מלא את כל השדות'); return;
-                  }
-                  setShowAuth(false);
-                  setTimeout(() => handleSubmit(), 100);
-                }} className="w-full mt-6 bg-carelink-teal text-white py-3 rounded-xl font-bold hover:bg-carelink-teal-medium transition">
-                  המשך להזמנה
-                </button>
-                <button onClick={() => setGuestMode(false)} className="w-full mt-2 text-carelink-gray hover:text-carelink-navy text-sm">חזור</button>
-              </>
-            )}
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
   // ==================== MAIN FORM ====================
 
   return (
@@ -419,7 +380,94 @@ const BookService = () => {
           {/* ===== LEFT: Form Sections ===== */}
           <div className="lg:col-span-2 space-y-5">
 
-            {/* 1. SERVICE DETAILS */}
+            {/* ===== STEP INDICATOR / STEPPER ===== */}
+            {(() => {
+              const steps = [
+                { num: 1, label: 'סוג שירות', shortLabel: 'שירות' },
+                { num: 2, label: 'מועד', shortLabel: 'מועד' },
+                { num: 3, label: 'פרטים', shortLabel: 'פרטים' },
+                { num: 4, label: 'פרטי מזמין', shortLabel: 'מזמין' },
+                { num: 5, label: 'סיכום ואישור', shortLabel: 'אישור' },
+              ];
+              return (
+                <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-5 border border-gray-200" data-testid="booking-stepper">
+                  <div className="flex items-center justify-between">
+                    {steps.map((step, idx) => (
+                      <React.Fragment key={step.num}>
+                        <div
+                          className={`flex flex-col items-center min-w-0 ${step.num < currentStep ? 'cursor-pointer' : ''}`}
+                          onClick={() => step.num < currentStep && setCurrentStep(step.num)}
+                        >
+                          <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold transition-colors ${
+                            step.num < currentStep
+                              ? 'bg-green-500 text-white'
+                              : step.num === currentStep
+                              ? 'bg-carelink-teal text-white'
+                              : 'bg-gray-200 text-gray-500'
+                          }`}>
+                            {step.num < currentStep ? <FaCheckCircle className="text-sm sm:text-base" /> : step.num}
+                          </div>
+                          <span className={`mt-1 text-center leading-tight ${
+                            step.num === currentStep ? 'font-semibold text-carelink-teal' : 'text-carelink-gray'
+                          } text-[10px] sm:text-xs`}>
+                            <span className="hidden sm:inline">{step.label}</span>
+                            <span className="sm:hidden">{step.shortLabel}</span>
+                          </span>
+                        </div>
+                        {idx < steps.length - 1 && (
+                          <div className={`flex-1 h-0.5 mx-1 sm:mx-2 ${
+                            step.num < currentStep ? 'bg-green-500' : 'bg-gray-200'
+                          }`} />
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* ===== AUTH BANNER (for unauthenticated, non-guest users) ===== */}
+            {!isAuthenticated && !guestMode && !authChecked && (
+              <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 sm:p-5" data-testid="auth-banner">
+                <p className="text-sm font-semibold text-carelink-navy mb-3 text-center">
+                  <FaInfoCircle className="inline ml-1 text-amber-500" />
+                  כדי להשלים הזמנה, התחבר או המשך כאורח
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <Link to={`/login?redirect=/book/${serviceId}`}
+                    className="bg-carelink-teal text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-carelink-teal-medium transition flex items-center gap-1.5">
+                    <FaSignInAlt /> התחבר
+                  </Link>
+                  <button onClick={() => { setGuestMode(true); setAuthChecked(true); }}
+                    className="bg-white border-2 border-carelink-teal text-carelink-teal px-4 py-2 rounded-xl text-sm font-semibold hover:bg-carelink-teal-pale transition flex items-center gap-1.5">
+                    <FaUser /> המשך כאורח
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ===== GUEST DETAILS INLINE (shown when guest mode selected) ===== */}
+            {!isAuthenticated && guestMode && (
+              <div className="bg-white rounded-2xl shadow-lg border-2 border-carelink-teal-pale p-4 sm:p-5" data-testid="guest-details-inline">
+                <h3 className="font-bold text-carelink-navy text-sm sm:text-base mb-3 flex items-center gap-2">
+                  <FaUser className="text-carelink-teal" /> פרטי אורח
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <input type="text" value={guestDetails.name} placeholder="שם מלא *"
+                    onChange={(e) => setGuestDetails({...guestDetails, name: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
+                  <input type="email" value={guestDetails.email} placeholder="אימייל *"
+                    onChange={(e) => setGuestDetails({...guestDetails, email: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
+                  <input type="tel" value={guestDetails.phone} placeholder="טלפון *"
+                    onChange={(e) => setGuestDetails({...guestDetails, phone: e.target.value})}
+                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
+                </div>
+              </div>
+            )}
+
+            {/* ===== STEP 1: SERVICE TYPE & DELIVERY ===== */}
+            {currentStep === 1 && (<>
             <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-5 border-2 border-carelink-teal" data-testid="service-header">
               <div className="flex items-start gap-3 sm:gap-4">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-carelink-teal-pale rounded-xl flex items-center justify-center flex-shrink-0">
@@ -481,7 +529,10 @@ const BookService = () => {
                 </div>
               )}
             </FormSection>
+            </>)}
 
+            {/* ===== STEP 2: DATE & TIME ===== */}
+            {currentStep === 2 && (<>
             {/* 3. WHEN - DATE & TIME */}
             <FormSection icon={FaCalendarAlt} title="בחר מועד" testId="datetime-section">
               {/* Shift for hourly */}
@@ -551,7 +602,10 @@ const BookService = () => {
                 </>
               )}
             </FormSection>
+            </>)}
 
+            {/* ===== STEP 3: DETAILS (Location + Notes) ===== */}
+            {currentStep === 3 && (<>
             {/* 4. LOCATION - Address / Platform */}
             <FormSection 
               icon={isVirtual ? FaLaptopMedical : FaMapMarkerAlt} 
@@ -678,7 +732,10 @@ const BookService = () => {
               )}
             </FormSection>
 
-            {/* 5. WHO - Contact & Requester */}
+            </>)}
+
+            {/* ===== STEP 4: REQUESTER DETAILS ===== */}
+            {currentStep === 4 && (<>
             <FormSection icon={FaUserFriends} title="למי - פרטי מזמין ואיש קשר" testId="contact-section">
               <div className="flex justify-between items-center mb-4">
                 <p className="text-sm font-medium text-carelink-navy">פרטי המזמין</p>
@@ -730,7 +787,10 @@ const BookService = () => {
                 placeholder="הערות מיוחדות, בקשות, מידע רפואי רלוונטי..."
                 data-testid="booking-notes" />
             </FormSection>
+            </>)}
 
+            {/* ===== STEP 5: SUMMARY & CONFIRMATION ===== */}
+            {currentStep === 5 && (<>
             {/* 7. TERMS */}
             <FormSection icon={FaFileContract} title="תנאים ואישורים" testId="terms-section">
               <label className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl mb-3 cursor-pointer hover:bg-carelink-teal-pale/20 transition">
@@ -755,6 +815,30 @@ const BookService = () => {
                 </div>
               </label>
             </FormSection>
+            </>)}
+
+            {/* ===== STEP NAVIGATION BUTTONS ===== */}
+            <div className="flex justify-between items-center mt-2">
+              {currentStep > 1 ? (
+                <button
+                  onClick={() => setCurrentStep(currentStep - 1)}
+                  className="flex items-center gap-2 px-5 py-3 bg-white border-2 border-gray-200 text-carelink-navy rounded-xl font-medium hover:border-carelink-teal hover:bg-carelink-teal-pale/20 transition"
+                >
+                  <FaChevronRight size={12} />
+                  הקודם
+                </button>
+              ) : <div />}
+
+              {currentStep < 5 ? (
+                <button
+                  onClick={() => setCurrentStep(currentStep + 1)}
+                  className="flex items-center gap-2 px-6 py-3 bg-carelink-teal text-white rounded-xl font-bold hover:bg-carelink-teal-medium transition shadow-md"
+                >
+                  הבא
+                  <FaChevronLeft size={12} />
+                </button>
+              ) : null}
+            </div>
           </div>
 
           {/* ===== RIGHT: Sticky Summary ===== */}
@@ -828,6 +912,112 @@ const BookService = () => {
       </div>
       
       <Footer />
+
+      {/* ===== CONFIRMATION MODAL OVERLAY ===== */}
+      {showConfirmation && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" data-testid="confirmation-overlay">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8">
+            <h2 className="text-xl font-bold text-carelink-navy mb-5 text-center flex items-center justify-center gap-2">
+              <FaCheckCircle className="text-carelink-teal" /> סיכום הזמנה - אישור סופי
+            </h2>
+
+            <div className="space-y-3 text-sm text-right">
+              {/* Service & Provider */}
+              <div className="bg-carelink-teal-pale/30 rounded-xl p-4 space-y-1.5">
+                <div className="flex justify-between"><span className="text-carelink-gray">שירות:</span><span className="font-semibold text-carelink-navy">{service.name}</span></div>
+                <div className="flex justify-between"><span className="text-carelink-gray">ספק:</span><span className="font-medium text-carelink-navy">{provider.business_name}</span></div>
+                <div className="flex justify-between"><span className="text-carelink-gray">סוג:</span><span className="font-medium text-carelink-navy">{categoryConfig.label}</span></div>
+              </div>
+
+              {/* Delivery & Schedule */}
+              <div className="bg-gray-50 rounded-xl p-4 space-y-1.5">
+                {selectedDeliveryType && (
+                  <div className="flex justify-between"><span className="text-carelink-gray">מיקום:</span><span className="font-medium text-carelink-navy">{DELIVERY_TYPES[selectedDeliveryType]?.label}</span></div>
+                )}
+                {!skipTimeSelection && selectedDate && (
+                  <div className="flex justify-between"><span className="text-carelink-gray">תאריך:</span><span className="font-medium text-carelink-navy">{format(selectedDate, 'dd/MM/yyyy', { locale: he })}</span></div>
+                )}
+                {selectedTime && (
+                  <div className="flex justify-between"><span className="text-carelink-gray">שעה:</span><span className="font-medium text-carelink-navy">{selectedTime}</span></div>
+                )}
+                {selectedShift && (
+                  <div className="flex justify-between"><span className="text-carelink-gray">משמרת:</span><span className="font-medium text-carelink-navy">{selectedShift.label} ({selectedShift.hours})</span></div>
+                )}
+                {skipTimeSelection && (
+                  <div className="flex justify-between"><span className="text-carelink-gray">תיאום:</span><span className="font-medium text-amber-600">יתואם טלפונית</span></div>
+                )}
+                {selectedPlatform && (
+                  <div className="flex justify-between"><span className="text-carelink-gray">פלטפורמה:</span><span className="font-medium text-carelink-navy">{TELEMEDICINE_PLATFORMS.find(p => p.id === selectedPlatform)?.label}</span></div>
+                )}
+              </div>
+
+              {/* Address (if applicable) */}
+              {(isHome || selectedDeliveryType === 'clinic' || selectedDeliveryType === 'hospital') && serviceAddress.street && (
+                <div className="bg-gray-50 rounded-xl p-4 space-y-1.5">
+                  <div className="flex justify-between"><span className="text-carelink-gray">כתובת:</span><span className="font-medium text-carelink-navy">{serviceAddress.street}, {serviceAddress.city}</span></div>
+                  {serviceAddress.floor && <div className="flex justify-between"><span className="text-carelink-gray">קומה:</span><span className="font-medium text-carelink-navy">{serviceAddress.floor}</span></div>}
+                  {serviceAddress.apartment && <div className="flex justify-between"><span className="text-carelink-gray">דירה:</span><span className="font-medium text-carelink-navy">{serviceAddress.apartment}</span></div>}
+                </div>
+              )}
+              {isDelivery && shippingAddress.street && (
+                <div className="bg-gray-50 rounded-xl p-4 space-y-1.5">
+                  <div className="flex justify-between"><span className="text-carelink-gray">משלוח ל:</span><span className="font-medium text-carelink-navy">{shippingAddress.street}, {shippingAddress.city}</span></div>
+                </div>
+              )}
+
+              {/* Contact */}
+              <div className="bg-gray-50 rounded-xl p-4 space-y-1.5">
+                <div className="flex justify-between"><span className="text-carelink-gray">שם מזמין:</span><span className="font-medium text-carelink-navy">{contactPerson.name}</span></div>
+                <div className="flex justify-between"><span className="text-carelink-gray">טלפון:</span><span className="font-medium text-carelink-navy">{contactPerson.phone}</span></div>
+                {contactPerson.relationship && <div className="flex justify-between"><span className="text-carelink-gray">קרבה:</span><span className="font-medium text-carelink-navy">{contactPerson.relationship === 'self' ? 'בעצמי' : contactPerson.relationship}</span></div>}
+              </div>
+
+              {/* Price breakdown */}
+              <div className="bg-carelink-teal-pale/30 rounded-xl p-4 space-y-1.5">
+                {isHourly ? (
+                  <div className="flex justify-between"><span className="text-carelink-gray">₪{service.price} x {selectedShift?.duration || customHours} שעות</span><span className="font-medium">₪{service.price * (selectedShift?.duration || customHours)}</span></div>
+                ) : isSeries && service.num_sessions ? (
+                  <div className="flex justify-between"><span className="text-carelink-gray">{service.num_sessions} מפגשים</span><span className="font-medium">₪{service.series_price || service.price * service.num_sessions}</span></div>
+                ) : (
+                  <div className="flex justify-between"><span className="text-carelink-gray">מחיר בסיס:</span><span className="font-medium">₪{service.price}</span></div>
+                )}
+                {isHome && service.has_travel_cost && service.travel_cost > 0 && (
+                  <div className="flex justify-between text-carelink-gray"><span>נסיעות:</span><span>₪{service.travel_cost}</span></div>
+                )}
+                {isDelivery && service.has_shipping && service.shipping_cost > 0 && (
+                  <div className="flex justify-between text-carelink-gray"><span>משלוח:</span><span>₪{service.shipping_cost}</span></div>
+                )}
+                <div className="border-t border-carelink-teal-pale my-2"></div>
+                <div className="flex justify-between text-lg">
+                  <span className="font-bold text-carelink-navy">סה"כ לתשלום:</span>
+                  <span className="font-bold text-carelink-teal">₪{totalPrice}</span>
+                </div>
+              </div>
+
+              {notes && (
+                <div className="bg-gray-50 rounded-xl p-4">
+                  <span className="text-carelink-gray text-xs">הערות:</span>
+                  <p className="text-carelink-navy text-sm mt-1">{notes}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-3 mt-6">
+              <button onClick={handleConfirmedSubmit} disabled={booking}
+                className="flex-1 bg-carelink-teal text-white py-3.5 rounded-xl font-bold text-base hover:bg-carelink-teal-medium transition disabled:opacity-50 flex items-center justify-center gap-2"
+                data-testid="confirm-booking-btn">
+                {booking ? <><FaSpinner className="animate-spin" /> מעבד...</> : <><FaCheckCircle /> אשר הזמנה</>}
+              </button>
+              <button onClick={() => setShowConfirmation(false)}
+                className="flex-1 bg-white border-2 border-gray-300 text-carelink-navy py-3.5 rounded-xl font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-2"
+                data-testid="back-to-edit-btn">
+                <FaArrowRight /> חזור לעריכה
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

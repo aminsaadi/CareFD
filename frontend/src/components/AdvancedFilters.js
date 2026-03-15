@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   FaFilter, FaTimes, FaMapMarkerAlt, FaCrosshairs, FaStar,
   FaUserMd, FaBriefcase, FaHome, FaVideo, FaClinicMedical, FaPhoneAlt,
   FaCheckCircle, FaAward, FaClock, FaChevronDown, FaChevronUp
 } from 'react-icons/fa';
+import api from '../utils/api';
 
 const serviceTypeConfig = {
   home_visit: { icon: FaHome, label: 'ביקור בית' },
@@ -17,15 +18,6 @@ const providerTypeConfig = {
   clinic: { icon: FaClinicMedical, label: 'מרפאה' },
   company: { icon: FaBriefcase, label: 'חברה' }
 };
-
-const categories = [
-  { id: 'nursing', name: 'סיעוד' },
-  { id: 'physiotherapy', name: 'פיזיותרפיה' },
-  { id: 'doctor', name: 'רופא בבית' },
-  { id: 'eldercare', name: 'טיפול בקשישים' },
-  { id: 'therapy', name: 'ריפוי בעיסוק' },
-  { id: 'alternative', name: 'רפואה משלימה' }
-];
 
 const ratingOptions = [
   { value: 4.5, label: '4.5+ כוכבים' },
@@ -62,6 +54,31 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
     badges: false
   });
   const [gettingLocation, setGettingLocation] = useState(false);
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await api.get('/professions');
+        const profs = response.data.professions || [];
+        setCategories(profs.map(p => ({
+          id: p.profession_id,
+          name: p.name
+        })));
+      } catch (err) {
+        // Fallback to defaults if API fails
+        setCategories([
+          { id: 'nursing', name: 'סיעוד' },
+          { id: 'physiotherapy', name: 'פיזיותרפיה' },
+          { id: 'doctor', name: 'רופא בבית' },
+          { id: 'eldercare', name: 'טיפול בקשישים' },
+          { id: 'therapy', name: 'ריפוי בעיסוק' },
+          { id: 'alternative', name: 'רפואה משלימה' }
+        ]);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
@@ -191,7 +208,7 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
             <CitySelect
               name="city"
               value={filters.city || ''}
-              onChange={(e) => onFilterChange({ ...filters, city: e.target.value || null })}
+              onChange={(e) => onFilterChange({ ...filters, city: e.target.value || null, latitude: null, longitude: null, useMyLocation: false, radius: null })}
               placeholder="כל הערים"
               inputClassName="w-full px-4 py-2 rounded-xl border-2 border-carelink-teal-pale focus:border-carelink-teal focus:outline-none"
             />
