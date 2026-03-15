@@ -1873,74 +1873,375 @@ async def admin_get_professions(
     
     if not professions:
         # Initialize default professions and save to DB
+        ts = datetime.now(timezone.utc).isoformat()
         default_professions = [
+            # ==================== רפואה ====================
             {
                 "profession_id": "prof_medicine",
                 "name": "רפואה",
                 "name_en": "Medicine",
                 "icon": "stethoscope",
-                "specializations": ["רפואת משפחה", "רפואה פנימית", "רפואת ילדים", "גריאטריה"],
+                "specializations": ["רפואת משפחה", "רפואה פנימית", "רפואת ילדים", "גריאטריה", "כירורגיה", "אורתופדיה", "קרדיולוגיה", "נוירולוגיה", "אורולוגיה", "גינקולוגיה", "עור ומין", "אף אוזן גרון", "רפואת עיניים", "אונקולוגיה", "אנדוקרינולוגיה", "גסטרואנטרולוגיה", "ריאות", "ראומטולוגיה", "רפואה דחופה", "הרדמה", "רדיולוגיה", "פתולוגיה", "רפואת ספורט", "רפואת כאב", "רפואה פיזיקלית ושיקום"],
                 "sub_professions": [
-                    {"sub_profession_id": "sub_family", "name": "רפואת משפחה", "name_en": "Family Medicine", "categories": [
+                    {"sub_profession_id": "sub_family_med", "name": "רפואת משפחה", "name_en": "Family Medicine", "categories": [
                         {"category_id": "cat_home_visit", "name": "ביקור בית", "name_en": "Home Visit"},
-                        {"category_id": "cat_checkup", "name": "בדיקה כללית", "name_en": "General Checkup"}
+                        {"category_id": "cat_checkup", "name": "בדיקה כללית", "name_en": "General Checkup"},
+                        {"category_id": "cat_prescription", "name": "מתן מרשם", "name_en": "Prescription"},
+                        {"category_id": "cat_referral", "name": "הפניה לבדיקות", "name_en": "Referral"},
+                        {"category_id": "cat_chronic", "name": "ניהול מחלות כרוניות", "name_en": "Chronic Disease Management"},
                     ]},
-                    {"sub_profession_id": "sub_pediatrics", "name": "ילדים", "name_en": "Pediatrics", "categories": []},
-                    {"sub_profession_id": "sub_geriatrics", "name": "גריאטריה", "name_en": "Geriatrics", "categories": []}
+                    {"sub_profession_id": "sub_internal", "name": "רפואה פנימית", "name_en": "Internal Medicine", "categories": [
+                        {"category_id": "cat_internal_consult", "name": "ייעוץ פנימי", "name_en": "Internal Consultation"},
+                        {"category_id": "cat_internal_followup", "name": "מעקב מחלות כרוניות", "name_en": "Chronic Follow-up"},
+                    ]},
+                    {"sub_profession_id": "sub_pediatrics", "name": "רפואת ילדים", "name_en": "Pediatrics", "categories": [
+                        {"category_id": "cat_child_checkup", "name": "בדיקת ילדים", "name_en": "Child Checkup"},
+                        {"category_id": "cat_vaccination", "name": "חיסונים", "name_en": "Vaccination"},
+                        {"category_id": "cat_child_development", "name": "מעקב התפתחות", "name_en": "Development Follow-up"},
+                    ]},
+                    {"sub_profession_id": "sub_geriatrics", "name": "גריאטריה", "name_en": "Geriatrics", "categories": [
+                        {"category_id": "cat_geriatric_assess", "name": "הערכה גריאטרית", "name_en": "Geriatric Assessment"},
+                        {"category_id": "cat_dementia", "name": "טיפול בדמנציה", "name_en": "Dementia Care"},
+                        {"category_id": "cat_fall_prevention", "name": "מניעת נפילות", "name_en": "Fall Prevention"},
+                    ]},
+                    {"sub_profession_id": "sub_surgery", "name": "כירורגיה", "name_en": "Surgery", "categories": [
+                        {"category_id": "cat_pre_surgery", "name": "ייעוץ לפני ניתוח", "name_en": "Pre-Surgery Consultation"},
+                        {"category_id": "cat_post_surgery", "name": "מעקב אחרי ניתוח", "name_en": "Post-Surgery Follow-up"},
+                    ]},
+                    {"sub_profession_id": "sub_orthopedics", "name": "אורתופדיה", "name_en": "Orthopedics", "categories": [
+                        {"category_id": "cat_ortho_consult", "name": "ייעוץ אורתופדי", "name_en": "Orthopedic Consultation"},
+                        {"category_id": "cat_joint_injection", "name": "הזרקה למפרק", "name_en": "Joint Injection"},
+                        {"category_id": "cat_ortho_rehab", "name": "שיקום אורתופדי", "name_en": "Orthopedic Rehab"},
+                    ]},
+                    {"sub_profession_id": "sub_cardiology", "name": "קרדיולוגיה", "name_en": "Cardiology", "categories": [
+                        {"category_id": "cat_cardio_consult", "name": "ייעוץ קרדיולוגי", "name_en": "Cardiology Consultation"},
+                        {"category_id": "cat_ecg", "name": "בדיקת אק\"ג", "name_en": "ECG Test"},
+                        {"category_id": "cat_holter", "name": "הולטר", "name_en": "Holter Monitor"},
+                    ]},
+                    {"sub_profession_id": "sub_neurology", "name": "נוירולוגיה", "name_en": "Neurology", "categories": [
+                        {"category_id": "cat_neuro_consult", "name": "ייעוץ נוירולוגי", "name_en": "Neurology Consultation"},
+                        {"category_id": "cat_eeg", "name": "בדיקת EEG", "name_en": "EEG Test"},
+                    ]},
+                    {"sub_profession_id": "sub_dermatology", "name": "עור ומין", "name_en": "Dermatology", "categories": [
+                        {"category_id": "cat_skin_consult", "name": "ייעוץ עור", "name_en": "Skin Consultation"},
+                        {"category_id": "cat_mole_check", "name": "בדיקת שומות", "name_en": "Mole Check"},
+                        {"category_id": "cat_skin_treatment", "name": "טיפול עורי", "name_en": "Skin Treatment"},
+                    ]},
+                    {"sub_profession_id": "sub_ent", "name": "אף אוזן גרון", "name_en": "ENT", "categories": [
+                        {"category_id": "cat_ent_consult", "name": "ייעוץ אא\"ג", "name_en": "ENT Consultation"},
+                        {"category_id": "cat_hearing_test", "name": "בדיקת שמיעה", "name_en": "Hearing Test"},
+                    ]},
+                    {"sub_profession_id": "sub_ophthalmology", "name": "רפואת עיניים", "name_en": "Ophthalmology", "categories": [
+                        {"category_id": "cat_eye_exam", "name": "בדיקת עיניים", "name_en": "Eye Exam"},
+                        {"category_id": "cat_eye_pressure", "name": "בדיקת לחץ תוך עיני", "name_en": "Eye Pressure Test"},
+                    ]},
+                    {"sub_profession_id": "sub_urology", "name": "אורולוגיה", "name_en": "Urology", "categories": [
+                        {"category_id": "cat_uro_consult", "name": "ייעוץ אורולוגי", "name_en": "Urology Consultation"},
+                    ]},
+                    {"sub_profession_id": "sub_gynecology", "name": "גינקולוגיה ומיילדות", "name_en": "Gynecology & Obstetrics", "categories": [
+                        {"category_id": "cat_gyn_consult", "name": "ייעוץ גינקולוגי", "name_en": "Gynecology Consultation"},
+                        {"category_id": "cat_pregnancy", "name": "מעקב הריון", "name_en": "Pregnancy Follow-up"},
+                        {"category_id": "cat_ultrasound", "name": "אולטרסאונד", "name_en": "Ultrasound"},
+                    ]},
+                    {"sub_profession_id": "sub_oncology", "name": "אונקולוגיה", "name_en": "Oncology", "categories": [
+                        {"category_id": "cat_onco_consult", "name": "ייעוץ אונקולוגי", "name_en": "Oncology Consultation"},
+                        {"category_id": "cat_onco_followup", "name": "מעקב אונקולוגי", "name_en": "Oncology Follow-up"},
+                    ]},
+                    {"sub_profession_id": "sub_endocrine", "name": "אנדוקרינולוגיה", "name_en": "Endocrinology", "categories": [
+                        {"category_id": "cat_diabetes", "name": "ניהול סוכרת", "name_en": "Diabetes Management"},
+                        {"category_id": "cat_thyroid", "name": "בעיות בלוטת התריס", "name_en": "Thyroid Disorders"},
+                    ]},
+                    {"sub_profession_id": "sub_gastro", "name": "גסטרואנטרולוגיה", "name_en": "Gastroenterology", "categories": [
+                        {"category_id": "cat_gastro_consult", "name": "ייעוץ גסטרו", "name_en": "Gastro Consultation"},
+                    ]},
+                    {"sub_profession_id": "sub_pulmonology", "name": "ריאות", "name_en": "Pulmonology", "categories": [
+                        {"category_id": "cat_pulmo_consult", "name": "ייעוץ ריאות", "name_en": "Pulmonology Consultation"},
+                        {"category_id": "cat_spirometry", "name": "בדיקת תפקודי ריאות", "name_en": "Spirometry"},
+                    ]},
+                    {"sub_profession_id": "sub_rheumatology", "name": "ראומטולוגיה", "name_en": "Rheumatology", "categories": [
+                        {"category_id": "cat_rheuma_consult", "name": "ייעוץ ראומטולוגי", "name_en": "Rheumatology Consultation"},
+                    ]},
+                    {"sub_profession_id": "sub_sports_med", "name": "רפואת ספורט", "name_en": "Sports Medicine", "categories": [
+                        {"category_id": "cat_sports_consult", "name": "ייעוץ רפואת ספורט", "name_en": "Sports Medicine Consultation"},
+                        {"category_id": "cat_sports_rehab", "name": "שיקום ספורטיבי", "name_en": "Sports Rehabilitation"},
+                    ]},
+                    {"sub_profession_id": "sub_pain", "name": "רפואת כאב", "name_en": "Pain Medicine", "categories": [
+                        {"category_id": "cat_pain_consult", "name": "ייעוץ כאב", "name_en": "Pain Consultation"},
+                        {"category_id": "cat_pain_injection", "name": "הזרקות כאב", "name_en": "Pain Injections"},
+                    ]},
+                    {"sub_profession_id": "sub_emergency", "name": "רפואה דחופה", "name_en": "Emergency Medicine", "categories": [
+                        {"category_id": "cat_urgent_visit", "name": "ביקור דחוף", "name_en": "Urgent Visit"},
+                    ]},
+                    {"sub_profession_id": "sub_pmr", "name": "רפואה פיזיקלית ושיקום", "name_en": "Physical Medicine & Rehabilitation", "categories": [
+                        {"category_id": "cat_rehab_plan", "name": "תכנית שיקום", "name_en": "Rehabilitation Plan"},
+                        {"category_id": "cat_disability_eval", "name": "הערכת נכות", "name_en": "Disability Evaluation"},
+                    ]},
                 ],
-                "created_at": datetime.now(timezone.utc).isoformat()
+                "created_at": ts
             },
+            # ==================== סיעוד ====================
             {
                 "profession_id": "prof_nursing",
                 "name": "סיעוד",
                 "name_en": "Nursing",
                 "icon": "heart-pulse",
-                "specializations": ["סיעוד ביתי", "טיפול בקשישים", "סיעוד אחרי ניתוח", "טיפול פליאטיבי"],
+                "specializations": ["סיעוד ביתי", "טיפול בקשישים", "סיעוד אחרי ניתוח", "טיפול פליאטיבי", "סיעוד ילדים", "סיעוד נפשי", "סיעוד אונקולוגי"],
                 "sub_professions": [
-                    {"sub_profession_id": "sub_home_care", "name": "סיעוד ביתי", "name_en": "Home Care", "categories": []},
-                    {"sub_profession_id": "sub_elderly_care", "name": "טיפול בקשישים", "name_en": "Elderly Care", "categories": []},
-                    {"sub_profession_id": "sub_post_op", "name": "סיעוד אחרי ניתוח", "name_en": "Post-Op Care", "categories": []}
+                    {"sub_profession_id": "sub_home_care", "name": "סיעוד ביתי", "name_en": "Home Care", "categories": [
+                        {"category_id": "cat_daily_care", "name": "טיפול יומיומי", "name_en": "Daily Care"},
+                        {"category_id": "cat_wound_care", "name": "טיפול בפצעים", "name_en": "Wound Care"},
+                        {"category_id": "cat_iv_therapy", "name": "עירוי תוך ורידי", "name_en": "IV Therapy"},
+                        {"category_id": "cat_injections", "name": "הזרקות", "name_en": "Injections"},
+                        {"category_id": "cat_catheter", "name": "טיפול בקטטר", "name_en": "Catheter Care"},
+                        {"category_id": "cat_blood_test", "name": "בדיקות דם", "name_en": "Blood Tests"},
+                        {"category_id": "cat_vitals", "name": "מדידת סימנים חיוניים", "name_en": "Vital Signs"},
+                    ]},
+                    {"sub_profession_id": "sub_elderly_care", "name": "טיפול בקשישים", "name_en": "Elderly Care", "categories": [
+                        {"category_id": "cat_elderly_daily", "name": "סיוע יומיומי לקשיש", "name_en": "Daily Elderly Care"},
+                        {"category_id": "cat_elderly_night", "name": "שמירת לילה", "name_en": "Night Watch"},
+                        {"category_id": "cat_medication_mgmt", "name": "ניהול תרופות", "name_en": "Medication Management"},
+                        {"category_id": "cat_companion", "name": "ליווי וחברה", "name_en": "Companion Care"},
+                    ]},
+                    {"sub_profession_id": "sub_post_op", "name": "סיעוד אחרי ניתוח", "name_en": "Post-Op Care", "categories": [
+                        {"category_id": "cat_post_op_care", "name": "טיפול אחרי ניתוח", "name_en": "Post-Op Care"},
+                        {"category_id": "cat_drain_care", "name": "טיפול בנקזים", "name_en": "Drain Care"},
+                        {"category_id": "cat_stoma_care", "name": "טיפול בסטומה", "name_en": "Stoma Care"},
+                    ]},
+                    {"sub_profession_id": "sub_palliative", "name": "טיפול פליאטיבי", "name_en": "Palliative Care", "categories": [
+                        {"category_id": "cat_palliative_care", "name": "טיפול תומך", "name_en": "Supportive Care"},
+                        {"category_id": "cat_pain_mgmt", "name": "ניהול כאב", "name_en": "Pain Management"},
+                    ]},
+                    {"sub_profession_id": "sub_child_nursing", "name": "סיעוד ילדים", "name_en": "Pediatric Nursing", "categories": [
+                        {"category_id": "cat_child_care", "name": "טיפול סיעודי לילדים", "name_en": "Pediatric Care"},
+                        {"category_id": "cat_child_chronic", "name": "ליווי ילד כרוני", "name_en": "Chronic Child Care"},
+                    ]},
                 ],
-                "created_at": datetime.now(timezone.utc).isoformat()
+                "created_at": ts
             },
+            # ==================== רפואת שיניים ====================
+            {
+                "profession_id": "prof_dental",
+                "name": "רפואת שיניים",
+                "name_en": "Dentistry",
+                "icon": "tooth",
+                "specializations": ["רפואת שיניים כללית", "אורתודונטיה", "פריודונטיה", "אנדודונטיה", "כירורגיית פה ולסת", "רפואת שיניים לילדים", "שיקום הפה", "אסתטיקה דנטלית"],
+                "sub_professions": [
+                    {"sub_profession_id": "sub_general_dental", "name": "רפואת שיניים כללית", "name_en": "General Dentistry", "categories": [
+                        {"category_id": "cat_dental_checkup", "name": "בדיקת שיניים", "name_en": "Dental Checkup"},
+                        {"category_id": "cat_filling", "name": "סתימה", "name_en": "Filling"},
+                        {"category_id": "cat_cleaning", "name": "ניקוי אבנית", "name_en": "Dental Cleaning"},
+                        {"category_id": "cat_extraction", "name": "עקירת שן", "name_en": "Tooth Extraction"},
+                    ]},
+                    {"sub_profession_id": "sub_orthodontics", "name": "אורתודונטיה", "name_en": "Orthodontics", "categories": [
+                        {"category_id": "cat_braces", "name": "יישור שיניים", "name_en": "Braces"},
+                        {"category_id": "cat_invisalign", "name": "קשתיות שקופות", "name_en": "Clear Aligners"},
+                    ]},
+                    {"sub_profession_id": "sub_periodontics", "name": "פריודונטיה", "name_en": "Periodontics", "categories": [
+                        {"category_id": "cat_gum_treatment", "name": "טיפול בחניכיים", "name_en": "Gum Treatment"},
+                        {"category_id": "cat_implant", "name": "השתלת שיניים", "name_en": "Dental Implant"},
+                    ]},
+                    {"sub_profession_id": "sub_endodontics", "name": "אנדודונטיה", "name_en": "Endodontics", "categories": [
+                        {"category_id": "cat_root_canal", "name": "טיפול שורש", "name_en": "Root Canal"},
+                    ]},
+                    {"sub_profession_id": "sub_child_dental", "name": "רפואת שיניים לילדים", "name_en": "Pediatric Dentistry", "categories": [
+                        {"category_id": "cat_child_dental", "name": "טיפול שיניים לילדים", "name_en": "Children Dental Care"},
+                    ]},
+                    {"sub_profession_id": "sub_dental_aesthetic", "name": "אסתטיקה דנטלית", "name_en": "Dental Aesthetics", "categories": [
+                        {"category_id": "cat_whitening", "name": "הלבנת שיניים", "name_en": "Teeth Whitening"},
+                        {"category_id": "cat_veneers", "name": "ציפויי חרסינה", "name_en": "Veneers"},
+                    ]},
+                ],
+                "created_at": ts
+            },
+            # ==================== טיפולי שיקום ====================
             {
                 "profession_id": "prof_therapy",
-                "name": "טיפולים",
-                "name_en": "Therapy",
+                "name": "טיפולי שיקום",
+                "name_en": "Rehabilitation Therapy",
                 "icon": "activity",
-                "specializations": ["פיזיותרפיה", "ריפוי בעיסוק", "קלינאות תקשורת", "טיפול רגשי"],
+                "specializations": ["פיזיותרפיה", "ריפוי בעיסוק", "קלינאות תקשורת", "פודיאטריה", "כירופרקטיקה"],
                 "sub_professions": [
-                    {"sub_profession_id": "sub_physio", "name": "פיזיותרפיה", "name_en": "Physiotherapy", "categories": []},
-                    {"sub_profession_id": "sub_occupational", "name": "ריפוי בעיסוק", "name_en": "Occupational Therapy", "categories": []},
-                    {"sub_profession_id": "sub_speech", "name": "קלינאות תקשורת", "name_en": "Speech Therapy", "categories": []}
+                    {"sub_profession_id": "sub_physio", "name": "פיזיותרפיה", "name_en": "Physiotherapy", "categories": [
+                        {"category_id": "cat_physio_ortho", "name": "פיזיותרפיה אורתופדית", "name_en": "Orthopedic Physiotherapy"},
+                        {"category_id": "cat_physio_neuro", "name": "פיזיותרפיה נוירולוגית", "name_en": "Neurological Physiotherapy"},
+                        {"category_id": "cat_physio_sport", "name": "פיזיותרפיה ספורטיבית", "name_en": "Sports Physiotherapy"},
+                        {"category_id": "cat_physio_resp", "name": "פיזיותרפיה נשימתית", "name_en": "Respiratory Physiotherapy"},
+                        {"category_id": "cat_physio_pelvic", "name": "פיזיותרפיה של רצפת האגן", "name_en": "Pelvic Floor Physiotherapy"},
+                        {"category_id": "cat_physio_child", "name": "פיזיותרפיה לילדים", "name_en": "Pediatric Physiotherapy"},
+                    ]},
+                    {"sub_profession_id": "sub_occupational", "name": "ריפוי בעיסוק", "name_en": "Occupational Therapy", "categories": [
+                        {"category_id": "cat_ot_child", "name": "ריפוי בעיסוק לילדים", "name_en": "Pediatric OT"},
+                        {"category_id": "cat_ot_adult", "name": "ריפוי בעיסוק למבוגרים", "name_en": "Adult OT"},
+                        {"category_id": "cat_ot_sensory", "name": "טיפול סנסורי", "name_en": "Sensory Therapy"},
+                        {"category_id": "cat_ot_hand", "name": "ריפוי בעיסוק - יד", "name_en": "Hand Therapy"},
+                    ]},
+                    {"sub_profession_id": "sub_speech", "name": "קלינאות תקשורת", "name_en": "Speech Therapy", "categories": [
+                        {"category_id": "cat_speech_child", "name": "טיפול בדיבור לילדים", "name_en": "Children Speech Therapy"},
+                        {"category_id": "cat_speech_adult", "name": "טיפול בדיבור למבוגרים", "name_en": "Adult Speech Therapy"},
+                        {"category_id": "cat_swallowing", "name": "טיפול בבעיות בליעה", "name_en": "Swallowing Therapy"},
+                        {"category_id": "cat_stuttering", "name": "טיפול בגמגום", "name_en": "Stuttering Therapy"},
+                    ]},
+                    {"sub_profession_id": "sub_podiatry", "name": "פודיאטריה", "name_en": "Podiatry", "categories": [
+                        {"category_id": "cat_foot_care", "name": "טיפול כפות רגליים", "name_en": "Foot Care"},
+                        {"category_id": "cat_orthotics", "name": "מדרסים", "name_en": "Orthotics"},
+                    ]},
+                    {"sub_profession_id": "sub_chiropractic", "name": "כירופרקטיקה", "name_en": "Chiropractic", "categories": [
+                        {"category_id": "cat_spinal_adjust", "name": "יישור עמוד שדרה", "name_en": "Spinal Adjustment"},
+                        {"category_id": "cat_back_pain", "name": "טיפול בכאבי גב", "name_en": "Back Pain Treatment"},
+                    ]},
                 ],
-                "created_at": datetime.now(timezone.utc).isoformat()
+                "created_at": ts
             },
+            # ==================== בריאות הנפש ====================
             {
                 "profession_id": "prof_mental",
                 "name": "בריאות הנפש",
                 "name_en": "Mental Health",
                 "icon": "brain",
-                "specializations": ["פסיכולוגיה", "פסיכיאטריה", "טיפול קוגניטיבי", "טיפול משפחתי"],
+                "specializations": ["פסיכולוגיה קלינית", "פסיכיאטריה", "פסיכותרפיה", "ייעוץ זוגי ומשפחתי", "טיפול בהתמכרויות", "נוירופסיכולוגיה", "טיפול קוגניטיבי-התנהגותי"],
                 "sub_professions": [
-                    {"sub_profession_id": "sub_psychology", "name": "פסיכולוגיה", "name_en": "Psychology", "categories": []},
-                    {"sub_profession_id": "sub_psychiatry", "name": "פסיכיאטריה", "name_en": "Psychiatry", "categories": []}
+                    {"sub_profession_id": "sub_clinical_psych", "name": "פסיכולוגיה קלינית", "name_en": "Clinical Psychology", "categories": [
+                        {"category_id": "cat_psych_assess", "name": "אבחון פסיכולוגי", "name_en": "Psychological Assessment"},
+                        {"category_id": "cat_psych_therapy", "name": "טיפול פסיכולוגי", "name_en": "Psychological Therapy"},
+                        {"category_id": "cat_anxiety", "name": "טיפול בחרדה", "name_en": "Anxiety Treatment"},
+                        {"category_id": "cat_depression", "name": "טיפול בדיכאון", "name_en": "Depression Treatment"},
+                        {"category_id": "cat_trauma", "name": "טיפול בטראומה", "name_en": "Trauma Treatment"},
+                    ]},
+                    {"sub_profession_id": "sub_psychiatry", "name": "פסיכיאטריה", "name_en": "Psychiatry", "categories": [
+                        {"category_id": "cat_psych_consult", "name": "ייעוץ פסיכיאטרי", "name_en": "Psychiatric Consultation"},
+                        {"category_id": "cat_med_mgmt", "name": "ניהול תרופתי", "name_en": "Medication Management"},
+                    ]},
+                    {"sub_profession_id": "sub_couple_family", "name": "טיפול זוגי ומשפחתי", "name_en": "Couple & Family Therapy", "categories": [
+                        {"category_id": "cat_couple_therapy", "name": "טיפול זוגי", "name_en": "Couple Therapy"},
+                        {"category_id": "cat_family_therapy", "name": "טיפול משפחתי", "name_en": "Family Therapy"},
+                    ]},
+                    {"sub_profession_id": "sub_child_psych", "name": "פסיכולוגיית ילדים", "name_en": "Child Psychology", "categories": [
+                        {"category_id": "cat_child_therapy", "name": "טיפול רגשי לילדים", "name_en": "Child Emotional Therapy"},
+                        {"category_id": "cat_adhd", "name": "אבחון וטיפול ADHD", "name_en": "ADHD Diagnosis & Treatment"},
+                        {"category_id": "cat_autism", "name": "טיפול בספקטרום האוטיזם", "name_en": "Autism Spectrum Treatment"},
+                    ]},
+                    {"sub_profession_id": "sub_addiction", "name": "טיפול בהתמכרויות", "name_en": "Addiction Treatment", "categories": [
+                        {"category_id": "cat_addiction_consult", "name": "ייעוץ התמכרויות", "name_en": "Addiction Counseling"},
+                    ]},
+                    {"sub_profession_id": "sub_social_work", "name": "עבודה סוציאלית", "name_en": "Social Work", "categories": [
+                        {"category_id": "cat_social_consult", "name": "ייעוץ סוציאלי", "name_en": "Social Counseling"},
+                        {"category_id": "cat_rights", "name": "מיצוי זכויות", "name_en": "Rights Advocacy"},
+                    ]},
                 ],
-                "created_at": datetime.now(timezone.utc).isoformat()
+                "created_at": ts
             },
+            # ==================== תזונה ודיאטה ====================
+            {
+                "profession_id": "prof_nutrition",
+                "name": "תזונה ודיאטה",
+                "name_en": "Nutrition & Dietetics",
+                "icon": "apple",
+                "specializations": ["תזונה קלינית", "תזונת ספורט", "תזונת ילדים", "הפרעות אכילה", "תזונה לנשים בהריון"],
+                "sub_professions": [
+                    {"sub_profession_id": "sub_clinical_diet", "name": "דיאטה קלינית", "name_en": "Clinical Dietetics", "categories": [
+                        {"category_id": "cat_diet_plan", "name": "תכנית תזונה", "name_en": "Nutrition Plan"},
+                        {"category_id": "cat_diet_diabetes", "name": "תזונה לסוכרתיים", "name_en": "Diabetic Diet"},
+                        {"category_id": "cat_weight_mgmt", "name": "ניהול משקל", "name_en": "Weight Management"},
+                    ]},
+                    {"sub_profession_id": "sub_sports_nutrition", "name": "תזונת ספורט", "name_en": "Sports Nutrition", "categories": [
+                        {"category_id": "cat_sport_diet", "name": "תכנית תזונה לספורטאים", "name_en": "Sports Nutrition Plan"},
+                    ]},
+                    {"sub_profession_id": "sub_eating_disorders", "name": "הפרעות אכילה", "name_en": "Eating Disorders", "categories": [
+                        {"category_id": "cat_eating_therapy", "name": "טיפול בהפרעות אכילה", "name_en": "Eating Disorder Therapy"},
+                    ]},
+                ],
+                "created_at": ts
+            },
+            # ==================== רפואה משלימה ====================
             {
                 "profession_id": "prof_alternative",
                 "name": "רפואה משלימה",
-                "name_en": "Alternative Medicine",
+                "name_en": "Alternative & Complementary Medicine",
                 "icon": "leaf",
-                "specializations": ["דיקור סיני", "נטורופתיה", "הומאופתיה", "עיסוי רפואי"],
+                "specializations": ["דיקור סיני", "נטורופתיה", "הומאופתיה", "עיסוי רפואי", "רפלקסולוגיה", "אוסטאופתיה"],
                 "sub_professions": [
-                    {"sub_profession_id": "sub_acupuncture", "name": "דיקור סיני", "name_en": "Acupuncture", "categories": []},
-                    {"sub_profession_id": "sub_naturopathy", "name": "נטורופתיה", "name_en": "Naturopathy", "categories": []},
-                    {"sub_profession_id": "sub_massage", "name": "עיסוי רפואי", "name_en": "Medical Massage", "categories": []}
+                    {"sub_profession_id": "sub_acupuncture", "name": "דיקור סיני", "name_en": "Acupuncture", "categories": [
+                        {"category_id": "cat_acupuncture", "name": "טיפול בדיקור", "name_en": "Acupuncture Treatment"},
+                        {"category_id": "cat_cupping", "name": "כוסות רוח", "name_en": "Cupping Therapy"},
+                    ]},
+                    {"sub_profession_id": "sub_naturopathy", "name": "נטורופתיה", "name_en": "Naturopathy", "categories": [
+                        {"category_id": "cat_naturo_consult", "name": "ייעוץ נטורופתי", "name_en": "Naturopathic Consultation"},
+                        {"category_id": "cat_herbal", "name": "רפואה בצמחים", "name_en": "Herbal Medicine"},
+                    ]},
+                    {"sub_profession_id": "sub_massage", "name": "עיסוי רפואי", "name_en": "Medical Massage", "categories": [
+                        {"category_id": "cat_therapeutic_massage", "name": "עיסוי טיפולי", "name_en": "Therapeutic Massage"},
+                        {"category_id": "cat_shiatsu", "name": "שיאצו", "name_en": "Shiatsu"},
+                        {"category_id": "cat_reflexology", "name": "רפלקסולוגיה", "name_en": "Reflexology"},
+                    ]},
+                    {"sub_profession_id": "sub_osteopathy", "name": "אוסטאופתיה", "name_en": "Osteopathy", "categories": [
+                        {"category_id": "cat_osteo_treatment", "name": "טיפול אוסטאופתי", "name_en": "Osteopathic Treatment"},
+                    ]},
+                    {"sub_profession_id": "sub_homeopathy", "name": "הומאופתיה", "name_en": "Homeopathy", "categories": [
+                        {"category_id": "cat_homeo_consult", "name": "ייעוץ הומאופתי", "name_en": "Homeopathic Consultation"},
+                    ]},
                 ],
-                "created_at": datetime.now(timezone.utc).isoformat()
-            }
+                "created_at": ts
+            },
+            # ==================== אופטומטריה ====================
+            {
+                "profession_id": "prof_optometry",
+                "name": "אופטומטריה",
+                "name_en": "Optometry",
+                "icon": "eye",
+                "specializations": ["בדיקות ראייה", "התאמת עדשות מגע", "ראייה ילדים"],
+                "sub_professions": [
+                    {"sub_profession_id": "sub_optometry_general", "name": "אופטומטריה כללית", "name_en": "General Optometry", "categories": [
+                        {"category_id": "cat_vision_test", "name": "בדיקת ראייה", "name_en": "Vision Test"},
+                        {"category_id": "cat_glasses", "name": "התאמת משקפיים", "name_en": "Glasses Fitting"},
+                        {"category_id": "cat_contacts", "name": "התאמת עדשות מגע", "name_en": "Contact Lens Fitting"},
+                    ]},
+                ],
+                "created_at": ts
+            },
+            # ==================== מיילדות ====================
+            {
+                "profession_id": "prof_midwifery",
+                "name": "מיילדות",
+                "name_en": "Midwifery",
+                "icon": "baby",
+                "specializations": ["ליווי הריון", "ליווי לידה", "ליווי לאחר לידה", "ייעוץ הנקה"],
+                "sub_professions": [
+                    {"sub_profession_id": "sub_pregnancy", "name": "ליווי הריון", "name_en": "Pregnancy Support", "categories": [
+                        {"category_id": "cat_prenatal", "name": "הכנה ללידה", "name_en": "Prenatal Preparation"},
+                        {"category_id": "cat_pregnancy_support", "name": "ליווי הריון", "name_en": "Pregnancy Companion"},
+                    ]},
+                    {"sub_profession_id": "sub_birth", "name": "ליווי לידה", "name_en": "Birth Support", "categories": [
+                        {"category_id": "cat_doula", "name": "דולה", "name_en": "Doula"},
+                        {"category_id": "cat_home_birth", "name": "לידה בבית", "name_en": "Home Birth"},
+                    ]},
+                    {"sub_profession_id": "sub_postpartum", "name": "לאחר לידה", "name_en": "Postpartum", "categories": [
+                        {"category_id": "cat_postpartum_care", "name": "טיפול לאחר לידה", "name_en": "Postpartum Care"},
+                        {"category_id": "cat_breastfeeding", "name": "ייעוץ הנקה", "name_en": "Breastfeeding Counseling"},
+                    ]},
+                ],
+                "created_at": ts
+            },
+            # ==================== טיפולי סיוע ====================
+            {
+                "profession_id": "prof_caregiving",
+                "name": "טיפול וסיוע",
+                "name_en": "Caregiving & Assistance",
+                "icon": "helping-hand",
+                "specializations": ["מטפל סיעודי", "עזרה בבית", "ליווי רפואי", "שמירה פרטית"],
+                "sub_professions": [
+                    {"sub_profession_id": "sub_caregiver", "name": "מטפל/ת סיעודי/ת", "name_en": "Caregiver", "categories": [
+                        {"category_id": "cat_daily_assist", "name": "סיוע יומיומי", "name_en": "Daily Assistance"},
+                        {"category_id": "cat_night_shift", "name": "שמירת לילה", "name_en": "Night Shift"},
+                        {"category_id": "cat_bathing", "name": "עזרה ברחצה והלבשה", "name_en": "Bathing & Dressing"},
+                        {"category_id": "cat_mobility", "name": "סיוע בניידות", "name_en": "Mobility Assistance"},
+                    ]},
+                    {"sub_profession_id": "sub_medical_escort", "name": "ליווי רפואי", "name_en": "Medical Escort", "categories": [
+                        {"category_id": "cat_hospital_escort", "name": "ליווי לבית חולים", "name_en": "Hospital Escort"},
+                        {"category_id": "cat_doctor_escort", "name": "ליווי לרופא", "name_en": "Doctor Escort"},
+                    ]},
+                ],
+                "created_at": ts
+            },
         ]
         # Save to database
         await db.professions.insert_many(default_professions)
