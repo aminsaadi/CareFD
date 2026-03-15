@@ -227,15 +227,26 @@ async def search_services(
         ]
 
     if city:
-        services = [
-            s for s in services
-            if s.get("provider", {}).get("location", {}).get("city") == city
-        ]
+        from app.localities import get_region_info, get_cities_in_region
+        region_info_svc = get_region_info(city)
+        if region_info_svc:
+            region_cities_svc = get_cities_in_region(city) or []
+            services = [
+                s for s in services
+                if (s.get("provider", {}).get("location") or {}).get("city") in region_cities_svc
+            ]
+        else:
+            city_pattern = re.compile(re.escape(city), re.IGNORECASE)
+            services = [
+                s for s in services
+                if city_pattern.search((s.get("provider", {}).get("location") or {}).get("city") or "")
+            ]
 
     if region:
+        region_pattern = re.compile(re.escape(region), re.IGNORECASE)
         services = [
             s for s in services
-            if s.get("provider", {}).get("location", {}).get("region") == region
+            if region_pattern.search((s.get("provider", {}).get("location") or {}).get("region") or "")
         ]
 
     if profession:

@@ -208,7 +208,7 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
             <CitySelect
               name="city"
               value={filters.city || ''}
-              onChange={(e) => onFilterChange({ ...filters, city: e.target.value || null })}
+              onChange={(e) => onFilterChange({ ...filters, city: e.target.value || null, latitude: null, longitude: null, useMyLocation: false, radius: null })}
               placeholder="כל הערים"
               inputClassName="w-full px-4 py-2 rounded-xl border-2 border-carelink-teal-pale focus:border-carelink-teal focus:outline-none"
             />

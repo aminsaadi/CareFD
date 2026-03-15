@@ -238,7 +238,9 @@ async def search_providers(
         query["$and"].append({"$or": search_or})
 
     # City / Region filter - check both provider location AND service_areas
-    if city:
+    # When lat/lng/radius are provided, skip city text filter - distance filtering replaces it
+    use_geo_filter = latitude is not None and longitude is not None and radius_km is not None
+    if city and not use_geo_filter:
         region_info = get_region_info(city)
         if region_info:
             # It's a region - match provider's city OR service_areas
@@ -327,7 +329,7 @@ async def search_providers(
                     provider["location"]["longitude"]
                 )
                 provider["distance_km"] = round(distance, 1)
-                
+
                 # Apply radius filter if specified
                 if radius_km is None or distance <= radius_km:
                     filtered_providers.append(provider)
@@ -335,6 +337,20 @@ async def search_providers(
                 # Include providers without coordinates if no radius filter
                 provider["distance_km"] = None
                 filtered_providers.append(provider)
+            elif city and radius_km:
+                # When radius is active but provider has no coordinates,
+                # include if their city name matches the search city
+                provider_city = (provider.get("location") or {}).get("city", "")
+                provider_areas = provider.get("service_areas") or []
+                region_info_check = get_region_info(city)
+                if region_info_check:
+                    region_cities_list = get_cities_in_region(city) or []
+                    if provider_city in region_cities_list or any(a in region_cities_list for a in provider_areas):
+                        provider["distance_km"] = None
+                        filtered_providers.append(provider)
+                elif (provider_city and re.search(re.escape(city), provider_city, re.IGNORECASE)) or city in provider_areas:
+                    provider["distance_km"] = None
+                    filtered_providers.append(provider)
         providers = filtered_providers
     
     # Sorting
