@@ -760,6 +760,30 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* ==================== REQUEST BANNER ==================== */}
+      <section className="py-10 bg-gradient-to-l from-carelink-teal via-carelink-teal-medium to-carelink-navy" data-testid="request-banner-section">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-center md:text-right">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                לא מצאתם מה שחיפשתם?
+              </h3>
+              <p className="text-carelink-teal-pale text-lg">
+                פרסמו בקשה וקבלו הצעות מספקים מתאימים ישירות אליכם
+              </p>
+            </div>
+            <Link
+              to="/requests"
+              className="inline-flex items-center gap-2 bg-white text-carelink-teal px-8 py-4 rounded-xl font-bold text-lg hover:bg-carelink-teal-pale transition-all shadow-soft-lg btn-press hover-scale whitespace-nowrap"
+              data-testid="request-banner-btn"
+            >
+              <FaSearch />
+              פרסם בקשה
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ==================== HOW IT WORKS ==================== */}
       <section className="py-16 bg-white" data-testid="how-it-works-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

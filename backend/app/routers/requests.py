@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException, Header, Request
 from typing import Optional, List
 from datetime import datetime, timezone, timedelta
 import uuid
+import asyncio
+import logging
 
 from app.database import db
 from app.models import (
@@ -10,6 +12,8 @@ from app.models import (
     Booking, BookingStatus, ChatRoom
 )
 from app.utils import get_current_user, send_email_async, create_notification, send_push_to_user
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -40,7 +44,83 @@ async def create_request(
 
     await db.requests.insert_one(req_dict)
 
+    # Notify matching providers in background
+    asyncio.create_task(
+        _notify_matching_providers(service_request, user.get("name", "משתמש"))
+    )
+
     return service_request.model_dump()
+
+
+async def _notify_matching_providers(service_request: ServiceRequest, requester_name: str):
+    """Find providers matching the request specialization and notify them."""
+    try:
+        query = {"is_verified": True}
+        conditions = []
+
+        spec = service_request.specialization
+        if spec:
+            conditions.append({"$or": [
+                {"specializations": {"$in": [spec]}},
+                {"specialization_name": spec},
+                {"specialization_id": spec},
+                {"profession_name": spec},
+            ]})
+
+        if service_request.service_type:
+            conditions.append({"service_types": {"$in": [service_request.service_type]}})
+
+        if service_request.provider_type:
+            conditions.append({"provider_type": service_request.provider_type})
+
+        if conditions:
+            query["$and"] = conditions
+
+        # Limit to 50 providers to avoid flooding
+        providers = await db.providers.find(query, {"_id": 0, "user_id": 1, "business_name": 1}).to_list(50)
+
+        if not providers:
+            # If no exact match, fall back to notifying all verified providers with same specialization text
+            if spec:
+                fallback_query = {
+                    "is_verified": True,
+                    "$or": [
+                        {"specializations": {"$regex": spec, "$options": "i"}},
+                        {"specialization_name": {"$regex": spec, "$options": "i"}},
+                        {"profession_name": {"$regex": spec, "$options": "i"}},
+                    ]
+                }
+                providers = await db.providers.find(fallback_query, {"_id": 0, "user_id": 1, "business_name": 1}).to_list(50)
+
+        title_text = service_request.title
+        urgency_labels = {"urgent": "דחוף", "high": "גבוהה", "medium": "בינונית", "low": "נמוכה"}
+        urgency_label = urgency_labels.get(service_request.urgency, "")
+        urgency_suffix = f" ({urgency_label})" if urgency_label else ""
+
+        notified_user_ids = set()
+        for provider in providers:
+            uid = provider["user_id"]
+            if uid == service_request.user_id or uid in notified_user_ids:
+                continue
+            notified_user_ids.add(uid)
+
+            await create_notification(
+                uid,
+                NotificationType.REQUEST_NEW,
+                "בקשה חדשה שמתאימה לך!",
+                f"{requester_name} פרסם בקשה: \"{title_text}\"{urgency_suffix}",
+                {"request_id": service_request.request_id}
+            )
+            await send_push_to_user(
+                uid,
+                "בקשה חדשה שמתאימה לך!",
+                f"\"{title_text}\"{urgency_suffix}",
+                {"request_id": service_request.request_id, "type": "request_new"}
+            )
+
+        logger.info(f"Notified {len(notified_user_ids)} providers about new request {service_request.request_id}")
+    except Exception as e:
+        logger.error(f"Failed to notify providers for request {service_request.request_id}: {e}")
 
 
 @router.get("/requests/my")

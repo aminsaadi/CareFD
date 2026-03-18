@@ -55,6 +55,7 @@ const Requests = () => {
         preferred_date: formData.preferred_date || null,
         provider_type: formData.provider_type || null,
         service_type: formData.service_type || null,
+        specialization: formData.specialization || null,
         preferences: formData.preferences || null
       };
       await api.post('/requests', payload);

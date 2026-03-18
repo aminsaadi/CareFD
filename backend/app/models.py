@@ -447,6 +447,51 @@ class RequestCreate(BaseModel):
     preferred_date: Optional[datetime] = None
     preferences: Optional[str] = None
 
+    @field_validator('request_type')
+    @classmethod
+    def validate_request_type(cls, v):
+        allowed = [RequestType.IMMEDIATE, RequestType.SCHEDULED, RequestType.ONE_TIME, RequestType.FOLLOW_UP]
+        if v not in allowed:
+            raise ValueError(f'request_type must be one of: {", ".join(allowed)}')
+        return v
+
+    @field_validator('urgency')
+    @classmethod
+    def validate_urgency(cls, v):
+        if v is None:
+            return v
+        allowed = [RequestUrgency.LOW, RequestUrgency.MEDIUM, RequestUrgency.HIGH, RequestUrgency.URGENT]
+        if v not in allowed:
+            raise ValueError(f'urgency must be one of: {", ".join(allowed)}')
+        return v
+
+    @field_validator('service_type')
+    @classmethod
+    def validate_service_type(cls, v):
+        if v is None:
+            return v
+        allowed = ["home", "clinic", "hospital", "virtual", "delivery", "home_visit", "clinic_visit", "video_call", "consultation"]
+        if v not in allowed:
+            raise ValueError(f'service_type must be one of: {", ".join(allowed)}')
+        return v
+
+    @field_validator('provider_type')
+    @classmethod
+    def validate_provider_type(cls, v):
+        if v is None:
+            return v
+        allowed = [ProviderType.INDIVIDUAL, ProviderType.COMPANY, ProviderType.CLINIC]
+        if v not in allowed:
+            raise ValueError(f'provider_type must be one of: {", ".join(allowed)}')
+        return v
+
+    @field_validator('budget')
+    @classmethod
+    def validate_budget(cls, v):
+        if v is not None and v < 0:
+            raise ValueError('budget must be a positive number')
+        return v
+
 class RequestUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
@@ -645,6 +690,7 @@ class NotificationType:
     OFFER_ACCEPTED = "offer_accepted"
     OFFER_REJECTED = "offer_rejected"
     OFFER_WITHDRAWN = "offer_withdrawn"
+    REQUEST_NEW = "request_new"
     REQUEST_CANCELLED = "request_cancelled"
     REVIEW_NEW = "review_new"
     BOOKING_CHANGE_REQUESTED = "booking_change_requested"
