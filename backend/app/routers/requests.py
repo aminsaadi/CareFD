@@ -53,13 +53,25 @@ async def create_request(
 
 
 async def _notify_matching_providers(service_request: ServiceRequest, requester_name: str):
-    """Find providers matching the request specialization and notify them."""
+    """Find providers matching the request professions/specialization and notify them."""
     try:
         query = {"is_verified": True}
         conditions = []
 
+        # Match by professions list (new field)
+        professions = service_request.professions
+        if professions and len(professions) > 0:
+            conditions.append({"$or": [
+                {"profession_id": {"$in": professions}},
+                {"profession_name": {"$in": professions}},
+                {"specialization_id": {"$in": professions}},
+                {"specialization_name": {"$in": professions}},
+                {"specializations": {"$in": professions}},
+            ]})
+
+        # Fallback: match by legacy specialization field
         spec = service_request.specialization
-        if spec:
+        if spec and not professions:
             conditions.append({"$or": [
                 {"specializations": {"$in": [spec]}},
                 {"specialization_name": spec},
@@ -80,16 +92,24 @@ async def _notify_matching_providers(service_request: ServiceRequest, requester_
         providers = await db.providers.find(query, {"_id": 0, "user_id": 1, "business_name": 1}).to_list(50)
 
         if not providers:
-            # If no exact match, fall back to notifying all verified providers with same specialization text
-            if spec:
-                fallback_query = {
-                    "is_verified": True,
-                    "$or": [
-                        {"specializations": {"$regex": spec, "$options": "i"}},
-                        {"specialization_name": {"$regex": spec, "$options": "i"}},
-                        {"profession_name": {"$regex": spec, "$options": "i"}},
-                    ]
-                }
+            # Fallback: broader match on professions or specialization text
+            fallback_or = []
+            if professions and len(professions) > 0:
+                for prof in professions:
+                    fallback_or.extend([
+                        {"profession_name": {"$regex": prof, "$options": "i"}},
+                        {"specialization_name": {"$regex": prof, "$options": "i"}},
+                        {"specializations": {"$regex": prof, "$options": "i"}},
+                    ])
+            elif spec:
+                fallback_or = [
+                    {"specializations": {"$regex": spec, "$options": "i"}},
+                    {"specialization_name": {"$regex": spec, "$options": "i"}},
+                    {"profession_name": {"$regex": spec, "$options": "i"}},
+                ]
+
+            if fallback_or:
+                fallback_query = {"is_verified": True, "$or": fallback_or}
                 providers = await db.providers.find(fallback_query, {"_id": 0, "user_id": 1, "business_name": 1}).to_list(50)
 
         title_text = service_request.title
@@ -437,9 +457,41 @@ async def get_my_offers(
 
 
 @router.get("/requests/{request_id}/offers")
-async def get_request_offers(request_id: str):
-    """Get all offers for a request"""
-    offers = await db.offers.find({"request_id": request_id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+async def get_request_offers(
+    request_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Get offers for a request - owner sees all, providers see only their own"""
+    user = None
+    try:
+        user = await get_current_user(authorization, request)
+    except Exception:
+        pass
+
+    # Get the request to check ownership
+    service_request = await db.requests.find_one({"request_id": request_id}, {"_id": 0})
+    if not service_request:
+        raise HTTPException(status_code=404, detail="Request not found")
+
+    is_owner = user and user["user_id"] == service_request["user_id"]
+
+    if is_owner:
+        # Owner sees all offers
+        offers = await db.offers.find({"request_id": request_id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    elif user:
+        # Providers see only their own offer
+        provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+        if provider:
+            offers = await db.offers.find(
+                {"request_id": request_id, "provider_id": provider["provider_id"]},
+                {"_id": 0}
+            ).to_list(10)
+        else:
+            offers = []
+    else:
+        # Non-authenticated users see no offers
+        offers = []
 
     # Enhance with provider info
     for offer in offers:

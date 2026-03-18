@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import api from '../utils/api';
 import { format } from 'date-fns';
-import { FaStar, FaCheckCircle, FaTimesCircle, FaExclamationTriangle, FaCalendar, FaComments } from 'react-icons/fa';
+import { FaStar, FaCheckCircle, FaTimesCircle, FaExclamationTriangle, FaCalendar, FaComments, FaEnvelope } from 'react-icons/fa';
 import { toast } from 'sonner';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { useConfirm } from '../hooks/useConfirm';
@@ -28,6 +28,20 @@ const RequestDetails = () => {
     message: ''
   });
   const { confirmState, confirm, closeConfirm } = useConfirm();
+
+  const handleContactProvider = async (providerId) => {
+    try {
+      const response = await api.post('/chat/rooms', {
+        user_id: user.user_id,
+        provider_id: providerId,
+        request_id: requestId
+      });
+      const roomId = response.data.room_id;
+      navigate(`/chat/${roomId}`);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'שגיאה ביצירת צ\'אט');
+    }
+  };
 
   useEffect(() => {
     fetchRequestDetails();
@@ -80,7 +94,7 @@ const RequestDetails = () => {
       const response = await api.post(`/offers/${offerId}/accept`);
       const { booking_id, room_id } = response.data;
       toast.success('ההצעה התקבלה! נוצרה הזמנה חדשה.');
-      navigate(`/bookings/${booking_id}`);
+      navigate('/dashboard?tab=bookings');
     } catch (error) {
       toast.error(error.response?.data?.detail || t('errorOccurred'));
     }
@@ -334,7 +348,7 @@ const RequestDetails = () => {
               {request.status === 'in_progress' && request.booking_id && isOwner && (
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg flex gap-3">
                   <Link
-                    to={`/bookings/${request.booking_id}`}
+                    to="/dashboard?tab=bookings"
                     className="flex-1 text-center bg-carelink-teal text-white py-2 rounded-lg hover:bg-carelink-teal-medium transition font-medium"
                   >
                     {t('viewBooking')}
@@ -349,10 +363,11 @@ const RequestDetails = () => {
               )}
             </div>
 
-            {/* Offers Section */}
+            {/* Offers Section - visible to owner and providers who made offers */}
+            {(isOwner || offers.length > 0) && (
             <div className="bg-white p-6 rounded-xl shadow-lg border-2 border-carelink-teal-pale">
               <h2 className="text-2xl font-bold mb-4 text-carelink-navy">
-                {t('offersReceived')} ({offers.length})
+                {isOwner ? `${t('offersReceived')} (${offers.length})` : 'ההצעה שלי'}
               </h2>
 
               {offers.length === 0 ? (
@@ -427,6 +442,13 @@ const RequestDetails = () => {
                       {isOwner && offer.status === 'pending' && request.status === 'open' && (
                         <div className="flex gap-2">
                           <button
+                            onClick={() => handleContactProvider(offer.provider_id || offer.provider?.provider_id)}
+                            className="px-4 bg-blue-100 text-blue-700 py-2 rounded-lg hover:bg-blue-200 transition flex items-center gap-2"
+                            data-testid={`contact-provider-${offer.offer_id}`}
+                          >
+                            <FaEnvelope /> צור קשר
+                          </button>
+                          <button
                             onClick={() => handleAcceptOffer(offer.offer_id)}
                             className="flex-1 bg-carelink-teal text-white py-2 rounded-lg hover:bg-carelink-teal-medium transition flex items-center justify-center gap-2"
                             data-testid={`accept-offer-${offer.offer_id}`}
@@ -453,6 +475,7 @@ const RequestDetails = () => {
                 </div>
               )}
             </div>
+            )}
           </div>
 
           {/* Actions Sidebar */}
