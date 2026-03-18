@@ -10,6 +10,28 @@ import { toast } from 'sonner';
 
 const isPatientRole = (role) => role === 'patient' || role === 'user';
 
+const GENDER_PREFERENCE_OPTIONS = [
+  { value: 'no_preference', label: 'ללא העדפה' },
+  { value: 'male', label: 'זכר' },
+  { value: 'female', label: 'נקבה' },
+];
+
+const LANGUAGE_OPTIONS = [
+  { value: 'hebrew', label: 'עברית' },
+  { value: 'arabic', label: 'ערבית' },
+  { value: 'english', label: 'אנגלית' },
+  { value: 'russian', label: 'רוסית' },
+  { value: 'french', label: 'צרפתית' },
+  { value: 'spanish', label: 'ספרדית' },
+  { value: 'amharic', label: 'אמהרית' },
+];
+
+const BUDGET_TYPE_OPTIONS = [
+  { value: 'per_hour', label: 'לשעה' },
+  { value: 'per_treatment', label: 'לטיפול' },
+  { value: 'per_visit', label: 'לביקור' },
+];
+
 const Requests = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -18,23 +40,59 @@ const Requests = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(searchParams.get('create') === 'true');
   const [activeTab, setActiveTab] = useState('all');
+
+  // Options fetched from backend
+  const [professionOptions, setProfessionOptions] = useState([]);
+  const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
+  const [deliveryTypeOptions, setDeliveryTypeOptions] = useState([]);
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    specialization: '',
+    professions: [],
+    service_type: '',
+    delivery_type: '',
     budget: '',
-    request_type: 'one_time',
+    budget_type: '',
     urgency: 'medium',
     preferred_date: '',
+    preferred_time: '',
+    gender_preference: '',
+    language_preferences: [],
+    request_type: 'one_time',
     preferences: '',
-    service_type: '',
-    provider_type: ''
   });
 
   useEffect(() => {
     fetchRequests();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
+
+  useEffect(() => {
+    fetchFormOptions();
+  }, []);
+
+  const fetchFormOptions = async () => {
+    try {
+      const [professionsRes, serviceTypesRes, deliveryTypesRes] = await Promise.all([
+        api.get('/professions').catch(() => ({ data: { professions: [] } })),
+        api.get('/service-types').catch(() => ({ data: { service_types: [] } })),
+        api.get('/delivery-types').catch(() => ({ data: { delivery_types: [] } })),
+      ]);
+
+      // Flatten professions for selection
+      const profs = professionsRes.data?.professions || professionsRes.data || [];
+      setProfessionOptions(Array.isArray(profs) ? profs : []);
+
+      const sTypes = serviceTypesRes.data?.service_types || serviceTypesRes.data || [];
+      setServiceTypeOptions(Array.isArray(sTypes) ? sTypes : []);
+
+      const dTypes = deliveryTypesRes.data?.delivery_types || deliveryTypesRes.data || [];
+      setDeliveryTypeOptions(Array.isArray(dTypes) ? dTypes : []);
+    } catch (error) {
+      console.error('Failed to fetch form options:', error);
+    }
+  };
 
   const fetchRequests = async () => {
     try {
@@ -49,25 +107,57 @@ const Requests = () => {
     }
   };
 
+  const handleProfessionToggle = (professionId) => {
+    setFormData(prev => {
+      const current = prev.professions;
+      if (current.includes(professionId)) {
+        return { ...prev, professions: current.filter(id => id !== professionId) };
+      }
+      if (current.length >= 3) {
+        toast.error('ניתן לבחור עד 3 מקצועות');
+        return prev;
+      }
+      return { ...prev, professions: [...current, professionId] };
+    });
+  };
+
+  const handleLanguageToggle = (lang) => {
+    setFormData(prev => {
+      const current = prev.language_preferences;
+      if (current.includes(lang)) {
+        return { ...prev, language_preferences: current.filter(l => l !== lang) };
+      }
+      return { ...prev, language_preferences: [...current, lang] };
+    });
+  };
+
   const handleCreateRequest = async (e) => {
     e.preventDefault();
     try {
       const payload = {
-        ...formData,
-        budget: formData.budget ? parseFloat(formData.budget) : null,
-        preferred_date: formData.preferred_date || null,
-        provider_type: formData.provider_type || null,
+        title: formData.title,
+        description: formData.description,
+        professions: formData.professions.length > 0 ? formData.professions : [],
         service_type: formData.service_type || null,
-        specialization: formData.specialization || null,
-        preferences: formData.preferences || null
+        delivery_type: formData.delivery_type || null,
+        budget: formData.budget ? parseFloat(formData.budget) : null,
+        budget_type: formData.budget_type || null,
+        request_type: formData.request_type,
+        urgency: formData.urgency,
+        preferred_date: formData.preferred_date || null,
+        preferred_time: formData.preferred_time || null,
+        gender_preference: formData.gender_preference || null,
+        language_preferences: formData.language_preferences.length > 0 ? formData.language_preferences : [],
+        preferences: formData.preferences || null,
       };
       await api.post('/requests', payload);
       toast.success('הבקשה נוצרה בהצלחה!');
       setShowCreateForm(false);
       setFormData({
-        title: '', description: '', specialization: '', budget: '',
-        request_type: 'one_time', urgency: 'medium', preferred_date: '',
-        preferences: '', service_type: '', provider_type: ''
+        title: '', description: '', professions: [], service_type: '',
+        delivery_type: '', budget: '', budget_type: '', urgency: 'medium',
+        preferred_date: '', preferred_time: '', gender_preference: '',
+        language_preferences: [], request_type: 'one_time', preferences: ''
       });
       fetchRequests();
     } catch (error) {
@@ -163,7 +253,7 @@ const Requests = () => {
               {/* Title */}
               <div>
                 <label className="block text-sm font-medium text-carelink-navy">
-                  {t('requestTitle')} *
+                  כותרת *
                 </label>
                 <input
                   type="text"
@@ -171,6 +261,7 @@ const Requests = () => {
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                  placeholder="תארו בקצרה את השירות שאתם מחפשים"
                   data-testid="request-title-input"
                 />
               </div>
@@ -178,7 +269,7 @@ const Requests = () => {
               {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-carelink-navy">
-                  {t('requestDescription')} *
+                  פרטים נוספים *
                 </label>
                 <textarea
                   required
@@ -186,11 +277,180 @@ const Requests = () => {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
                   rows="4"
+                  placeholder="פרטו על הצורך, מצב רפואי רלוונטי, דרישות מיוחדות..."
                   data-testid="request-description-input"
                 />
               </div>
 
+              {/* Professions - multi-select chips, up to 3 */}
+              <div>
+                <label className="block text-sm font-medium text-carelink-navy mb-2">
+                  מקצוע (עד 3)
+                </label>
+                <div className="flex flex-wrap gap-2" data-testid="request-professions-select">
+                  {professionOptions.map((prof) => {
+                    const profId = prof.profession_id || prof.id || prof.value;
+                    const profName = prof.name || prof.name_he || prof.label;
+                    const isSelected = formData.professions.includes(profId);
+                    return (
+                      <button
+                        key={profId}
+                        type="button"
+                        onClick={() => handleProfessionToggle(profId)}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium border-2 transition ${
+                          isSelected
+                            ? 'bg-carelink-teal text-white border-carelink-teal'
+                            : 'bg-white text-carelink-navy border-carelink-light-gray hover:border-carelink-teal'
+                        }`}
+                      >
+                        {profName}
+                      </button>
+                    );
+                  })}
+                  {professionOptions.length === 0 && (
+                    <span className="text-sm text-gray-400">טוען מקצועות...</span>
+                  )}
+                </div>
+                {formData.professions.length > 0 && (
+                  <p className="text-xs text-carelink-gray mt-1">
+                    נבחרו {formData.professions.length}/3
+                  </p>
+                )}
+              </div>
+
               <div className="grid md:grid-cols-2 gap-4">
+                {/* Service Type - synced with backend */}
+                <div>
+                  <label className="block text-sm font-medium text-carelink-navy">
+                    סוג שירות
+                  </label>
+                  <select
+                    value={formData.service_type}
+                    onChange={(e) => setFormData({ ...formData, service_type: e.target.value })}
+                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    data-testid="request-service-type-select"
+                  >
+                    <option value="">-- בחר סוג שירות --</option>
+                    {serviceTypeOptions.map((st) => (
+                      <option key={st.type_id || st.id || st.value} value={st.value || st.type_id || st.id}>
+                        {st.name_he || st.name || st.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Delivery Type - synced with backend */}
+                <div>
+                  <label className="block text-sm font-medium text-carelink-navy">
+                    דרך מתן השירות
+                  </label>
+                  <select
+                    value={formData.delivery_type}
+                    onChange={(e) => setFormData({ ...formData, delivery_type: e.target.value })}
+                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    data-testid="request-delivery-type-select"
+                  >
+                    <option value="">-- בחר דרך מתן שירות --</option>
+                    {deliveryTypeOptions.map((dt) => (
+                      <option key={dt.type_id || dt.id || dt.value} value={dt.value || dt.type_id || dt.id}>
+                        {dt.name_he || dt.name || dt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Budget + Budget Type */}
+                <div>
+                  <label className="block text-sm font-medium text-carelink-navy">
+                    תקציב
+                  </label>
+                  <div className="mt-1 flex gap-2">
+                    <input
+                      type="number"
+                      value={formData.budget}
+                      onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                      className="block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                      placeholder="₪"
+                      data-testid="request-budget-input"
+                    />
+                    <select
+                      value={formData.budget_type}
+                      onChange={(e) => setFormData({ ...formData, budget_type: e.target.value })}
+                      className="block w-32 px-2 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal text-sm"
+                      data-testid="request-budget-type-select"
+                    >
+                      <option value="">סוג</option>
+                      {BUDGET_TYPE_OPTIONS.map((bt) => (
+                        <option key={bt.value} value={bt.value}>{bt.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Urgency */}
+                <div>
+                  <label className="block text-sm font-medium text-carelink-navy">
+                    דחיפות
+                  </label>
+                  <select
+                    value={formData.urgency}
+                    onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
+                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    data-testid="request-urgency-select"
+                  >
+                    <option value="low">נמוכה</option>
+                    <option value="medium">בינונית</option>
+                    <option value="high">גבוהה</option>
+                    <option value="urgent">דחוף</option>
+                  </select>
+                </div>
+
+                {/* Preferred Date */}
+                <div>
+                  <label className="block text-sm font-medium text-carelink-navy">
+                    תאריך רצוי
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.preferred_date}
+                    onChange={(e) => setFormData({ ...formData, preferred_date: e.target.value })}
+                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    data-testid="request-date-input"
+                  />
+                </div>
+
+                {/* Preferred Time */}
+                <div>
+                  <label className="block text-sm font-medium text-carelink-navy">
+                    שעה רצויה
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.preferred_time}
+                    onChange={(e) => setFormData({ ...formData, preferred_time: e.target.value })}
+                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    data-testid="request-time-input"
+                  />
+                </div>
+
+                {/* Gender Preference */}
+                <div>
+                  <label className="block text-sm font-medium text-carelink-navy">
+                    העדפת מגדר
+                  </label>
+                  <select
+                    value={formData.gender_preference}
+                    onChange={(e) => setFormData({ ...formData, gender_preference: e.target.value })}
+                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    data-testid="request-gender-select"
+                  >
+                    <option value="">-- ללא העדפה --</option>
+                    {GENDER_PREFERENCE_OPTIONS.map((g) => (
+                      <option key={g.value} value={g.value}>{g.label}</option>
+                    ))}
+                  </select>
+                </div>
+
                 {/* Request Type */}
                 <div>
                   <label className="block text-sm font-medium text-carelink-navy">
@@ -208,101 +468,32 @@ const Requests = () => {
                     <option value="follow_up">{t('follow_up')}</option>
                   </select>
                 </div>
-
-                {/* Urgency */}
-                <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
-                    {t('urgency')}
-                  </label>
-                  <select
-                    value={formData.urgency}
-                    onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
-                    data-testid="request-urgency-select"
-                  >
-                    <option value="low">{t('low')}</option>
-                    <option value="medium">{t('medium')}</option>
-                    <option value="high">{t('high')}</option>
-                    <option value="urgent">{t('urgent')}</option>
-                  </select>
-                </div>
-
-                {/* Specialization */}
-                <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
-                    {t('specialization')}
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.specialization}
-                    onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
-                    data-testid="request-specialization-input"
-                  />
-                </div>
-
-                {/* Budget */}
-                <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
-                    {t('budget')}
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.budget}
-                    onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
-                    placeholder="₪"
-                    data-testid="request-budget-input"
-                  />
-                </div>
-
-                {/* Preferred Date */}
-                <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
-                    {t('preferredDate')}
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.preferred_date}
-                    onChange={(e) => setFormData({ ...formData, preferred_date: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
-                    data-testid="request-date-input"
-                  />
-                </div>
-
-                {/* Service Type */}
-                <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
-                    {t('serviceType')}
-                  </label>
-                  <select
-                    value={formData.service_type}
-                    onChange={(e) => setFormData({ ...formData, service_type: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
-                    data-testid="request-service-type-select"
-                  >
-                    <option value="">-- {t('serviceType')} --</option>
-                    <option value="home_visit">{t('homeVisit')}</option>
-                    <option value="clinic_visit">{t('clinicVisit')}</option>
-                    <option value="video_call">{t('videoCall')}</option>
-                    <option value="consultation">{t('consultation')}</option>
-                  </select>
-                </div>
               </div>
 
-              {/* Preferences */}
+              {/* Language Preferences - multi-select chips */}
               <div>
-                <label className="block text-sm font-medium text-carelink-navy">
-                  {t('preferences')}
+                <label className="block text-sm font-medium text-carelink-navy mb-2">
+                  העדפות שפה
                 </label>
-                <textarea
-                  value={formData.preferences}
-                  onChange={(e) => setFormData({ ...formData, preferences: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
-                  rows="2"
-                  placeholder="העדפות נוספות..."
-                  data-testid="request-preferences-input"
-                />
+                <div className="flex flex-wrap gap-2" data-testid="request-languages-select">
+                  {LANGUAGE_OPTIONS.map((lang) => {
+                    const isSelected = formData.language_preferences.includes(lang.value);
+                    return (
+                      <button
+                        key={lang.value}
+                        type="button"
+                        onClick={() => handleLanguageToggle(lang.value)}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium border-2 transition ${
+                          isSelected
+                            ? 'bg-carelink-teal text-white border-carelink-teal'
+                            : 'bg-white text-carelink-navy border-carelink-light-gray hover:border-carelink-teal'
+                        }`}
+                      >
+                        {lang.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div className="flex gap-4">

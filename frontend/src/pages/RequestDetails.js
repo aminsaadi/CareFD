@@ -216,7 +216,22 @@ const RequestDetails = () => {
                   <p className="text-carelink-slate">{request.description}</p>
                 </div>
 
-                {request.specialization && (
+                {/* Professions */}
+                {request.professions && request.professions.length > 0 && (
+                  <div>
+                    <span className="font-semibold text-carelink-navy">מקצוע:</span>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {request.professions.map((prof, idx) => (
+                        <span key={idx} className="bg-carelink-teal-pale text-carelink-teal text-sm px-3 py-1 rounded-full">
+                          {prof}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Legacy specialization fallback */}
+                {(!request.professions || request.professions.length === 0) && request.specialization && (
                   <div>
                     <span className="font-semibold text-carelink-navy">{t('specialization')}:</span>
                     <span className="mr-2 text-carelink-slate">{request.specialization}</span>
@@ -225,8 +240,15 @@ const RequestDetails = () => {
 
                 {request.service_type && (
                   <div>
-                    <span className="font-semibold text-carelink-navy">{t('serviceType')}:</span>
+                    <span className="font-semibold text-carelink-navy">סוג שירות:</span>
                     <span className="mr-2 text-carelink-slate">{t(request.service_type)}</span>
+                  </div>
+                )}
+
+                {request.delivery_type && (
+                  <div>
+                    <span className="font-semibold text-carelink-navy">דרך מתן השירות:</span>
+                    <span className="mr-2 text-carelink-slate">{t(request.delivery_type)}</span>
                   </div>
                 )}
 
@@ -240,7 +262,16 @@ const RequestDetails = () => {
                 {request.budget && (
                   <div>
                     <span className="font-semibold text-carelink-navy">{t('budget')}:</span>
-                    <span className="text-carelink-teal font-bold text-xl mr-2">₪{request.budget}</span>
+                    <span className="text-carelink-teal font-bold text-xl mr-2">
+                      ₪{request.budget}
+                      {request.budget_type && (
+                        <span className="text-sm font-normal text-carelink-gray mr-1">
+                          {request.budget_type === 'per_hour' ? 'לשעה' :
+                           request.budget_type === 'per_treatment' ? 'לטיפול' :
+                           request.budget_type === 'per_visit' ? 'לביקור' : request.budget_type}
+                        </span>
+                      )}
+                    </span>
                   </div>
                 )}
 
@@ -248,7 +279,39 @@ const RequestDetails = () => {
                   <div className="flex items-center gap-2">
                     <FaCalendar className="text-carelink-teal" />
                     <span className="font-semibold text-carelink-navy">{t('preferredDate')}:</span>
-                    <span className="text-carelink-slate">{format(new Date(request.preferred_date), 'dd/MM/yyyy')}</span>
+                    <span className="text-carelink-slate">
+                      {format(new Date(request.preferred_date), 'dd/MM/yyyy')}
+                      {request.preferred_time && ` בשעה ${request.preferred_time}`}
+                    </span>
+                  </div>
+                )}
+
+                {request.gender_preference && request.gender_preference !== 'no_preference' && (
+                  <div>
+                    <span className="font-semibold text-carelink-navy">העדפת מגדר:</span>
+                    <span className="mr-2 text-carelink-slate">
+                      {request.gender_preference === 'male' ? 'זכר' :
+                       request.gender_preference === 'female' ? 'נקבה' : request.gender_preference}
+                    </span>
+                  </div>
+                )}
+
+                {request.language_preferences && request.language_preferences.length > 0 && (
+                  <div>
+                    <span className="font-semibold text-carelink-navy">העדפות שפה:</span>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {request.language_preferences.map((lang, idx) => {
+                        const labels = {
+                          hebrew: 'עברית', arabic: 'ערבית', english: 'אנגלית',
+                          russian: 'רוסית', french: 'צרפתית', spanish: 'ספרדית', amharic: 'אמהרית'
+                        };
+                        return (
+                          <span key={idx} className="bg-blue-50 text-blue-600 text-sm px-2 py-0.5 rounded-full">
+                            {labels[lang] || lang}
+                          </span>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
 

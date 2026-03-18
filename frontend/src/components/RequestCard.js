@@ -1,8 +1,30 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaCalendar, FaMoneyBillWave, FaMapMarkerAlt, FaComments, FaExclamationTriangle } from 'react-icons/fa';
+import { FaCalendar, FaMoneyBillWave, FaMapMarkerAlt, FaComments, FaExclamationTriangle, FaClock, FaUser, FaGlobe } from 'react-icons/fa';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+
+const BUDGET_TYPE_LABELS = {
+  per_hour: 'לשעה',
+  per_treatment: 'לטיפול',
+  per_visit: 'לביקור',
+};
+
+const GENDER_LABELS = {
+  male: 'זכר',
+  female: 'נקבה',
+  no_preference: 'ללא העדפה',
+};
+
+const LANGUAGE_LABELS = {
+  hebrew: 'עברית',
+  arabic: 'ערבית',
+  english: 'אנגלית',
+  russian: 'רוסית',
+  french: 'צרפתית',
+  spanish: 'ספרדית',
+  amharic: 'אמהרית',
+};
 
 const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
   const { t } = useTranslation();
@@ -66,7 +88,20 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
       <p className="text-carelink-slate mb-4 line-clamp-2">{request.description}</p>
 
       <div className="space-y-2 mb-4">
-        {request.specialization && (
+        {/* Professions */}
+        {request.professions && request.professions.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1">
+            <span className="text-sm font-medium text-carelink-navy">מקצוע:</span>
+            {request.professions.map((prof, idx) => (
+              <span key={idx} className="bg-carelink-teal-pale text-carelink-teal text-xs px-2 py-0.5 rounded-full">
+                {prof}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Legacy specialization fallback */}
+        {(!request.professions || request.professions.length === 0) && request.specialization && (
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-carelink-navy">{t('specialization')}:</span>
             <span className="bg-carelink-teal-pale text-carelink-teal text-sm px-3 py-1 rounded-full">
@@ -79,7 +114,14 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
           <div className="flex items-center gap-2">
             <FaMoneyBillWave className="text-carelink-teal" />
             <span className="text-sm font-medium text-carelink-navy">{t('budget')}:</span>
-            <span className="text-lg font-bold text-carelink-teal">₪{request.budget}</span>
+            <span className="text-lg font-bold text-carelink-teal">
+              ₪{request.budget}
+              {request.budget_type && (
+                <span className="text-sm font-normal text-carelink-gray mr-1">
+                  {BUDGET_TYPE_LABELS[request.budget_type] || request.budget_type}
+                </span>
+              )}
+            </span>
           </div>
         )}
 
@@ -93,7 +135,24 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
         {request.preferred_date && (
           <div className="flex items-center gap-2 text-sm text-carelink-gray">
             <FaCalendar className="text-carelink-teal" />
-            <span>{t('preferredDate')}: {format(new Date(request.preferred_date), 'dd/MM/yyyy')}</span>
+            <span>
+              {t('preferredDate')}: {format(new Date(request.preferred_date), 'dd/MM/yyyy')}
+              {request.preferred_time && ` בשעה ${request.preferred_time}`}
+            </span>
+          </div>
+        )}
+
+        {request.gender_preference && request.gender_preference !== 'no_preference' && (
+          <div className="flex items-center gap-2 text-sm text-carelink-gray">
+            <FaUser className="text-carelink-teal" />
+            <span>העדפת מגדר: {GENDER_LABELS[request.gender_preference] || request.gender_preference}</span>
+          </div>
+        )}
+
+        {request.language_preferences && request.language_preferences.length > 0 && (
+          <div className="flex items-center gap-2 text-sm text-carelink-gray">
+            <FaGlobe className="text-carelink-teal" />
+            <span>שפות: {request.language_preferences.map(l => LANGUAGE_LABELS[l] || l).join(', ')}</span>
           </div>
         )}
 

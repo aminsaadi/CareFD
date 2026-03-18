@@ -409,6 +409,11 @@ class OfferStatus:
     WITHDRAWN = "withdrawn"
     EXPIRED = "expired"
 
+class BudgetType:
+    PER_HOUR = "per_hour"           # לשעה
+    PER_TREATMENT = "per_treatment" # לטיפול
+    PER_VISIT = "per_visit"         # לביקור
+
 class ServiceRequest(BaseModel):
     model_config = ConfigDict(extra="ignore")
     request_id: str = Field(default_factory=lambda: f"request_{uuid.uuid4().hex[:12]}")
@@ -417,12 +422,18 @@ class ServiceRequest(BaseModel):
     description: str
     provider_type: Optional[str] = None
     specialization: Optional[str] = None
-    service_type: Optional[str] = None
+    professions: List[str] = []                    # מקצוע - up to 3 profession IDs
+    service_type: Optional[str] = None             # סוג שירות - synced with backend
+    delivery_type: Optional[str] = None            # דרך מתן השירות
     location: Optional[Location] = None
     budget: Optional[float] = None
+    budget_type: Optional[str] = None              # לשעה / לטיפול / לביקור
     request_type: str = RequestType.ONE_TIME
     urgency: Optional[str] = RequestUrgency.MEDIUM
     preferred_date: Optional[datetime] = None
+    preferred_time: Optional[str] = None           # שעה רצויה
+    gender_preference: Optional[str] = None        # העדפת מגדר
+    language_preferences: List[str] = []           # העדפות שפה
     preferences: Optional[str] = None
     status: str = RequestStatus.OPEN
     offer_count: int = 0
@@ -439,13 +450,46 @@ class RequestCreate(BaseModel):
     description: str
     provider_type: Optional[str] = None
     specialization: Optional[str] = None
+    professions: List[str] = []
     service_type: Optional[str] = None
+    delivery_type: Optional[str] = None
     location: Optional[Location] = None
     budget: Optional[float] = None
+    budget_type: Optional[str] = None
     request_type: str = RequestType.ONE_TIME
     urgency: Optional[str] = RequestUrgency.MEDIUM
     preferred_date: Optional[datetime] = None
+    preferred_time: Optional[str] = None
+    gender_preference: Optional[str] = None
+    language_preferences: List[str] = []
     preferences: Optional[str] = None
+
+    @field_validator('professions')
+    @classmethod
+    def validate_professions(cls, v):
+        if len(v) > 3:
+            raise ValueError('You can select up to 3 professions')
+        return v
+
+    @field_validator('budget_type')
+    @classmethod
+    def validate_budget_type(cls, v):
+        if v is None:
+            return v
+        allowed = [BudgetType.PER_HOUR, BudgetType.PER_TREATMENT, BudgetType.PER_VISIT]
+        if v not in allowed:
+            raise ValueError(f'budget_type must be one of: {", ".join(allowed)}')
+        return v
+
+    @field_validator('gender_preference')
+    @classmethod
+    def validate_gender_preference(cls, v):
+        if v is None:
+            return v
+        allowed = ["male", "female", "no_preference"]
+        if v not in allowed:
+            raise ValueError(f'gender_preference must be one of: {", ".join(allowed)}')
+        return v
 
     @field_validator('request_type')
     @classmethod
@@ -497,12 +541,18 @@ class RequestUpdate(BaseModel):
     description: Optional[str] = None
     provider_type: Optional[str] = None
     specialization: Optional[str] = None
+    professions: Optional[List[str]] = None
     service_type: Optional[str] = None
+    delivery_type: Optional[str] = None
     location: Optional[Location] = None
     budget: Optional[float] = None
+    budget_type: Optional[str] = None
     request_type: Optional[str] = None
     urgency: Optional[str] = None
     preferred_date: Optional[datetime] = None
+    preferred_time: Optional[str] = None
+    gender_preference: Optional[str] = None
+    language_preferences: Optional[List[str]] = None
     preferences: Optional[str] = None
 
 class RequestCancel(BaseModel):
