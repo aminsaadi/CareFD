@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import RequestCard from '../components/RequestCard';
@@ -11,9 +11,10 @@ import { toast } from 'sonner';
 const Requests = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(searchParams.get('create') === 'true');
   const [activeTab, setActiveTab] = useState('all');
   const [formData, setFormData] = useState({
     title: '',
@@ -77,6 +78,36 @@ const Requests = () => {
       <Navbar />
 
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        {/* CTA Banner for patients */}
+        {user?.role === 'patient' && !showCreateForm && (
+          <div className="bg-gradient-to-l from-carelink-teal to-carelink-navy p-6 rounded-2xl mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-white">
+              <h2 className="text-xl font-bold mb-1">צריכים שירות? פרסמו בקשה!</h2>
+              <p className="text-carelink-teal-pale text-sm">תארו את הצורך שלכם וקבלו הצעות מספקים מתאימים</p>
+            </div>
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="bg-white text-carelink-teal px-6 py-3 rounded-xl font-bold hover:bg-carelink-teal-pale transition whitespace-nowrap"
+              data-testid="create-request-btn"
+            >
+              + {t('createRequest')}
+            </button>
+          </div>
+        )}
+
+        {/* Login prompt for non-authenticated users */}
+        {!user && (
+          <div className="bg-blue-50 border-2 border-blue-200 p-6 rounded-2xl mb-6 text-center">
+            <p className="text-carelink-navy font-medium mb-3">רוצים לפרסם בקשה? התחברו כדי להתחיל</p>
+            <Link
+              to="/login"
+              className="inline-block bg-carelink-teal text-white px-6 py-2 rounded-lg hover:bg-carelink-teal-medium transition font-medium"
+            >
+              התחברות
+            </Link>
+          </div>
+        )}
+
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-carelink-navy font-heading" data-testid="requests-title">
             {t('requests')}
@@ -85,9 +116,9 @@ const Requests = () => {
             <button
               onClick={() => setShowCreateForm(!showCreateForm)}
               className="bg-carelink-teal text-white px-6 py-2 rounded-lg hover:bg-carelink-teal-medium transition font-medium"
-              data-testid="create-request-btn"
+              data-testid="create-request-btn-toggle"
             >
-              {t('createRequest')}
+              {showCreateForm ? 'סגור' : t('createRequest')}
             </button>
           )}
         </div>

@@ -773,7 +773,7 @@ const Landing = () => {
               </p>
             </div>
             <Link
-              to="/requests"
+              to="/requests?create=true"
               className="inline-flex items-center gap-2 bg-white text-carelink-teal px-8 py-4 rounded-xl font-bold text-lg hover:bg-carelink-teal-pale transition-all shadow-soft-lg btn-press hover-scale whitespace-nowrap"
               data-testid="request-banner-btn"
             >

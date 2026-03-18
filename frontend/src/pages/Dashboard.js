@@ -48,6 +48,16 @@ const Dashboard = () => {
   const [changingPassword, setChangingPassword] = useState(false);
   const [showPw, setShowPw] = useState({ current: false, new_pw: false, confirm: false });
   const fileInputRef = useRef(null);
+
+  // Request management state
+  const [showRequestForm, setShowRequestForm] = useState(false);
+  const [editingRequest, setEditingRequest] = useState(null);
+  const [requestFilter, setRequestFilter] = useState('all');
+  const [requestFormData, setRequestFormData] = useState({
+    title: '', description: '', specialization: '', budget: '',
+    request_type: 'one_time', urgency: 'medium', preferred_date: '',
+    preferences: '', service_type: '', provider_type: ''
+  });
   
   // User settings form
   const [userForm, setUserForm] = useState({
@@ -303,9 +313,114 @@ const Dashboard = () => {
     return `${first[0] || ''}${last[0] || ''}`.toUpperCase() || 'U';
   };
 
+  // === Request CRUD functions ===
+  const resetRequestForm = () => {
+    setRequestFormData({
+      title: '', description: '', specialization: '', budget: '',
+      request_type: 'one_time', urgency: 'medium', preferred_date: '',
+      preferences: '', service_type: '', provider_type: ''
+    });
+    setEditingRequest(null);
+    setShowRequestForm(false);
+  };
+
+  const handleCreateRequest = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        ...requestFormData,
+        budget: requestFormData.budget ? parseFloat(requestFormData.budget) : null,
+        preferred_date: requestFormData.preferred_date || null,
+        provider_type: requestFormData.provider_type || null,
+        service_type: requestFormData.service_type || null,
+        specialization: requestFormData.specialization || null,
+        preferences: requestFormData.preferences || null
+      };
+      await api.post('/requests', payload);
+      toast.success('הבקשה נוצרה בהצלחה!');
+      resetRequestForm();
+      fetchDashboardData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'שגיאה ביצירת הבקשה');
+    }
+  };
+
+  const handleUpdateRequest = async (e) => {
+    e.preventDefault();
+    if (!editingRequest) return;
+    try {
+      const payload = {};
+      if (requestFormData.title) payload.title = requestFormData.title;
+      if (requestFormData.description) payload.description = requestFormData.description;
+      payload.specialization = requestFormData.specialization || null;
+      payload.budget = requestFormData.budget ? parseFloat(requestFormData.budget) : null;
+      payload.request_type = requestFormData.request_type;
+      payload.urgency = requestFormData.urgency;
+      payload.preferred_date = requestFormData.preferred_date || null;
+      payload.service_type = requestFormData.service_type || null;
+      payload.provider_type = requestFormData.provider_type || null;
+      payload.preferences = requestFormData.preferences || null;
+
+      await api.put(`/requests/${editingRequest}`, payload);
+      toast.success('הבקשה עודכנה בהצלחה!');
+      resetRequestForm();
+      fetchDashboardData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'שגיאה בעדכון הבקשה');
+    }
+  };
+
+  const handleCancelRequest = async (requestId) => {
+    if (!window.confirm('האם אתה בטוח שברצונך לבטל את הבקשה?')) return;
+    try {
+      await api.put(`/requests/${requestId}/cancel`, { reason: '' });
+      toast.success('הבקשה בוטלה');
+      fetchDashboardData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'שגיאה בביטול הבקשה');
+    }
+  };
+
+  const startEditRequest = (request) => {
+    setEditingRequest(request.request_id);
+    setRequestFormData({
+      title: request.title || '',
+      description: request.description || '',
+      specialization: request.specialization || '',
+      budget: request.budget?.toString() || '',
+      request_type: request.request_type || 'one_time',
+      urgency: request.urgency || 'medium',
+      preferred_date: request.preferred_date ? request.preferred_date.split('T')[0] : '',
+      preferences: request.preferences || '',
+      service_type: request.service_type || '',
+      provider_type: request.provider_type || ''
+    });
+    setShowRequestForm(true);
+  };
+
+  const getRequestStatusColor = (status) => {
+    const colors = {
+      open: 'bg-green-100 text-green-800 border-green-300',
+      in_progress: 'bg-blue-100 text-blue-800 border-blue-300',
+      completed: 'bg-gray-100 text-gray-800 border-gray-300',
+      cancelled: 'bg-red-100 text-red-800 border-red-300'
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getRequestStatusText = (status) => {
+    const texts = { open: 'פתוח', in_progress: 'בתהליך', completed: 'הושלם', cancelled: 'בוטל' };
+    return texts[status] || status;
+  };
+
+  const filteredRequests = requestFilter === 'all'
+    ? requests
+    : requests.filter(r => r.status === requestFilter);
+
   const tabs = [
     { id: 'overview', label: 'סקירה כללית', icon: FaUser },
     { id: 'bookings', label: 'ההזמנות שלי', icon: FaCalendarAlt },
+    { id: 'requests', label: 'הבקשות שלי', icon: FaFileAlt },
     { id: 'notifications', label: 'התראות', icon: FaBell, link: '/notifications' },
     { id: 'reviews', label: 'הביקורות שלי', icon: FaStar },
     { id: 'messages', label: 'הודעות', icon: FaComments },
@@ -442,17 +557,17 @@ const Dashboard = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="bg-white p-6 rounded-2xl shadow-lg">
+                        <button onClick={() => setActiveTab('requests')} className="bg-white p-6 rounded-2xl shadow-lg text-right hover:shadow-xl transition w-full">
                           <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
-                              <FaStar className="text-amber-600 text-xl" />
+                            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                              <FaFileAlt className="text-purple-600 text-xl" />
                             </div>
                             <div>
-                              <div className="text-2xl font-bold text-carelink-navy">{stats.totalReviews}</div>
-                              <div className="text-sm text-carelink-gray">ביקורות</div>
+                              <div className="text-2xl font-bold text-carelink-navy">{stats.totalRequests}</div>
+                              <div className="text-sm text-carelink-gray">בקשות</div>
                             </div>
                           </div>
-                        </div>
+                        </button>
                       </div>
 
                       {/* Quick Actions */}
@@ -466,13 +581,13 @@ const Dashboard = () => {
                             <FaPlus className="text-carelink-teal" />
                             <span className="font-medium text-carelink-navy">חפש ספק חדש</span>
                           </Link>
-                          <Link
-                            to="/requests/new"
-                            className="flex items-center gap-3 p-4 bg-carelink-teal-pale/30 rounded-xl hover:bg-carelink-teal-pale transition"
+                          <button
+                            onClick={() => { setActiveTab('requests'); setShowRequestForm(true); }}
+                            className="flex items-center gap-3 p-4 bg-carelink-teal-pale/30 rounded-xl hover:bg-carelink-teal-pale transition w-full"
                           >
                             <FaFileAlt className="text-carelink-teal" />
                             <span className="font-medium text-carelink-navy">פרסם בקשה</span>
-                          </Link>
+                          </button>
                           <Link
                             to="/chats"
                             className="flex items-center gap-3 p-4 bg-carelink-teal-pale/30 rounded-xl hover:bg-carelink-teal-pale transition"
@@ -795,6 +910,286 @@ const Dashboard = () => {
                                 </span>
                               )}
                             </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Requests Tab */}
+                  {activeTab === 'requests' && (
+                    <div className="space-y-6">
+                      {/* Header with create button */}
+                      <div className="bg-white p-6 rounded-2xl shadow-lg">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-xl font-bold text-carelink-navy flex items-center gap-2">
+                            <FaFileAlt className="text-carelink-teal" />
+                            הבקשות שלי
+                          </h3>
+                          <button
+                            onClick={() => { resetRequestForm(); setShowRequestForm(true); }}
+                            className="bg-carelink-teal text-white px-5 py-2 rounded-lg hover:bg-carelink-teal-medium transition font-medium flex items-center gap-2"
+                          >
+                            <FaPlus /> בקשה חדשה
+                          </button>
+                        </div>
+
+                        {/* Filter buttons */}
+                        <div className="flex gap-2 flex-wrap">
+                          {[
+                            { id: 'all', label: 'הכל' },
+                            { id: 'open', label: 'פתוחות' },
+                            { id: 'in_progress', label: 'בתהליך' },
+                            { id: 'completed', label: 'הושלמו' },
+                            { id: 'cancelled', label: 'בוטלו' }
+                          ].map(f => (
+                            <button
+                              key={f.id}
+                              onClick={() => setRequestFilter(f.id)}
+                              className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
+                                requestFilter === f.id
+                                  ? 'bg-carelink-teal text-white'
+                                  : 'bg-gray-100 text-carelink-gray hover:bg-gray-200'
+                              }`}
+                            >
+                              {f.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Create / Edit Request Form */}
+                      {showRequestForm && (
+                        <div className="bg-white p-6 rounded-2xl shadow-lg border-2 border-carelink-teal">
+                          <h3 className="text-lg font-bold text-carelink-navy mb-4">
+                            {editingRequest ? 'עריכת בקשה' : 'בקשה חדשה'}
+                          </h3>
+                          <form onSubmit={editingRequest ? handleUpdateRequest : handleCreateRequest} className="space-y-4">
+                            <div>
+                              <label className="block text-sm font-medium text-carelink-navy mb-1">כותרת *</label>
+                              <input
+                                type="text"
+                                required
+                                value={requestFormData.title}
+                                onChange={(e) => setRequestFormData({ ...requestFormData, title: e.target.value })}
+                                className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                placeholder="מה אתה מחפש?"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-carelink-navy mb-1">תיאור *</label>
+                              <textarea
+                                required
+                                value={requestFormData.description}
+                                onChange={(e) => setRequestFormData({ ...requestFormData, description: e.target.value })}
+                                className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                rows="3"
+                                placeholder="תאר את הצורך שלך..."
+                              />
+                            </div>
+                            <div className="grid md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">סוג בקשה</label>
+                                <select
+                                  value={requestFormData.request_type}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, request_type: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                >
+                                  <option value="one_time">חד פעמי</option>
+                                  <option value="immediate">מיידי</option>
+                                  <option value="scheduled">מתוזמן</option>
+                                  <option value="follow_up">המשך טיפול</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">דחיפות</label>
+                                <select
+                                  value={requestFormData.urgency}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, urgency: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                >
+                                  <option value="low">נמוכה</option>
+                                  <option value="medium">בינונית</option>
+                                  <option value="high">גבוהה</option>
+                                  <option value="urgent">דחוף</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">התמחות</label>
+                                <input
+                                  type="text"
+                                  value={requestFormData.specialization}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, specialization: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                  placeholder="למשל: סיעוד, פיזיותרפיה..."
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">תקציב (₪)</label>
+                                <input
+                                  type="number"
+                                  value={requestFormData.budget}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, budget: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                  placeholder="₪"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">תאריך מועדף</label>
+                                <input
+                                  type="date"
+                                  value={requestFormData.preferred_date}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, preferred_date: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">סוג שירות</label>
+                                <select
+                                  value={requestFormData.service_type}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, service_type: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                >
+                                  <option value="">-- בחר --</option>
+                                  <option value="home_visit">ביקור בית</option>
+                                  <option value="clinic_visit">ביקור במרפאה</option>
+                                  <option value="video_call">שיחת וידאו</option>
+                                  <option value="consultation">ייעוץ</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-carelink-navy mb-1">העדפות נוספות</label>
+                              <textarea
+                                value={requestFormData.preferences}
+                                onChange={(e) => setRequestFormData({ ...requestFormData, preferences: e.target.value })}
+                                className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                rows="2"
+                                placeholder="העדפות נוספות..."
+                              />
+                            </div>
+                            <div className="flex gap-3">
+                              <button
+                                type="submit"
+                                className="bg-carelink-teal text-white px-6 py-2 rounded-lg hover:bg-carelink-teal-medium transition font-medium"
+                              >
+                                {editingRequest ? 'עדכן בקשה' : 'פרסם בקשה'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={resetRequestForm}
+                                className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition"
+                              >
+                                ביטול
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      )}
+
+                      {/* Requests List */}
+                      {filteredRequests.length === 0 ? (
+                        <div className="bg-white p-6 rounded-2xl shadow-lg text-center py-12 text-carelink-gray">
+                          <FaFileAlt className="text-5xl mx-auto mb-3 text-carelink-teal-pale" />
+                          <p className="text-lg mb-2">
+                            {requestFilter === 'all' ? 'עדיין לא פרסמת בקשות' : 'אין בקשות בסטטוס זה'}
+                          </p>
+                          {requestFilter === 'all' && (
+                            <button
+                              onClick={() => { resetRequestForm(); setShowRequestForm(true); }}
+                              className="text-carelink-teal font-medium hover:underline"
+                            >
+                              פרסם בקשה ראשונה
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {filteredRequests.map((request) => (
+                            <div
+                              key={request.request_id}
+                              className="bg-white p-5 rounded-2xl shadow-lg border-2 border-carelink-teal-pale hover:border-carelink-teal transition"
+                            >
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex-1">
+                                  <Link
+                                    to={`/requests/${request.request_id}`}
+                                    className="text-lg font-bold text-carelink-navy hover:text-carelink-teal transition"
+                                  >
+                                    {request.title}
+                                  </Link>
+                                  <p className="text-sm text-carelink-gray mt-1 line-clamp-2">{request.description}</p>
+                                </div>
+                                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getRequestStatusColor(request.status)}`}>
+                                  {getRequestStatusText(request.status)}
+                                </span>
+                              </div>
+
+                              {/* Details row */}
+                              <div className="flex flex-wrap gap-3 mb-3 text-sm">
+                                {request.specialization && (
+                                  <span className="bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full">
+                                    {request.specialization}
+                                  </span>
+                                )}
+                                {request.budget && (
+                                  <span className="flex items-center gap-1 text-carelink-navy font-medium">
+                                    <FaMoneyBillWave className="text-carelink-teal" /> ₪{request.budget}
+                                  </span>
+                                )}
+                                {request.urgency && request.urgency !== 'medium' && (
+                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    request.urgency === 'urgent' ? 'bg-red-100 text-red-700' :
+                                    request.urgency === 'high' ? 'bg-orange-100 text-orange-700' :
+                                    'bg-gray-100 text-gray-600'
+                                  }`}>
+                                    {request.urgency === 'urgent' ? 'דחוף' : request.urgency === 'high' ? 'גבוה' : 'נמוך'}
+                                  </span>
+                                )}
+                                {request.offer_count > 0 && (
+                                  <span className="flex items-center gap-1 text-carelink-gray">
+                                    <FaComments className="text-carelink-teal" /> {request.offer_count} הצעות
+                                  </span>
+                                )}
+                                <span className="text-carelink-gray">
+                                  {new Date(request.created_at).toLocaleDateString('he-IL')}
+                                </span>
+                              </div>
+
+                              {/* Action buttons */}
+                              <div className="flex gap-2">
+                                <Link
+                                  to={`/requests/${request.request_id}`}
+                                  className="text-sm bg-carelink-navy text-white px-4 py-1.5 rounded-lg hover:bg-carelink-slate transition"
+                                >
+                                  {request.offer_count > 0 ? `צפה בהצעות (${request.offer_count})` : 'פרטים'}
+                                </Link>
+                                {request.status === 'open' && (
+                                  <>
+                                    <button
+                                      onClick={() => startEditRequest(request)}
+                                      className="text-sm bg-blue-50 text-blue-600 px-4 py-1.5 rounded-lg hover:bg-blue-100 transition flex items-center gap-1"
+                                    >
+                                      <FaEdit /> ערוך
+                                    </button>
+                                    <button
+                                      onClick={() => handleCancelRequest(request.request_id)}
+                                      className="text-sm bg-red-50 text-red-600 px-4 py-1.5 rounded-lg hover:bg-red-100 transition flex items-center gap-1"
+                                    >
+                                      <FaTimes /> בטל
+                                    </button>
+                                  </>
+                                )}
+                                {request.status === 'in_progress' && request.booking_id && (
+                                  <Link
+                                    to={`/bookings/${request.booking_id}`}
+                                    className="text-sm bg-carelink-teal text-white px-4 py-1.5 rounded-lg hover:bg-carelink-teal-medium transition"
+                                  >
+                                    צפה בהזמנה
+                                  </Link>
+                                )}
+                              </div>
+                            </div>
                           ))}
                         </div>
                       )}

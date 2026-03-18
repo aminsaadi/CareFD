@@ -120,6 +120,10 @@ function AppRouter() {
         }
       />
       <Route
+        path="/requests/new"
+        element={<Navigate to="/requests?create=true" replace />}
+      />
+      <Route
         path="/provider/setup"
         element={
           <ProtectedRoute>

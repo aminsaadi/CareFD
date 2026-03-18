@@ -1654,37 +1654,74 @@ const ProviderDashboard = () => {
                   {/* Requests Tab */}
                   {activeTab === 'requests' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <h3 className="text-xl font-bold text-carelink-navy mb-6">בקשות פתוחות</h3>
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-bold text-carelink-navy flex items-center gap-2">
+                          <FaFileAlt className="text-carelink-teal" />
+                          בקשות פתוחות
+                        </h3>
+                        <Link to="/requests" className="text-carelink-teal font-medium text-sm hover:underline">
+                          צפה בכל הבקשות
+                        </Link>
+                      </div>
                       {requests.length === 0 ? (
                         <div className="text-center py-12 text-carelink-gray">
                           <FaFileAlt className="text-5xl mx-auto mb-3 text-carelink-teal-pale" />
-                          <p className="text-lg">אין בקשות פתוחות כרגע</p>
+                          <p className="text-lg mb-2">אין בקשות פתוחות כרגע</p>
+                          <Link to="/requests" className="text-carelink-teal font-medium hover:underline">
+                            עבור לדף הבקשות
+                          </Link>
                         </div>
                       ) : (
                         <div className="space-y-4">
                           {requests.map((request) => (
-                            <Link
+                            <div
                               key={request.request_id}
-                              to={`/requests/${request.request_id}`}
-                              className="block p-4 border-2 border-carelink-teal-pale rounded-xl hover:border-carelink-teal transition"
+                              className="p-4 border-2 border-carelink-teal-pale rounded-xl hover:border-carelink-teal transition"
                             >
-                              <div className="flex items-start justify-between">
-                                <div>
-                                  <h4 className="font-bold text-carelink-navy mb-1">{request.title}</h4>
-                                  <p className="text-sm text-carelink-gray line-clamp-2">{request.description}</p>
-                                  <div className="flex items-center gap-4 mt-2 text-xs text-carelink-gray">
-                                    <span>{request.location?.city || 'לא צוין מיקום'}</span>
-                                    <span>{new Date(request.created_at).toLocaleDateString('he-IL')}</span>
-                                  </div>
+                              <div className="flex items-start justify-between mb-2">
+                                <div className="flex-1">
+                                  <Link
+                                    to={`/requests/${request.request_id}`}
+                                    className="font-bold text-carelink-navy hover:text-carelink-teal transition text-lg"
+                                  >
+                                    {request.title}
+                                  </Link>
+                                  <p className="text-sm text-carelink-gray line-clamp-2 mt-1">{request.description}</p>
                                 </div>
-                                {request.budget && (
-                                  <div className="text-right">
+                                <div className="flex flex-col items-end gap-1 mr-4">
+                                  {request.budget && (
                                     <span className="text-xl font-bold text-carelink-teal">₪{request.budget}</span>
-                                    <p className="text-xs text-carelink-gray">תקציב</p>
-                                  </div>
+                                  )}
+                                  {request.urgency && request.urgency !== 'medium' && (
+                                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                      request.urgency === 'urgent' ? 'bg-red-100 text-red-700' :
+                                      request.urgency === 'high' ? 'bg-orange-100 text-orange-700' :
+                                      'bg-gray-100 text-gray-600'
+                                    }`}>
+                                      {request.urgency === 'urgent' ? 'דחוף' : request.urgency === 'high' ? 'גבוה' : 'נמוך'}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex flex-wrap items-center gap-3 text-xs text-carelink-gray mb-3">
+                                {request.specialization && (
+                                  <span className="bg-carelink-teal-pale text-carelink-teal px-2 py-1 rounded-full text-xs">
+                                    {request.specialization}
+                                  </span>
+                                )}
+                                <span>{request.location?.city || 'לא צוין מיקום'}</span>
+                                <span>{new Date(request.created_at).toLocaleDateString('he-IL')}</span>
+                                {request.offer_count > 0 && (
+                                  <span className="text-carelink-teal font-medium">{request.offer_count} הצעות</span>
                                 )}
                               </div>
-                            </Link>
+                              <Link
+                                to={`/requests/${request.request_id}`}
+                                className="inline-flex items-center gap-2 text-sm bg-carelink-teal text-white px-4 py-2 rounded-lg hover:bg-carelink-teal-medium transition font-medium"
+                              >
+                                <FaMoneyBillWave /> הגש הצעה
+                              </Link>
+                            </div>
                           ))}
                         </div>
                       )}
