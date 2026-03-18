@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaCalendar, FaMoneyBillWave, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaCalendar, FaMoneyBillWave, FaMapMarkerAlt, FaComments, FaExclamationTriangle } from 'react-icons/fa';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 
@@ -27,6 +27,16 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
     return texts[status] || status;
   };
 
+  const getUrgencyColor = (urgency) => {
+    const colors = {
+      low: 'bg-gray-100 text-gray-600',
+      medium: 'bg-yellow-100 text-yellow-700',
+      high: 'bg-orange-100 text-orange-700',
+      urgent: 'bg-red-100 text-red-700'
+    };
+    return colors[urgency] || 'bg-gray-100 text-gray-600';
+  };
+
   return (
     <div
       className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border-2 border-carelink-teal-pale"
@@ -40,9 +50,17 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
             <span>{format(new Date(request.created_at), 'dd/MM/yyyy')}</span>
           </div>
         </div>
-        <span className={`px-3 py-1 rounded-full text-sm font-medium border-2 ${getStatusColor(request.status)}`}>
-          {getStatusText(request.status)}
-        </span>
+        <div className="flex flex-col gap-1 items-end">
+          <span className={`px-3 py-1 rounded-full text-sm font-medium border-2 ${getStatusColor(request.status)}`}>
+            {getStatusText(request.status)}
+          </span>
+          {request.urgency && request.urgency !== 'medium' && (
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 ${getUrgencyColor(request.urgency)}`}>
+              <FaExclamationTriangle className="text-xs" />
+              {t(request.urgency)}
+            </span>
+          )}
+        </div>
       </div>
 
       <p className="text-carelink-slate mb-4 line-clamp-2">{request.description}</p>
@@ -50,7 +68,7 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
       <div className="space-y-2 mb-4">
         {request.specialization && (
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-carelink-navy">התמחות:</span>
+            <span className="text-sm font-medium text-carelink-navy">{t('specialization')}:</span>
             <span className="bg-carelink-teal-pale text-carelink-teal text-sm px-3 py-1 rounded-full">
               {request.specialization}
             </span>
@@ -60,7 +78,7 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
         {request.budget && (
           <div className="flex items-center gap-2">
             <FaMoneyBillWave className="text-carelink-teal" />
-            <span className="text-sm font-medium text-carelink-navy">תקציב:</span>
+            <span className="text-sm font-medium text-carelink-navy">{t('budget')}:</span>
             <span className="text-lg font-bold text-carelink-teal">₪{request.budget}</span>
           </div>
         )}
@@ -71,7 +89,30 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
             <span>{request.location.city}</span>
           </div>
         )}
+
+        {request.preferred_date && (
+          <div className="flex items-center gap-2 text-sm text-carelink-gray">
+            <FaCalendar className="text-carelink-teal" />
+            <span>{t('preferredDate')}: {format(new Date(request.preferred_date), 'dd/MM/yyyy')}</span>
+          </div>
+        )}
+
+        {request.request_type && request.request_type !== 'one_time' && (
+          <div className="flex items-center gap-2">
+            <span className="bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded-full">
+              {t(request.request_type)}
+            </span>
+          </div>
+        )}
       </div>
+
+      {/* Offer count badge */}
+      {(request.offer_count > 0) && (
+        <div className="flex items-center gap-1 mb-3 text-sm text-carelink-gray">
+          <FaComments className="text-carelink-teal" />
+          <span>{request.offer_count} {t('offerCount')}</span>
+        </div>
+      )}
 
       <Link
         to={`/requests/${request.request_id}`}

@@ -396,6 +396,19 @@ class RequestType:
     ONE_TIME = "one_time"
     FOLLOW_UP = "follow_up"
 
+class RequestUrgency:
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    URGENT = "urgent"
+
+class OfferStatus:
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    WITHDRAWN = "withdrawn"
+    EXPIRED = "expired"
+
 class ServiceRequest(BaseModel):
     model_config = ConfigDict(extra="ignore")
     request_id: str = Field(default_factory=lambda: f"request_{uuid.uuid4().hex[:12]}")
@@ -408,7 +421,16 @@ class ServiceRequest(BaseModel):
     location: Optional[Location] = None
     budget: Optional[float] = None
     request_type: str = RequestType.ONE_TIME
+    urgency: Optional[str] = RequestUrgency.MEDIUM
+    preferred_date: Optional[datetime] = None
+    preferences: Optional[str] = None
     status: str = RequestStatus.OPEN
+    offer_count: int = 0
+    accepted_offer_id: Optional[str] = None
+    accepted_at: Optional[datetime] = None
+    booking_id: Optional[str] = None
+    cancelled_at: Optional[datetime] = None
+    cancellation_reason: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -421,6 +443,25 @@ class RequestCreate(BaseModel):
     location: Optional[Location] = None
     budget: Optional[float] = None
     request_type: str = RequestType.ONE_TIME
+    urgency: Optional[str] = RequestUrgency.MEDIUM
+    preferred_date: Optional[datetime] = None
+    preferences: Optional[str] = None
+
+class RequestUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    provider_type: Optional[str] = None
+    specialization: Optional[str] = None
+    service_type: Optional[str] = None
+    location: Optional[Location] = None
+    budget: Optional[float] = None
+    request_type: Optional[str] = None
+    urgency: Optional[str] = None
+    preferred_date: Optional[datetime] = None
+    preferences: Optional[str] = None
+
+class RequestCancel(BaseModel):
+    reason: Optional[str] = None
 
 class Offer(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -432,7 +473,11 @@ class Offer(BaseModel):
     duration_days: Optional[int] = None
     message: str
     suggested_service_id: Optional[str] = None
-    status: str = "pending"
+    provider_name: Optional[str] = None
+    provider_picture: Optional[str] = None
+    status: str = OfferStatus.PENDING
+    rejected_at: Optional[datetime] = None
+    withdrawn_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class OfferCreate(BaseModel):
@@ -598,6 +643,9 @@ class NotificationType:
     MESSAGE_NEW = "message_new"
     OFFER_NEW = "offer_new"
     OFFER_ACCEPTED = "offer_accepted"
+    OFFER_REJECTED = "offer_rejected"
+    OFFER_WITHDRAWN = "offer_withdrawn"
+    REQUEST_CANCELLED = "request_cancelled"
     REVIEW_NEW = "review_new"
     BOOKING_CHANGE_REQUESTED = "booking_change_requested"
     SYSTEM = "system"

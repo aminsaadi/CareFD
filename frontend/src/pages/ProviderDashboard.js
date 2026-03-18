@@ -62,6 +62,7 @@ const ProviderDashboard = () => {
   const [bookings, setBookings] = useState([]);
   const [services, setServices] = useState([]);
   const [requests, setRequests] = useState([]);
+  const [myOffers, setMyOffers] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -227,6 +228,14 @@ const ProviderDashboard = () => {
       // Fetch open requests (for offers)
       const requestsRes = await api.get('/requests?status=open&limit=10');
       setRequests(requestsRes.data.requests || []);
+
+      // Fetch my offers
+      try {
+        const myOffersRes = await api.get('/offers/my');
+        setMyOffers(myOffersRes.data.offers || []);
+      } catch (e) {
+        console.error('Failed to fetch offers:', e);
+      }
 
       // Fetch reviews
       if (providerRes.data?.provider_id) {
@@ -534,6 +543,7 @@ const ProviderDashboard = () => {
     { id: 'clinics', label: 'קליניקות', icon: FaBuilding },
     { id: 'team', label: 'צוות', icon: FaUsers },
     { id: 'requests', label: 'בקשות פתוחות', icon: FaFileAlt },
+    { id: 'my_offers', label: 'ההצעות שלי', icon: FaMoneyBillWave },
     { id: 'notifications', label: 'התראות', icon: FaBell, link: '/notifications' },
     { id: 'messages', label: 'הודעות', icon: FaComments },
     { id: 'reviews', label: 'ביקורות', icon: FaStar },
@@ -1676,6 +1686,106 @@ const ProviderDashboard = () => {
                               </div>
                             </Link>
                           ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* My Offers Tab */}
+                  {activeTab === 'my_offers' && (
+                    <div className="bg-white p-6 rounded-2xl shadow-lg">
+                      <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
+                        <FaMoneyBillWave className="text-carelink-teal" />
+                        ההצעות שלי
+                      </h3>
+                      {myOffers.length === 0 ? (
+                        <div className="text-center py-12 text-carelink-gray">
+                          <FaMoneyBillWave className="text-5xl mx-auto mb-3 text-carelink-teal-pale" />
+                          <p className="text-lg">עדיין לא הגשת הצעות</p>
+                          <Link to="/requests" className="text-carelink-teal hover:underline mt-2 inline-block">
+                            צפה בבקשות פתוחות
+                          </Link>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {myOffers.map((offer) => {
+                            const statusConfig = {
+                              pending: { color: 'bg-yellow-100 text-yellow-800 border-yellow-300', text: 'ממתין', icon: FaHourglass },
+                              accepted: { color: 'bg-green-100 text-green-800 border-green-300', text: 'התקבלה', icon: FaCheckCircle },
+                              rejected: { color: 'bg-red-100 text-red-800 border-red-300', text: 'נדחתה', icon: FaTimes },
+                              withdrawn: { color: 'bg-gray-100 text-gray-600 border-gray-300', text: 'נמשכה', icon: FaTimes }
+                            };
+                            const sc = statusConfig[offer.status] || statusConfig.pending;
+                            const StatusIcon = sc.icon;
+
+                            return (
+                              <div
+                                key={offer.offer_id}
+                                className={`p-4 border-2 rounded-xl transition ${
+                                  offer.status === 'accepted' ? 'border-green-300 bg-green-50' :
+                                  offer.status === 'rejected' ? 'border-red-200 bg-red-50 opacity-70' :
+                                  offer.status === 'withdrawn' ? 'border-gray-200 bg-gray-50 opacity-70' :
+                                  'border-carelink-teal-pale hover:border-carelink-teal'
+                                }`}
+                              >
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <Link
+                                      to={`/requests/${offer.request_id}`}
+                                      className="font-bold text-carelink-navy hover:text-carelink-teal transition"
+                                    >
+                                      {offer.request?.title || 'בקשה'}
+                                    </Link>
+                                    <p className="text-sm text-carelink-gray mt-1">
+                                      {new Date(offer.created_at).toLocaleDateString('he-IL')}
+                                    </p>
+                                    <p className="text-carelink-slate text-sm mt-2 line-clamp-2">{offer.message}</p>
+                                  </div>
+                                  <div className="text-left ms-4">
+                                    <div className="text-xl font-bold text-carelink-teal">₪{offer.price}</div>
+                                    <span className={`px-2 py-1 rounded-full text-xs font-medium border flex items-center gap-1 mt-1 ${sc.color}`}>
+                                      <StatusIcon className="text-xs" /> {sc.text}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="mt-3 flex gap-2">
+                                  {offer.status === 'pending' && (
+                                    <button
+                                      onClick={async () => {
+                                        try {
+                                          await api.post(`/offers/${offer.offer_id}/withdraw`);
+                                          toast.success('ההצעה נמשכה');
+                                          const res = await api.get('/offers/my');
+                                          setMyOffers(res.data.offers || []);
+                                        } catch (err) {
+                                          toast.error(err.response?.data?.detail || 'שגיאה');
+                                        }
+                                      }}
+                                      className="text-sm text-red-600 hover:text-red-800 transition px-3 py-1 rounded border border-red-200 hover:bg-red-50"
+                                    >
+                                      משוך הצעה
+                                    </button>
+                                  )}
+                                  {offer.status === 'accepted' && (
+                                    <Link
+                                      to="/chats"
+                                      className="text-sm text-carelink-teal hover:text-carelink-teal-medium transition px-3 py-1 rounded border border-carelink-teal hover:bg-carelink-teal-pale flex items-center gap-1"
+                                    >
+                                      <FaComments /> פתח צ'אט
+                                    </Link>
+                                  )}
+                                  <Link
+                                    to={`/requests/${offer.request_id}`}
+                                    className="text-sm text-carelink-navy hover:text-carelink-teal transition px-3 py-1 rounded border border-carelink-light-gray hover:bg-gray-50"
+                                  >
+                                    צפה בבקשה
+                                  </Link>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       )}
                     </div>
