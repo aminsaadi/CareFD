@@ -8,6 +8,8 @@ import RequestCard from '../components/RequestCard';
 import api from '../utils/api';
 import { toast } from 'sonner';
 
+const isPatientRole = (role) => role === 'patient' || role === 'user';
+
 const Requests = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -79,7 +81,7 @@ const Requests = () => {
 
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         {/* CTA Banner for patients */}
-        {user?.role === 'patient' && !showCreateForm && (
+        {isPatientRole(user?.role) && !showCreateForm && (
           <div className="bg-gradient-to-l from-carelink-teal to-carelink-navy p-6 rounded-2xl mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-white">
               <h2 className="text-xl font-bold mb-1">צריכים שירות? פרסמו בקשה!</h2>
@@ -112,7 +114,7 @@ const Requests = () => {
           <h1 className="text-3xl font-bold text-carelink-navy font-heading" data-testid="requests-title">
             {t('requests')}
           </h1>
-          {user?.role === 'patient' && (
+          {isPatientRole(user?.role) && (
             <button
               onClick={() => setShowCreateForm(!showCreateForm)}
               className="bg-carelink-teal text-white px-6 py-2 rounded-lg hover:bg-carelink-teal-medium transition font-medium"
@@ -137,7 +139,7 @@ const Requests = () => {
             >
               {t('allRequests')}
             </button>
-            {user?.role === 'patient' && (
+            {isPatientRole(user?.role) && (
               <button
                 onClick={() => setActiveTab('my')}
                 className={`px-4 py-2 rounded-lg font-medium transition ${

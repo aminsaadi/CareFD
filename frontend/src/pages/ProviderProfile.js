@@ -325,11 +325,18 @@ const ProviderProfile = () => {
                 )}
               </div>
               
-              {/* Profession Title - NEW */}
-              {provider.profession_title && (
-                <p className="text-xl text-carelink-teal-pale font-medium mb-3" data-testid="profession-title">
-                  {getProfessionLabel(provider.profession_title)}
-                </p>
+              {/* Profession & Specialization */}
+              {(provider.profession_name || provider.profession_title) && (
+                <div className="flex flex-wrap items-center gap-2 mb-3" data-testid="profession-title">
+                  <span className="text-xl text-carelink-teal-pale font-medium">
+                    {provider.profession_name || getProfessionLabel(provider.profession_title)}
+                  </span>
+                  {provider.specialization_name && (
+                    <span className="bg-white/20 text-white px-3 py-1 rounded-full text-sm">
+                      {provider.specialization_name}
+                    </span>
+                  )}
+                </div>
               )}
 
               {/* Provider Number */}
