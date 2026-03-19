@@ -15,7 +15,7 @@ import {
   FaCopy, FaCheck, FaInfoCircle, FaGraduationCap, FaCreditCard,
   FaHospital, FaFileContract, FaIdCard, FaCertificate
 } from 'react-icons/fa';
-import { dummyProviders, dummyServices } from '../data/dummyData';
+
 
 // Service type config
 const serviceTypeConfig = {
