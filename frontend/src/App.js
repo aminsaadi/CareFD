@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { SiteSettingsProvider } from './context/SiteSettingsContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import CookieConsent from './components/CookieConsent';
 import AccessibilityWidget from './components/AccessibilityWidget';
@@ -410,15 +411,17 @@ function AppRouter() {
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <NotificationProvider>
-          <AppRouter />
-          <CookieConsent />
-          <AccessibilityWidget />
-        </NotificationProvider>
-      </BrowserRouter>
-    </AuthProvider>
+    <SiteSettingsProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <NotificationProvider>
+            <AppRouter />
+            <CookieConsent />
+            <AccessibilityWidget />
+          </NotificationProvider>
+        </BrowserRouter>
+      </AuthProvider>
+    </SiteSettingsProvider>
   );
 }
 

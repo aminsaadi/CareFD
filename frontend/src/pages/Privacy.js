@@ -2,8 +2,10 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { FaShieldAlt, FaLock, FaEye, FaUserShield, FaDatabase, FaCookie } from 'react-icons/fa';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 
 const Privacy = () => {
+  const { siteName } = useSiteSettings();
   const lastUpdated = '22 בפברואר, 2026';
 
   return (
@@ -30,7 +32,7 @@ const Privacy = () => {
                 התחייבותנו לפרטיותך
               </h2>
               <p className="text-carelink-slate">
-                ב-CareLink, הפרטיות שלך חשובה לנו. מסמך זה מסביר כיצד אנו אוספים, משתמשים ומגנים על המידע האישי שלך.
+                ב-{siteName}, הפרטיות שלך חשובה לנו. מסמך זה מסביר כיצד אנו אוספים, משתמשים ומגנים על המידע האישי שלך.
               </p>
             </div>
 

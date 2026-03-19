@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AddReviewForm from '../components/AddReviewForm';
@@ -99,6 +100,7 @@ const ProviderProfile = () => {
   const { t } = useTranslation();
   const { providerId } = useParams();
   const { user, isAuthenticated } = useAuth();
+  const { siteName } = useSiteSettings();
   const navigate = useNavigate();
   const [provider, setProvider] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -183,7 +185,7 @@ const ProviderProfile = () => {
 
   const shareToWhatsApp = () => {
     const url = window.location.href;
-    const text = `בדוק את ${provider?.business_name || 'הספק הזה'} ב-CareLink: ${url}`;
+    const text = `בדוק את ${provider?.business_name || 'הספק הזה'} ב-${siteName}: ${url}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -200,7 +202,7 @@ const ProviderProfile = () => {
   const handleWhatsApp = () => {
     if (!provider?.phone) return;
     const phone = provider.phone.replace(/[^0-9]/g, '');
-    window.open(`https://wa.me/${phone}?text=שלום, מצאתי אתכם ב-CareLink ואשמח לקבל מידע נוסף`, '_blank');
+    window.open(`https://wa.me/${phone}?text=שלום, מצאתי אתכם ב-${siteName} ואשמח לקבל מידע נוסף`, '_blank');
   };
 
   const handleCall = () => {
@@ -1151,8 +1153,8 @@ const ProviderProfile = () => {
                 onClick={() => {
                   if (navigator.share) {
                     navigator.share({
-                      title: provider?.business_name || 'CareLink',
-                      text: `בדוק את ${provider?.business_name || 'הספק הזה'} ב-CareLink`,
+                      title: provider?.business_name || siteName,
+                      text: `בדוק את ${provider?.business_name || 'הספק הזה'} ב-${siteName}`,
                       url: window.location.href
                     });
                   }

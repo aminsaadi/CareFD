@@ -1299,10 +1299,13 @@ async def get_public_settings():
     settings = await db.site_settings.find_one({}, {"_id": 0})
     if not settings:
         settings = {
-            "contact_email": "info@carelink.co.il",
-            "contact_phone": "03-1234567",
-            "contact_address": "תל אביב, ישראל",
-            "footer_text": "© 2025 CareLink. All rights reserved.",
+            "site_name": "Healthcare Platform",
+            "site_tagline": "Connecting Care Providers",
+            "logo_url": "",
+            "contact_email": "",
+            "contact_phone": "",
+            "contact_address": "",
+            "footer_text": "",
             "social_facebook": "",
             "social_instagram": "",
             "social_twitter": "",
@@ -1315,7 +1318,7 @@ async def get_public_settings():
         "contact_email", "contact_phone", "contact_address",
         "footer_text", "social_facebook", "social_instagram",
         "social_twitter", "social_linkedin", "social_youtube",
-        "footer_links", "site_name", "site_tagline"
+        "footer_links", "site_name", "site_tagline", "logo_url"
     ]
     return {k: v for k, v in settings.items() if k in public_fields}
 
@@ -1333,14 +1336,14 @@ async def admin_get_settings(
     if not settings:
         # Return default settings
         settings = {
-            "site_name": "CareLink",
+            "site_name": "Healthcare Platform",
             "site_tagline": "Connecting Care Providers",
             "logo_url": "",
             "favicon_url": "",
-            "contact_email": "info@carelink.co.il",
-            "contact_phone": "03-1234567",
-            "contact_address": "תל אביב, ישראל",
-            "footer_text": "© 2024 CareLink. כל הזכויות שמורות.",
+            "contact_email": "",
+            "contact_phone": "",
+            "contact_address": "",
+            "footer_text": "",
             "social_facebook": "",
             "social_instagram": "",
             "social_twitter": "",

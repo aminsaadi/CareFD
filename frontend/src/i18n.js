@@ -5,7 +5,7 @@ const resources = {
   he: {
     translation: {
       // Common
-      "welcome": "ברוכים הבאים ל-CareLink",
+      "welcome": "ברוכים הבאים",
       "login": "התחברות",
       "register": "הרשמה",
       "logout": "התנתקות",
@@ -133,7 +133,7 @@ const resources = {
   ar: {
     translation: {
       // Common
-      "welcome": "مرحباً بك في CareLink",
+      "welcome": "مرحباً بك",
       "login": "تسجيل الدخول",
       "register": "التسجيل",
       "logout": "تسجيل الخروج",
@@ -261,7 +261,7 @@ const resources = {
   en: {
     translation: {
       // Common
-      "welcome": "Welcome to CareLink",
+      "welcome": "Welcome",
       "login": "Login",
       "register": "Register",
       "logout": "Logout",

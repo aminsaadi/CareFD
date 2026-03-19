@@ -6,6 +6,7 @@ import {
 } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 import api from '../utils/api';
 
 // Service type icons and labels
@@ -38,6 +39,7 @@ const ProviderCard = ({ provider, showContact = true }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const { siteName } = useSiteSettings();
   const [showPhoneModal, setShowPhoneModal] = useState(false);
 
   // Determine service types offered (from services or default)
@@ -48,7 +50,7 @@ const ProviderCard = ({ provider, showContact = true }) => {
     e.stopPropagation();
     if (!provider.phone) return;
     const phone = provider.phone.replace(/[^0-9]/g, '');
-    window.open(`https://wa.me/${phone}?text=שלום, מצאתי אתכם ב-CareLink ואשמח לקבל מידע נוסף`, '_blank');
+    window.open(`https://wa.me/${phone}?text=שלום, מצאתי אתכם ב-${siteName} ואשמח לקבל מידע נוסף`, '_blank');
   };
 
   const handleCall = (e) => {
