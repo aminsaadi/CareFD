@@ -82,13 +82,17 @@ const RequestDetails = () => {
   };
 
   const handleAcceptOffer = async (offerId) => {
-    await confirm({
-      title: 'קבלת הצעה',
-      message: 'האם אתה בטוח שברצונך לקבל הצעה זו? תיווצר הזמנה חדשה ושיחת צ\'אט עם הספק.',
-      type: 'info',
-      confirmText: 'קבל הצעה',
-      cancelText: 'ביטול'
-    });
+    try {
+      await confirm({
+        title: 'קבלת הצעה',
+        message: 'האם אתה בטוח שברצונך לקבל הצעה זו? תיווצר הזמנה חדשה ושיחת צ\'אט עם הספק.',
+        type: 'info',
+        confirmText: 'קבל הצעה',
+        cancelText: 'ביטול'
+      });
+    } catch {
+      return; // User cancelled
+    }
 
     try {
       const response = await api.post(`/offers/${offerId}/accept`);
@@ -101,13 +105,17 @@ const RequestDetails = () => {
   };
 
   const handleRejectOffer = async (offerId) => {
-    await confirm({
-      title: 'דחיית הצעה',
-      message: 'האם אתה בטוח שברצונך לדחות הצעה זו?',
-      type: 'warning',
-      confirmText: 'דחה',
-      cancelText: 'ביטול'
-    });
+    try {
+      await confirm({
+        title: 'דחיית הצעה',
+        message: 'האם אתה בטוח שברצונך לדחות הצעה זו?',
+        type: 'warning',
+        confirmText: 'דחה',
+        cancelText: 'ביטול'
+      });
+    } catch {
+      return; // User cancelled
+    }
 
     try {
       await api.post(`/offers/${offerId}/reject`);
@@ -119,13 +127,17 @@ const RequestDetails = () => {
   };
 
   const handleCancelRequest = async () => {
-    await confirm({
-      title: 'ביטול בקשה',
-      message: 'האם אתה בטוח שברצונך לבטל את הבקשה? כל ההצעות הפתוחות יידחו.',
-      type: 'warning',
-      confirmText: 'בטל בקשה',
-      cancelText: 'חזור'
-    });
+    try {
+      await confirm({
+        title: 'ביטול בקשה',
+        message: 'האם אתה בטוח שברצונך לבטל את הבקשה? כל ההצעות הפתוחות יידחו.',
+        type: 'warning',
+        confirmText: 'בטל בקשה',
+        cancelText: 'חזור'
+      });
+    } catch {
+      return; // User cancelled
+    }
 
     try {
       await api.put(`/requests/${requestId}/cancel`, { reason: cancelReason });
@@ -367,8 +379,8 @@ const RequestDetails = () => {
               )}
             </div>
 
-            {/* Offers Section - visible to owner and providers who made offers */}
-            {(isOwner || offers.length > 0) && (
+            {/* Offers Section - visible to owner and the provider who made the offer */}
+            {(isOwner || (isProvider && offers.some(o => o.provider_id === user?.provider_id || o.provider?.provider_id === user?.provider_id))) && (
             <div className="bg-white p-6 rounded-xl shadow-lg border-2 border-carelink-teal-pale">
               <h2 className="text-2xl font-bold mb-4 text-carelink-navy">
                 {isOwner ? `${t('offersReceived')} (${offers.length})` : 'ההצעה שלי'}
@@ -407,10 +419,10 @@ const RequestDetails = () => {
                               {offer.provider?.business_name || offer.provider_name || 'ספק שירותים'}
                             </h3>
                             <div className="flex items-center gap-3 text-sm text-carelink-gray">
-                              {offer.provider?.rating > 0 && (
+                              {offer.provider?.rating != null && offer.provider.rating > 0 && (
                                 <div className="flex items-center">
                                   <FaStar className="text-yellow-500 ml-1" />
-                                  <span>{offer.provider.rating.toFixed(1)}</span>
+                                  <span>{Number(offer.provider.rating).toFixed(1)}</span>
                                   {offer.provider?.total_reviews > 0 && (
                                     <span className="text-xs mr-1">({offer.provider.total_reviews})</span>
                                   )}

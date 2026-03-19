@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
 export const useConfirm = () => {
   const [confirmState, setConfirmState] = useState({
@@ -10,6 +10,7 @@ export const useConfirm = () => {
     cancelText: 'ביטול',
     onConfirm: () => {}
   });
+  const rejectRef = useRef(null);
 
   const confirm = useCallback(({
     title = 'אישור',
@@ -18,7 +19,8 @@ export const useConfirm = () => {
     confirmText = 'אישור',
     cancelText = 'ביטול'
   }) => {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
+      rejectRef.current = reject;
       setConfirmState({
         isOpen: true,
         title,
@@ -33,6 +35,10 @@ export const useConfirm = () => {
 
   const closeConfirm = useCallback(() => {
     setConfirmState(prev => ({ ...prev, isOpen: false }));
+    if (rejectRef.current) {
+      rejectRef.current(new Error('cancelled'));
+      rejectRef.current = null;
+    }
   }, []);
 
   return {

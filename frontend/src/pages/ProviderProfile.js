@@ -125,13 +125,7 @@ const ProviderProfile = () => {
       setProvider(response.data);
     } catch (error) {
       console.error('Failed to fetch provider:', error);
-      // Fallback to dummy data
-      const dummyProvider = dummyProviders.find(p => p.provider_id === providerId);
-      if (dummyProvider) {
-        // Add services to dummy provider
-        const providerServices = dummyServices.filter(s => s.provider_id === providerId);
-        setProvider({ ...dummyProvider, services_list: providerServices });
-      }
+      setProvider(null);
     } finally {
       setLoading(false);
     }
@@ -140,11 +134,10 @@ const ProviderProfile = () => {
   const fetchReviews = async () => {
     try {
       const response = await api.get(`/providers/${providerId}/reviews`);
-      const apiReviews = response.data.reviews || [];
-      setReviews(apiReviews.length > 0 ? apiReviews : demoReviews);
+      setReviews(response.data.reviews || []);
     } catch (error) {
       console.error('Failed to fetch reviews:', error);
-      setReviews(demoReviews);
+      setReviews([]);
     }
   };
 
@@ -205,20 +198,19 @@ const ProviderProfile = () => {
   };
 
   const handleWhatsApp = () => {
-    const phone = provider?.phone?.replace(/[^0-9]/g, '') || '972500000000';
+    if (!provider?.phone) return;
+    const phone = provider.phone.replace(/[^0-9]/g, '');
     window.open(`https://wa.me/${phone}?text=שלום, מצאתי אתכם ב-CareLink ואשמח לקבל מידע נוסף`, '_blank');
   };
 
   const handleCall = () => {
+    if (!provider?.phone) return;
     // Check if mobile device
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
+
     if (isMobile) {
-      // On mobile, directly call
-      const phone = provider?.phone || '050-0000000';
-      window.location.href = `tel:${phone}`;
+      window.location.href = `tel:${provider.phone}`;
     } else {
-      // On desktop, show phone number modal
       setShowPhoneModal(true);
     }
   };

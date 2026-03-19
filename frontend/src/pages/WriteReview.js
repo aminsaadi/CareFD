@@ -128,28 +128,31 @@ const WriteReview = () => {
     }
   };
 
-  // Star rating component
-  const StarRating = ({ value, onChange, size = 'text-2xl', label }) => (
-    <div className="flex flex-col gap-2">
-      {label && <span className="text-sm text-carelink-gray">{label}</span>}
-      <div className="flex gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            type="button"
-            onClick={() => onChange(star)}
-            onMouseEnter={() => setHoverRating(star)}
-            onMouseLeave={() => setHoverRating(0)}
-            className={`${size} transition-transform hover:scale-110 ${
-              star <= (hoverRating || value) ? 'text-yellow-400' : 'text-gray-300'
-            }`}
-          >
-            <FaStar />
-          </button>
-        ))}
+  // Star rating component with its own hover state
+  const StarRating = ({ value, onChange, size = 'text-2xl', label }) => {
+    const [localHover, setLocalHover] = useState(0);
+    return (
+      <div className="flex flex-col gap-2">
+        {label && <span className="text-sm text-carelink-gray">{label}</span>}
+        <div className="flex gap-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              onClick={() => onChange(star)}
+              onMouseEnter={() => setLocalHover(star)}
+              onMouseLeave={() => setLocalHover(0)}
+              className={`${size} transition-transform hover:scale-110 ${
+                star <= (localHover || value) ? 'text-yellow-400' : 'text-gray-300'
+              }`}
+            >
+              <FaStar />
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   if (loading) {
     return (

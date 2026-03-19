@@ -52,6 +52,7 @@ const Footer = () => {
       const pages = (response.data.pages || []).filter(p => p.is_active !== false);
       setStaticPages(pages);
     } catch (error) {
+      // Falls back to default links if admin endpoint is not accessible
       setStaticPages([]);
     }
   };

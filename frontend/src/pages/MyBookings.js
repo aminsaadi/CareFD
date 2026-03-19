@@ -67,13 +67,17 @@ const MyBookings = () => {
   };
 
   const handleCancelBooking = async (bookingId) => {
-    await confirm({
-      title: 'ביטול הזמנה',
-      message: 'האם אתה בטוח שברצונך לבטל הזמנה זו?',
-      type: 'danger',
-      confirmText: 'בטל הזמנה',
-      cancelText: 'השאר'
-    });
+    try {
+      await confirm({
+        title: 'ביטול הזמנה',
+        message: 'האם אתה בטוח שברצונך לבטל הזמנה זו?',
+        type: 'danger',
+        confirmText: 'בטל הזמנה',
+        cancelText: 'השאר'
+      });
+    } catch {
+      return; // User cancelled
+    }
 
     try {
       await api.put(`/bookings/${bookingId}/cancel`);
@@ -308,7 +312,7 @@ const MyBookings = () => {
       {/* Review Modal */}
       {showReviewModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowReviewModal(null)}>
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" role="dialog" aria-modal="true" aria-label="כתוב ביקורת" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold text-carelink-navy mb-2">כתוב ביקורת</h3>
             <p className="text-carelink-gray mb-6">
               ספר לנו על החוויה שלך עם {showReviewModal.provider?.business_name || 'הספק'}
@@ -351,6 +355,7 @@ const MyBookings = () => {
                 onChange={(e) => setReviewComment(e.target.value)}
                 placeholder="ספר/י על החוויה שלך עם הספק..."
                 rows={4}
+                maxLength={500}
                 className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal resize-none"
                 data-testid="review-modal-comment"
               />
