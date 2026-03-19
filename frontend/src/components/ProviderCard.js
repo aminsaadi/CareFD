@@ -112,10 +112,10 @@ const ProviderCard = ({ provider, showContact = true }) => {
             <h3 className="text-xl font-bold text-carelink-navy mb-1">
               {provider.business_name || 'ספק שירותים'}
             </h3>
-            {/* Profession Title */}
-            {provider.profession_title && (
+            {/* Profession Name */}
+            {(provider.profession_name || provider.profession_title) && (
               <p className="text-carelink-teal font-medium text-sm mb-1" data-testid="profession-title">
-                {getProfessionLabel(provider.profession_title)}
+                {provider.profession_name || getProfessionLabel(provider.profession_title)}
               </p>
             )}
             <div className="flex items-center gap-2 text-sm text-carelink-gray">

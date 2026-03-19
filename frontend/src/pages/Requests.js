@@ -47,6 +47,8 @@ const Requests = () => {
   const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
   const [deliveryTypeOptions, setDeliveryTypeOptions] = useState([]);
 
+  const [regionOptions, setRegionOptions] = useState([]);
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -55,6 +57,7 @@ const Requests = () => {
     delivery_type: '',
     budget: '',
     budget_type: '',
+    hours_needed: '',
     urgency: 'medium',
     preferred_date: '',
     preferred_time: '',
@@ -64,6 +67,8 @@ const Requests = () => {
     preferences: '',
     city: '',
     address: '',
+    address_notes: '',
+    region: '',
   });
 
   useEffect(() => {
@@ -77,10 +82,11 @@ const Requests = () => {
 
   const fetchFormOptions = async () => {
     try {
-      const [professionsRes, serviceTypesRes, deliveryTypesRes] = await Promise.all([
+      const [professionsRes, serviceTypesRes, deliveryTypesRes, regionsRes] = await Promise.all([
         api.get('/professions').catch(() => ({ data: { professions: [] } })),
         api.get('/service-types').catch(() => ({ data: { service_types: [] } })),
         api.get('/delivery-types').catch(() => ({ data: { delivery_types: [] } })),
+        api.get('/regions').catch(() => ({ data: { regions: [] } })),
       ]);
 
       // Flatten professions for selection
@@ -92,6 +98,9 @@ const Requests = () => {
 
       const dTypes = deliveryTypesRes.data?.delivery_types || deliveryTypesRes.data || [];
       setDeliveryTypeOptions(Array.isArray(dTypes) ? dTypes : []);
+
+      const regions = regionsRes.data?.regions || regionsRes.data || [];
+      setRegionOptions(Array.isArray(regions) ? regions : []);
     } catch (error) {
       console.error('Failed to fetch form options:', error);
     }
@@ -145,6 +154,7 @@ const Requests = () => {
         delivery_type: formData.delivery_type || null,
         budget: formData.budget ? parseFloat(formData.budget) : null,
         budget_type: formData.budget_type || null,
+        hours_needed: formData.hours_needed ? parseInt(formData.hours_needed) : null,
         request_type: formData.request_type,
         urgency: formData.urgency,
         preferred_date: formData.preferred_date || null,
@@ -152,6 +162,8 @@ const Requests = () => {
         gender_preference: formData.gender_preference || null,
         language_preferences: formData.language_preferences.length > 0 ? formData.language_preferences : [],
         preferences: formData.preferences || null,
+        address_notes: formData.address_notes || null,
+        region: formData.region || null,
         location: (formData.city || formData.address) ? {
           city: formData.city || '',
           address: formData.address || '',
@@ -162,10 +174,10 @@ const Requests = () => {
       setShowCreateForm(false);
       setFormData({
         title: '', description: '', professions: [], service_type: '',
-        delivery_type: '', budget: '', budget_type: '', urgency: 'medium',
-        preferred_date: '', preferred_time: '', gender_preference: '',
-        language_preferences: [], request_type: 'one_time', preferences: '',
-        city: '', address: ''
+        delivery_type: '', budget: '', budget_type: '', hours_needed: '',
+        urgency: 'medium', preferred_date: '', preferred_time: '',
+        gender_preference: '', language_preferences: [], request_type: 'one_time',
+        preferences: '', city: '', address: '', address_notes: '', region: ''
       });
       fetchRequests();
     } catch (error) {
@@ -395,6 +407,24 @@ const Requests = () => {
                   </div>
                 </div>
 
+                {/* Hours Needed - shown when budget_type is per_hour */}
+                {formData.budget_type === 'per_hour' && (
+                  <div>
+                    <label className="block text-sm font-medium text-carelink-navy">
+                      מספר שעות דרושות
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={formData.hours_needed}
+                      onChange={(e) => setFormData({ ...formData, hours_needed: e.target.value })}
+                      className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                      placeholder="מספר שעות"
+                      data-testid="request-hours-input"
+                    />
+                  </div>
+                )}
+
                 {/* Urgency */}
                 <div>
                   <label className="block text-sm font-medium text-carelink-navy">
@@ -478,8 +508,26 @@ const Requests = () => {
                 </div>
               </div>
 
-              {/* Location - City and Address */}
+              {/* Location - Region, City, Address, Address Notes */}
               <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-carelink-navy">
+                    אזור
+                  </label>
+                  <select
+                    value={formData.region}
+                    onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    data-testid="request-region-select"
+                  >
+                    <option value="">-- בחר אזור --</option>
+                    {regionOptions.map((r) => (
+                      <option key={r.region_id || r.name} value={r.name}>
+                        {r.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-carelink-navy">
                     עיר
@@ -504,6 +552,19 @@ const Requests = () => {
                     className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
                     placeholder="רחוב, מספר בית"
                     data-testid="request-address-input"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-carelink-navy">
+                    הערות לכתובת
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.address_notes}
+                    onChange={(e) => setFormData({ ...formData, address_notes: e.target.value })}
+                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    placeholder="קומה, דירה, קוד כניסה..."
+                    data-testid="request-address-notes-input"
                   />
                 </div>
               </div>

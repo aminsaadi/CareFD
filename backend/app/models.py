@@ -428,6 +428,7 @@ class ServiceRequest(BaseModel):
     location: Optional[Location] = None
     budget: Optional[float] = None
     budget_type: Optional[str] = None              # לשעה / לטיפול / לביקור
+    hours_needed: Optional[int] = None             # מספר שעות דרושות (לשירות שעתי)
     request_type: str = RequestType.ONE_TIME
     urgency: Optional[str] = RequestUrgency.MEDIUM
     preferred_date: Optional[datetime] = None
@@ -435,6 +436,8 @@ class ServiceRequest(BaseModel):
     gender_preference: Optional[str] = None        # העדפת מגדר
     language_preferences: List[str] = []           # העדפות שפה
     preferences: Optional[str] = None
+    address_notes: Optional[str] = None            # הערות לכתובת
+    region: Optional[str] = None                   # אזור
     status: str = RequestStatus.OPEN
     offer_count: int = 0
     accepted_offer_id: Optional[str] = None
@@ -456,6 +459,7 @@ class RequestCreate(BaseModel):
     location: Optional[Location] = None
     budget: Optional[float] = None
     budget_type: Optional[str] = None
+    hours_needed: Optional[int] = None
     request_type: str = RequestType.ONE_TIME
     urgency: Optional[str] = RequestUrgency.MEDIUM
     preferred_date: Optional[datetime] = None
@@ -463,6 +467,8 @@ class RequestCreate(BaseModel):
     gender_preference: Optional[str] = None
     language_preferences: List[str] = []
     preferences: Optional[str] = None
+    address_notes: Optional[str] = None
+    region: Optional[str] = None
 
     @field_validator('professions')
     @classmethod
@@ -509,16 +515,6 @@ class RequestCreate(BaseModel):
             raise ValueError(f'urgency must be one of: {", ".join(allowed)}')
         return v
 
-    @field_validator('service_type')
-    @classmethod
-    def validate_service_type(cls, v):
-        if v is None:
-            return v
-        allowed = ["home", "clinic", "hospital", "virtual", "delivery", "home_visit", "clinic_visit", "video_call", "consultation"]
-        if v not in allowed:
-            raise ValueError(f'service_type must be one of: {", ".join(allowed)}')
-        return v
-
     @field_validator('provider_type')
     @classmethod
     def validate_provider_type(cls, v):
@@ -536,6 +532,13 @@ class RequestCreate(BaseModel):
             raise ValueError('budget must be a positive number')
         return v
 
+    @field_validator('hours_needed')
+    @classmethod
+    def validate_hours_needed(cls, v):
+        if v is not None and v < 1:
+            raise ValueError('hours_needed must be at least 1')
+        return v
+
 class RequestUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
@@ -547,6 +550,7 @@ class RequestUpdate(BaseModel):
     location: Optional[Location] = None
     budget: Optional[float] = None
     budget_type: Optional[str] = None
+    hours_needed: Optional[int] = None
     request_type: Optional[str] = None
     urgency: Optional[str] = None
     preferred_date: Optional[datetime] = None
@@ -554,6 +558,8 @@ class RequestUpdate(BaseModel):
     gender_preference: Optional[str] = None
     language_preferences: Optional[List[str]] = None
     preferences: Optional[str] = None
+    address_notes: Optional[str] = None
+    region: Optional[str] = None
 
 class RequestCancel(BaseModel):
     reason: Optional[str] = None

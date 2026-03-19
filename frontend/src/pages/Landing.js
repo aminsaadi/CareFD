@@ -86,8 +86,8 @@ const testimonials = [
   { id: 3, name: 'רחל אברהם', role: 'ספקית שירות', content: 'הפלטפורמה עזרה לי להגיע ללקוחות חדשים ולפתח את העסק שלי בצורה משמעותית.', rating: 5, avatar: 'ר' },
 ];
 
-// Popular searches data - use from searchData
-const popularSearches = searchData;
+// Fallback popular searches - used until backend data loads
+const fallbackPopularSearches = searchData;
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -97,7 +97,8 @@ const Landing = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [selectedRadius, setSelectedRadius] = useState('');
   const [searchTab, setSearchTab] = useState('providers'); // 'providers' or 'services'
-  
+  const [dynamicPopularSearches, setDynamicPopularSearches] = useState(fallbackPopularSearches);
+
   // Dropdown states
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
@@ -149,9 +150,26 @@ const Landing = () => {
 
       const regionsRes = await api.get('/regions');
       setRegions(regionsRes.data.regions || []);
-      
+
       // Use comprehensive localities list
       setCities(israeliLocalities);
+
+      // Fetch professions from backend for dynamic popular searches
+      try {
+        const professionsRes = await api.get('/professions');
+        const profs = professionsRes.data?.professions || professionsRes.data || [];
+        if (Array.isArray(profs) && profs.length > 0) {
+          const profNames = profs.map(p => p.name || p.name_he || p.label).filter(Boolean);
+          if (profNames.length > 0) {
+            setDynamicPopularSearches(prev => ({
+              ...prev,
+              providers: profNames
+            }));
+          }
+        }
+      } catch {
+        // Keep fallback popular searches
+      }
 
       try {
         const statsRes = await api.get('/stats/public');
@@ -229,7 +247,7 @@ const Landing = () => {
   ).slice(0, 10);
   
   // Get current popular searches based on tab
-  const currentPopularSearches = popularSearches[searchTab] || popularSearches.providers;
+  const currentPopularSearches = dynamicPopularSearches[searchTab] || dynamicPopularSearches.providers;
   
   // Filter popular searches based on input
   const filteredSearches = searchQuery.trim() 

@@ -53,10 +53,17 @@ const Dashboard = () => {
   const [showRequestForm, setShowRequestForm] = useState(false);
   const [editingRequest, setEditingRequest] = useState(null);
   const [requestFilter, setRequestFilter] = useState('all');
+  const [professionOptions, setProfessionOptions] = useState([]);
+  const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
+  const [deliveryTypeOptions, setDeliveryTypeOptions] = useState([]);
+  const [regionOptions, setRegionOptions] = useState([]);
   const [requestFormData, setRequestFormData] = useState({
-    title: '', description: '', specialization: '', budget: '',
-    request_type: 'one_time', urgency: 'medium', preferred_date: '',
-    preferences: '', service_type: '', provider_type: ''
+    title: '', description: '', professions: [], specialization: '',
+    service_type: '', delivery_type: '', budget: '', budget_type: '',
+    hours_needed: '', request_type: 'one_time', urgency: 'medium',
+    preferred_date: '', preferred_time: '', gender_preference: '',
+    language_preferences: [], preferences: '', city: '', address: '',
+    address_notes: '', region: '', provider_type: ''
   });
   
   // User settings form
@@ -90,7 +97,29 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchDashboardData();
+    fetchRequestFormOptions();
   }, []);
+
+  const fetchRequestFormOptions = async () => {
+    try {
+      const [professionsRes, serviceTypesRes, deliveryTypesRes, regionsRes] = await Promise.all([
+        api.get('/professions').catch(() => ({ data: { professions: [] } })),
+        api.get('/service-types').catch(() => ({ data: { service_types: [] } })),
+        api.get('/delivery-types').catch(() => ({ data: { delivery_types: [] } })),
+        api.get('/regions').catch(() => ({ data: { regions: [] } })),
+      ]);
+      const profs = professionsRes.data?.professions || professionsRes.data || [];
+      setProfessionOptions(Array.isArray(profs) ? profs : []);
+      const sTypes = serviceTypesRes.data?.service_types || serviceTypesRes.data || [];
+      setServiceTypeOptions(Array.isArray(sTypes) ? sTypes : []);
+      const dTypes = deliveryTypesRes.data?.delivery_types || deliveryTypesRes.data || [];
+      setDeliveryTypeOptions(Array.isArray(dTypes) ? dTypes : []);
+      const regions = regionsRes.data?.regions || regionsRes.data || [];
+      setRegionOptions(Array.isArray(regions) ? regions : []);
+    } catch (error) {
+      console.error('Failed to fetch form options:', error);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -316,9 +345,12 @@ const Dashboard = () => {
   // === Request CRUD functions ===
   const resetRequestForm = () => {
     setRequestFormData({
-      title: '', description: '', specialization: '', budget: '',
-      request_type: 'one_time', urgency: 'medium', preferred_date: '',
-      preferences: '', service_type: '', provider_type: ''
+      title: '', description: '', professions: [], specialization: '',
+      service_type: '', delivery_type: '', budget: '', budget_type: '',
+      hours_needed: '', request_type: 'one_time', urgency: 'medium',
+      preferred_date: '', preferred_time: '', gender_preference: '',
+      language_preferences: [], preferences: '', city: '', address: '',
+      address_notes: '', region: '', provider_type: ''
     });
     setEditingRequest(null);
     setShowRequestForm(false);
@@ -328,13 +360,29 @@ const Dashboard = () => {
     e.preventDefault();
     try {
       const payload = {
-        ...requestFormData,
-        budget: requestFormData.budget ? parseFloat(requestFormData.budget) : null,
-        preferred_date: requestFormData.preferred_date || null,
-        provider_type: requestFormData.provider_type || null,
+        title: requestFormData.title,
+        description: requestFormData.description,
+        professions: requestFormData.professions?.length > 0 ? requestFormData.professions : [],
         service_type: requestFormData.service_type || null,
+        delivery_type: requestFormData.delivery_type || null,
+        budget: requestFormData.budget ? parseFloat(requestFormData.budget) : null,
+        budget_type: requestFormData.budget_type || null,
+        hours_needed: requestFormData.hours_needed ? parseInt(requestFormData.hours_needed) : null,
+        request_type: requestFormData.request_type,
+        urgency: requestFormData.urgency,
+        preferred_date: requestFormData.preferred_date || null,
+        preferred_time: requestFormData.preferred_time || null,
+        gender_preference: requestFormData.gender_preference || null,
+        language_preferences: requestFormData.language_preferences?.length > 0 ? requestFormData.language_preferences : [],
+        preferences: requestFormData.preferences || null,
+        address_notes: requestFormData.address_notes || null,
+        region: requestFormData.region || null,
+        provider_type: requestFormData.provider_type || null,
         specialization: requestFormData.specialization || null,
-        preferences: requestFormData.preferences || null
+        location: (requestFormData.city || requestFormData.address) ? {
+          city: requestFormData.city || '',
+          address: requestFormData.address || '',
+        } : null,
       };
       await api.post('/requests', payload);
       toast.success('הבקשה נוצרה בהצלחה!');
@@ -352,14 +400,26 @@ const Dashboard = () => {
       const payload = {};
       if (requestFormData.title) payload.title = requestFormData.title;
       if (requestFormData.description) payload.description = requestFormData.description;
+      if (requestFormData.professions?.length > 0) payload.professions = requestFormData.professions;
       payload.specialization = requestFormData.specialization || null;
+      payload.service_type = requestFormData.service_type || null;
+      payload.delivery_type = requestFormData.delivery_type || null;
       payload.budget = requestFormData.budget ? parseFloat(requestFormData.budget) : null;
+      payload.budget_type = requestFormData.budget_type || null;
+      payload.hours_needed = requestFormData.hours_needed ? parseInt(requestFormData.hours_needed) : null;
       payload.request_type = requestFormData.request_type;
       payload.urgency = requestFormData.urgency;
       payload.preferred_date = requestFormData.preferred_date || null;
-      payload.service_type = requestFormData.service_type || null;
+      payload.preferred_time = requestFormData.preferred_time || null;
+      payload.gender_preference = requestFormData.gender_preference || null;
+      if (requestFormData.language_preferences?.length > 0) payload.language_preferences = requestFormData.language_preferences;
       payload.provider_type = requestFormData.provider_type || null;
       payload.preferences = requestFormData.preferences || null;
+      payload.address_notes = requestFormData.address_notes || null;
+      payload.region = requestFormData.region || null;
+      if (requestFormData.city || requestFormData.address) {
+        payload.location = { city: requestFormData.city || '', address: requestFormData.address || '' };
+      }
 
       await api.put(`/requests/${editingRequest}`, payload);
       toast.success('הבקשה עודכנה בהצלחה!');
@@ -386,13 +446,24 @@ const Dashboard = () => {
     setRequestFormData({
       title: request.title || '',
       description: request.description || '',
+      professions: request.professions || [],
       specialization: request.specialization || '',
+      service_type: request.service_type || '',
+      delivery_type: request.delivery_type || '',
       budget: request.budget?.toString() || '',
+      budget_type: request.budget_type || '',
+      hours_needed: request.hours_needed?.toString() || '',
       request_type: request.request_type || 'one_time',
       urgency: request.urgency || 'medium',
       preferred_date: request.preferred_date ? request.preferred_date.split('T')[0] : '',
+      preferred_time: request.preferred_time || '',
+      gender_preference: request.gender_preference || '',
+      language_preferences: request.language_preferences || [],
       preferences: request.preferences || '',
-      service_type: request.service_type || '',
+      city: request.location?.city || '',
+      address: request.location?.address || '',
+      address_notes: request.address_notes || '',
+      region: request.region || '',
       provider_type: request.provider_type || ''
     });
     setShowRequestForm(true);
@@ -965,6 +1036,7 @@ const Dashboard = () => {
                             {editingRequest ? 'עריכת בקשה' : 'בקשה חדשה'}
                           </h3>
                           <form onSubmit={editingRequest ? handleUpdateRequest : handleCreateRequest} className="space-y-4">
+                            {/* Title */}
                             <div>
                               <label className="block text-sm font-medium text-carelink-navy mb-1">כותרת *</label>
                               <input
@@ -973,34 +1045,136 @@ const Dashboard = () => {
                                 value={requestFormData.title}
                                 onChange={(e) => setRequestFormData({ ...requestFormData, title: e.target.value })}
                                 className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
-                                placeholder="מה אתה מחפש?"
+                                placeholder="תארו בקצרה את השירות שאתם מחפשים"
                               />
                             </div>
+
+                            {/* Description */}
                             <div>
-                              <label className="block text-sm font-medium text-carelink-navy mb-1">תיאור *</label>
+                              <label className="block text-sm font-medium text-carelink-navy mb-1">פרטים נוספים *</label>
                               <textarea
                                 required
                                 value={requestFormData.description}
                                 onChange={(e) => setRequestFormData({ ...requestFormData, description: e.target.value })}
                                 className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
                                 rows="3"
-                                placeholder="תאר את הצורך שלך..."
+                                placeholder="פרטו על הצורך, מצב רפואי רלוונטי, דרישות מיוחדות..."
                               />
                             </div>
+
+                            {/* Professions - multi-select chips */}
+                            <div>
+                              <label className="block text-sm font-medium text-carelink-navy mb-2">מקצוע (עד 3)</label>
+                              <div className="flex flex-wrap gap-2">
+                                {professionOptions.map((prof) => {
+                                  const profId = prof.profession_id || prof.id || prof.value;
+                                  const profName = prof.name || prof.name_he || prof.label;
+                                  const isSelected = (requestFormData.professions || []).includes(profId);
+                                  return (
+                                    <button
+                                      key={profId}
+                                      type="button"
+                                      onClick={() => {
+                                        const current = requestFormData.professions || [];
+                                        if (isSelected) {
+                                          setRequestFormData({ ...requestFormData, professions: current.filter(id => id !== profId) });
+                                        } else if (current.length < 3) {
+                                          setRequestFormData({ ...requestFormData, professions: [...current, profId] });
+                                        } else {
+                                          toast.error('ניתן לבחור עד 3 מקצועות');
+                                        }
+                                      }}
+                                      className={`px-3 py-1.5 rounded-full text-sm font-medium border-2 transition ${
+                                        isSelected
+                                          ? 'bg-carelink-teal text-white border-carelink-teal'
+                                          : 'bg-white text-carelink-navy border-carelink-light-gray hover:border-carelink-teal'
+                                      }`}
+                                    >
+                                      {profName}
+                                    </button>
+                                  );
+                                })}
+                                {professionOptions.length === 0 && (
+                                  <span className="text-sm text-gray-400">טוען מקצועות...</span>
+                                )}
+                              </div>
+                            </div>
+
                             <div className="grid md:grid-cols-2 gap-4">
+                              {/* Service Type - synced with backend */}
                               <div>
-                                <label className="block text-sm font-medium text-carelink-navy mb-1">סוג בקשה</label>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">סוג שירות</label>
                                 <select
-                                  value={requestFormData.request_type}
-                                  onChange={(e) => setRequestFormData({ ...requestFormData, request_type: e.target.value })}
+                                  value={requestFormData.service_type}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, service_type: e.target.value })}
                                   className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
                                 >
-                                  <option value="one_time">חד פעמי</option>
-                                  <option value="immediate">מיידי</option>
-                                  <option value="scheduled">מתוזמן</option>
-                                  <option value="follow_up">המשך טיפול</option>
+                                  <option value="">-- בחר סוג שירות --</option>
+                                  {serviceTypeOptions.map((st) => (
+                                    <option key={st.type_id || st.id || st.value} value={st.value || st.type_id || st.id}>
+                                      {st.name_he || st.name || st.label}
+                                    </option>
+                                  ))}
                                 </select>
                               </div>
+
+                              {/* Delivery Type - synced with backend */}
+                              <div>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">דרך מתן השירות</label>
+                                <select
+                                  value={requestFormData.delivery_type}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, delivery_type: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                >
+                                  <option value="">-- בחר דרך מתן שירות --</option>
+                                  {deliveryTypeOptions.map((dt) => (
+                                    <option key={dt.type_id || dt.id || dt.value} value={dt.value || dt.type_id || dt.id}>
+                                      {dt.name_he || dt.name || dt.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              {/* Budget + Budget Type */}
+                              <div>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">תקציב</label>
+                                <div className="flex gap-2">
+                                  <input
+                                    type="number"
+                                    value={requestFormData.budget}
+                                    onChange={(e) => setRequestFormData({ ...requestFormData, budget: e.target.value })}
+                                    className="flex-1 px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                    placeholder="₪"
+                                  />
+                                  <select
+                                    value={requestFormData.budget_type}
+                                    onChange={(e) => setRequestFormData({ ...requestFormData, budget_type: e.target.value })}
+                                    className="w-28 px-2 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal text-sm"
+                                  >
+                                    <option value="">סוג</option>
+                                    <option value="per_hour">לשעה</option>
+                                    <option value="per_treatment">לטיפול</option>
+                                    <option value="per_visit">לביקור</option>
+                                  </select>
+                                </div>
+                              </div>
+
+                              {/* Hours Needed - shown when budget_type is per_hour */}
+                              {requestFormData.budget_type === 'per_hour' && (
+                                <div>
+                                  <label className="block text-sm font-medium text-carelink-navy mb-1">מספר שעות דרושות</label>
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    value={requestFormData.hours_needed}
+                                    onChange={(e) => setRequestFormData({ ...requestFormData, hours_needed: e.target.value })}
+                                    className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                    placeholder="מספר שעות"
+                                  />
+                                </div>
+                              )}
+
+                              {/* Urgency */}
                               <div>
                                 <label className="block text-sm font-medium text-carelink-navy mb-1">דחיפות</label>
                                 <select
@@ -1014,28 +1188,25 @@ const Dashboard = () => {
                                   <option value="urgent">דחוף</option>
                                 </select>
                               </div>
+
+                              {/* Request Type */}
                               <div>
-                                <label className="block text-sm font-medium text-carelink-navy mb-1">התמחות</label>
-                                <input
-                                  type="text"
-                                  value={requestFormData.specialization}
-                                  onChange={(e) => setRequestFormData({ ...requestFormData, specialization: e.target.value })}
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">סוג בקשה</label>
+                                <select
+                                  value={requestFormData.request_type}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, request_type: e.target.value })}
                                   className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
-                                  placeholder="למשל: סיעוד, פיזיותרפיה..."
-                                />
+                                >
+                                  <option value="one_time">חד פעמי</option>
+                                  <option value="immediate">מיידי</option>
+                                  <option value="scheduled">מתוזמן</option>
+                                  <option value="follow_up">המשך טיפול</option>
+                                </select>
                               </div>
+
+                              {/* Preferred Date */}
                               <div>
-                                <label className="block text-sm font-medium text-carelink-navy mb-1">תקציב (₪)</label>
-                                <input
-                                  type="number"
-                                  value={requestFormData.budget}
-                                  onChange={(e) => setRequestFormData({ ...requestFormData, budget: e.target.value })}
-                                  className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
-                                  placeholder="₪"
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-sm font-medium text-carelink-navy mb-1">תאריך מועדף</label>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">תאריך רצוי</label>
                                 <input
                                   type="date"
                                   value={requestFormData.preferred_date}
@@ -1043,21 +1214,122 @@ const Dashboard = () => {
                                   className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
                                 />
                               </div>
+
+                              {/* Preferred Time */}
                               <div>
-                                <label className="block text-sm font-medium text-carelink-navy mb-1">סוג שירות</label>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">שעה רצויה</label>
+                                <input
+                                  type="time"
+                                  value={requestFormData.preferred_time}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, preferred_time: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                />
+                              </div>
+
+                              {/* Gender Preference */}
+                              <div>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">העדפת מגדר</label>
                                 <select
-                                  value={requestFormData.service_type}
-                                  onChange={(e) => setRequestFormData({ ...requestFormData, service_type: e.target.value })}
+                                  value={requestFormData.gender_preference}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, gender_preference: e.target.value })}
                                   className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
                                 >
-                                  <option value="">-- בחר --</option>
-                                  <option value="home_visit">ביקור בית</option>
-                                  <option value="clinic_visit">ביקור במרפאה</option>
-                                  <option value="video_call">שיחת וידאו</option>
-                                  <option value="consultation">ייעוץ</option>
+                                  <option value="">-- ללא העדפה --</option>
+                                  <option value="no_preference">ללא העדפה</option>
+                                  <option value="male">זכר</option>
+                                  <option value="female">נקבה</option>
                                 </select>
                               </div>
                             </div>
+
+                            {/* Location - Region, City, Address, Address Notes */}
+                            <div className="grid md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">אזור</label>
+                                <select
+                                  value={requestFormData.region}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, region: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                >
+                                  <option value="">-- בחר אזור --</option>
+                                  {regionOptions.map((r) => (
+                                    <option key={r.region_id || r.name} value={r.name}>
+                                      {r.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">עיר</label>
+                                <CitySelect
+                                  name="city"
+                                  value={requestFormData.city}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, city: e.target.value })}
+                                  placeholder="בחר עיר..."
+                                  inputClassName="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">כתובת</label>
+                                <input
+                                  type="text"
+                                  value={requestFormData.address}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, address: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                  placeholder="רחוב, מספר בית"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-carelink-navy mb-1">הערות לכתובת</label>
+                                <input
+                                  type="text"
+                                  value={requestFormData.address_notes}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, address_notes: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carelink-light-gray rounded-lg focus:ring-carelink-teal focus:border-carelink-teal"
+                                  placeholder="קומה, דירה, קוד כניסה..."
+                                />
+                              </div>
+                            </div>
+
+                            {/* Language Preferences */}
+                            <div>
+                              <label className="block text-sm font-medium text-carelink-navy mb-2">העדפות שפה</label>
+                              <div className="flex flex-wrap gap-2">
+                                {[
+                                  { value: 'hebrew', label: 'עברית' },
+                                  { value: 'arabic', label: 'ערבית' },
+                                  { value: 'english', label: 'אנגלית' },
+                                  { value: 'russian', label: 'רוסית' },
+                                  { value: 'french', label: 'צרפתית' },
+                                  { value: 'amharic', label: 'אמהרית' },
+                                ].map((lang) => {
+                                  const isSelected = (requestFormData.language_preferences || []).includes(lang.value);
+                                  return (
+                                    <button
+                                      key={lang.value}
+                                      type="button"
+                                      onClick={() => {
+                                        const current = requestFormData.language_preferences || [];
+                                        if (isSelected) {
+                                          setRequestFormData({ ...requestFormData, language_preferences: current.filter(l => l !== lang.value) });
+                                        } else {
+                                          setRequestFormData({ ...requestFormData, language_preferences: [...current, lang.value] });
+                                        }
+                                      }}
+                                      className={`px-3 py-1.5 rounded-full text-sm font-medium border-2 transition ${
+                                        isSelected
+                                          ? 'bg-carelink-teal text-white border-carelink-teal'
+                                          : 'bg-white text-carelink-navy border-carelink-light-gray hover:border-carelink-teal'
+                                      }`}
+                                    >
+                                      {lang.label}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+
+                            {/* Preferences */}
                             <div>
                               <label className="block text-sm font-medium text-carelink-navy mb-1">העדפות נוספות</label>
                               <textarea
@@ -1068,6 +1340,7 @@ const Dashboard = () => {
                                 placeholder="העדפות נוספות..."
                               />
                             </div>
+
                             <div className="flex gap-3">
                               <button
                                 type="submit"
