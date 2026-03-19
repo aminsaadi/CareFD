@@ -327,10 +327,10 @@ const ProviderProfile = () => {
               
               {/* Profession & Specialization */}
               {(provider.profession_name || provider.profession_title) && (
-                <div className="flex flex-wrap items-center gap-2 mb-3" data-testid="profession-title">
-                  <span className="text-xl text-carelink-teal-pale font-medium">
+                <div className="mb-3" data-testid="profession-title">
+                  <p className="text-xl text-carelink-teal-pale font-medium mb-1">
                     {provider.profession_name || getProfessionLabel(provider.profession_title)}
-                  </span>
+                  </p>
                   {provider.specialization_name && (
                     <span className="bg-white/20 text-white px-3 py-1 rounded-full text-sm">
                       {provider.specialization_name}
