@@ -5,6 +5,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import RequestCard from '../components/RequestCard';
+import CitySelect from '../components/CitySelect';
 import api from '../utils/api';
 import { toast } from 'sonner';
 
@@ -61,6 +62,8 @@ const Requests = () => {
     language_preferences: [],
     request_type: 'one_time',
     preferences: '',
+    city: '',
+    address: '',
   });
 
   useEffect(() => {
@@ -149,6 +152,10 @@ const Requests = () => {
         gender_preference: formData.gender_preference || null,
         language_preferences: formData.language_preferences.length > 0 ? formData.language_preferences : [],
         preferences: formData.preferences || null,
+        location: (formData.city || formData.address) ? {
+          city: formData.city || '',
+          address: formData.address || '',
+        } : null,
       };
       await api.post('/requests', payload);
       toast.success('הבקשה נוצרה בהצלחה!');
@@ -157,7 +164,8 @@ const Requests = () => {
         title: '', description: '', professions: [], service_type: '',
         delivery_type: '', budget: '', budget_type: '', urgency: 'medium',
         preferred_date: '', preferred_time: '', gender_preference: '',
-        language_preferences: [], request_type: 'one_time', preferences: ''
+        language_preferences: [], request_type: 'one_time', preferences: '',
+        city: '', address: ''
       });
       fetchRequests();
     } catch (error) {
@@ -467,6 +475,36 @@ const Requests = () => {
                     <option value="scheduled">{t('scheduled')}</option>
                     <option value="follow_up">{t('follow_up')}</option>
                   </select>
+                </div>
+              </div>
+
+              {/* Location - City and Address */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-carelink-navy">
+                    עיר
+                  </label>
+                  <CitySelect
+                    name="city"
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    placeholder="בחר עיר..."
+                    inputClassName="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    data-testid="request-city-input"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-carelink-navy">
+                    כתובת
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    placeholder="רחוב, מספר בית"
+                    data-testid="request-address-input"
+                  />
                 </div>
               </div>
 

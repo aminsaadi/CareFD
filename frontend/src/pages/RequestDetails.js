@@ -94,7 +94,7 @@ const RequestDetails = () => {
       const response = await api.post(`/offers/${offerId}/accept`);
       const { booking_id, room_id } = response.data;
       toast.success('ההצעה התקבלה! נוצרה הזמנה חדשה.');
-      navigate('/dashboard?tab=bookings');
+      fetchRequestDetails();
     } catch (error) {
       toast.error(error.response?.data?.detail || t('errorOccurred'));
     }
@@ -336,10 +336,14 @@ const RequestDetails = () => {
                   </div>
                 )}
 
-                {request.location && (
+                {request.location && (request.location.city || request.location.address) && (
                   <div>
-                    <span className="font-semibold text-carelink-navy">{t('location')}:</span>
-                    <span className="mr-2 text-carelink-slate">{request.location.city}</span>
+                    <span className="font-semibold text-carelink-navy">מיקום:</span>
+                    <span className="mr-2 text-carelink-slate">
+                      {request.location.city}
+                      {request.location.city && request.location.address && ', '}
+                      {request.location.address}
+                    </span>
                   </div>
                 )}
               </div>
