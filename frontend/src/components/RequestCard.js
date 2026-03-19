@@ -69,7 +69,7 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
           <h3 className="text-xl font-bold text-carelink-navy mb-1">{request.title}</h3>
           <div className="flex items-center gap-2 text-sm text-carelink-gray">
             <FaCalendar className="text-carelink-teal" />
-            <span>{format(new Date(request.created_at), 'dd/MM/yyyy')}</span>
+            <span>{request.created_at ? format(new Date(request.created_at), 'dd/MM/yyyy') : ''}</span>
           </div>
         </div>
         <div className="flex flex-col gap-1 items-end">
@@ -136,7 +136,7 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
           <div className="flex items-center gap-2 text-sm text-carelink-gray">
             <FaCalendar className="text-carelink-teal" />
             <span>
-              {t('preferredDate')}: {format(new Date(request.preferred_date), 'dd/MM/yyyy')}
+              {t('preferredDate')}: {request.preferred_date ? format(new Date(request.preferred_date), 'dd/MM/yyyy') : ''}
               {request.preferred_time && ` בשעה ${request.preferred_time}`}
             </span>
           </div>

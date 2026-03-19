@@ -763,7 +763,7 @@ const ProviderDashboard = () => {
                               <FaStar className="text-yellow-600 text-xl" />
                             </div>
                             <div>
-                              <div className="text-2xl font-bold text-carelink-navy">{stats.averageRating.toFixed(1)}</div>
+                              <div className="text-2xl font-bold text-carelink-navy">{(stats.averageRating || 0).toFixed(1)}</div>
                               <div className="text-sm text-carelink-gray">{stats.totalReviews} ביקורות</div>
                             </div>
                           </div>
@@ -1884,12 +1884,12 @@ const ProviderDashboard = () => {
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
                       <div className="flex items-center gap-6 mb-6">
                         <div className="text-center">
-                          <div className="text-5xl font-bold text-carelink-teal">{stats.averageRating.toFixed(1)}</div>
+                          <div className="text-5xl font-bold text-carelink-teal">{(stats.averageRating || 0).toFixed(1)}</div>
                           <div className="flex justify-center my-2">
                             {[...Array(5)].map((_, i) => (
                               <FaStar
                                 key={i}
-                                className={i < Math.round(stats.averageRating) ? 'text-yellow-500' : 'text-gray-300'}
+                                className={i < Math.round(stats.averageRating || 0) ? 'text-yellow-500' : 'text-gray-300'}
                               />
                             ))}
                           </div>

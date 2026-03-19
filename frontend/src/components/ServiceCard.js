@@ -128,10 +128,10 @@ const ServiceCard = ({ service, showProvider = true }) => {
                 <p className="text-sm font-semibold text-gray-900 group-hover/provider:text-carelink-teal transition-colors">
                   {service.provider.business_name || 'ספק שירותים'}
                 </p>
-                {service.provider.rating > 0 && (
+                {service.provider.rating != null && service.provider.rating > 0 && (
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <FaStar className="text-yellow-500" />
-                    <span>{service.provider.rating.toFixed(1)}</span>
+                    <span>{Number(service.provider.rating).toFixed(1)}</span>
                   </div>
                 )}
               </div>

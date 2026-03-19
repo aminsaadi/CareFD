@@ -3,9 +3,13 @@ from typing import Optional, List
 from datetime import datetime, timezone, timedelta
 import uuid
 
+import os
+
 from app.database import db
 from app.models import Booking, BookingCreate, BookingStatus, ContactPerson, ServiceLocation, NotificationType
 from app.utils import get_current_user, send_email_async, create_notification, send_push_to_user
+
+SITE_URL = os.environ.get('SITE_URL', 'https://example.com').rstrip('/')
 
 router = APIRouter()
 
@@ -216,7 +220,7 @@ async def create_booking(
     if provider_user:
         await send_email_async(
             provider_user.get("email"),
-            f"CareLink - הזמנה חדשה #{booking.booking_number}",
+            f"הזמנה -הזמנה חדשה #{booking.booking_number}",
             f"""
             <!DOCTYPE html>
             <html dir="rtl" lang="he">
@@ -254,7 +258,7 @@ async def create_booking(
                     {f'<div style="background: #e8f5f3; padding: 15px; border-radius: 10px; margin-top: 20px;"><strong>הערות:</strong> {booking_data.notes}</div>' if booking_data.notes else ''}
                     
                     <div style="text-align: center; margin-top: 30px;">
-                        <a href="https://carelink.co.il/provider/dashboard" style="background: #00a99d; color: white; padding: 15px 40px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">אשר את ההזמנה</a>
+                        <a href="{SITE_URL}/provider/dashboard" style="background: #00a99d; color: white; padding: 15px 40px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">אשר את ההזמנה</a>
                     </div>
                 </div>
             </body>
@@ -267,7 +271,7 @@ async def create_booking(
     if client_email_to_send:
         await send_email_async(
             client_email_to_send,
-            f"CareLink - אישור קבלת הזמנה #{booking.booking_number}",
+            f"הזמנה -אישור קבלת הזמנה #{booking.booking_number}",
             f"""
             <!DOCTYPE html>
             <html dir="rtl" lang="he">
@@ -314,11 +318,11 @@ async def create_booking(
                     </div>
                     
                     <div style="text-align: center; margin-top: 30px;">
-                        <a href="https://carelink.co.il/dashboard" style="background: #00a99d; color: white; padding: 15px 40px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">צפה בהזמנות שלי</a>
+                        <a href="{SITE_URL}/dashboard" style="background: #00a99d; color: white; padding: 15px 40px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">צפה בהזמנות שלי</a>
                     </div>
-                    
+
                     <p style="text-align: center; color: #999; font-size: 12px; margin-top: 30px;">
-                        יש שאלות? צרו קשר: support@carelink.co.il
+                        יש שאלות? צרו קשר דרך האתר
                     </p>
                 </div>
             </body>
@@ -523,7 +527,7 @@ async def request_booking_change(
     if client_user and client_user.get("email"):
         await send_email_async(
             client_user["email"],
-            "CareLink - בקשה לשינוי מועד הזמנה",
+            "הזמנה -בקשה לשינוי מועד הזמנה",
             f"""
             <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <div style="background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 30px; border-radius: 15px 15px 0 0; text-align: center;">
@@ -540,7 +544,7 @@ async def request_booking_change(
                     </div>
                     <p>אנא היכנס לאזור האישי שלך לאשר או לדחות את הבקשה.</p>
                     <div style="text-align: center; margin-top: 20px;">
-                        <a href="https://carelink.co.il/dashboard" style="background: #00a99d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold;">לאזור האישי</a>
+                        <a href="{SITE_URL}/dashboard" style="background: #00a99d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold;">לאזור האישי</a>
                     </div>
                 </div>
             </div>
@@ -693,7 +697,7 @@ async def cancel_booking(
                 client_user = await db.users.find_one({"user_id": booking["user_id"]}, {"_id": 0})
                 await send_email_async(
                     provider_user["email"],
-                    "CareLink - הזמנה בוטלה ❌",
+                    "הזמנה -הזמנה בוטלה ❌",
                     f"""
                     <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                         <h2 style="color: #e74c3c;">הזמנה בוטלה</h2>
@@ -703,7 +707,7 @@ async def cancel_booking(
                             <p><strong>שירות:</strong> {booking.get('service_name', 'שירות')}</p>
                             <p><strong>תאריך:</strong> {booking.get('booking_date', '')[:10]}</p>
                         </div>
-                        <p>צוות CareLink</p>
+                        <p>בברכה</p>
                     </div>
                     """
                 )
@@ -728,7 +732,7 @@ async def cancel_booking(
             provider_info = await db.providers.find_one({"provider_id": booking["provider_id"]}, {"_id": 0})
             await send_email_async(
                 client_user["email"],
-                "CareLink - הזמנה בוטלה ❌",
+                "הזמנה -הזמנה בוטלה ❌",
                 f"""
                 <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                     <h2 style="color: #e74c3c;">הזמנה בוטלה</h2>
@@ -739,7 +743,7 @@ async def cancel_booking(
                         <p><strong>תאריך:</strong> {booking.get('booking_date', '')[:10]}</p>
                     </div>
                     <p>מומלץ לחפש ספק חלופי.</p>
-                    <p>צוות CareLink</p>
+                    <p>בברכה</p>
                 </div>
                 """
             )
@@ -793,7 +797,7 @@ async def confirm_booking(
         provider_info = await db.providers.find_one({"provider_id": booking["provider_id"]}, {"_id": 0})
         await send_email_async(
             client_user["email"],
-            "CareLink - ההזמנה שלך אושרה! ✅",
+            "הזמנה -ההזמנה שלך אושרה! ✅",
             f"""
             <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                 <div style="text-align: center; margin-bottom: 30px;">
@@ -816,7 +820,7 @@ async def confirm_booking(
                 </div>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">
-                    <p>צוות CareLink</p>
+                    <p>בברכה</p>
                 </div>
             </div>
             """
@@ -874,7 +878,7 @@ async def reject_booking(
     if client_user and client_user.get("email"):
         await send_email_async(
             client_user["email"],
-            "CareLink - ההזמנה נדחתה",
+            "הזמנה -ההזמנה נדחתה",
             f"""
             <!DOCTYPE html>
             <html dir="rtl" lang="he">
@@ -893,7 +897,7 @@ async def reject_booking(
                     </div>
                     <p>מומלץ לחפש ספק חלופי באתר.</p>
                     <div style="text-align: center; margin-top: 20px;">
-                        <a href="https://carelink.co.il/providers" style="background: #00a99d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold;">חפש ספק אחר</a>
+                        <a href="{SITE_URL}/providers" style="background: #00a99d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold;">חפש ספק אחר</a>
                     </div>
                 </div>
             </body>

@@ -216,7 +216,7 @@ async def verify_email(token: str):
     if not verification:
         raise HTTPException(status_code=400, detail="invalid_token")
     
-    if datetime.fromisoformat(verification["expires_at"]) < datetime.now(timezone.utc):
+    if datetime.fromisoformat(verification["expires_at"].replace('Z', '+00:00')) < datetime.now(timezone.utc):
         await db.email_verifications.delete_one({"token": token})
         raise HTTPException(status_code=400, detail="token_expired")
     

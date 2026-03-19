@@ -217,7 +217,7 @@ const RequestDetails = () => {
                 <div>
                   <h2 className="text-2xl font-bold text-carelink-navy">{request.title}</h2>
                   <p className="text-carelink-gray text-sm">
-                    {format(new Date(request.created_at), 'dd/MM/yyyy HH:mm')}
+                    {request.created_at ? format(new Date(request.created_at), 'dd/MM/yyyy HH:mm') : ''}
                   </p>
                 </div>
                 <div className="flex flex-col gap-1 items-end">
@@ -306,7 +306,7 @@ const RequestDetails = () => {
                     <FaCalendar className="text-carelink-teal" />
                     <span className="font-semibold text-carelink-navy">{t('preferredDate')}:</span>
                     <span className="text-carelink-slate">
-                      {format(new Date(request.preferred_date), 'dd/MM/yyyy')}
+                      {request.preferred_date ? format(new Date(request.preferred_date), 'dd/MM/yyyy') : ''}
                       {request.preferred_time && ` בשעה ${request.preferred_time}`}
                     </span>
                   </div>

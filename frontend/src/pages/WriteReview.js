@@ -233,7 +233,7 @@ const WriteReview = () => {
               <h2 className="text-xl font-bold text-carelink-navy">{provider?.business_name}</h2>
               <p className="text-carelink-gray">{booking?.service_name}</p>
               <p className="text-sm text-carelink-gray">
-                {new Date(booking?.booking_date).toLocaleDateString('he-IL')}
+                {booking?.booking_date ? new Date(booking.booking_date).toLocaleDateString('he-IL') : ''}
               </p>
             </div>
           </div>

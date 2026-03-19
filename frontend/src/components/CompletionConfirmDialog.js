@@ -120,7 +120,7 @@ const CompletionConfirmDialog = ({ booking, onClose, onSuccess }) => {
                 <p className="font-medium text-teal-900">{booking.service_name}</p>
                 <p className="text-sm text-teal-700">{booking.provider_name}</p>
                 <p className="text-xs text-teal-600 mt-1">
-                  {new Date(booking.booking_date).toLocaleDateString('he-IL')}
+                  {booking.booking_date ? new Date(booking.booking_date).toLocaleDateString('he-IL') : ''}
                 </p>
               </div>
 

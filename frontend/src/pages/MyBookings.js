@@ -243,7 +243,7 @@ const MyBookings = () => {
                   <div>
                     <span className="font-semibold text-carelink-navy">תאריך:</span>
                     <span className="mr-2 text-carelink-slate">
-                      {format(new Date(booking.booking_date), 'dd/MM/yyyy HH:mm')}
+                      {booking.booking_date ? format(new Date(booking.booking_date), 'dd/MM/yyyy HH:mm') : ''}
                     </span>
                   </div>
                   {booking.service?.price && (

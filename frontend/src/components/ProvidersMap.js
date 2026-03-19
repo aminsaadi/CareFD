@@ -181,9 +181,9 @@ const ProvidersMap = ({
                       🚗 {provider.distance_km} ק״מ ממך
                     </p>
                   )}
-                  {provider.rating > 0 && (
+                  {provider.rating != null && provider.rating > 0 && (
                     <p className="text-amber-500">
-                      ⭐ {provider.rating.toFixed(1)} ({provider.total_reviews || 0} ביקורות)
+                      ⭐ {Number(provider.rating).toFixed(1)} ({provider.total_reviews || 0} ביקורות)
                     </p>
                   )}
                 </div>

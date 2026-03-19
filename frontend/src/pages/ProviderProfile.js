@@ -862,7 +862,7 @@ const ProviderProfile = () => {
                   השכלה
                 </h3>
                 <div className="space-y-4">
-                  {provider.education.filter(e => e.institution || e.degree).map((edu, idx) => (
+                  {(provider.education || []).filter(e => e.institution || e.degree).map((edu, idx) => (
                     <div key={idx} className="border-r-4 border-carelink-teal pr-4">
                       <p className="font-semibold text-carelink-navy">
                         {educationLevelLabels[edu.degree] || edu.degree}
@@ -890,7 +890,7 @@ const ProviderProfile = () => {
                   תעודות ורישיונות
                 </h3>
                 <div className="space-y-4">
-                  {provider.certifications.filter(c => c.name || c.license_number).map((cert, idx) => (
+                  {(provider.certifications || []).filter(c => c.name || c.license_number).map((cert, idx) => (
                     <div key={idx} className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200">
                       <p className="font-semibold text-carelink-navy flex items-center gap-2">
                         <FaAward className="text-amber-500" />

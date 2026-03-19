@@ -862,8 +862,8 @@ const Providers = () => {
                               <p className="font-medium text-carelink-navy text-sm truncate group-hover:text-carelink-teal transition">{provider.name}</p>
                               <p className="text-xs text-carelink-gray truncate">{provider.profession_name || provider.profession} • {provider.location?.city}</p>
                               <div className="flex items-center gap-3 mt-0.5">
-                                {provider.rating > 0 && (
-                                  <span className="text-xs text-amber-500">⭐ {provider.rating.toFixed(1)}</span>
+                                {provider.rating != null && provider.rating > 0 && (
+                                  <span className="text-xs text-amber-500">⭐ {Number(provider.rating).toFixed(1)}</span>
                                 )}
                                 {provider.distance_km != null && (
                                   <span className="text-xs text-blue-500">{provider.distance_km} ק״מ</span>
