@@ -21,10 +21,14 @@ async def register(user_data: UserRegister, request: Request = None):
     # Rate limit: 10 registrations per IP per 15 minutes
     if request:
         rate_limiter.check(f"register:{get_client_ip(request)}", max_requests=10, window_seconds=900)
+    # Prevent self-registration as admin
+    if user_data.role not in [UserRole.PATIENT, UserRole.PROVIDER]:
+        raise HTTPException(status_code=400, detail="Invalid role. Must be 'patient' or 'provider'")
+
     existing_user = await db.users.find_one({"email": user_data.email}, {"_id": 0})
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    
+
     user = User(
         email=user_data.email,
         name=user_data.name,
@@ -563,6 +567,12 @@ async def change_password(
     
     if len(new_password) < 8:
         raise HTTPException(status_code=400, detail="הסיסמה חייבת להכיל לפחות 8 תווים עם אותיות וספרות")
+
+    if not any(c.isdigit() for c in new_password):
+        raise HTTPException(status_code=400, detail="הסיסמה חייבת להכיל לפחות ספרה אחת")
+
+    if not any(c.isalpha() for c in new_password):
+        raise HTTPException(status_code=400, detail="הסיסמה חייבת להכיל לפחות אות אחת")
     
     # Get user with password
     db_user = await db.users.find_one({"user_id": user["user_id"]})

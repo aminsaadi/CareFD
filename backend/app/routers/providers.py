@@ -527,21 +527,37 @@ async def update_provider(
     if provider["user_id"] != user["user_id"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
+    # Whitelist allowed fields to prevent mass assignment attacks
+    ALLOWED_FIELDS = {
+        "business_name", "description", "phone", "email", "website",
+        "provider_type", "location", "address", "city", "professions",
+        "sub_professions", "categories", "languages", "education",
+        "experience_years", "about", "specializations", "target_audiences",
+        "profile_image", "cover_image", "gallery", "working_hours",
+        "availability", "services", "social_links", "gender",
+        "shifts", "travel_radius", "home_visit", "online_service",
+        "instant_booking", "cancellation_policy", "payment_methods",
+        "insurance_accepted", "certifications", "awards",
+    }
+
+    # Filter out any non-allowed fields
+    filtered_updates = {k: v for k, v in updates.items() if k in ALLOWED_FIELDS}
+
     # Auto-geocode location if city is provided but coordinates are missing
-    if "location" in updates and updates["location"]:
-        loc = updates["location"]
+    if "location" in filtered_updates and filtered_updates["location"]:
+        loc = filtered_updates["location"]
         city_name = loc.get("city", "")
         if city_name and (not loc.get("latitude") or not loc.get("longitude")):
             coords = get_locality_coords(city_name)
             if coords:
-                updates["location"]["latitude"] = coords["lat"]
-                updates["location"]["longitude"] = coords["lng"]
-    
-    updates["updated_at"] = datetime.now(timezone.utc).isoformat()
-    
+                filtered_updates["location"]["latitude"] = coords["lat"]
+                filtered_updates["location"]["longitude"] = coords["lng"]
+
+    filtered_updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+
     await db.providers.update_one(
         {"provider_id": provider_id},
-        {"$set": updates}
+        {"$set": filtered_updates}
     )
     
     return {"message": "Provider updated successfully"}

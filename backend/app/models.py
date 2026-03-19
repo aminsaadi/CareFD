@@ -48,6 +48,14 @@ class UserRegister(BaseModel):
     role: str = UserRole.PATIENT
     language_preference: str = "he"
 
+    @field_validator('role')
+    @classmethod
+    def validate_role(cls, v):
+        allowed = [UserRole.PATIENT, UserRole.PROVIDER]
+        if v not in allowed:
+            raise ValueError(f'Role must be one of: {", ".join(allowed)}')
+        return v
+
     @field_validator('password')
     @classmethod
     def validate_password(cls, v):
@@ -727,6 +735,13 @@ class ReviewCreate(BaseModel):
     communication: Optional[int] = None
     price_value: Optional[int] = None
     would_recommend: bool = True
+
+    @field_validator('rating')
+    @classmethod
+    def validate_rating(cls, v):
+        if v < 1.0 or v > 5.0:
+            raise ValueError('Rating must be between 1.0 and 5.0')
+        return v
 
 
 # ==================== NOTIFICATION MODELS ====================

@@ -25,9 +25,10 @@ const Navbar = () => {
   const fetchUnreadChats = async () => {
     try {
       const response = await api.get('/chat/rooms');
-      // Count rooms with unread messages (simplified - in real app would track read status)
       const rooms = response.data.rooms || [];
-      setUnreadChats(rooms.length > 0 ? Math.min(rooms.length, 9) : 0);
+      // Count rooms that actually have unread messages
+      const unreadRooms = rooms.filter(room => room.unread_count > 0);
+      setUnreadChats(unreadRooms.length);
     } catch (error) {
       console.error('Failed to fetch chat rooms:', error);
     }
@@ -205,7 +206,7 @@ const Navbar = () => {
                           <span>לוח בקרה</span>
                         </Link>
                         <Link
-                          to="/profile"
+                          to="/dashboard?tab=overview"
                           onClick={() => setProfileDropdownOpen(false)}
                           className="flex items-center gap-3 px-4 py-2.5 text-sm text-carelink-slate hover:bg-carelink-teal-pale/30 hover:text-carelink-teal transition-colors"
                         >
@@ -213,7 +214,7 @@ const Navbar = () => {
                           <span>הפרופיל שלי</span>
                         </Link>
                         <Link
-                          to="/settings"
+                          to="/dashboard?tab=settings"
                           onClick={() => setProfileDropdownOpen(false)}
                           className="flex items-center gap-3 px-4 py-2.5 text-sm text-carelink-slate hover:bg-carelink-teal-pale/30 hover:text-carelink-teal transition-colors"
                         >
@@ -350,7 +351,7 @@ const Navbar = () => {
                     לוח בקרה
                   </Link>
                   <Link
-                    to="/profile"
+                    to="/dashboard?tab=overview"
                     className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium flex items-center gap-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -358,7 +359,7 @@ const Navbar = () => {
                     הפרופיל שלי
                   </Link>
                   <Link
-                    to="/settings"
+                    to="/dashboard?tab=settings"
                     className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium flex items-center gap-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >

@@ -183,7 +183,7 @@ const ProvidersMap = ({
                   )}
                   {provider.rating > 0 && (
                     <p className="text-amber-500">
-                      ⭐ {provider.rating.toFixed(1)} ({provider.review_count} ביקורות)
+                      ⭐ {provider.rating.toFixed(1)} ({provider.total_reviews || 0} ביקורות)
                     </p>
                   )}
                 </div>

@@ -33,6 +33,14 @@ const Dashboard = () => {
   const { user, setUser } = useAuth();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
+
+  // Sync active tab when URL search params change (e.g. navigating from Navbar)
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
   const [bookings, setBookings] = useState([]);
   const [requests, setRequests] = useState([]);
   const [chats, setChats] = useState([]);

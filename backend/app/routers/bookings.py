@@ -172,7 +172,7 @@ async def create_booking(
         travel_cost=travel_cost if travel_cost > 0 else None,
         weekend_addition=weekend_addition if weekend_addition > 0 else None,
         shipping_cost=shipping_cost if shipping_cost > 0 else None,
-        final_price=booking_data.total_price or final_price,
+        final_price=final_price,
         provider_name=provider.get("business_name"),
         user_name=user_name or client_name,
         is_guest_booking=is_guest_booking
