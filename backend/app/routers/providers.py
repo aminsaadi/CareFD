@@ -9,7 +9,7 @@ from app.database import db, UPLOAD_DIR
 from app.models import (Provider, ProviderRegister, VerificationDocument, VerificationStatus, NotificationType, UserRole,
     PROFESSION_TITLES, GENDER_OPTIONS, LANGUAGE_OPTIONS, TARGET_AUDIENCE_OPTIONS, SHIFT_DEFINITIONS)
 from app.utils import get_current_user, send_email_async, create_notification, calculate_distance
-from app.localities import ISRAEL_LOCALITIES, get_locality_coords, search_localities, REGION_CENTERS, get_region_info, get_cities_in_region
+from app.localities import ISRAEL_LOCALITIES, ALL_LOCALITIES, get_locality_coords, search_localities, get_all_localities, REGION_CENTERS, get_region_info, get_cities_in_region
 
 router = APIRouter()
 
@@ -149,17 +149,26 @@ async def get_provider(provider_id: str):
     provider = await db.providers.find_one({"provider_id": provider_id}, {"_id": 0})
     if not provider:
         raise HTTPException(status_code=404, detail="Provider not found")
-    
+
     # Increment view count
     await db.providers.update_one(
         {"provider_id": provider_id},
         {"$inc": {"views_count": 1}}
     )
-    
+
+    # Resolve profession name from professions collection (in case it was renamed)
+    if provider.get("profession_id"):
+        profession = await db.professions.find_one(
+            {"profession_id": provider["profession_id"]},
+            {"_id": 0, "name": 1}
+        )
+        if profession and profession.get("name"):
+            provider["profession_name"] = profession["name"]
+
     # Get services
     services = await db.services.find({"provider_id": provider_id, "is_active": True}, {"_id": 0}).to_list(100)
     provider['services_list'] = services
-    
+
     return provider
 
 @router.get("/providers")
@@ -204,55 +213,91 @@ async def search_providers(
         ]
     })
     
-    # Text search in business_name and description
+    # Text search in business_name, description, profession, and specializations
     if search:
         safe_search = re.escape(search)
-        query["$and"].append({
-            "$or": [
-                {"business_name": {"$regex": safe_search, "$options": "i"}},
-                {"description": {"$regex": safe_search, "$options": "i"}},
-                {"specializations": {"$in": [search]}},
-                {"profession_title": {"$regex": safe_search, "$options": "i"}}
-            ]
-        })
-    
-    # City / Region filter
-    if city:
-        # Check if it's a region name first
+        search_or = [
+            {"business_name": {"$regex": safe_search, "$options": "i"}},
+            {"description": {"$regex": safe_search, "$options": "i"}},
+            {"specializations": {"$regex": safe_search, "$options": "i"}},
+            # Search in new hierarchy fields
+            {"profession_name": {"$regex": safe_search, "$options": "i"}},
+            {"specialization_name": {"$regex": safe_search, "$options": "i"}},
+            {"expertise": {"$regex": safe_search, "$options": "i"}},
+            {"service_categories.name": {"$regex": safe_search, "$options": "i"}},
+        ]
+
+        # Map Hebrew search terms to profession_title values (legacy support)
+        matched_profession_values = []
+        search_lower = search.strip()
+        for prof in PROFESSION_TITLES:
+            if search_lower in prof["label"] or prof["label"] in search_lower:
+                matched_profession_values.append(prof["value"])
+                continue
+            for term in prof.get("search_terms", []):
+                if search_lower in term or term in search_lower:
+                    matched_profession_values.append(prof["value"])
+                    break
+
+        if matched_profession_values:
+            search_or.append({"profession_title": {"$in": matched_profession_values}})
+
+        search_or.append({"profession_title": {"$regex": safe_search, "$options": "i"}})
+
+        query["$and"].append({"$or": search_or})
+
+    # City / Region filter - check both provider location AND service_areas
+    # When lat/lng/radius are provided, skip city text filter - distance filtering replaces it
+    use_geo_filter = latitude is not None and longitude is not None and radius_km is not None
+    if city and not use_geo_filter:
         region_info = get_region_info(city)
         if region_info:
-            # It's a region - get all cities in this region
+            # It's a region - match provider's city OR service_areas
             region_cities = get_cities_in_region(city)
+            region_tag = f"אזור: {city}"
             if region_cities:
-                query["$and"].append({"location.city": {"$in": region_cities}})
+                query["$and"].append({"$or": [
+                    {"location.city": {"$in": region_cities}},
+                    {"service_areas": {"$in": region_cities + [region_tag]}},
+                ]})
             else:
-                # Fallback to regex if no mapped cities
-                query["$and"].append({"location.city": {"$regex": re.escape(city), "$options": "i"}})
+                query["$and"].append({"$or": [
+                    {"location.city": {"$regex": re.escape(city), "$options": "i"}},
+                    {"service_areas": {"$regex": re.escape(city), "$options": "i"}},
+                ]})
         else:
-            # It's a specific city name
-            query["$and"].append({"location.city": {"$regex": re.escape(city), "$options": "i"}})
+            # It's a specific city name - match location OR service_areas
+            query["$and"].append({"$or": [
+                {"location.city": {"$regex": re.escape(city), "$options": "i"}},
+                {"service_areas": city},
+            ]})
     
     # Specialization filter (single)
     if specialization:
-        query["specializations"] = {"$in": [specialization]}
-    
+        query["$and"].append({"$or": [
+            {"specializations": {"$in": [specialization]}},
+            {"specialization_name": specialization},
+            {"specialization_id": specialization},
+        ]})
+
     # Multiple specializations filter
     if specializations:
         spec_list = [s.strip() for s in specializations.split(",")]
-        query["specializations"] = {"$in": spec_list}
-    
-    # Category filter (maps to specializations)
+        query["$and"].append({"$or": [
+            {"specializations": {"$in": spec_list}},
+            {"specialization_name": {"$in": spec_list}},
+        ]})
+
+    # Category filter - search by profession_id or profession_name
     if category:
-        category_mapping = {
-            "nursing": ["סיעוד", "סיעוד ביתי", "טיפול בקשישים"],
-            "physiotherapy": ["פיזיותרפיה", "שיקום", "שיקום לאחר ניתוח"],
-            "doctor": ["רפואת משפחה", "רפואה פנימית"],
-            "eldercare": ["גריאטריה", "טיפול בקשישים", "סיעוד"],
-            "therapy": ["ריפוי בעיסוק", "ריפוי בדיבור"],
-            "alternative": ["רפואה משלימה", "דיקור", "עיסוי רפואי"]
-        }
-        if category in category_mapping:
-            query["specializations"] = {"$in": category_mapping[category]}
+        query["$and"].append({"$or": [
+            {"profession_id": category},
+            {"profession_name": {"$regex": re.escape(category), "$options": "i"}},
+            {"service_categories.category_id": category},
+            {"service_categories.profession_id": category},
+            # Legacy fallback
+            {"specializations": {"$regex": re.escape(category), "$options": "i"}},
+        ]})
     
     # Provider type filter
     if provider_type:
@@ -293,7 +338,7 @@ async def search_providers(
                     provider["location"]["longitude"]
                 )
                 provider["distance_km"] = round(distance, 1)
-                
+
                 # Apply radius filter if specified
                 if radius_km is None or distance <= radius_km:
                     filtered_providers.append(provider)
@@ -301,6 +346,20 @@ async def search_providers(
                 # Include providers without coordinates if no radius filter
                 provider["distance_km"] = None
                 filtered_providers.append(provider)
+            elif city and radius_km:
+                # When radius is active but provider has no coordinates,
+                # include if their city name matches the search city
+                provider_city = (provider.get("location") or {}).get("city", "")
+                provider_areas = provider.get("service_areas") or []
+                region_info_check = get_region_info(city)
+                if region_info_check:
+                    region_cities_list = get_cities_in_region(city) or []
+                    if provider_city in region_cities_list or any(a in region_cities_list for a in provider_areas):
+                        provider["distance_km"] = None
+                        filtered_providers.append(provider)
+                elif (provider_city and re.search(re.escape(city), provider_city, re.IGNORECASE)) or city in provider_areas:
+                    provider["distance_km"] = None
+                    filtered_providers.append(provider)
         providers = filtered_providers
     
     # Sorting
@@ -315,7 +374,20 @@ async def search_providers(
     
     # Apply pagination after filtering and sorting
     providers = providers[skip:skip + limit]
-    
+
+    # Resolve profession names from professions collection
+    prof_ids = list({p.get("profession_id") for p in providers if p.get("profession_id")})
+    if prof_ids:
+        prof_docs = await db.professions.find(
+            {"profession_id": {"$in": prof_ids}},
+            {"_id": 0, "profession_id": 1, "name": 1}
+        ).to_list(100)
+        prof_name_map = {p["profession_id"]: p["name"] for p in prof_docs if p.get("name")}
+        for prov in providers:
+            pid = prov.get("profession_id")
+            if pid and pid in prof_name_map:
+                prov["profession_name"] = prof_name_map[pid]
+
     return {
         "providers": providers,
         "total": total,
@@ -346,19 +418,20 @@ async def get_filter_options():
     # Get unique specializations
     specializations = await db.providers.distinct("specializations")
     specializations = [s for s in specializations if s]
-    
+
     # Get unique provider types
     provider_types = await db.providers.distinct("provider_type")
-    
-    # Category options
-    categories = [
-        {"id": "nursing", "name": "סיעוד", "name_en": "Nursing"},
-        {"id": "physiotherapy", "name": "פיזיותרפיה", "name_en": "Physiotherapy"},
-        {"id": "doctor", "name": "רופא בבית", "name_en": "Doctor"},
-        {"id": "eldercare", "name": "טיפול בקשישים", "name_en": "Elder Care"},
-        {"id": "therapy", "name": "ריפוי בעיסוק", "name_en": "Occupational Therapy"},
-        {"id": "alternative", "name": "רפואה משלימה", "name_en": "Alternative Medicine"}
-    ]
+
+    # Categories from admin professions hierarchy
+    professions_data = await db.professions.find({}, {"_id": 0}).to_list(100)
+    categories = []
+    for prof in professions_data:
+        categories.append({
+            "id": prof.get("profession_id", ""),
+            "name": prof.get("name", ""),
+            "name_en": prof.get("name_en", ""),
+            "icon": prof.get("icon", "briefcase"),
+        })
     
     # Service types
     service_types = [
@@ -423,6 +496,7 @@ async def get_filter_options():
         "cities": sorted(cities) if cities else ["תל אביב", "ירושלים", "חיפה", "באר שבע", "רמת גן", "הרצליה", "פתח תקווה"],
         "specializations": sorted(specializations) if specializations else [],
         "categories": categories,
+        "professions": professions_data,  # Full hierarchy for provider forms
         "service_types": service_types,
         "provider_types": provider_type_options,
         "rating_options": rating_options,
@@ -453,21 +527,37 @@ async def update_provider(
     if provider["user_id"] != user["user_id"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
+    # Whitelist allowed fields to prevent mass assignment attacks
+    ALLOWED_FIELDS = {
+        "business_name", "description", "phone", "email", "website",
+        "provider_type", "location", "address", "city", "professions",
+        "sub_professions", "categories", "languages", "education",
+        "experience_years", "about", "specializations", "target_audiences",
+        "profile_image", "cover_image", "gallery", "working_hours",
+        "availability", "services", "social_links", "gender",
+        "shifts", "travel_radius", "home_visit", "online_service",
+        "instant_booking", "cancellation_policy", "payment_methods",
+        "insurance_accepted", "certifications", "awards",
+    }
+
+    # Filter out any non-allowed fields
+    filtered_updates = {k: v for k, v in updates.items() if k in ALLOWED_FIELDS}
+
     # Auto-geocode location if city is provided but coordinates are missing
-    if "location" in updates and updates["location"]:
-        loc = updates["location"]
+    if "location" in filtered_updates and filtered_updates["location"]:
+        loc = filtered_updates["location"]
         city_name = loc.get("city", "")
         if city_name and (not loc.get("latitude") or not loc.get("longitude")):
             coords = get_locality_coords(city_name)
             if coords:
-                updates["location"]["latitude"] = coords["lat"]
-                updates["location"]["longitude"] = coords["lng"]
-    
-    updates["updated_at"] = datetime.now(timezone.utc).isoformat()
-    
+                filtered_updates["location"]["latitude"] = coords["lat"]
+                filtered_updates["location"]["longitude"] = coords["lng"]
+
+    filtered_updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+
     await db.providers.update_one(
         {"provider_id": provider_id},
-        {"$set": updates}
+        {"$set": filtered_updates}
     )
     
     return {"message": "Provider updated successfully"}
@@ -475,13 +565,14 @@ async def update_provider(
 # ==================== LOCALITIES ROUTES ====================
 
 @router.get("/localities")
-async def get_localities(q: Optional[str] = None, limit: int = 50):
+async def get_localities(q: Optional[str] = None, limit: int = 500):
     """Get list of Israeli localities with coordinates"""
+    all_locs = get_all_localities()
     if q:
         results = search_localities(q, limit)
     else:
-        results = ISRAEL_LOCALITIES[:limit]
-    return {"localities": results, "total": len(ISRAEL_LOCALITIES)}
+        results = all_locs[:limit]
+    return {"localities": results, "total": len(all_locs)}
 
 @router.get("/localities/{city_name}/coords")
 async def get_city_coords(city_name: str):

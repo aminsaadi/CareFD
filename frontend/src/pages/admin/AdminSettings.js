@@ -12,14 +12,14 @@ import {
 
 const AdminSettings = () => {
   const [settings, setSettings] = useState({
-    site_name: 'CareLink',
+    site_name: 'Healthcare Platform',
     site_tagline: 'Connecting Care Providers',
     logo_url: '',
     favicon_url: '',
     contact_email: 'info@carelink.co.il',
     contact_phone: '03-1234567',
     contact_address: 'תל אביב, ישראל',
-    footer_text: '© 2024 CareLink. כל הזכויות שמורות.',
+    footer_text: '© 2024 Healthcare Platform. כל הזכויות שמורות.',
     social_facebook: '',
     social_instagram: '',
     social_twitter: '',

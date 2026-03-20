@@ -86,8 +86,8 @@ const testimonials = [
   { id: 3, name: 'רחל אברהם', role: 'ספקית שירות', content: 'הפלטפורמה עזרה לי להגיע ללקוחות חדשים ולפתח את העסק שלי בצורה משמעותית.', rating: 5, avatar: 'ר' },
 ];
 
-// Popular searches data - use from searchData
-const popularSearches = searchData;
+// Fallback popular searches - used until backend data loads
+const fallbackPopularSearches = searchData;
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -97,7 +97,8 @@ const Landing = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [selectedRadius, setSelectedRadius] = useState('');
   const [searchTab, setSearchTab] = useState('providers'); // 'providers' or 'services'
-  
+  const [dynamicPopularSearches, setDynamicPopularSearches] = useState(fallbackPopularSearches);
+
   // Dropdown states
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
@@ -149,9 +150,26 @@ const Landing = () => {
 
       const regionsRes = await api.get('/regions');
       setRegions(regionsRes.data.regions || []);
-      
+
       // Use comprehensive localities list
       setCities(israeliLocalities);
+
+      // Fetch professions from backend for dynamic popular searches
+      try {
+        const professionsRes = await api.get('/professions');
+        const profs = professionsRes.data?.professions || professionsRes.data || [];
+        if (Array.isArray(profs) && profs.length > 0) {
+          const profNames = profs.map(p => p.name || p.name_he || p.label).filter(Boolean);
+          if (profNames.length > 0) {
+            setDynamicPopularSearches(prev => ({
+              ...prev,
+              providers: profNames
+            }));
+          }
+        }
+      } catch {
+        // Keep fallback popular searches
+      }
 
       try {
         const statsRes = await api.get('/stats/public');
@@ -229,7 +247,7 @@ const Landing = () => {
   ).slice(0, 10);
   
   // Get current popular searches based on tab
-  const currentPopularSearches = popularSearches[searchTab] || popularSearches.providers;
+  const currentPopularSearches = dynamicPopularSearches[searchTab] || dynamicPopularSearches.providers;
   
   // Filter popular searches based on input
   const filteredSearches = searchQuery.trim() 
@@ -755,6 +773,30 @@ const Landing = () => {
             >
               צפה בכל השירותים
               <FaArrowLeft className="rtl:rotate-180" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== REQUEST BANNER ==================== */}
+      <section className="py-10 bg-gradient-to-l from-carelink-teal via-carelink-teal-medium to-carelink-navy" data-testid="request-banner-section">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-center md:text-right">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                לא מצאתם מה שחיפשתם?
+              </h3>
+              <p className="text-carelink-teal-pale text-lg">
+                פרסמו בקשה וקבלו הצעות מספקים מתאימים ישירות אליכם
+              </p>
+            </div>
+            <Link
+              to="/requests?create=true"
+              className="inline-flex items-center gap-2 bg-white text-carelink-teal px-8 py-4 rounded-xl font-bold text-lg hover:bg-carelink-teal-pale transition-all shadow-soft-lg btn-press hover-scale whitespace-nowrap"
+              data-testid="request-banner-btn"
+            >
+              <FaSearch />
+              פרסם בקשה
             </Link>
           </div>
         </div>

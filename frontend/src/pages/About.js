@@ -2,8 +2,10 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { FaHeart, FaUsers, FaShieldAlt, FaHandshake, FaLightbulb, FaStar } from 'react-icons/fa';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 
 const About = () => {
+  const { siteName } = useSiteSettings();
   const values = [
     { icon: FaHeart, title: 'אכפתיות', desc: 'אנחנו מאמינים שכל אדם ראוי לטיפול איכותי ונגיש' },
     { icon: FaShieldAlt, title: 'אמינות', desc: 'כל הספקים שלנו עוברים תהליך אימות קפדני' },
@@ -25,7 +27,7 @@ const About = () => {
       <section className="bg-gradient-to-br from-carelink-navy to-carelink-teal py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            אודות CareLink
+            אודות {siteName}
           </h1>
           <p className="text-xl text-carelink-teal-pale max-w-3xl mx-auto">
             אנחנו מחברים בין מטופלים לספקי שירותי בריאות מובילים בישראל, 
@@ -41,7 +43,7 @@ const About = () => {
             <div>
               <h2 className="text-3xl font-bold text-carelink-navy mb-6">המשימה שלנו</h2>
               <p className="text-carelink-slate text-lg mb-4">
-                CareLink נוסדה מתוך אמונה שכל אדם ראוי לגישה נוחה ומהירה לשירותי בריאות איכותיים.
+                הפלטפורמה נוסדה מתוך אמונה שכל אדם ראוי לגישה נוחה ומהירה לשירותי בריאות איכותיים.
               </p>
               <p className="text-carelink-slate text-lg mb-4">
                 אנחנו מספקים פלטפורמה שמאפשרת למטופלים למצוא בקלות ספקי שירותים מאומתים, 

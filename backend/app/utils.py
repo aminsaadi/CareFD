@@ -11,6 +11,7 @@ from fastapi import HTTPException, Header, Request
 from jose import jwt
 import bcrypt
 from pywebpush import webpush, WebPushException
+import resend
 import math
 
 from app.database import db
@@ -30,12 +31,21 @@ if not SECRET_KEY:
 
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'carelink.co.il@gmail.com')
 SMTP_HOST = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
-SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
+try:
+    SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
+except (ValueError, TypeError):
+    SMTP_PORT = 587
+    logger.warning("Invalid SMTP_PORT value, defaulting to 587")
 SMTP_USER = os.environ.get('SMTP_USER', '')
 SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
 VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', '')
 VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY', '')
 VAPID_CLAIMS_EMAIL = os.environ.get('VAPID_CLAIMS_EMAIL', 'admin@carelink.co.il')
+
+# Resend API (preferred over SMTP on Railway where SMTP ports are blocked)
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
+if RESEND_API_KEY:
+    resend.api_key = RESEND_API_KEY
 
 SITE_URL = os.environ.get('SITE_URL', 'https://carelink.co.il')
 
@@ -96,16 +106,21 @@ async def _get_smtp_settings():
     now = time.time()
     if _smtp_cache["settings"] and _smtp_cache["fetched_at"] and (now - _smtp_cache["fetched_at"]) < 300:
         return _smtp_cache["settings"]
-    
-    db_settings = await db.smtp_settings.find_one({"_id": "smtp_config"}, {"_id": 0})
+
+    db_settings = await db.smtp_settings.find_one({"_id": "smtp_config"})
     if db_settings and db_settings.get("smtp_user") and db_settings.get("smtp_password"):
+        try:
+            port = int(db_settings.get("smtp_port", SMTP_PORT))
+        except (ValueError, TypeError):
+            port = 587
         settings = {
             "sender_email": db_settings.get("sender_email", SENDER_EMAIL),
             "smtp_host": db_settings.get("smtp_host", SMTP_HOST),
-            "smtp_port": int(db_settings.get("smtp_port", SMTP_PORT)),
+            "smtp_port": port,
             "smtp_user": db_settings.get("smtp_user", SMTP_USER),
             "smtp_password": db_settings.get("smtp_password", SMTP_PASSWORD),
         }
+        logger.info(f"SMTP: Using DB settings (host={settings['smtp_host']}, port={settings['smtp_port']}, user={settings['smtp_user'][:3]}***)")
     else:
         settings = {
             "sender_email": SENDER_EMAIL,
@@ -114,6 +129,10 @@ async def _get_smtp_settings():
             "smtp_user": SMTP_USER,
             "smtp_password": SMTP_PASSWORD,
         }
+        if not SMTP_USER or not SMTP_PASSWORD:
+            logger.warning("SMTP: No credentials configured in DB or env vars - emails will NOT be sent!")
+        else:
+            logger.info(f"SMTP: Using env var settings (host={SMTP_HOST}, port={SMTP_PORT}, user={SMTP_USER[:3]}***)")
     _smtp_cache["settings"] = settings
     _smtp_cache["fetched_at"] = now
     return settings
@@ -125,51 +144,85 @@ def send_email_smtp_with_config(recipient: str, subject: str, html_content: str,
     sender = smtp_cfg["sender_email"]
     host = smtp_cfg["smtp_host"]
     port = smtp_cfg["smtp_port"]
-    
+
     if not smtp_user or not smtp_password:
-        logger.error(f"SMTP not configured! Cannot send email to {recipient}")
+        logger.error(f"SMTP not configured! user={'set' if smtp_user else 'EMPTY'}, password={'set' if smtp_password else 'EMPTY'} - Cannot send email to {recipient}")
         return None
     try:
+        logger.info(f"Sending email to {recipient} via {host}:{port} from {sender} - Subject: {subject}")
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
         msg['From'] = sender
         msg['To'] = recipient
         html_part = MIMEText(html_content, 'html', 'utf-8')
         msg.attach(html_part)
-        with smtplib.SMTP(host, port) as server:
-            server.starttls()
-            server.login(smtp_user, smtp_password)
-            server.sendmail(sender, recipient, msg.as_string())
-        logger.info(f"Email sent successfully to {recipient} via {host} - Subject: {subject}")
+
+        if port == 465:
+            # SSL connection (port 465)
+            with smtplib.SMTP_SSL(host, port, timeout=15) as server:
+                server.login(smtp_user, smtp_password)
+                server.sendmail(sender, recipient, msg.as_string())
+        else:
+            # STARTTLS connection (port 587)
+            with smtplib.SMTP(host, port, timeout=15) as server:
+                server.starttls()
+                server.login(smtp_user, smtp_password)
+                server.sendmail(sender, recipient, msg.as_string())
+
+        logger.info(f"Email sent successfully to {recipient} via {host}:{port} - Subject: {subject}")
         return {"success": True, "recipient": recipient}
+    except smtplib.SMTPAuthenticationError as e:
+        logger.error(f"SMTP authentication failed for {smtp_user}@{host}:{port} - Error: {str(e)}")
+        logger.error("If using Gmail, make sure to use an App Password (not your regular password)")
+        return None
+    except (smtplib.SMTPConnectError, OSError) as e:
+        logger.error(f"Cannot connect to SMTP server {host}:{port} - {type(e).__name__}: {str(e)}")
+        # If port 587 failed, try 465 with SSL as fallback
+        if port != 465:
+            logger.info(f"Retrying with SSL on port 465...")
+            try:
+                with smtplib.SMTP_SSL(host, 465, timeout=15) as server:
+                    server.login(smtp_user, smtp_password)
+                    server.sendmail(sender, recipient, msg.as_string())
+                logger.info(f"Email sent successfully to {recipient} via {host}:465 (SSL fallback)")
+                return {"success": True, "recipient": recipient}
+            except Exception as e2:
+                logger.error(f"SSL fallback also failed: {type(e2).__name__}: {str(e2)}")
+        return None
     except Exception as e:
-        logger.error(f"Failed to send email to {recipient} via {host} - Error: {str(e)}")
+        logger.error(f"Failed to send email to {recipient} via {host}:{port} - {type(e).__name__}: {str(e)}")
         return None
 
 
-def send_email_smtp(recipient: str, subject: str, html_content: str):
-    if not SMTP_USER or not SMTP_PASSWORD:
-        logger.error(f"SMTP not configured! SMTP_USER={'set' if SMTP_USER else 'EMPTY'}, SMTP_PASSWORD={'set' if SMTP_PASSWORD else 'EMPTY'} - Cannot send email to {recipient}")
-        return None
+def _send_email_resend(recipient: str, subject: str, html_content: str, sender: str):
+    """Send email via Resend API (works on Railway where SMTP is blocked)."""
     try:
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = subject
-        msg['From'] = SENDER_EMAIL
-        msg['To'] = recipient
-        html_part = MIMEText(html_content, 'html', 'utf-8')
-        msg.attach(html_part)
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-            server.starttls()
-            server.login(SMTP_USER, SMTP_PASSWORD)
-            server.sendmail(SENDER_EMAIL, recipient, msg.as_string())
-        logger.info(f"Email sent successfully to {recipient} - Subject: {subject}")
-        return {"success": True, "recipient": recipient}
+        logger.info(f"Sending email via Resend to {recipient} - Subject: {subject}")
+        params = {
+            "from": sender,
+            "to": [recipient],
+            "subject": subject,
+            "html": html_content,
+        }
+        result = resend.Emails.send(params)
+        logger.info(f"Email sent via Resend to {recipient} - ID: {result.get('id', 'unknown')}")
+        return {"success": True, "recipient": recipient, "provider": "resend"}
     except Exception as e:
-        logger.error(f"Failed to send email to {recipient} - Subject: {subject} - Error: {str(e)}")
+        logger.error(f"Resend failed for {recipient} - {type(e).__name__}: {str(e)}")
         return None
+
 
 async def send_email_async(recipient: str, subject: str, html_content: str):
     try:
+        # Prefer Resend API (works on Railway where SMTP ports are blocked)
+        if RESEND_API_KEY:
+            sender = f"CareLink <{SENDER_EMAIL}>"
+            result = await asyncio.to_thread(_send_email_resend, recipient, subject, html_content, sender)
+            if result:
+                return result
+            logger.warning("Resend failed, falling back to SMTP...")
+
+        # Fallback to SMTP
         smtp_cfg = await _get_smtp_settings()
         result = await asyncio.to_thread(send_email_smtp_with_config, recipient, subject, html_content, smtp_cfg)
         return result

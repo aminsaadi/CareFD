@@ -10,14 +10,15 @@ import { israeliLocalities } from '../data/israeliLocalities';
 import { israeliRegions, healthcareProfessions, popularSearches as searchData } from '../data/searchData';
 import { 
   FaSearch, FaFilter, FaTimes, FaSortAmountDown, FaMapMarkerAlt,
-  FaThLarge, FaList, FaCrosshairs, FaSpinner, FaMap, FaBriefcase
+  FaThLarge, FaList, FaCrosshairs, FaSpinner, FaMap, FaBriefcase, FaChevronLeft
 } from 'react-icons/fa';
 
 // Lazy load map component
 const ProvidersMap = lazy(() => import('../components/ProvidersMap'));
 
-// Popular searches data - use from searchData
-const popularSearches = searchData.providers;
+// Fallback popular searches - used until backend professions load
+const fallbackPopularSearches = searchData.providers;
+
 const Providers = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -30,6 +31,7 @@ const Providers = () => {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [locationQuery, setLocationQuery] = useState(searchParams.get('city') || '');
   const [isLocating, setIsLocating] = useState(false);
+  const [popularSearches, setPopularSearches] = useState(fallbackPopularSearches);
   
   // Dropdown states
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
@@ -40,8 +42,8 @@ const Providers = () => {
   const searchDropdownRef = useRef(null);
   const locationDropdownRef = useRef(null);
   
-  // Israeli regions for quick selection - use from searchData
-  const regions = israeliRegions;
+  // Israeli regions for quick selection - fetched from backend with fallback
+  const [regions, setRegions] = useState(israeliRegions);
 
   const radiusOptions = [
     { value: 5, label: '5 ק"מ' },
@@ -84,6 +86,37 @@ const Providers = () => {
       }
     };
     fetchCities();
+
+    // Fetch professions from backend for popular searches
+    const fetchProfessions = async () => {
+      try {
+        const res = await api.get('/professions');
+        const profs = res.data?.professions || res.data || [];
+        if (Array.isArray(profs) && profs.length > 0) {
+          const profNames = profs.map(p => p.name || p.name_he || p.label).filter(Boolean);
+          if (profNames.length > 0) {
+            setPopularSearches(profNames);
+          }
+        }
+      } catch {
+        // Keep fallback popular searches
+      }
+    };
+    fetchProfessions();
+
+    // Fetch regions from backend
+    const fetchRegions = async () => {
+      try {
+        const res = await api.get('/regions');
+        const backendRegions = res.data?.regions || [];
+        if (backendRegions.length > 0) {
+          setRegions(backendRegions);
+        }
+      } catch {
+        // Keep fallback regions
+      }
+    };
+    fetchRegions();
   }, []);
 
   // Close dropdowns when clicking outside
@@ -356,6 +389,7 @@ const Providers = () => {
                     onFocus={() => setShowSearchDropdown(true)}
                     placeholder="מקצוע, התמחות, שם ספק..."
                     className="w-full px-4 py-3 pr-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
+                    aria-label="חיפוש לפי מקצוע, התמחות או שם ספק"
                     data-testid="search-input"
                   />
                   
@@ -407,6 +441,7 @@ const Providers = () => {
                       onFocus={() => setShowLocationDropdown(true)}
                       placeholder="עיר או אזור"
                       className="w-full px-4 py-3 pr-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
+                      aria-label="חיפוש לפי עיר או אזור"
                       data-testid="location-input"
                     />
                     
@@ -439,7 +474,7 @@ const Providers = () => {
                             <div className="p-2">
                               {regions.map((region) => (
                                 <button
-                                  key={region.id}
+                                  key={region.region_id || region.id}
                                   type="button"
                                   onClick={() => {
                                     setLocationQuery(region.name);
@@ -559,7 +594,7 @@ const Providers = () => {
                 <span className="text-sm text-carelink-gray">אזורים:</span>
                 {regions.map((region) => (
                   <button
-                    key={region.id}
+                    key={region.region_id || region.id}
                     type="button"
                     onClick={() => {
                       setLocationQuery(region.name);
@@ -620,6 +655,8 @@ const Providers = () => {
                   onClick={() => setViewMode('grid')}
                   className={`px-3 py-2 ${viewMode === 'grid' ? 'bg-carelink-teal text-white' : 'bg-white text-carelink-gray'}`}
                   title="תצוגת רשת"
+                  aria-label="תצוגת רשת"
+                  aria-pressed={viewMode === 'grid'}
                 >
                   <FaThLarge />
                 </button>
@@ -627,6 +664,8 @@ const Providers = () => {
                   onClick={() => setViewMode('list')}
                   className={`px-3 py-2 ${viewMode === 'list' ? 'bg-carelink-teal text-white' : 'bg-white text-carelink-gray'}`}
                   title="תצוגת רשימה"
+                  aria-label="תצוגת רשימה"
+                  aria-pressed={viewMode === 'list'}
                 >
                   <FaList />
                 </button>
@@ -634,6 +673,8 @@ const Providers = () => {
                   onClick={() => setViewMode('map')}
                   className={`px-3 py-2 ${viewMode === 'map' ? 'bg-carelink-teal text-white' : 'bg-white text-carelink-gray'}`}
                   title="תצוגת מפה"
+                  aria-label="תצוגת מפה"
+                  aria-pressed={viewMode === 'map'}
                   data-testid="map-view-btn"
                 >
                   <FaMap />
@@ -723,69 +764,116 @@ const Providers = () => {
               </div>
 
               {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="w-12 h-12 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+                <div className="grid md:grid-cols-2 gap-6" aria-label="טוען ספקים">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="bg-white p-6 rounded-2xl shadow-md border-2 border-carelink-teal-pale animate-pulse">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="h-6 bg-gray-200 rounded-lg w-3/4 mb-2"></div>
+                          <div className="h-4 bg-gray-200 rounded-lg w-1/2 mb-1"></div>
+                          <div className="h-4 bg-gray-200 rounded-lg w-1/3"></div>
+                        </div>
+                        <div className="h-8 w-20 bg-gray-200 rounded-full"></div>
+                      </div>
+                      <div className="h-10 bg-gray-200 rounded-lg mb-4"></div>
+                      <div className="flex gap-2 mb-4">
+                        <div className="h-6 w-20 bg-gray-200 rounded-lg"></div>
+                        <div className="h-6 w-20 bg-gray-200 rounded-lg"></div>
+                      </div>
+                      <div className="flex gap-2">
+                        <div className="h-10 flex-1 bg-gray-200 rounded-xl"></div>
+                        <div className="h-10 w-10 bg-gray-200 rounded-xl"></div>
+                        <div className="h-10 w-10 bg-gray-200 rounded-xl"></div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : providers.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-2xl shadow-lg">
                   <FaSearch className="text-5xl text-carelink-teal-pale mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-carelink-navy mb-2">לא נמצאו ספקים</h3>
                   <p className="text-carelink-gray mb-4">נסו לשנות את הסינון או מילות החיפוש</p>
+                  <div className="space-y-3 max-w-md mx-auto text-sm text-carelink-slate mb-6">
+                    <p>הנה כמה טיפים לשיפור החיפוש:</p>
+                    <ul className="text-right list-disc list-inside space-y-1">
+                      <li>נסו להרחיב את אזור החיפוש</li>
+                      <li>שנו את מילות החיפוש</li>
+                      <li>הסירו חלק מהפילטרים</li>
+                    </ul>
+                  </div>
                   <button
                     onClick={handleResetFilters}
-                    className="text-carelink-teal font-medium hover:underline"
+                    className="px-6 py-2 bg-carelink-teal text-white rounded-lg font-medium hover:bg-carelink-teal-medium transition"
                   >
-                    נקה סינון
+                    נקה סינון והצג הכל
                   </button>
                 </div>
               ) : viewMode === 'map' ? (
-                /* Map View */
-                <div className="space-y-6">
-                  <Suspense fallback={
-                    <div className="h-[500px] bg-gray-100 rounded-xl flex items-center justify-center">
-                      <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+                /* Map View - split layout */
+                <div className="flex flex-col lg:flex-row gap-4" style={{ height: '650px' }}>
+                  {/* Map */}
+                  <div className="flex-1 min-h-[350px] lg:min-h-0">
+                    <Suspense fallback={
+                      <div className="h-full bg-gray-100 rounded-xl flex items-center justify-center">
+                        <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    }>
+                      <ProvidersMap
+                        providers={providers}
+                        userLocation={filters.latitude && filters.longitude ? { lat: filters.latitude, lng: filters.longitude } : null}
+                        radiusKm={filters.radius}
+                        height="100%"
+                        className="h-full"
+                      />
+                    </Suspense>
+                  </div>
+
+                  {/* Provider list sidebar */}
+                  <div className="lg:w-80 xl:w-96 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden">
+                    <div className="p-4 border-b border-gray-100 bg-gray-50/50">
+                      <h3 className="font-bold text-carelink-navy flex items-center gap-2">
+                        <FaMapMarkerAlt className="text-carelink-teal" />
+                        ספקים באזור
+                        <span className="text-sm font-normal text-carelink-gray">({providers.length})</span>
+                      </h3>
                     </div>
-                  }>
-                    <ProvidersMap
-                      providers={providers}
-                      userLocation={filters.latitude && filters.longitude ? { lat: filters.latitude, lng: filters.longitude } : null}
-                      height="500px"
-                    />
-                  </Suspense>
-                  
-                  {/* Provider list below map */}
-                  <div className="bg-white rounded-xl p-4 shadow-lg">
-                    <h3 className="font-bold text-carelink-navy mb-4">ספקים באזור ({providers.length})</h3>
-                    <div className="space-y-3 max-h-[400px] overflow-y-auto">
-                      {providers.map((provider) => (
-                        <a
-                          key={provider.provider_id}
-                          href={`/providers/${provider.provider_id}`}
-                          className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition border border-gray-100"
-                        >
-                          {provider.profile_image ? (
-                            <img src={provider.profile_image} alt={provider.name} className="w-12 h-12 rounded-full object-cover" />
-                          ) : (
-                            <div className="w-12 h-12 rounded-full bg-carelink-teal/20 flex items-center justify-center text-carelink-teal font-bold">
-                              {provider.name?.charAt(0)}
+                    <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
+                      {providers.length === 0 ? (
+                        <div className="p-8 text-center text-carelink-gray">
+                          <FaSearch className="mx-auto text-3xl text-gray-300 mb-3" />
+                          <p className="font-medium">לא נמצאו ספקים</p>
+                          <p className="text-sm mt-1">נסו לשנות את הסינון</p>
+                        </div>
+                      ) : (
+                        providers.map((provider) => (
+                          <a
+                            key={provider.provider_id}
+                            href={`/providers/${provider.provider_id}`}
+                            className="flex items-center gap-3 p-3 hover:bg-carelink-teal/5 transition group"
+                          >
+                            {provider.profile_image ? (
+                              <img src={provider.profile_image} alt={provider.name} className="w-11 h-11 rounded-full object-cover flex-shrink-0 ring-2 ring-gray-100 group-hover:ring-carelink-teal/30" />
+                            ) : (
+                              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-carelink-teal/20 to-carelink-navy/10 flex items-center justify-center text-carelink-teal font-bold flex-shrink-0">
+                                {provider.name?.charAt(0)}
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-carelink-navy text-sm truncate group-hover:text-carelink-teal transition">{provider.name}</p>
+                              <p className="text-xs text-carelink-gray truncate">{provider.profession_name || provider.profession} • {provider.location?.city}</p>
+                              <div className="flex items-center gap-3 mt-0.5">
+                                {provider.rating != null && provider.rating > 0 && (
+                                  <span className="text-xs text-amber-500">⭐ {Number(provider.rating).toFixed(1)}</span>
+                                )}
+                                {provider.distance_km != null && (
+                                  <span className="text-xs text-blue-500">{provider.distance_km} ק״מ</span>
+                                )}
+                              </div>
                             </div>
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-carelink-navy truncate">{provider.name}</p>
-                            <p className="text-sm text-carelink-gray truncate">{provider.profession} • {provider.location?.city}</p>
-                          </div>
-                          {provider.distance_km != null && (
-                            <div className="text-sm text-blue-600 font-medium whitespace-nowrap">
-                              {provider.distance_km} ק״מ
-                            </div>
-                          )}
-                          {provider.rating > 0 && (
-                            <div className="text-sm text-amber-500 whitespace-nowrap">
-                              ⭐ {provider.rating.toFixed(1)}
-                            </div>
-                          )}
-                        </a>
-                      ))}
+                            <FaChevronLeft className="text-gray-300 group-hover:text-carelink-teal text-xs flex-shrink-0" />
+                          </a>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>

@@ -5,25 +5,29 @@ import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import MapPicker from '../components/MapPicker';
 import api from '../utils/api';
-import { 
+import {
   FaPlus, FaTrash, FaSave, FaCamera, FaUser, FaMapMarkerAlt,
   FaClock, FaLanguage, FaUsers, FaBriefcase, FaGraduationCap,
   FaInfoCircle, FaCheck, FaTimes, FaAward, FaCreditCard, FaPhone,
   FaWhatsapp, FaEnvelope, FaFileAlt, FaUpload, FaEye, FaEyeSlash
 } from 'react-icons/fa';
+import CitySelect, { sortedCities } from '../components/CitySelect';
+import { israeliRegions } from '../data/searchData';
 
-// Options data
-const PROFESSION_OPTIONS = [
-  { value: 'doctor', label: 'רופא/ה' },
-  { value: 'nurse', label: 'אח/ות מוסמך/ת' },
-  { value: 'physiotherapist', label: 'פיזיותרפיסט/ית' },
-  { value: 'occupational_therapist', label: 'מרפא/ה בעיסוק' },
-  { value: 'student', label: 'סטודנט/ית' },
-  { value: 'caregiver', label: 'מטפל/ת' },
-  { value: 'psychologist', label: 'פסיכולוג/ית' },
-  { value: 'social_worker', label: 'עובד/ת סוציאלי/ת' },
-  { value: 'dietitian', label: 'דיאטן/ית' },
-  { value: 'speech_therapist', label: 'קלינאי/ת תקשורת' },
+// Options data - professions loaded from API (admin-managed)
+
+const PROVIDER_TYPE_OPTIONS = [
+  { value: 'individual', label: 'עצמאי / פרילנסר' },
+  { value: 'company', label: 'חברה / עסק' },
+  { value: 'clinic', label: 'מרפאה' },
+  { value: 'organization', label: 'עמותה / ארגון' },
+];
+
+const SERVICE_TYPE_OPTIONS = [
+  { value: 'home_visit', label: 'ביקור בית' },
+  { value: 'clinic_visit', label: 'ביקור במרפאה' },
+  { value: 'video_call', label: 'טלרפואה / שיחת וידאו' },
+  { value: 'phone_call', label: 'ייעוץ טלפוני' },
 ];
 
 const GENDER_OPTIONS = [
@@ -53,11 +57,7 @@ const TARGET_AUDIENCE_OPTIONS = [
   { value: 'postpartum', label: 'יולדות' },
 ];
 
-const SERVICE_AREAS = [
-  'תל אביב', 'ירושלים', 'חיפה', 'באר שבע', 'רמת גן', 'הרצליה', 
-  'פתח תקווה', 'ראשון לציון', 'נתניה', 'אשדוד', 'חולון', 'בני ברק',
-  'רעננה', 'כפר סבא', 'מודיעין', 'אשקלון', 'רחובות', 'בת ים'
-];
+const SERVICE_AREAS = sortedCities;
 
 // New options for enhanced profile
 const HEALTH_FUNDS = [
@@ -126,11 +126,18 @@ const ProviderEdit = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('basic');
+  const [professions, setProfessions] = useState([]); // From admin hierarchy
 
   // Form state
   const [formData, setFormData] = useState({
     business_name: '',
     profession_title: '',
+    // Profession hierarchy (from admin)
+    profession_id: '',
+    profession_name: '',
+    specialization_id: '',
+    specialization_name: '',
+    service_categories: [], // [{category_id, name, profession_id}]
     gender: '',
     years_experience: '',
     about: '',
@@ -138,6 +145,7 @@ const ProviderEdit = () => {
     profile_image: '',
     profile_color: 'from-carelink-teal to-carelink-navy',
     provider_type: 'individual',
+    service_types: [],
     specializations: [''],
     expertise: [''],
     languages: [],
@@ -185,14 +193,24 @@ const ProviderEdit = () => {
   const [availability, setAvailability] = useState([]);
 
   useEffect(() => {
+    fetchProfessions();
     fetchProvider();
   }, [providerId]);
+
+  const fetchProfessions = async () => {
+    try {
+      const response = await api.get('/professions');
+      setProfessions(response.data.professions || []);
+    } catch (err) {
+      console.error('Failed to fetch professions:', err);
+    }
+  };
 
   const fetchProvider = async () => {
     try {
       const response = await api.get(`/providers/${providerId}`);
       const data = response.data;
-      
+
       if (data.user_id !== user?.user_id && user?.role !== 'admin') {
         navigate('/dashboard');
         return;
@@ -201,6 +219,11 @@ const ProviderEdit = () => {
       setFormData({
         business_name: data.business_name || '',
         profession_title: data.profession_title || '',
+        profession_id: data.profession_id || '',
+        profession_name: data.profession_name || '',
+        specialization_id: data.specialization_id || '',
+        specialization_name: data.specialization_name || '',
+        service_categories: data.service_categories || [],
         gender: data.gender || '',
         years_experience: data.years_experience || '',
         about: data.about || '',
@@ -208,6 +231,7 @@ const ProviderEdit = () => {
         profile_image: data.profile_image || '',
         profile_color: data.profile_color || 'from-carelink-teal to-carelink-navy',
         provider_type: data.provider_type || 'individual',
+        service_types: data.service_types || [],
         specializations: data.specializations?.length > 0 ? data.specializations : [''],
         expertise: data.expertise?.length > 0 ? data.expertise : [''],
         languages: data.languages || [],
@@ -261,6 +285,8 @@ const ProviderEdit = () => {
         years_experience: formData.years_experience ? parseInt(formData.years_experience) : null,
         specializations: formData.specializations.filter(s => s.trim() !== ''),
         expertise: formData.expertise.filter(e => e.trim() !== ''),
+        service_types: formData.service_types || [],
+        service_categories: formData.service_categories || [],
         education: formData.education.filter(e => e.institution || e.degree),
         certifications: formData.certifications.filter(c => c.name || c.license_number),
         location,
@@ -425,7 +451,7 @@ const ProviderEdit = () => {
   };
 
   const tabs = [
-    { id: 'basic', label: 'פרטים בסיסיים', icon: FaUser },
+    { id: 'basic', label: 'פרטי פרופיל', icon: FaUser },
     { id: 'about', label: 'אודות', icon: FaInfoCircle },
     { id: 'expertise', label: 'התמחויות', icon: FaGraduationCap },
     { id: 'education', label: 'השכלה ותעודות', icon: FaAward },
@@ -553,94 +579,241 @@ const ProviderEdit = () => {
           </div>
 
           <div className="p-6">
-            {/* Basic Info Tab */}
+            {/* Profile Details Tab */}
             {activeTab === 'basic' && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">שם מלא / שם העסק *</label>
-                    <input
-                      type="text"
-                      value={formData.business_name}
-                      onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
-                      placeholder="ד״ר ישראל ישראלי"
-                    />
+              <div className="space-y-8">
+                {/* Section: Personal / Business Info */}
+                <div>
+                  <h3 className="text-lg font-semibold text-carelink-navy mb-4 flex items-center gap-2">
+                    <FaUser className="text-carelink-teal" />
+                    פרטים אישיים
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-carelink-navy mb-2">שם מלא / שם העסק *</label>
+                      <input
+                        type="text"
+                        value={formData.business_name}
+                        onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                        placeholder="ד״ר ישראל ישראלי"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-carelink-navy mb-2">מגדר</label>
+                      <select
+                        value={formData.gender}
+                        onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none bg-white"
+                      >
+                        <option value="">בחר מגדר</option>
+                        {GENDER_OPTIONS.map(opt => (
+                          <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-carelink-navy mb-2">טלפון</label>
+                      <input
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                        placeholder="050-1234567"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-carelink-navy mb-2">אימייל</label>
+                      <input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                        placeholder="email@example.com"
+                      />
+                    </div>
                   </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">מקצוע</label>
-                    <select
-                      value={formData.profession_title}
-                      onChange={(e) => setFormData({ ...formData, profession_title: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none bg-white"
-                    >
-                      <option value="">בחר מקצוע</option>
-                      {PROFESSION_OPTIONS.map(opt => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">מגדר</label>
-                    <select
-                      value={formData.gender}
-                      onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none bg-white"
-                    >
-                      <option value="">בחר מגדר</option>
-                      {GENDER_OPTIONS.map(opt => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">שנות ותק</label>
-                    <input
-                      type="number"
-                      value={formData.years_experience}
-                      onChange={(e) => setFormData({ ...formData, years_experience: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
-                      placeholder="15"
-                      min="0"
-                      max="60"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">טלפון</label>
-                    <input
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
-                      placeholder="050-1234567"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">אימייל</label>
-                    <input
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
-                      placeholder="email@example.com"
+
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-carelink-navy mb-2">תיאור קצר</label>
+                    <textarea
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      rows={3}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none resize-none"
+                      placeholder="תיאור קצר שיופיע בכרטיס הספק..."
                     />
                   </div>
                 </div>
-                
+
+                <hr className="border-gray-100" />
+
+                {/* Section: Professional Details */}
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy mb-2">תיאור קצר</label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={3}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none resize-none"
-                    placeholder="תיאור קצר שיופיע בכרטיס הספק..."
-                  />
+                  <h3 className="text-lg font-semibold text-carelink-navy mb-4 flex items-center gap-2">
+                    <FaBriefcase className="text-carelink-teal" />
+                    פרטים מקצועיים
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-carelink-navy mb-2">מקצוע *</label>
+                      <select
+                        value={formData.profession_id}
+                        onChange={(e) => {
+                          const prof = professions.find(p => p.profession_id === e.target.value);
+                          setFormData({
+                            ...formData,
+                            profession_id: e.target.value,
+                            profession_name: prof?.name || '',
+                            profession_title: prof?.name || '',
+                            specialization_id: '',
+                            specialization_name: '',
+                            service_categories: [],
+                          });
+                        }}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none bg-white"
+                      >
+                        <option value="">בחר מקצוע</option>
+                        {professions.map(prof => (
+                          <option key={prof.profession_id} value={prof.profession_id}>{prof.name}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Specialization inline (from selected profession) */}
+                    <div>
+                      <label className="block text-sm font-medium text-carelink-navy mb-2">התמחות</label>
+                      {formData.profession_id ? (() => {
+                        const selectedProfession = professions.find(p => p.profession_id === formData.profession_id);
+                        const subProfessions = selectedProfession?.sub_professions || [];
+                        return subProfessions.length > 0 ? (
+                          <select
+                            value={formData.specialization_id}
+                            onChange={(e) => {
+                              const sub = subProfessions.find(s => s.sub_profession_id === e.target.value);
+                              setFormData({
+                                ...formData,
+                                specialization_id: e.target.value,
+                                specialization_name: sub?.name || '',
+                              });
+                            }}
+                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none bg-white"
+                          >
+                            <option value="">בחר התמחות</option>
+                            {subProfessions.map(sub => (
+                              <option key={sub.sub_profession_id} value={sub.sub_profession_id}>{sub.name}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <p className="px-4 py-3 text-sm text-carelink-gray border border-gray-200 rounded-lg bg-gray-50">אין התמחויות מוגדרות למקצוע זה</p>
+                        );
+                      })() : (
+                        <p className="px-4 py-3 text-sm text-carelink-gray border border-gray-200 rounded-lg bg-gray-50">יש לבחור מקצוע תחילה</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-carelink-navy mb-2">סוג ספק</label>
+                      <select
+                        value={formData.provider_type}
+                        onChange={(e) => setFormData({ ...formData, provider_type: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none bg-white"
+                      >
+                        {PROVIDER_TYPE_OPTIONS.map(opt => (
+                          <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-carelink-navy mb-2">שנות ניסיון</label>
+                      <input
+                        type="number"
+                        value={formData.years_experience}
+                        onChange={(e) => setFormData({ ...formData, years_experience: e.target.value })}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                        placeholder="10"
+                        min="0"
+                        max="60"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <hr className="border-gray-100" />
+
+                {/* Section: Service Types */}
+                <div>
+                  <h3 className="text-lg font-semibold text-carelink-navy mb-2 flex items-center gap-2">
+                    <FaGraduationCap className="text-carelink-teal" />
+                    סוגי שירות
+                  </h3>
+                  <p className="text-sm text-carelink-gray mb-4">באילו דרכים את/ה מספק/ת שירות?</p>
+                  <div className="flex flex-wrap gap-3">
+                    {SERVICE_TYPE_OPTIONS.map(opt => {
+                      const isSelected = (formData.service_types || []).includes(opt.value);
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => {
+                            const current = formData.service_types || [];
+                            const updated = isSelected
+                              ? current.filter(t => t !== opt.value)
+                              : [...current, opt.value];
+                            setFormData({ ...formData, service_types: updated });
+                          }}
+                          className={`px-4 py-2.5 rounded-xl border-2 text-sm font-medium transition-all ${
+                            isSelected
+                              ? 'bg-carelink-teal text-white border-carelink-teal shadow-sm'
+                              : 'bg-white text-carelink-navy border-gray-200 hover:border-carelink-teal hover:bg-carelink-teal-pale/20'
+                          }`}
+                        >
+                          {isSelected && <FaCheck className="inline ml-1.5" size={12} />}
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <hr className="border-gray-100" />
+
+                {/* Section: Specializations (free text) */}
+                <div>
+                  <h3 className="text-lg font-semibold text-carelink-navy mb-2 flex items-center gap-2">
+                    <FaGraduationCap className="text-carelink-teal" />
+                    התמחויות נוספות
+                  </h3>
+                  <p className="text-sm text-carelink-gray mb-4">הוסף תחומי מומחיות ספציפיים</p>
+                  <div className="space-y-2">
+                    {formData.specializations.map((spec, index) => (
+                      <div key={index} className="flex gap-2">
+                        <input
+                          type="text"
+                          value={spec}
+                          onChange={(e) => handleArrayFieldChange('specializations', index, e.target.value)}
+                          className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                          placeholder="לדוגמה: טיפול בכאבי גב, שיקום ספורטאים..."
+                        />
+                        <button
+                          onClick={() => removeArrayField('specializations', index)}
+                          className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                        >
+                          <FaTrash />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => addArrayField('specializations')}
+                    className="mt-2 text-carelink-teal hover:underline flex items-center gap-1 text-sm"
+                  >
+                    <FaPlus size={12} /> הוסף התמחות
+                  </button>
                 </div>
               </div>
             )}
@@ -676,39 +849,161 @@ const ProviderEdit = () => {
             {/* Expertise Tab */}
             {activeTab === 'expertise' && (
               <div className="space-y-6">
-                {/* Specializations */}
-                <div>
-                  <label className="block text-sm font-medium text-carelink-navy mb-2">התמחויות</label>
-                  <div className="space-y-2">
-                    {formData.specializations.map((spec, index) => (
-                      <div key={index} className="flex gap-2">
-                        <input
-                          type="text"
-                          value={spec}
-                          onChange={(e) => handleArrayFieldChange('specializations', index, e.target.value)}
-                          className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
-                          placeholder="לדוגמה: רפואת משפחה, כירורגיה..."
-                        />
-                        <button
-                          onClick={() => removeArrayField('specializations', index)}
-                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
-                    ))}
+                {/* Profession Selection Info */}
+                {!formData.profession_id && (
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-700 flex items-center gap-2">
+                    <FaInfoCircle /> יש לבחור מקצוע בטאב "פרטי פרופיל" כדי לראות התמחויות וקטגוריות רלוונטיות
                   </div>
-                  <button
-                    onClick={() => addArrayField('specializations')}
-                    className="mt-2 text-carelink-teal hover:underline flex items-center gap-1 text-sm"
-                  >
-                    <FaPlus size={12} /> הוסף התמחות
-                  </button>
-                </div>
-                
-                {/* Expertise */}
+                )}
+
+                {/* Specialization (sub-profession) - dropdown from hierarchy */}
+                {formData.profession_id && (() => {
+                  const selectedProfession = professions.find(p => p.profession_id === formData.profession_id);
+                  const subProfessions = selectedProfession?.sub_professions || [];
+                  return (
+                    <div>
+                      <label className="block text-sm font-medium text-carelink-navy mb-2">
+                        <FaBriefcase className="inline ml-1" />
+                        התמחות
+                      </label>
+                      <p className="text-sm text-carelink-gray mb-2">בחר את תחום ההתמחות שלך בתוך {selectedProfession?.name}</p>
+                      {subProfessions.length > 0 ? (
+                        <div className="flex flex-wrap gap-2">
+                          {subProfessions.map(sub => (
+                            <button
+                              key={sub.sub_profession_id}
+                              onClick={() => setFormData({
+                                ...formData,
+                                specialization_id: sub.sub_profession_id,
+                                specialization_name: sub.name,
+                              })}
+                              className={`px-4 py-2 rounded-full border text-sm font-medium transition ${
+                                formData.specialization_id === sub.sub_profession_id
+                                  ? 'bg-carelink-teal text-white border-carelink-teal'
+                                  : 'bg-white text-carelink-navy border-gray-200 hover:border-carelink-teal hover:bg-carelink-teal/5'
+                              }`}
+                            >
+                              {formData.specialization_id === sub.sub_profession_id && <FaCheck className="inline ml-1" size={12} />}
+                              {sub.name}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-carelink-gray italic">אין התמחויות מוגדרות למקצוע זה</p>
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {/* Service Categories - multi-select from all professions hierarchy */}
+                {formData.profession_id && (() => {
+                  // Collect all categories from all professions
+                  const allCategories = [];
+                  professions.forEach(prof => {
+                    (prof.sub_professions || []).forEach(sub => {
+                      (sub.categories || []).forEach(cat => {
+                        allCategories.push({
+                          ...cat,
+                          profession_id: prof.profession_id,
+                          profession_name: prof.name,
+                          sub_profession_name: sub.name,
+                        });
+                      });
+                    });
+                  });
+
+                  const selectedCategories = formData.service_categories || [];
+                  const isSelected = (catId) => selectedCategories.some(c => c.category_id === catId);
+
+                  const toggleCategory = (cat) => {
+                    if (isSelected(cat.category_id)) {
+                      setFormData({
+                        ...formData,
+                        service_categories: selectedCategories.filter(c => c.category_id !== cat.category_id)
+                      });
+                    } else if (selectedCategories.length < 3) {
+                      setFormData({
+                        ...formData,
+                        service_categories: [...selectedCategories, {
+                          category_id: cat.category_id,
+                          name: cat.name,
+                          profession_id: cat.profession_id,
+                          profession_name: cat.profession_name,
+                        }]
+                      });
+                    }
+                  };
+
+                  // Group categories by profession
+                  const categoriesByProfession = {};
+                  allCategories.forEach(cat => {
+                    const key = cat.profession_name;
+                    if (!categoriesByProfession[key]) categoriesByProfession[key] = [];
+                    categoriesByProfession[key].push(cat);
+                  });
+
+                  return (
+                    <div>
+                      <label className="block text-sm font-medium text-carelink-navy mb-2">
+                        <FaGraduationCap className="inline ml-1" />
+                        קטגוריות שירות ({selectedCategories.length}/3)
+                      </label>
+                      <p className="text-sm text-carelink-gray mb-3">בחר עד 3 קטגוריות שירות שאתה מציע</p>
+
+                      {/* Selected categories */}
+                      {selectedCategories.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {selectedCategories.map(cat => (
+                            <span key={cat.category_id} className="inline-flex items-center gap-1 px-3 py-1.5 bg-carelink-teal/10 text-carelink-teal border border-carelink-teal/30 rounded-full text-sm font-medium">
+                              {cat.name}
+                              <span className="text-xs text-carelink-gray">({cat.profession_name})</span>
+                              <button onClick={() => toggleCategory(cat)} className="mr-1 hover:text-red-500">
+                                <FaTimes size={10} />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Available categories grouped by profession */}
+                      {Object.keys(categoriesByProfession).length > 0 ? (
+                        <div className="space-y-3">
+                          {Object.entries(categoriesByProfession).map(([profName, cats]) => (
+                            <div key={profName} className="border border-gray-100 rounded-lg p-3">
+                              <p className="text-sm font-medium text-carelink-navy mb-2">{profName}</p>
+                              <div className="flex flex-wrap gap-2">
+                                {cats.map(cat => (
+                                  <button
+                                    key={cat.category_id}
+                                    onClick={() => toggleCategory(cat)}
+                                    disabled={!isSelected(cat.category_id) && selectedCategories.length >= 3}
+                                    className={`px-3 py-1.5 rounded-full border text-sm transition ${
+                                      isSelected(cat.category_id)
+                                        ? 'bg-carelink-teal text-white border-carelink-teal'
+                                        : selectedCategories.length >= 3
+                                          ? 'bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed'
+                                          : 'bg-white text-carelink-navy border-gray-200 hover:border-carelink-teal'
+                                    }`}
+                                  >
+                                    {isSelected(cat.category_id) && <FaCheck className="inline ml-1" size={10} />}
+                                    {cat.name}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-carelink-gray italic">אין קטגוריות שירות מוגדרות עדיין. ניתן להגדירן בפאנל האדמין.</p>
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {/* Free text expertise */}
                 <div>
                   <label className="block text-sm font-medium text-carelink-navy mb-2">מומחיויות ספציפיות</label>
+                  <p className="text-sm text-carelink-gray mb-2">הוסף מומחיויות ספציפיות שלא מופיעות ברשימה</p>
                   <div className="space-y-2">
                     {formData.expertise.map((exp, index) => (
                       <div key={index} className="flex gap-2">
@@ -755,37 +1050,110 @@ const ProviderEdit = () => {
                   
                   <div>
                     <label className="block text-sm font-medium text-carelink-navy mb-2">עיר</label>
-                    <select
+                    <CitySelect
+                      name="city"
                       value={location.city}
                       onChange={(e) => setLocation({ ...location, city: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none bg-white"
-                    >
-                      <option value="">בחר עיר</option>
-                      {SERVICE_AREAS.map(city => (
-                        <option key={city} value={city}>{city}</option>
-                      ))}
-                    </select>
+                      placeholder="בחר עיר..."
+                      inputClassName="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none bg-white"
+                    />
                   </div>
                 </div>
-                
+
+                {/* Map + Radius */}
+                <div>
+                  <label className="block text-sm font-medium text-carelink-navy mb-2">מיקום במפה ורדיוס כיסוי</label>
+                  <p className="text-sm text-carelink-gray mb-2">לחץ על המפה לבחירת מיקום. הרדיוס מוצג בקו מקווקו.</p>
+                  <MapPicker
+                    location={location}
+                    setLocation={setLocation}
+                    height="h-80"
+                  />
+                </div>
+
                 <div>
                   <label className="block text-sm font-medium text-carelink-navy mb-2">אזורי מתן שירות</label>
-                  <p className="text-sm text-carelink-gray mb-3">בחר את האזורים בהם אתה מספק שירות</p>
-                  <div className="flex flex-wrap gap-2">
-                    {SERVICE_AREAS.map(area => (
-                      <button
-                        key={area}
-                        onClick={() => toggleMultiSelect('service_areas', area)}
-                        className={`px-4 py-2 rounded-full text-sm transition ${
-                          formData.service_areas.includes(area)
-                            ? 'bg-carelink-teal text-white'
-                            : 'bg-gray-100 text-carelink-gray hover:bg-gray-200'
-                        }`}
-                      >
-                        {area}
-                      </button>
-                    ))}
+                  <p className="text-sm text-carelink-gray mb-3">בחר אזור שלם או חפש והוסף ערים בודדות</p>
+
+                  {/* Region quick-select buttons */}
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {israeliRegions.map(region => {
+                      const regionTag = `אזור: ${region.name}`;
+                      const isSelected = formData.service_areas.includes(regionTag);
+                      return (
+                        <button
+                          key={region.id}
+                          type="button"
+                          onClick={() => {
+                            const current = formData.service_areas || [];
+                            if (isSelected) {
+                              // Remove region tag and its cities
+                              const regionCities = region.cities || [];
+                              const filtered = current.filter(a => a !== regionTag && !regionCities.includes(a));
+                              setFormData({ ...formData, service_areas: filtered });
+                            } else {
+                              // Add region tag and all its cities (avoid duplicates)
+                              const regionCities = region.cities || [];
+                              const merged = [...new Set([...current, regionTag, ...regionCities])];
+                              setFormData({ ...formData, service_areas: merged });
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-full text-sm border transition flex items-center gap-1 ${
+                            isSelected
+                              ? 'bg-carelink-navy text-white border-carelink-navy'
+                              : 'bg-white text-carelink-navy border-gray-300 hover:border-carelink-teal'
+                          }`}
+                        >
+                          <FaMapMarkerAlt className="text-xs" />
+                          {region.name}
+                          {isSelected && <FaCheck className="text-xs" />}
+                        </button>
+                      );
+                    })}
                   </div>
+
+                  <CitySelect
+                    name="service_area_add"
+                    value=""
+                    onChange={(e) => {
+                      if (e.target.value && !formData.service_areas.includes(e.target.value)) {
+                        toggleMultiSelect('service_areas', e.target.value);
+                      }
+                    }}
+                    placeholder="חפש עיר להוספה..."
+                    inputClassName="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none bg-white mb-3"
+                  />
+                  {formData.service_areas.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {formData.service_areas.map(area => (
+                        <button
+                          key={area}
+                          onClick={() => {
+                            if (area.startsWith('אזור: ')) {
+                              // Removing a region tag - also remove its cities
+                              const regionName = area.replace('אזור: ', '');
+                              const region = israeliRegions.find(r => r.name === regionName);
+                              const regionCities = region?.cities || [];
+                              const current = formData.service_areas || [];
+                              const filtered = current.filter(a => a !== area && !regionCities.includes(a));
+                              setFormData({ ...formData, service_areas: filtered });
+                            } else {
+                              toggleMultiSelect('service_areas', area);
+                            }
+                          }}
+                          className={`px-4 py-2 rounded-full text-sm transition flex items-center gap-1 ${
+                            area.startsWith('אזור: ')
+                              ? 'bg-carelink-navy text-white'
+                              : 'bg-carelink-teal text-white'
+                          }`}
+                        >
+                          {area.startsWith('אזור: ') && <FaMapMarkerAlt className="text-xs" />}
+                          {area}
+                          <FaTimes className="text-xs" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 
                 <div>

@@ -2,6 +2,8 @@ from fastapi import FastAPI, APIRouter, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response as StarletteResponse
 from pathlib import Path
 import os
 import logging
@@ -62,10 +64,24 @@ async def health_check():
 # Include the api router in the main app
 app.include_router(api_router)
 
+# Security headers middleware
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        if IS_PRODUCTION:
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
+
 # CORS: In production, require explicit origins. In staging/dev, allow all.
 cors_origins_env = os.environ.get('CORS_ORIGINS', '')
 if cors_origins_env:
-    cors_origins = [origin.strip() for origin in cors_origins_env.split(',')]
+    cors_origins = [origin.strip().rstrip('/') for origin in cors_origins_env.split(',')]
 elif IS_PRODUCTION:
     # Include Railway URLs alongside the main domain
     cors_origins = [
@@ -89,6 +105,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Debug: test POST endpoint (only available in non-production)
+if not IS_PRODUCTION:
+    @api_router.post("/debug/test-post")
+    async def test_post():
+        return {"message": "POST works!", "cors_origins": cors_origins_env[:50] if cors_origins_env else "not set"}
+
 # Serve frontend static files if available
 STATIC_DIR = Path(__file__).parent / "static"
 if STATIC_DIR.exists():
@@ -97,7 +119,10 @@ if STATIC_DIR.exists():
     @app.get("/{full_path:path}")
     async def serve_frontend(request: Request, full_path: str):
         """Serve React frontend for all non-API routes."""
-        file_path = STATIC_DIR / full_path
+        file_path = (STATIC_DIR / full_path).resolve()
+        # Prevent path traversal - ensure resolved path is within STATIC_DIR
+        if not str(file_path).startswith(str(STATIC_DIR.resolve())):
+            return FileResponse(str(STATIC_DIR / "index.html"))
         if file_path.is_file():
             return FileResponse(str(file_path))
         return FileResponse(str(STATIC_DIR / "index.html"))
@@ -108,6 +133,15 @@ async def startup_db_client():
     """Verify database connection and environment on startup."""
     logger.info(f"Starting Carelink in {ENVIRONMENT} mode")
 
+    # Log all registered routes for debugging
+    logger.info("=== Registered Routes ===")
+    for route in app.routes:
+        if hasattr(route, 'methods') and hasattr(route, 'path'):
+            logger.info(f"  {route.methods} {route.path}")
+        elif hasattr(route, 'path'):
+            logger.info(f"  MOUNT {route.path}")
+    logger.info(f"=== Total: {len(app.routes)} routes ===")
+
     # Verify database connection
     logger.info("Checking MongoDB connection on startup...")
     connected = await check_db_connection()
@@ -117,9 +151,18 @@ async def startup_db_client():
     else:
         logger.info("MongoDB connection verified successfully")
 
+    # Check SMTP configuration
+    smtp_user = os.environ.get('SMTP_USER', '')
+    smtp_password = os.environ.get('SMTP_PASSWORD', '')
+    smtp_port_raw = os.environ.get('SMTP_PORT', '587')
+    if smtp_user and smtp_password:
+        logger.info(f"SMTP: Configured via env vars (user={smtp_user[:3]}***, port={smtp_port_raw})")
+    else:
+        logger.warning("SMTP: SMTP_USER/SMTP_PASSWORD not set in env vars. Checking DB settings on first email...")
+
     # Warn about missing optional config
     missing = []
-    if not os.environ.get('SMTP_USER'):
+    if not smtp_user:
         missing.append('SMTP_USER/SMTP_PASSWORD (email sending)')
     if not os.environ.get('VAPID_PRIVATE_KEY'):
         missing.append('VAPID keys (push notifications)')

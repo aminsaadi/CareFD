@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { X, Star, DollarSign, MessageSquare, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { X, Star, DollarSign, MessageSquare, ThumbsUp, ThumbsDown, CheckCircle } from 'lucide-react';
 import api from '../utils/api';
+import { toast } from 'sonner';
 
 const CompletionConfirmDialog = ({ booking, onClose, onSuccess }) => {
-  const [step, setStep] = useState(1); // 1: confirm + payment, 2: review
+  const [step, setStep] = useState(1); // 1: confirm + payment, 2: success, 3: review
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
@@ -25,13 +26,14 @@ const CompletionConfirmDialog = ({ booking, onClose, onSuccess }) => {
   const handleConfirmCompletion = async () => {
     setLoading(true);
     setError('');
-    
+
     try {
       await api.put(`/bookings/${booking.booking_id}/client-confirm`, {
         final_price: paymentData.final_price ? parseFloat(paymentData.final_price) : null,
         payment_notes: paymentData.payment_notes || null
       });
-      setStep(2);
+      toast.success('ההזמנה אושרה כהושלמה!');
+      setStep(2); // success step
     } catch (err) {
       setError(err.response?.data?.detail || 'שגיאה באישור ההשלמה');
     } finally {
@@ -42,7 +44,7 @@ const CompletionConfirmDialog = ({ booking, onClose, onSuccess }) => {
   const handleSubmitReview = async () => {
     setLoading(true);
     setError('');
-    
+
     try {
       await api.post('/reviews', {
         provider_id: booking.provider_id,
@@ -55,8 +57,8 @@ const CompletionConfirmDialog = ({ booking, onClose, onSuccess }) => {
         price_value: reviewData.price_value,
         would_recommend: reviewData.would_recommend
       });
+      toast.success('הביקורת נשלחה בהצלחה!');
       onSuccess?.();
-      onClose();
     } catch (err) {
       setError(err.response?.data?.detail || 'שגיאה בשליחת הביקורת');
     } finally {
@@ -66,7 +68,6 @@ const CompletionConfirmDialog = ({ booking, onClose, onSuccess }) => {
 
   const handleSkipReview = () => {
     onSuccess?.();
-    onClose();
   };
 
   const RatingStars = ({ value, onChange, label }) => (
@@ -95,10 +96,10 @@ const CompletionConfirmDialog = ({ booking, onClose, onSuccess }) => {
         {/* Header */}
         <div className="border-b p-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-gray-900">
-            {step === 1 ? 'אישור השלמת השירות' : 'דירוג וביקורת'}
+            {step === 1 ? 'אישור השלמת השירות' : step === 2 ? 'ההזמנה הושלמה!' : 'דירוג וביקורת'}
           </h2>
           <button
-            onClick={onClose}
+            onClick={step >= 2 ? () => onSuccess?.() : onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
             <X className="w-5 h-5" />
@@ -119,7 +120,7 @@ const CompletionConfirmDialog = ({ booking, onClose, onSuccess }) => {
                 <p className="font-medium text-teal-900">{booking.service_name}</p>
                 <p className="text-sm text-teal-700">{booking.provider_name}</p>
                 <p className="text-xs text-teal-600 mt-1">
-                  {new Date(booking.booking_date).toLocaleDateString('he-IL')}
+                  {booking.booking_date ? new Date(booking.booking_date).toLocaleDateString('he-IL') : ''}
                 </p>
               </div>
 
@@ -129,7 +130,7 @@ const CompletionConfirmDialog = ({ booking, onClose, onSuccess }) => {
                   <DollarSign className="w-5 h-5 text-green-600" />
                   רישום תשלום
                 </h3>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     כמה שילמת עבור השירות?
@@ -148,7 +149,7 @@ const CompletionConfirmDialog = ({ booking, onClose, onSuccess }) => {
                     </span>
                   </div>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     הערות לתשלום (אופציונלי)
@@ -175,6 +176,40 @@ const CompletionConfirmDialog = ({ booking, onClose, onSuccess }) => {
           )}
 
           {step === 2 && (
+            <>
+              {/* Success confirmation */}
+              <div className="text-center py-4">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="w-10 h-10 text-green-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">ההזמנה הושלמה בהצלחה!</h3>
+                <p className="text-gray-600 mb-1">
+                  השירות <span className="font-medium">{booking.service_name}</span> סומן כהושלם.
+                </p>
+                <p className="text-sm text-gray-500">
+                  תרצה לדרג את השירות שקיבלת?
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => onSuccess?.()}
+                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
+                >
+                  לא תודה
+                </button>
+                <button
+                  onClick={() => setStep(3)}
+                  className="flex-1 px-6 py-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors font-medium"
+                  data-testid="go-to-review-btn"
+                >
+                  דרג את השירות
+                </button>
+              </div>
+            </>
+          )}
+
+          {step === 3 && (
             <>
               {/* Rating */}
               <div className="space-y-4">

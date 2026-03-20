@@ -11,6 +11,7 @@ import ProviderSubscription from '../components/provider/ProviderSubscription';
 import ProviderClinics from '../components/provider/ProviderClinics';
 import ProviderTeam from '../components/provider/ProviderTeam';
 import BookingDetailsModal from '../components/provider/BookingDetailsModal';
+import CitySelect from '../components/CitySelect';
 import api from '../utils/api';
 import { toast } from 'sonner';
 import { 
@@ -57,9 +58,11 @@ const ProviderDashboard = () => {
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
   const [provider, setProvider] = useState(null);
+  const [professions, setProfessions] = useState([]); // Admin hierarchy for service categories
   const [bookings, setBookings] = useState([]);
   const [services, setServices] = useState([]);
   const [requests, setRequests] = useState([]);
+  const [myOffers, setMyOffers] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [chats, setChats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -90,6 +93,7 @@ const ProviderDashboard = () => {
     duration_minutes: '',
     // New fields
     service_category: 'visit',
+    categories: [], // [{category_id, name, profession_id, profession_name}] - max 3
     delivery_types: [],
     pricing_type: 'fixed',
     minimum_hours: '',
@@ -148,7 +152,17 @@ const ProviderDashboard = () => {
   useEffect(() => {
     fetchDashboardData();
     fetchServiceAndDeliveryTypes();
+    fetchProfessions();
   }, []);
+
+  const fetchProfessions = async () => {
+    try {
+      const response = await api.get('/professions');
+      setProfessions(response.data.professions || []);
+    } catch (err) {
+      console.error('Failed to fetch professions:', err);
+    }
+  };
 
   const fetchServiceAndDeliveryTypes = async () => {
     try {
@@ -214,6 +228,14 @@ const ProviderDashboard = () => {
       // Fetch open requests (for offers)
       const requestsRes = await api.get('/requests?status=open&limit=10');
       setRequests(requestsRes.data.requests || []);
+
+      // Fetch my offers
+      try {
+        const myOffersRes = await api.get('/offers/my');
+        setMyOffers(myOffersRes.data.offers || []);
+      } catch (e) {
+        console.error('Failed to fetch offers:', e);
+      }
 
       // Fetch reviews
       if (providerRes.data?.provider_id) {
@@ -290,6 +312,7 @@ const ProviderDashboard = () => {
       price: '',
       duration_minutes: '',
       service_category: 'visit',
+      categories: [],
       delivery_types: [],
       pricing_type: 'fixed',
       minimum_hours: '',
@@ -313,6 +336,7 @@ const ProviderDashboard = () => {
       price: service.price || '',
       duration_minutes: service.duration_minutes || '',
       service_category: service.service_category || 'visit',
+      categories: service.categories || [],
       delivery_types: service.delivery_types || [],
       pricing_type: service.pricing_type || 'fixed',
       minimum_hours: service.minimum_hours || '',
@@ -349,6 +373,7 @@ const ProviderDashboard = () => {
         price: parseFloat(serviceForm.price),
         duration_minutes: serviceForm.duration_minutes ? parseInt(serviceForm.duration_minutes) : null,
         service_category: serviceForm.service_category,
+        categories: serviceForm.categories || [],
         delivery_types: serviceForm.delivery_types,
         pricing_type: serviceForm.pricing_type,
         minimum_hours: serviceForm.minimum_hours ? parseFloat(serviceForm.minimum_hours) : null,
@@ -518,6 +543,7 @@ const ProviderDashboard = () => {
     { id: 'clinics', label: 'קליניקות', icon: FaBuilding },
     { id: 'team', label: 'צוות', icon: FaUsers },
     { id: 'requests', label: 'בקשות פתוחות', icon: FaFileAlt },
+    { id: 'my_offers', label: 'ההצעות שלי', icon: FaMoneyBillWave },
     { id: 'notifications', label: 'התראות', icon: FaBell, link: '/notifications' },
     { id: 'messages', label: 'הודעות', icon: FaComments },
     { id: 'reviews', label: 'ביקורות', icon: FaStar },
@@ -737,7 +763,7 @@ const ProviderDashboard = () => {
                               <FaStar className="text-yellow-600 text-xl" />
                             </div>
                             <div>
-                              <div className="text-2xl font-bold text-carelink-navy">{stats.averageRating.toFixed(1)}</div>
+                              <div className="text-2xl font-bold text-carelink-navy">{(stats.averageRating || 0).toFixed(1)}</div>
                               <div className="text-sm text-carelink-gray">{stats.totalReviews} ביקורות</div>
                             </div>
                           </div>
@@ -1190,9 +1216,101 @@ const ProviderDashboard = () => {
                                 </div>
                               </div>
 
+                              {/* Categories from admin hierarchy (1-3) */}
+                              {professions.length > 0 && (() => {
+                                const allCategories = [];
+                                professions.forEach(prof => {
+                                  (prof.sub_professions || []).forEach(sub => {
+                                    (sub.categories || []).forEach(cat => {
+                                      allCategories.push({
+                                        ...cat,
+                                        profession_id: prof.profession_id,
+                                        profession_name: prof.name,
+                                        sub_name: sub.name,
+                                      });
+                                    });
+                                  });
+                                });
+
+                                if (allCategories.length === 0) return null;
+
+                                const selectedCats = serviceForm.categories || [];
+                                const isCatSelected = (catId) => selectedCats.some(c => c.category_id === catId);
+                                const toggleCat = (cat) => {
+                                  if (isCatSelected(cat.category_id)) {
+                                    setServiceForm({
+                                      ...serviceForm,
+                                      categories: selectedCats.filter(c => c.category_id !== cat.category_id)
+                                    });
+                                  } else if (selectedCats.length < 3) {
+                                    setServiceForm({
+                                      ...serviceForm,
+                                      categories: [...selectedCats, {
+                                        category_id: cat.category_id,
+                                        name: cat.name,
+                                        profession_id: cat.profession_id,
+                                        profession_name: cat.profession_name,
+                                      }]
+                                    });
+                                  }
+                                };
+
+                                // Group by profession
+                                const grouped = {};
+                                allCategories.forEach(cat => {
+                                  if (!grouped[cat.profession_name]) grouped[cat.profession_name] = [];
+                                  grouped[cat.profession_name].push(cat);
+                                });
+
+                                return (
+                                  <div className="bg-white p-4 rounded-xl">
+                                    <label className="block text-sm font-bold text-carelink-navy mb-2">
+                                      קטגוריות מקצועיות ({selectedCats.length}/3)
+                                    </label>
+                                    <p className="text-xs text-carelink-gray mb-3">בחר 1-3 קטגוריות שהשירות שייך אליהן</p>
+                                    {selectedCats.length > 0 && (
+                                      <div className="flex flex-wrap gap-2 mb-3">
+                                        {selectedCats.map(cat => (
+                                          <span key={cat.category_id} className="inline-flex items-center gap-1 px-3 py-1 bg-carelink-teal/10 text-carelink-teal border border-carelink-teal/30 rounded-full text-sm">
+                                            {cat.name}
+                                            <button onClick={() => toggleCat(cat)} className="mr-1 hover:text-red-500">×</button>
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
+                                    <div className="space-y-2">
+                                      {Object.entries(grouped).map(([profName, cats]) => (
+                                        <div key={profName}>
+                                          <p className="text-xs font-medium text-carelink-gray mb-1">{profName}</p>
+                                          <div className="flex flex-wrap gap-1.5">
+                                            {cats.map(cat => (
+                                              <button
+                                                key={cat.category_id}
+                                                type="button"
+                                                onClick={() => toggleCat(cat)}
+                                                disabled={!isCatSelected(cat.category_id) && selectedCats.length >= 3}
+                                                className={`px-3 py-1 rounded-full border text-xs transition ${
+                                                  isCatSelected(cat.category_id)
+                                                    ? 'bg-carelink-teal text-white border-carelink-teal'
+                                                    : selectedCats.length >= 3
+                                                      ? 'bg-gray-50 text-gray-400 border-gray-200'
+                                                      : 'bg-white text-carelink-navy border-gray-200 hover:border-carelink-teal'
+                                                }`}
+                                              >
+                                                {cat.name}
+                                              </button>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                );
+                              })()}
+
                               {/* Service Category */}
                               <div className="bg-white p-4 rounded-xl">
-                                <label className="block text-sm font-bold text-carelink-navy mb-3">קטגוריית שירות *</label>
+                                <label className="block text-sm font-bold text-carelink-navy mb-3">סוג שירות *</label>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                   {[
                                     { id: 'visit', name: 'שירות ביקור', icon: '🏠', desc: 'ביקור חד פעמי' },
@@ -1536,38 +1654,175 @@ const ProviderDashboard = () => {
                   {/* Requests Tab */}
                   {activeTab === 'requests' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <h3 className="text-xl font-bold text-carelink-navy mb-6">בקשות פתוחות</h3>
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-bold text-carelink-navy flex items-center gap-2">
+                          <FaFileAlt className="text-carelink-teal" />
+                          בקשות פתוחות
+                        </h3>
+                        <Link to="/requests" className="text-carelink-teal font-medium text-sm hover:underline">
+                          צפה בכל הבקשות
+                        </Link>
+                      </div>
                       {requests.length === 0 ? (
                         <div className="text-center py-12 text-carelink-gray">
                           <FaFileAlt className="text-5xl mx-auto mb-3 text-carelink-teal-pale" />
-                          <p className="text-lg">אין בקשות פתוחות כרגע</p>
+                          <p className="text-lg mb-2">אין בקשות פתוחות כרגע</p>
+                          <Link to="/requests" className="text-carelink-teal font-medium hover:underline">
+                            עבור לדף הבקשות
+                          </Link>
                         </div>
                       ) : (
                         <div className="space-y-4">
                           {requests.map((request) => (
-                            <Link
+                            <div
                               key={request.request_id}
-                              to={`/requests/${request.request_id}`}
-                              className="block p-4 border-2 border-carelink-teal-pale rounded-xl hover:border-carelink-teal transition"
+                              className="p-4 border-2 border-carelink-teal-pale rounded-xl hover:border-carelink-teal transition"
                             >
-                              <div className="flex items-start justify-between">
-                                <div>
-                                  <h4 className="font-bold text-carelink-navy mb-1">{request.title}</h4>
-                                  <p className="text-sm text-carelink-gray line-clamp-2">{request.description}</p>
-                                  <div className="flex items-center gap-4 mt-2 text-xs text-carelink-gray">
-                                    <span>{request.location?.city || 'לא צוין מיקום'}</span>
-                                    <span>{new Date(request.created_at).toLocaleDateString('he-IL')}</span>
-                                  </div>
+                              <div className="flex items-start justify-between mb-2">
+                                <div className="flex-1">
+                                  <Link
+                                    to={`/requests/${request.request_id}`}
+                                    className="font-bold text-carelink-navy hover:text-carelink-teal transition text-lg"
+                                  >
+                                    {request.title}
+                                  </Link>
+                                  <p className="text-sm text-carelink-gray line-clamp-2 mt-1">{request.description}</p>
                                 </div>
-                                {request.budget && (
-                                  <div className="text-right">
+                                <div className="flex flex-col items-end gap-1 mr-4">
+                                  {request.budget && (
                                     <span className="text-xl font-bold text-carelink-teal">₪{request.budget}</span>
-                                    <p className="text-xs text-carelink-gray">תקציב</p>
-                                  </div>
+                                  )}
+                                  {request.urgency && request.urgency !== 'medium' && (
+                                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                      request.urgency === 'urgent' ? 'bg-red-100 text-red-700' :
+                                      request.urgency === 'high' ? 'bg-orange-100 text-orange-700' :
+                                      'bg-gray-100 text-gray-600'
+                                    }`}>
+                                      {request.urgency === 'urgent' ? 'דחוף' : request.urgency === 'high' ? 'גבוה' : 'נמוך'}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex flex-wrap items-center gap-3 text-xs text-carelink-gray mb-3">
+                                {request.specialization && (
+                                  <span className="bg-carelink-teal-pale text-carelink-teal px-2 py-1 rounded-full text-xs">
+                                    {request.specialization}
+                                  </span>
+                                )}
+                                <span>{request.location?.city || 'לא צוין מיקום'}</span>
+                                <span>{new Date(request.created_at).toLocaleDateString('he-IL')}</span>
+                                {request.offer_count > 0 && (
+                                  <span className="text-carelink-teal font-medium">{request.offer_count} הצעות</span>
                                 )}
                               </div>
-                            </Link>
+                              <Link
+                                to={`/requests/${request.request_id}`}
+                                className="inline-flex items-center gap-2 text-sm bg-carelink-teal text-white px-4 py-2 rounded-lg hover:bg-carelink-teal-medium transition font-medium"
+                              >
+                                <FaMoneyBillWave /> הגש הצעה
+                              </Link>
+                            </div>
                           ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* My Offers Tab */}
+                  {activeTab === 'my_offers' && (
+                    <div className="bg-white p-6 rounded-2xl shadow-lg">
+                      <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
+                        <FaMoneyBillWave className="text-carelink-teal" />
+                        ההצעות שלי
+                      </h3>
+                      {myOffers.length === 0 ? (
+                        <div className="text-center py-12 text-carelink-gray">
+                          <FaMoneyBillWave className="text-5xl mx-auto mb-3 text-carelink-teal-pale" />
+                          <p className="text-lg">עדיין לא הגשת הצעות</p>
+                          <Link to="/requests" className="text-carelink-teal hover:underline mt-2 inline-block">
+                            צפה בבקשות פתוחות
+                          </Link>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {myOffers.map((offer) => {
+                            const statusConfig = {
+                              pending: { color: 'bg-yellow-100 text-yellow-800 border-yellow-300', text: 'ממתין', icon: FaHourglass },
+                              accepted: { color: 'bg-green-100 text-green-800 border-green-300', text: 'התקבלה', icon: FaCheckCircle },
+                              rejected: { color: 'bg-red-100 text-red-800 border-red-300', text: 'נדחתה', icon: FaTimes },
+                              withdrawn: { color: 'bg-gray-100 text-gray-600 border-gray-300', text: 'נמשכה', icon: FaTimes }
+                            };
+                            const sc = statusConfig[offer.status] || statusConfig.pending;
+                            const StatusIcon = sc.icon;
+
+                            return (
+                              <div
+                                key={offer.offer_id}
+                                className={`p-4 border-2 rounded-xl transition ${
+                                  offer.status === 'accepted' ? 'border-green-300 bg-green-50' :
+                                  offer.status === 'rejected' ? 'border-red-200 bg-red-50 opacity-70' :
+                                  offer.status === 'withdrawn' ? 'border-gray-200 bg-gray-50 opacity-70' :
+                                  'border-carelink-teal-pale hover:border-carelink-teal'
+                                }`}
+                              >
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <Link
+                                      to={`/requests/${offer.request_id}`}
+                                      className="font-bold text-carelink-navy hover:text-carelink-teal transition"
+                                    >
+                                      {offer.request?.title || 'בקשה'}
+                                    </Link>
+                                    <p className="text-sm text-carelink-gray mt-1">
+                                      {new Date(offer.created_at).toLocaleDateString('he-IL')}
+                                    </p>
+                                    <p className="text-carelink-slate text-sm mt-2 line-clamp-2">{offer.message}</p>
+                                  </div>
+                                  <div className="text-left ms-4">
+                                    <div className="text-xl font-bold text-carelink-teal">₪{offer.price}</div>
+                                    <span className={`px-2 py-1 rounded-full text-xs font-medium border flex items-center gap-1 mt-1 ${sc.color}`}>
+                                      <StatusIcon className="text-xs" /> {sc.text}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="mt-3 flex gap-2">
+                                  {offer.status === 'pending' && (
+                                    <button
+                                      onClick={async () => {
+                                        try {
+                                          await api.post(`/offers/${offer.offer_id}/withdraw`);
+                                          toast.success('ההצעה נמשכה');
+                                          const res = await api.get('/offers/my');
+                                          setMyOffers(res.data.offers || []);
+                                        } catch (err) {
+                                          toast.error(err.response?.data?.detail || 'שגיאה');
+                                        }
+                                      }}
+                                      className="text-sm text-red-600 hover:text-red-800 transition px-3 py-1 rounded border border-red-200 hover:bg-red-50"
+                                    >
+                                      משוך הצעה
+                                    </button>
+                                  )}
+                                  {offer.status === 'accepted' && (
+                                    <Link
+                                      to="/chats"
+                                      className="text-sm text-carelink-teal hover:text-carelink-teal-medium transition px-3 py-1 rounded border border-carelink-teal hover:bg-carelink-teal-pale flex items-center gap-1"
+                                    >
+                                      <FaComments /> פתח צ'אט
+                                    </Link>
+                                  )}
+                                  <Link
+                                    to={`/requests/${offer.request_id}`}
+                                    className="text-sm text-carelink-navy hover:text-carelink-teal transition px-3 py-1 rounded border border-carelink-light-gray hover:bg-gray-50"
+                                  >
+                                    צפה בבקשה
+                                  </Link>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -1629,12 +1884,12 @@ const ProviderDashboard = () => {
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
                       <div className="flex items-center gap-6 mb-6">
                         <div className="text-center">
-                          <div className="text-5xl font-bold text-carelink-teal">{stats.averageRating.toFixed(1)}</div>
+                          <div className="text-5xl font-bold text-carelink-teal">{(stats.averageRating || 0).toFixed(1)}</div>
                           <div className="flex justify-center my-2">
                             {[...Array(5)].map((_, i) => (
                               <FaStar
                                 key={i}
-                                className={i < Math.round(stats.averageRating) ? 'text-yellow-500' : 'text-gray-300'}
+                                className={i < Math.round(stats.averageRating || 0) ? 'text-yellow-500' : 'text-gray-300'}
                               />
                             ))}
                           </div>
@@ -2056,12 +2311,12 @@ const ProviderDashboard = () => {
                         <div className="grid md:grid-cols-2 gap-6">
                           <div>
                             <label className="block text-sm font-medium text-carelink-navy mb-2">עיר</label>
-                            <input
-                              type="text"
+                            <CitySelect
+                              name="personal_city"
                               value={userInfoForm.personal_city}
                               onChange={(e) => setUserInfoForm({ ...userInfoForm, personal_city: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
-                              placeholder="תל אביב"
+                              placeholder="בחר עיר..."
+                              inputClassName="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
                             />
                           </div>
                           <div>

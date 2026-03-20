@@ -1,7 +1,8 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { SiteSettingsProvider } from './context/SiteSettingsContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import CookieConsent from './components/CookieConsent';
 import AccessibilityWidget from './components/AccessibilityWidget';
@@ -71,9 +72,27 @@ const RoleRedirect = ({ children, providerPath, adminPath }) => {
   return children;
 };
 
+const AdminRoute = ({ children }) => {
+  const { user } = useAuth();
+  if (user?.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return children;
+};
+
+const NotFound = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-center">
+      <h1 className="text-6xl font-bold text-gray-300 mb-4">404</h1>
+      <p className="text-xl text-gray-600 mb-6">הדף לא נמצא</p>
+      <a href="/" className="bg-carelink-teal text-white px-6 py-3 rounded-lg hover:bg-carelink-teal-medium transition">
+        חזרה לדף הבית
+      </a>
+    </div>
+  </div>
+);
+
 function AppRouter() {
-  const location = useLocation();
-  
   return (
     <>
     <ScrollToTop />
@@ -104,14 +123,6 @@ function AppRouter() {
         }
       />
       <Route
-        path="/providers"
-        element={<Providers />}
-      />
-      <Route
-        path="/services"
-        element={<Services />}
-      />
-      <Route
         path="/requests"
         element={
           <ProtectedRoute>
@@ -120,16 +131,16 @@ function AppRouter() {
         }
       />
       <Route
+        path="/requests/new"
+        element={<Navigate to="/requests?create=true" replace />}
+      />
+      <Route
         path="/provider/setup"
         element={
           <ProtectedRoute>
             <ProviderSetup />
           </ProtectedRoute>
         }
-      />
-      <Route
-        path="/providers/:providerId"
-        element={<ProviderProfile />}
       />
       <Route
         path="/provider/edit/:providerId"
@@ -211,7 +222,7 @@ function AppRouter() {
         path="/admin"
         element={
           <ProtectedRoute>
-            <AdminOverview />
+            <AdminRoute><AdminOverview /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -219,7 +230,7 @@ function AppRouter() {
         path="/admin/overview"
         element={
           <ProtectedRoute>
-            <AdminOverview />
+            <AdminRoute><AdminOverview /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -227,7 +238,7 @@ function AppRouter() {
         path="/admin/old"
         element={
           <ProtectedRoute>
-            <AdminDashboard />
+            <AdminRoute><AdminDashboard /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -235,7 +246,7 @@ function AppRouter() {
         path="/admin/users"
         element={
           <ProtectedRoute>
-            <AdminUsers />
+            <AdminRoute><AdminUsers /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -243,7 +254,7 @@ function AppRouter() {
         path="/admin/providers"
         element={
           <ProtectedRoute>
-            <AdminProviders />
+            <AdminRoute><AdminProviders /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -251,7 +262,7 @@ function AppRouter() {
         path="/admin/verification"
         element={
           <ProtectedRoute>
-            <AdminVerification />
+            <AdminRoute><AdminVerification /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -259,7 +270,7 @@ function AppRouter() {
         path="/admin/bookings"
         element={
           <ProtectedRoute>
-            <AdminBookings />
+            <AdminRoute><AdminBookings /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -267,7 +278,7 @@ function AppRouter() {
         path="/admin/professions"
         element={
           <ProtectedRoute>
-            <AdminProfessions />
+            <AdminRoute><AdminProfessions /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -275,7 +286,7 @@ function AppRouter() {
         path="/admin/regions"
         element={
           <ProtectedRoute>
-            <AdminRegions />
+            <AdminRoute><AdminRegions /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -283,7 +294,7 @@ function AppRouter() {
         path="/admin/pages"
         element={
           <ProtectedRoute>
-            <AdminPages />
+            <AdminRoute><AdminPages /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -291,7 +302,7 @@ function AppRouter() {
         path="/admin/blog"
         element={
           <ProtectedRoute>
-            <AdminBlog />
+            <AdminRoute><AdminBlog /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -299,7 +310,7 @@ function AppRouter() {
         path="/admin/ads"
         element={
           <ProtectedRoute>
-            <AdminAds />
+            <AdminRoute><AdminAds /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -307,7 +318,7 @@ function AppRouter() {
         path="/admin/featured"
         element={
           <ProtectedRoute>
-            <AdminFeatured />
+            <AdminRoute><AdminFeatured /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -315,7 +326,7 @@ function AppRouter() {
         path="/admin/settings"
         element={
           <ProtectedRoute>
-            <AdminSettings />
+            <AdminRoute><AdminSettings /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -323,7 +334,7 @@ function AppRouter() {
         path="/admin/reports"
         element={
           <ProtectedRoute>
-            <AdminReports />
+            <AdminRoute><AdminReports /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -331,7 +342,7 @@ function AppRouter() {
         path="/admin/services"
         element={
           <ProtectedRoute>
-            <AdminServices />
+            <AdminRoute><AdminServices /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -339,7 +350,7 @@ function AppRouter() {
         path="/admin/service-types"
         element={
           <ProtectedRoute>
-            <AdminServiceTypes />
+            <AdminRoute><AdminServiceTypes /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -347,7 +358,7 @@ function AppRouter() {
         path="/admin/subscriptions"
         element={
           <ProtectedRoute>
-            <AdminSubscriptions />
+            <AdminRoute><AdminSubscriptions /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -355,7 +366,7 @@ function AppRouter() {
         path="/admin/push-notifications"
         element={
           <ProtectedRoute>
-            <AdminPushNotifications />
+            <AdminRoute><AdminPushNotifications /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -363,7 +374,7 @@ function AppRouter() {
         path="/admin/notifications"
         element={
           <ProtectedRoute>
-            <AdminNotifications />
+            <AdminRoute><AdminNotifications /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -371,7 +382,7 @@ function AppRouter() {
         path="/admin/messages"
         element={
           <ProtectedRoute>
-            <AdminMessages />
+            <AdminRoute><AdminMessages /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -379,7 +390,7 @@ function AppRouter() {
         path="/admin/reviews"
         element={
           <ProtectedRoute>
-            <AdminReviews />
+            <AdminRoute><AdminReviews /></AdminRoute>
           </ProtectedRoute>
         }
       />
@@ -387,11 +398,12 @@ function AppRouter() {
         path="/admin/providers/:providerId/edit"
         element={
           <ProtectedRoute>
-            <AdminProviderEdit />
+            <AdminRoute><AdminProviderEdit /></AdminRoute>
           </ProtectedRoute>
         }
       />
       <Route path="/page/:slug" element={<GenericPage />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
     </>
   );
@@ -399,15 +411,17 @@ function AppRouter() {
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <NotificationProvider>
-          <AppRouter />
-          <CookieConsent />
-          <AccessibilityWidget />
-        </NotificationProvider>
-      </BrowserRouter>
-    </AuthProvider>
+    <SiteSettingsProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <NotificationProvider>
+            <AppRouter />
+            <CookieConsent />
+            <AccessibilityWidget />
+          </NotificationProvider>
+        </BrowserRouter>
+      </AuthProvider>
+    </SiteSettingsProvider>
   );
 }
 

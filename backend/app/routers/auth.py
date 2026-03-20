@@ -9,18 +9,26 @@ import logging
 from app.database import db
 from app.models import User, UserRegister, UserLogin, UserSession, UserRole, Provider, ProviderRegister, NotificationType, VerificationStatus
 from app.utils import get_current_user, send_email_async, create_notification, get_site_url, hash_password, verify_password, create_jwt_token
+from app.rate_limiter import rate_limiter, get_client_ip
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 @router.post("/auth/register")
-async def register(user_data: UserRegister):
+async def register(user_data: UserRegister, request: Request = None):
     """Register new user with email/password"""
+    # Rate limit: 10 registrations per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"register:{get_client_ip(request)}", max_requests=10, window_seconds=900)
+    # Prevent self-registration as admin
+    if user_data.role not in [UserRole.PATIENT, UserRole.PROVIDER]:
+        raise HTTPException(status_code=400, detail="Invalid role. Must be 'patient' or 'provider'")
+
     existing_user = await db.users.find_one({"email": user_data.email}, {"_id": 0})
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
-    
+
     user = User(
         email=user_data.email,
         name=user_data.name,
@@ -146,8 +154,11 @@ async def register(user_data: UserRegister):
     }
 
 @router.post("/auth/login")
-async def login(credentials: UserLogin, response: Response):
+async def login(credentials: UserLogin, request: Request = None, response: Response = None):
     """Login with email/password"""
+    # Rate limit: 30 login attempts per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"login:{get_client_ip(request)}", max_requests=30, window_seconds=900)
     user_doc = await db.users.find_one({"email": credentials.email}, {"_id": 0})
     if not user_doc:
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -205,7 +216,7 @@ async def verify_email(token: str):
     if not verification:
         raise HTTPException(status_code=400, detail="invalid_token")
     
-    if datetime.fromisoformat(verification["expires_at"]) < datetime.now(timezone.utc):
+    if datetime.fromisoformat(verification["expires_at"].replace('Z', '+00:00')) < datetime.now(timezone.utc):
         await db.email_verifications.delete_one({"token": token})
         raise HTTPException(status_code=400, detail="token_expired")
     
@@ -273,13 +284,18 @@ async def resend_verification(data: dict):
     return {"message": "Verification email sent"}
 
 @router.post("/auth/setup-admin")
-async def setup_admin(body: dict):
+async def setup_admin(body: dict, request: Request = None):
     """One-time setup endpoint to create initial admin user"""
+    # Rate limit: 3 attempts per IP per hour
+    if request:
+        rate_limiter.check(f"admin_setup:{get_client_ip(request)}", max_requests=3, window_seconds=3600)
     setup_key = body.get("setup_key")
     
     # Security: require a setup key from environment variable
     expected_key = os.environ.get("ADMIN_SETUP_KEY", "")
-    if not expected_key or setup_key != expected_key:
+    if not expected_key:
+        raise HTTPException(status_code=403, detail="Admin setup is disabled. Set ADMIN_SETUP_KEY environment variable.")
+    if not setup_key or setup_key != expected_key:
         raise HTTPException(status_code=403, detail="Invalid setup key")
     
     email = body.get("email")
@@ -353,8 +369,11 @@ async def logout(authorization: Optional[str] = Header(None), request: Request =
     return {"message": "Logged out successfully"}
 
 @router.post("/auth/forgot-password")
-async def forgot_password(data: dict):
+async def forgot_password(data: dict, request: Request = None):
     """Send password reset email"""
+    # Rate limit: 3 password reset requests per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"forgot:{get_client_ip(request)}", max_requests=3, window_seconds=900)
     email = data.get("email", "").lower().strip()
     
     if not email:
@@ -453,9 +472,9 @@ async def reset_password(data: dict):
     if not token or not new_password:
         raise HTTPException(status_code=400, detail="Token and new password are required")
     
-    if len(new_password) < 6:
-        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
-    
+    if len(new_password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters with letters and digits")
+
     # Find reset request
     reset_doc = await db.password_resets.find_one({"token": token})
     
@@ -546,8 +565,14 @@ async def change_password(
     if not current_password or not new_password:
         raise HTTPException(status_code=400, detail="נא למלא את כל השדות")
     
-    if len(new_password) < 6:
-        raise HTTPException(status_code=400, detail="הסיסמה חייבת להכיל לפחות 6 תווים")
+    if len(new_password) < 8:
+        raise HTTPException(status_code=400, detail="הסיסמה חייבת להכיל לפחות 8 תווים עם אותיות וספרות")
+
+    if not any(c.isdigit() for c in new_password):
+        raise HTTPException(status_code=400, detail="הסיסמה חייבת להכיל לפחות ספרה אחת")
+
+    if not any(c.isalpha() for c in new_password):
+        raise HTTPException(status_code=400, detail="הסיסמה חייבת להכיל לפחות אות אחת")
     
     # Get user with password
     db_user = await db.users.find_one({"user_id": user["user_id"]})

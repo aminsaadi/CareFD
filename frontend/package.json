@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
@@ -37,6 +37,7 @@
     "cmdk": "^1.1.1",
     "cra-template": "1.2.0",
     "date-fns": "^4.1.0",
+    "dompurify": "^3.3.3",
     "embla-carousel-react": "^8.6.0",
     "i18next": "^25.8.5",
     "input-otp": "^1.4.2",

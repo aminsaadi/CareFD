@@ -45,14 +45,16 @@ const ServiceCard = ({ service, showProvider = true }) => {
 
   const handleWhatsApp = (e) => {
     e.stopPropagation();
-    const phone = service.provider?.phone?.replace(/[^0-9]/g, '') || '972500000000';
+    if (!service.provider?.phone) return;
+    const phone = service.provider.phone.replace(/[^0-9]/g, '');
     window.open(`https://wa.me/${phone}?text=שלום, אני מתעניין/ת בשירות "${service.name}"`, '_blank');
   };
 
   const handleCall = (e) => {
     e.stopPropagation();
+    if (!service.provider?.phone) return;
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const phone = service.provider?.phone || '050-0000000';
+    const phone = service.provider.phone;
     if (isMobile) {
       window.location.href = `tel:${phone}`;
     } else {
@@ -126,10 +128,10 @@ const ServiceCard = ({ service, showProvider = true }) => {
                 <p className="text-sm font-semibold text-gray-900 group-hover/provider:text-carelink-teal transition-colors">
                   {service.provider.business_name || 'ספק שירותים'}
                 </p>
-                {service.provider.rating > 0 && (
+                {service.provider.rating != null && service.provider.rating > 0 && (
                   <div className="flex items-center gap-1 text-xs text-gray-500">
                     <FaStar className="text-yellow-500" />
-                    <span>{service.provider.rating.toFixed(1)}</span>
+                    <span>{Number(service.provider.rating).toFixed(1)}</span>
                   </div>
                 )}
               </div>
@@ -146,23 +148,30 @@ const ServiceCard = ({ service, showProvider = true }) => {
             onClick={() => navigate(`/book/${service.service_id}`)}
             className="flex-1 bg-carelink-teal text-white px-4 py-2.5 rounded-xl hover:bg-carelink-teal-medium transition-colors font-medium text-sm"
             data-testid={`book-service-${service.service_id}`}
+            aria-label={`הזמן עכשיו את ${service.name}`}
           >
             הזמן עכשיו
           </button>
-          <button
-            onClick={handleCall}
-            className="w-10 h-10 flex items-center justify-center bg-carelink-navy text-white rounded-xl hover:bg-carelink-slate transition-colors"
-            title="התקשר"
-          >
-            <FaPhone className="text-sm" />
-          </button>
-          <button
-            onClick={handleWhatsApp}
-            className="w-10 h-10 flex items-center justify-center bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors"
-            title="WhatsApp"
-          >
-            <FaWhatsapp className="text-sm" />
-          </button>
+          {service.provider?.phone && (
+            <button
+              onClick={handleCall}
+              className="w-10 h-10 flex items-center justify-center bg-carelink-navy text-white rounded-xl hover:bg-carelink-slate transition-colors"
+              title="התקשר"
+              aria-label="התקשר לספק"
+            >
+              <FaPhone className="text-sm" />
+            </button>
+          )}
+          {service.provider?.phone && (
+            <button
+              onClick={handleWhatsApp}
+              className="w-10 h-10 flex items-center justify-center bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors"
+              title="WhatsApp"
+              aria-label="שלח הודעת WhatsApp לספק"
+            >
+              <FaWhatsapp className="text-sm" />
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -179,7 +179,7 @@ const AdminServiceTypes = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-carelink-navy">סוגי שירותים</h1>
-            <p className="text-carelink-slate mt-1">ניהול קטגוריות ואופני מתן שירות</p>
+            <p className="text-carelink-slate mt-1">ניהול סוגי שירות ואופני מתן שירות</p>
           </div>
         </div>
 
@@ -194,7 +194,7 @@ const AdminServiceTypes = () => {
             }`}
           >
             <FiPackage className="inline-block ml-2" />
-            קטגוריות שירות ({serviceTypes.length})
+            סוגי שירות ({serviceTypes.length})
           </button>
           <button
             onClick={() => setActiveTab('delivery')}
@@ -223,7 +223,7 @@ const AdminServiceTypes = () => {
               data-testid="add-type-btn"
             >
               <FiPlus size={18} />
-              {activeTab === 'service' ? 'הוסף קטגוריה' : 'הוסף אופן מתן שירות'}
+              {activeTab === 'service' ? 'הוסף סוג שירות' : 'הוסף אופן מתן שירות'}
             </button>
 
             {/* Items Grid */}
@@ -318,7 +318,7 @@ const AdminServiceTypes = () => {
           <div className="bg-white rounded-xl w-full max-w-lg p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-carelink-navy">
-                {showModal.includes('edit') ? 'עריכה' : 'הוספה'} - {showModal.includes('service') ? 'קטגוריית שירות' : 'אופן מתן שירות'}
+                {showModal.includes('edit') ? 'עריכה' : 'הוספה'} - {showModal.includes('service') ? 'סוג שירות' : 'אופן מתן שירות'}
               </h3>
               <button
                 onClick={() => { setShowModal(null); resetForm(); }}

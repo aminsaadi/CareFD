@@ -6,6 +6,7 @@ import {
 } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 import api from '../utils/api';
 
 // Service type icons and labels
@@ -38,6 +39,7 @@ const ProviderCard = ({ provider, showContact = true }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const { siteName } = useSiteSettings();
   const [showPhoneModal, setShowPhoneModal] = useState(false);
 
   // Determine service types offered (from services or default)
@@ -46,19 +48,20 @@ const ProviderCard = ({ provider, showContact = true }) => {
   const handleWhatsApp = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const phone = provider.phone?.replace(/[^0-9]/g, '') || '972500000000';
-    window.open(`https://wa.me/${phone}?text=שלום, מצאתי אתכם ב-CareLink ואשמח לקבל מידע נוסף`, '_blank');
+    if (!provider.phone) return;
+    const phone = provider.phone.replace(/[^0-9]/g, '');
+    window.open(`https://wa.me/${phone}?text=שלום, מצאתי אתכם ב-${siteName} ואשמח לקבל מידע נוסף`, '_blank');
   };
 
   const handleCall = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+    if (!provider.phone) return;
+
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const phone = provider.phone || '050-0000000';
-    
+
     if (isMobile) {
-      window.location.href = `tel:${phone}`;
+      window.location.href = `tel:${provider.phone}`;
     } else {
       setShowPhoneModal(true);
     }
@@ -111,10 +114,10 @@ const ProviderCard = ({ provider, showContact = true }) => {
             <h3 className="text-xl font-bold text-carelink-navy mb-1">
               {provider.business_name || 'ספק שירותים'}
             </h3>
-            {/* Profession Title */}
-            {provider.profession_title && (
+            {/* Profession Name */}
+            {(provider.profession_name || provider.profession_title) && (
               <p className="text-carelink-teal font-medium text-sm mb-1" data-testid="profession-title">
-                {getProfessionLabel(provider.profession_title)}
+                {provider.profession_name || getProfessionLabel(provider.profession_title)}
               </p>
             )}
             <div className="flex items-center gap-2 text-sm text-carelink-gray">
@@ -191,33 +194,41 @@ const ProviderCard = ({ provider, showContact = true }) => {
             to={`/providers/${provider.provider_id}`}
             className="flex-1 min-w-[140px] text-center bg-carelink-teal text-white px-4 py-2.5 rounded-xl hover:bg-carelink-teal-medium transition-colors font-medium text-sm sm:text-base"
             data-testid={`view-provider-${provider.provider_id}`}
+            aria-label={`צפה בפרופיל של ${provider.business_name || 'ספק שירותים'}`}
           >
             צפה בפרופיל
           </Link>
           
           {showContact && (
             <div className="flex gap-2">
-              <button
-                onClick={handleCall}
-                className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-carelink-navy text-white rounded-xl hover:bg-carelink-slate transition-colors"
-                data-testid={`call-${provider.provider_id}`}
-                title="התקשר"
-              >
-                <FaPhone className="text-sm sm:text-base" />
-              </button>
-              <button
-                onClick={handleWhatsApp}
-                className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors"
-                data-testid={`whatsapp-${provider.provider_id}`}
-                title="WhatsApp"
-              >
-                <FaWhatsapp className="text-base sm:text-lg" />
-              </button>
+              {provider.phone && (
+                <button
+                  onClick={handleCall}
+                  className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-carelink-navy text-white rounded-xl hover:bg-carelink-slate transition-colors"
+                  data-testid={`call-${provider.provider_id}`}
+                  title="התקשר"
+                  aria-label={`התקשר אל ${provider.business_name || 'ספק שירותים'}`}
+                >
+                  <FaPhone className="text-sm sm:text-base" />
+                </button>
+              )}
+              {provider.phone && (
+                <button
+                  onClick={handleWhatsApp}
+                  className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors"
+                  data-testid={`whatsapp-${provider.provider_id}`}
+                  title="WhatsApp"
+                  aria-label={`שלח הודעת WhatsApp אל ${provider.business_name || 'ספק שירותים'}`}
+                >
+                  <FaWhatsapp className="text-base sm:text-lg" />
+                </button>
+              )}
               <button
                 onClick={handleChat}
                 className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors"
                 data-testid={`chat-${provider.provider_id}`}
                 title="צ'אט"
+                aria-label={`שלח הודעת צ'אט אל ${provider.business_name || 'ספק שירותים'}`}
               >
                 <FaComments className="text-sm sm:text-base" />
               </button>
@@ -238,14 +249,14 @@ const ProviderCard = ({ provider, showContact = true }) => {
             
             <div className="bg-carelink-teal-pale/30 px-6 py-4 rounded-xl mb-4">
               <p className="text-2xl font-bold text-carelink-navy direction-ltr">
-                {provider.phone || '050-0000000'}
+                {provider.phone}
               </p>
             </div>
 
             <div className="flex gap-3">
               <button
                 onClick={() => {
-                  navigator.clipboard.writeText(provider.phone || '050-0000000');
+                  navigator.clipboard.writeText(provider.phone);
                   setShowPhoneModal(false);
                 }}
                 className="flex-1 bg-carelink-teal text-white py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition"

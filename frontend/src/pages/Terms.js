@@ -2,8 +2,10 @@ import React from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { FaFileContract, FaUserCheck, FaExclamationTriangle, FaBan, FaGavel } from 'react-icons/fa';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 
 const Terms = () => {
+  const { siteName } = useSiteSettings();
   const lastUpdated = '22 בפברואר, 2026';
 
   return (
@@ -26,7 +28,7 @@ const Terms = () => {
             
             <div className="bg-amber-50 border-r-4 border-amber-400 p-4 rounded-lg mb-8">
               <p className="text-amber-800">
-                <strong>חשוב:</strong> השימוש באתר CareLink מהווה הסכמה לתנאים אלה. אנא קראו אותם בעיון.
+                <strong>חשוב:</strong> השימוש באתר {siteName} מהווה הסכמה לתנאים אלה. אנא קראו אותם בעיון.
               </p>
             </div>
 
@@ -35,7 +37,7 @@ const Terms = () => {
               1. הגדרות ופרשנות
             </h2>
             <ul className="list-disc list-inside text-carelink-slate mb-8 space-y-2">
-              <li><strong>"האתר"</strong> - אתר CareLink ו/או האפליקציה</li>
+              <li><strong>"האתר"</strong> - אתר {siteName} ו/או האפליקציה</li>
               <li><strong>"משתמש"</strong> - כל אדם המשתמש באתר</li>
               <li><strong>"ספק"</strong> - נותן שירות הרשום באתר</li>
               <li><strong>"שירותים"</strong> - השירותים המוצעים דרך האתר</li>
@@ -53,7 +55,7 @@ const Terms = () => {
             <h2 className="text-2xl font-bold text-carelink-navy mb-4">3. הזמנת שירותים</h2>
             <p className="text-carelink-slate mb-8">
               בעת הזמנת שירות דרך האתר, נוצר הסכם ישיר בין המשתמש לספק. 
-              CareLink משמשת כפלטפורמה מתווכת בלבד ואינה צד להסכם זה.
+              {siteName} משמשת כפלטפורמה מתווכת בלבד ואינה צד להסכם זה.
               המשתמש אחראי לבדוק את התאמת הספק והשירות לצרכיו.
             </p>
 
@@ -69,7 +71,7 @@ const Terms = () => {
               5. הגבלת אחריות
             </h2>
             <p className="text-carelink-slate mb-8">
-              CareLink אינה אחראית לאיכות השירותים הניתנים על ידי הספקים, 
+              {siteName} אינה אחראית לאיכות השירותים הניתנים על ידי הספקים, 
               לנזקים ישירים או עקיפים הנובעים משימוש באתר, 
               או להפסקות זמניות בפעילות האתר.
             </p>
@@ -89,7 +91,7 @@ const Terms = () => {
             <h2 className="text-2xl font-bold text-carelink-navy mb-4">7. קניין רוחני</h2>
             <p className="text-carelink-slate mb-8">
               כל הזכויות באתר, לרבות סימני מסחר, לוגואים ותכנים, 
-              שייכות ל-CareLink או לבעלי הזכויות בהם. 
+              שייכות לבעלי האתר או לבעלי הזכויות בהם. 
               אין להעתיק, לשכפל או להפיץ תוכן מהאתר ללא אישור מראש.
             </p>
 

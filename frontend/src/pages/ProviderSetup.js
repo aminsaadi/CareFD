@@ -5,7 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import MapPicker from '../components/MapPicker';
 import api from '../utils/api';
-import { FaPlus, FaTrash } from 'react-icons/fa';
+import { FaPlus, FaTrash, FaCheck } from 'react-icons/fa';
+import CitySelect from '../components/CitySelect';
 
 const ProviderSetup = () => {
   const { t } = useTranslation();
@@ -13,10 +14,15 @@ const ProviderSetup = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [professions, setProfessions] = useState([]);
   const [formData, setFormData] = useState({
     provider_type: 'individual',
     business_name: '',
     description: '',
+    profession_id: '',
+    profession_name: '',
+    specialization_id: '',
+    specialization_name: '',
     specializations: [''],
     location: {
       address: '',
@@ -27,6 +33,18 @@ const ProviderSetup = () => {
       coverage_radius_km: 10
     }
   });
+
+  useEffect(() => {
+    const fetchProfessions = async () => {
+      try {
+        const response = await api.get('/professions');
+        setProfessions(response.data.professions || []);
+      } catch (err) {
+        console.error('Failed to fetch professions:', err);
+      }
+    };
+    fetchProfessions();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,6 +79,9 @@ const ProviderSetup = () => {
     }));
   };
 
+  const selectedProfession = professions.find(p => p.profession_id === formData.profession_id);
+  const subProfessions = selectedProfession?.sub_professions || [];
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -70,9 +91,10 @@ const ProviderSetup = () => {
       const data = {
         ...formData,
         user_id: user.user_id,
+        profession_title: formData.profession_name || '',
         specializations: formData.specializations.filter(s => s.trim() !== '')
       };
-      
+
       await api.post('/providers', data);
       navigate('/dashboard');
     } catch (err) {
@@ -96,7 +118,7 @@ const ProviderSetup = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
+
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl font-bold mb-6" data-testid="provider-setup-title">
           הגדרת פרופיל ספק
@@ -142,6 +164,63 @@ const ProviderSetup = () => {
             />
           </div>
 
+          {/* Profession - from admin hierarchy */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              מקצוע *
+            </label>
+            <select
+              value={formData.profession_id}
+              onChange={(e) => {
+                const prof = professions.find(p => p.profession_id === e.target.value);
+                setFormData(prev => ({
+                  ...prev,
+                  profession_id: e.target.value,
+                  profession_name: prof?.name || '',
+                  specialization_id: '',
+                  specialization_name: '',
+                }));
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              data-testid="profession-select"
+            >
+              <option value="">בחר מקצוע</option>
+              {professions.map(prof => (
+                <option key={prof.profession_id} value={prof.profession_id}>{prof.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Specialization (sub-profession) */}
+          {formData.profession_id && subProfessions.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                התמחות
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {subProfessions.map(sub => (
+                  <button
+                    key={sub.sub_profession_id}
+                    type="button"
+                    onClick={() => setFormData(prev => ({
+                      ...prev,
+                      specialization_id: sub.sub_profession_id,
+                      specialization_name: sub.name,
+                    }))}
+                    className={`px-4 py-2 rounded-full border text-sm font-medium transition ${
+                      formData.specialization_id === sub.sub_profession_id
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
+                    }`}
+                  >
+                    {formData.specialization_id === sub.sub_profession_id && <FaCheck className="inline ml-1" size={12} />}
+                    {sub.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -157,10 +236,10 @@ const ProviderSetup = () => {
             />
           </div>
 
-          {/* Specializations */}
+          {/* Additional Specializations (free text) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('specializations')}
+              מומחיויות נוספות
             </label>
             {formData.specializations.map((spec, index) => (
               <div key={index} className="flex gap-2 mb-2">
@@ -168,7 +247,7 @@ const ProviderSetup = () => {
                   type="text"
                   value={spec}
                   onChange={(e) => handleSpecializationChange(index, e.target.value)}
-                  placeholder="לדוגמה: רפואת משפחה, פיזיותרפיה"
+                  placeholder="לדוגמה: טיפול בכאבי גב, שיקום ספורטאים"
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
                   data-testid={`specialization-${index}`}
                 />
@@ -190,14 +269,14 @@ const ProviderSetup = () => {
               className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mt-2"
               data-testid="add-specialization-btn"
             >
-              <FaPlus /> הוסף התמחות
+              <FaPlus /> הוסף מומחיות
             </button>
           </div>
 
           {/* Location */}
           <div>
             <h3 className="text-lg font-semibold mb-4">{t('location')}</h3>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -217,12 +296,12 @@ const ProviderSetup = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   עיר
                 </label>
-                <input
-                  type="text"
+                <CitySelect
                   name="city"
                   value={formData.location.city}
                   onChange={handleLocationChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  placeholder="בחר עיר..."
+                  inputClassName="w-full px-3 py-2 border border-gray-300 rounded-md"
                   data-testid="city-input"
                 />
               </div>

@@ -48,11 +48,23 @@ class UserRegister(BaseModel):
     role: str = UserRole.PATIENT
     language_preference: str = "he"
 
+    @field_validator('role')
+    @classmethod
+    def validate_role(cls, v):
+        allowed = [UserRole.PATIENT, UserRole.PROVIDER]
+        if v not in allowed:
+            raise ValueError(f'Role must be one of: {", ".join(allowed)}')
+        return v
+
     @field_validator('password')
     @classmethod
     def validate_password(cls, v):
-        if len(v) < 6:
-            raise ValueError('Password must be at least 6 characters')
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters')
+        if not any(c.isdigit() for c in v):
+            raise ValueError('Password must contain at least one digit')
+        if not any(c.isalpha() for c in v):
+            raise ValueError('Password must contain at least one letter')
         return v
 
 class UserLogin(BaseModel):
@@ -196,9 +208,18 @@ class Provider(BaseModel):
     about: Optional[str] = None
     profile_image: Optional[str] = None
     gender: Optional[str] = None
+    # Profession hierarchy (linked to admin professions collection)
+    profession_id: Optional[str] = None          # מקצוע - e.g. "prof_nursing"
+    profession_name: Optional[str] = None         # cached name - e.g. "סיעוד"
+    specialization_id: Optional[str] = None       # התמחות - e.g. "sub_home_care"
+    specialization_name: Optional[str] = None     # cached name - e.g. "סיעוד ביתי"
+    expertise: List[str] = []                     # מומחיות - free text specific skills
+    # Legacy fields (kept for backward compatibility)
     specializations: List[str] = []
-    expertise: List[str] = []
     services: List[str] = []
+    profession_title: Optional[str] = None
+    # Service categories from admin hierarchy (what services the provider offers)
+    service_categories: List[dict] = []           # [{category_id, name, profession_id}]
     team_members: List[TeamMember] = []
     location: Optional[Location] = None
     service_areas: List[str] = []
@@ -220,19 +241,28 @@ class Provider(BaseModel):
     years_experience: Optional[int] = None
     service_types: List[str] = []
     views_count: int = 0
-    profession_title: Optional[str] = None
 
 PROFESSION_TITLES = [
-    {"value": "doctor", "label": "רופא", "label_en": "Doctor"},
-    {"value": "nurse", "label": "אח/ות מוסמך/ת", "label_en": "Registered Nurse"},
-    {"value": "physiotherapist", "label": "פיזיותרפיסט", "label_en": "Physiotherapist"},
-    {"value": "occupational_therapist", "label": "מרפא/ה בעיסוק", "label_en": "Occupational Therapist"},
-    {"value": "student", "label": "סטודנט/ית", "label_en": "Student"},
-    {"value": "caregiver", "label": "מטפל/ת", "label_en": "Caregiver"},
-    {"value": "psychologist", "label": "פסיכולוג/ית", "label_en": "Psychologist"},
-    {"value": "social_worker", "label": "עובד/ת סוציאלי/ת", "label_en": "Social Worker"},
-    {"value": "dietitian", "label": "דיאטן/ית", "label_en": "Dietitian"},
-    {"value": "speech_therapist", "label": "קלינאי/ת תקשורת", "label_en": "Speech Therapist"},
+    {"value": "doctor", "label": "רופא", "label_en": "Doctor",
+     "search_terms": ["רופא", "רופאה", "דוקטור", "רופא משפחה", "רופא ילדים", "פדיאטר"]},
+    {"value": "nurse", "label": "אח/ות מוסמך/ת", "label_en": "Registered Nurse",
+     "search_terms": ["אחות", "אח", "אחות/אח", "סיעוד", "אחות מוסמכת", "אחות מעשית", "אח מוסמך"]},
+    {"value": "physiotherapist", "label": "פיזיותרפיסט", "label_en": "Physiotherapist",
+     "search_terms": ["פיזיותרפיה", "פיזיותרפיסט", "פיזיותרפיסטית", "שיקום"]},
+    {"value": "occupational_therapist", "label": "מרפא/ה בעיסוק", "label_en": "Occupational Therapist",
+     "search_terms": ["ריפוי בעיסוק", "מרפא בעיסוק", "מרפאה בעיסוק"]},
+    {"value": "student", "label": "סטודנט/ית", "label_en": "Student",
+     "search_terms": ["סטודנט", "סטודנטית"]},
+    {"value": "caregiver", "label": "מטפל/ת", "label_en": "Caregiver",
+     "search_terms": ["מטפל", "מטפלת", "מטפל סיעודי", "מטפלת סיעודית", "טיפול סיעודי"]},
+    {"value": "psychologist", "label": "פסיכולוג/ית", "label_en": "Psychologist",
+     "search_terms": ["פסיכולוג", "פסיכולוגית", "פסיכולוגיה", "טיפול נפשי"]},
+    {"value": "social_worker", "label": "עובד/ת סוציאלי/ת", "label_en": "Social Worker",
+     "search_terms": ["עובד סוציאלי", "עובדת סוציאלית", "עבודה סוציאלית"]},
+    {"value": "dietitian", "label": "דיאטן/ית", "label_en": "Dietitian",
+     "search_terms": ["דיאטן", "דיאטנית", "דיאטה", "תזונה", "יועץ תזונה"]},
+    {"value": "speech_therapist", "label": "קלינאי/ת תקשורת", "label_en": "Speech Therapist",
+     "search_terms": ["קלינאי תקשורת", "קלינאית תקשורת", "דיבור", "תקשורת"]},
 ]
 
 GENDER_OPTIONS = [
@@ -311,6 +341,8 @@ class Service(BaseModel):
     name: str
     description: str
     service_category: str = ServiceCategory.VISIT
+    # Links to admin profession categories (1-3 required)
+    categories: List[dict] = []  # [{category_id, name, profession_id, profession_name}]
     delivery_types: List[str] = []
     pricing_type: str = PricingType.FIXED
     price: float
@@ -338,6 +370,7 @@ class ServiceCreate(BaseModel):
     name: str
     description: str
     service_category: str = ServiceCategory.VISIT
+    categories: List[dict] = []  # [{category_id, name, profession_id, profession_name}]
     delivery_types: List[str] = []
     pricing_type: str = PricingType.FIXED
     price: float
@@ -371,6 +404,24 @@ class RequestType:
     ONE_TIME = "one_time"
     FOLLOW_UP = "follow_up"
 
+class RequestUrgency:
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    URGENT = "urgent"
+
+class OfferStatus:
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    WITHDRAWN = "withdrawn"
+    EXPIRED = "expired"
+
+class BudgetType:
+    PER_HOUR = "per_hour"           # לשעה
+    PER_TREATMENT = "per_treatment" # לטיפול
+    PER_VISIT = "per_visit"         # לביקור
+
 class ServiceRequest(BaseModel):
     model_config = ConfigDict(extra="ignore")
     request_id: str = Field(default_factory=lambda: f"request_{uuid.uuid4().hex[:12]}")
@@ -379,11 +430,29 @@ class ServiceRequest(BaseModel):
     description: str
     provider_type: Optional[str] = None
     specialization: Optional[str] = None
-    service_type: Optional[str] = None
+    professions: List[str] = []                    # מקצוע - up to 3 profession IDs
+    service_type: Optional[str] = None             # סוג שירות - synced with backend
+    delivery_type: Optional[str] = None            # דרך מתן השירות
     location: Optional[Location] = None
     budget: Optional[float] = None
+    budget_type: Optional[str] = None              # לשעה / לטיפול / לביקור
+    hours_needed: Optional[int] = None             # מספר שעות דרושות (לשירות שעתי)
     request_type: str = RequestType.ONE_TIME
+    urgency: Optional[str] = RequestUrgency.MEDIUM
+    preferred_date: Optional[datetime] = None
+    preferred_time: Optional[str] = None           # שעה רצויה
+    gender_preference: Optional[str] = None        # העדפת מגדר
+    language_preferences: List[str] = []           # העדפות שפה
+    preferences: Optional[str] = None
+    address_notes: Optional[str] = None            # הערות לכתובת
+    region: Optional[str] = None                   # אזור
     status: str = RequestStatus.OPEN
+    offer_count: int = 0
+    accepted_offer_id: Optional[str] = None
+    accepted_at: Optional[datetime] = None
+    booking_id: Optional[str] = None
+    cancelled_at: Optional[datetime] = None
+    cancellation_reason: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -392,10 +461,116 @@ class RequestCreate(BaseModel):
     description: str
     provider_type: Optional[str] = None
     specialization: Optional[str] = None
+    professions: List[str] = []
     service_type: Optional[str] = None
+    delivery_type: Optional[str] = None
     location: Optional[Location] = None
     budget: Optional[float] = None
+    budget_type: Optional[str] = None
+    hours_needed: Optional[int] = None
     request_type: str = RequestType.ONE_TIME
+    urgency: Optional[str] = RequestUrgency.MEDIUM
+    preferred_date: Optional[datetime] = None
+    preferred_time: Optional[str] = None
+    gender_preference: Optional[str] = None
+    language_preferences: List[str] = []
+    preferences: Optional[str] = None
+    address_notes: Optional[str] = None
+    region: Optional[str] = None
+
+    @field_validator('professions')
+    @classmethod
+    def validate_professions(cls, v):
+        if len(v) > 3:
+            raise ValueError('You can select up to 3 professions')
+        return v
+
+    @field_validator('budget_type')
+    @classmethod
+    def validate_budget_type(cls, v):
+        if v is None:
+            return v
+        allowed = [BudgetType.PER_HOUR, BudgetType.PER_TREATMENT, BudgetType.PER_VISIT]
+        if v not in allowed:
+            raise ValueError(f'budget_type must be one of: {", ".join(allowed)}')
+        return v
+
+    @field_validator('gender_preference')
+    @classmethod
+    def validate_gender_preference(cls, v):
+        if v is None:
+            return v
+        allowed = ["male", "female", "no_preference"]
+        if v not in allowed:
+            raise ValueError(f'gender_preference must be one of: {", ".join(allowed)}')
+        return v
+
+    @field_validator('request_type')
+    @classmethod
+    def validate_request_type(cls, v):
+        allowed = [RequestType.IMMEDIATE, RequestType.SCHEDULED, RequestType.ONE_TIME, RequestType.FOLLOW_UP]
+        if v not in allowed:
+            raise ValueError(f'request_type must be one of: {", ".join(allowed)}')
+        return v
+
+    @field_validator('urgency')
+    @classmethod
+    def validate_urgency(cls, v):
+        if v is None:
+            return v
+        allowed = [RequestUrgency.LOW, RequestUrgency.MEDIUM, RequestUrgency.HIGH, RequestUrgency.URGENT]
+        if v not in allowed:
+            raise ValueError(f'urgency must be one of: {", ".join(allowed)}')
+        return v
+
+    @field_validator('provider_type')
+    @classmethod
+    def validate_provider_type(cls, v):
+        if v is None:
+            return v
+        allowed = [ProviderType.INDIVIDUAL, ProviderType.COMPANY, ProviderType.CLINIC]
+        if v not in allowed:
+            raise ValueError(f'provider_type must be one of: {", ".join(allowed)}')
+        return v
+
+    @field_validator('budget')
+    @classmethod
+    def validate_budget(cls, v):
+        if v is not None and v < 0:
+            raise ValueError('budget must be a positive number')
+        return v
+
+    @field_validator('hours_needed')
+    @classmethod
+    def validate_hours_needed(cls, v):
+        if v is not None and v < 1:
+            raise ValueError('hours_needed must be at least 1')
+        return v
+
+class RequestUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    provider_type: Optional[str] = None
+    specialization: Optional[str] = None
+    professions: Optional[List[str]] = None
+    service_type: Optional[str] = None
+    delivery_type: Optional[str] = None
+    location: Optional[Location] = None
+    budget: Optional[float] = None
+    budget_type: Optional[str] = None
+    hours_needed: Optional[int] = None
+    request_type: Optional[str] = None
+    urgency: Optional[str] = None
+    preferred_date: Optional[datetime] = None
+    preferred_time: Optional[str] = None
+    gender_preference: Optional[str] = None
+    language_preferences: Optional[List[str]] = None
+    preferences: Optional[str] = None
+    address_notes: Optional[str] = None
+    region: Optional[str] = None
+
+class RequestCancel(BaseModel):
+    reason: Optional[str] = None
 
 class Offer(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -407,7 +582,11 @@ class Offer(BaseModel):
     duration_days: Optional[int] = None
     message: str
     suggested_service_id: Optional[str] = None
-    status: str = "pending"
+    provider_name: Optional[str] = None
+    provider_picture: Optional[str] = None
+    status: str = OfferStatus.PENDING
+    rejected_at: Optional[datetime] = None
+    withdrawn_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class OfferCreate(BaseModel):
@@ -557,6 +736,13 @@ class ReviewCreate(BaseModel):
     price_value: Optional[int] = None
     would_recommend: bool = True
 
+    @field_validator('rating')
+    @classmethod
+    def validate_rating(cls, v):
+        if v < 1.0 or v > 5.0:
+            raise ValueError('Rating must be between 1.0 and 5.0')
+        return v
+
 
 # ==================== NOTIFICATION MODELS ====================
 
@@ -573,6 +759,10 @@ class NotificationType:
     MESSAGE_NEW = "message_new"
     OFFER_NEW = "offer_new"
     OFFER_ACCEPTED = "offer_accepted"
+    OFFER_REJECTED = "offer_rejected"
+    OFFER_WITHDRAWN = "offer_withdrawn"
+    REQUEST_NEW = "request_new"
+    REQUEST_CANCELLED = "request_cancelled"
     REVIEW_NEW = "review_new"
     BOOKING_CHANGE_REQUESTED = "booking_change_requested"
     SYSTEM = "system"
