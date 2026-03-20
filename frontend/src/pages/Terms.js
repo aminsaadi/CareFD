@@ -5,7 +5,7 @@ import { FaFileContract, FaUserCheck, FaExclamationTriangle, FaBan, FaGavel } fr
 import { useSiteSettings } from '../context/SiteSettingsContext';
 
 const Terms = () => {
-  const { siteName } = useSiteSettings();
+  const { siteName, settings } = useSiteSettings();
   const lastUpdated = '22 בפברואר, 2026';
 
   return (
@@ -110,7 +110,7 @@ const Terms = () => {
             </p>
             <div className="bg-gray-50 p-4 rounded-xl">
               <p className="text-carelink-slate">
-                <strong>אימייל:</strong> legal@carelink.co.il<br />
+                <strong>אימייל:</strong> {settings.contact_email || 'legal@example.com'}<br />
                 <strong>טלפון:</strong> 03-1234567
               </p>
             </div>
