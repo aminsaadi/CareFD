@@ -7,6 +7,7 @@ const DEFAULT_SETTINGS = {
   site_name: 'Healthcare Platform',
   site_tagline: 'Connecting Care Providers',
   logo_url: '',
+  favicon_url: '',
   contact_email: '',
   contact_phone: '',
   contact_address: '',

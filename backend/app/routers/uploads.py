@@ -12,7 +12,7 @@ from app.utils import get_current_user, get_site_url
 
 router = APIRouter()
 
-ALLOWED_EXTENSIONS = {'pdf', 'jpg', 'jpeg', 'png', 'webp', 'gif'}
+ALLOWED_EXTENSIONS = {'pdf', 'jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'ico'}
 
 # Magic bytes for file type verification
 FILE_SIGNATURES = {
@@ -103,10 +103,10 @@ async def upload_image(
     user = await get_current_user(authorization, request)
 
     # Validate file type - images only
-    allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+    allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon']
     content_type = file.content_type
     if content_type not in allowed_types:
-        raise HTTPException(status_code=400, detail="Only image files are allowed (JPEG, PNG, WebP, GIF)")
+        raise HTTPException(status_code=400, detail="Only image files are allowed (JPEG, PNG, WebP, GIF, SVG, ICO)")
 
     # Validate file size (5MB max for images)
     max_size = 5 * 1024 * 1024
@@ -117,9 +117,11 @@ async def upload_image(
     # Generate unique filename with sanitized extension
     ext = _sanitize_extension(file.filename, 'jpg')
 
-    # Verify file content matches claimed type
-    if not _verify_file_magic(content, ext):
-        raise HTTPException(status_code=400, detail="File content does not match image type")
+    # SVG and ICO files skip magic byte verification
+    if ext not in ('svg', 'ico'):
+        # Verify file content matches claimed type
+        if not _verify_file_magic(content, ext):
+            raise HTTPException(status_code=400, detail="File content does not match image type")
 
     unique_filename = f"img_{uuid.uuid4().hex}.{ext}"
     file_path = UPLOAD_DIR / unique_filename
