@@ -141,6 +141,17 @@ async def upload_image(
         "size": len(content)
     }
 
+CONTENT_TYPE_MAP = {
+    'svg': 'image/svg+xml',
+    'ico': 'image/x-icon',
+    'png': 'image/png',
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'webp': 'image/webp',
+    'gif': 'image/gif',
+    'pdf': 'application/pdf',
+}
+
 @router.get("/files/{filename}")
 async def get_file(filename: str):
     """Serve uploaded files"""
@@ -157,7 +168,9 @@ async def get_file(filename: str):
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="File not found")
 
-    return FileResponse(str(file_path))
+    ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
+    media_type = CONTENT_TYPE_MAP.get(ext)
+    return FileResponse(str(file_path), media_type=media_type)
 
 
 # ==================== USER VERIFICATION ====================
