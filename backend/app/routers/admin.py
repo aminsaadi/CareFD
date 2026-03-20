@@ -1302,6 +1302,7 @@ async def get_public_settings():
             "site_name": "Healthcare Platform",
             "site_tagline": "Connecting Care Providers",
             "logo_url": "",
+            "favicon_url": "",
             "contact_email": "",
             "contact_phone": "",
             "contact_address": "",
@@ -1318,7 +1319,7 @@ async def get_public_settings():
         "contact_email", "contact_phone", "contact_address",
         "footer_text", "social_facebook", "social_instagram",
         "social_twitter", "social_linkedin", "social_youtube",
-        "footer_links", "site_name", "site_tagline", "logo_url"
+        "footer_links", "site_name", "site_tagline", "logo_url", "favicon_url"
     ]
     return {k: v for k, v in settings.items() if k in public_fields}
 

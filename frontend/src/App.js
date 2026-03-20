@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
-import { SiteSettingsProvider } from './context/SiteSettingsContext';
+import { SiteSettingsProvider, useSiteSettings } from './context/SiteSettingsContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import CookieConsent from './components/CookieConsent';
 import AccessibilityWidget from './components/AccessibilityWidget';
@@ -409,9 +409,29 @@ function AppRouter() {
   );
 }
 
+function DynamicFavicon() {
+  const { settings } = useSiteSettings();
+
+  useEffect(() => {
+    if (settings.favicon_url) {
+      let link = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = settings.favicon_url;
+      link.type = '';
+    }
+  }, [settings.favicon_url]);
+
+  return null;
+}
+
 function App() {
   return (
     <SiteSettingsProvider>
+      <DynamicFavicon />
       <AuthProvider>
         <BrowserRouter>
           <NotificationProvider>
