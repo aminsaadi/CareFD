@@ -53,7 +53,8 @@ SITE_URL = os.environ.get('SITE_URL', 'https://carelink.co.il')
 async def get_site_url():
     """Get the frontend site URL from DB settings, fallback to constant"""
     settings = await db.site_settings.find_one({}, {"_id": 0, "site_url": 1})
-    return (settings or {}).get("site_url") or SITE_URL
+    url = (settings or {}).get("site_url") or SITE_URL
+    return url.rstrip('/')
 
 
 def hash_password(password: str) -> str:
