@@ -12,14 +12,14 @@ import {
 
 const AdminSettings = () => {
   const [settings, setSettings] = useState({
-    site_name: 'Healthcare Platform',
-    site_tagline: 'Connecting Care Providers',
+    site_name: '',
+    site_tagline: '',
     logo_url: '',
     favicon_url: '',
-    contact_email: 'info@carelink.co.il',
-    contact_phone: '03-1234567',
-    contact_address: 'תל אביב, ישראל',
-    footer_text: '© 2024 Healthcare Platform. כל הזכויות שמורות.',
+    contact_email: '',
+    contact_phone: '',
+    contact_address: '',
+    footer_text: '',
     social_facebook: '',
     social_instagram: '',
     social_twitter: '',
@@ -662,7 +662,7 @@ const AdminSettings = () => {
                       <label className="block text-sm text-carelink-slate mb-1">אימייל שולח</label>
                       <input type="email" value={smtpSettings.sender_email}
                         onChange={(e) => setSmtpSettings(p => ({...p, sender_email: e.target.value}))}
-                        placeholder="carelink.co.il@gmail.com" dir="ltr"
+                        placeholder="your-email@gmail.com" dir="ltr"
                         className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carelink-teal outline-none"
                         data-testid="smtp-sender-email" />
                     </div>
@@ -678,7 +678,7 @@ const AdminSettings = () => {
                       <label className="block text-sm text-carelink-slate mb-1">שם משתמש SMTP</label>
                       <input type="text" value={smtpSettings.smtp_user}
                         onChange={(e) => setSmtpSettings(p => ({...p, smtp_user: e.target.value}))}
-                        placeholder="carelink.co.il@gmail.com" dir="ltr"
+                        placeholder="your-email@gmail.com" dir="ltr"
                         className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carelink-teal outline-none"
                         data-testid="smtp-user" />
                     </div>

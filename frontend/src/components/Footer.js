@@ -9,7 +9,7 @@ const Footer = () => {
   const { settings: siteSettings, siteName } = useSiteSettings();
   const [settings, setSettings] = useState({
     contact_phone: '03-1234567',
-    contact_email: 'info@carelink.co.il',
+    contact_email: '',
     contact_address: 'תל אביב, ישראל',
     footer_text: '',
     social_facebook: '',

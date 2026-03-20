@@ -4,8 +4,8 @@ import api from '../utils/api';
 const SiteSettingsContext = createContext({});
 
 const DEFAULT_SETTINGS = {
-  site_name: 'Healthcare Platform',
-  site_tagline: 'Connecting Care Providers',
+  site_name: '',
+  site_tagline: '',
   logo_url: '',
   favicon_url: '',
   contact_email: '',
