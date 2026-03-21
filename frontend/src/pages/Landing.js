@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import ProviderCard from '../components/ProviderCard';
 import ServiceCard from '../components/ServiceCard';
 import api from '../utils/api';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 import { israeliLocalities } from '../data/israeliLocalities';
 import { israeliRegions, healthcareProfessions, popularSearches as searchData } from '../data/searchData';
 import {
@@ -148,6 +149,7 @@ const fallbackPopularSearches = searchData;
 
 const Landing = () => {
   const navigate = useNavigate();
+  const { settings: siteSettings } = useSiteSettings();
   const [searchQuery, setSearchQuery] = useState('');
   const [locationQuery, setLocationQuery] = useState('');
   const [isLocating, setIsLocating] = useState(false);
@@ -379,7 +381,7 @@ const Landing = () => {
             <div className="text-white">
               <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
                 <span className="w-2 h-2 bg-carelink-teal rounded-full animate-pulse"></span>
-                <span className="text-sm text-carelink-teal-pale">הפלטפורמה המובילה לשירותי בריאות בישראל</span>
+                <span className="text-sm text-carelink-teal-pale">{siteSettings.site_tagline || 'הפלטפורמה המובילה לשירותי בריאות בישראל'}</span>
               </div>
               
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 font-heading leading-tight" data-testid="hero-title">
