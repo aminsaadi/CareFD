@@ -29,14 +29,14 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
 
   return (
     <div
-      className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border-2 border-carelink-teal-pale"
+      className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border-2 border-carefd-teal-pale"
       data-testid={`request-card-${request.request_id}`}
     >
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
-          <h3 className="text-xl font-bold text-carelink-navy mb-1">{request.title}</h3>
-          <div className="flex items-center gap-2 text-sm text-carelink-gray">
-            <FaCalendar className="text-carelink-teal" />
+          <h3 className="text-xl font-bold text-carefd-navy mb-1">{request.title}</h3>
+          <div className="flex items-center gap-2 text-sm text-carefd-gray">
+            <FaCalendar className="text-carefd-teal" />
             <span>{format(new Date(request.created_at), 'dd/MM/yyyy')}</span>
           </div>
         </div>
@@ -45,13 +45,13 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
         </span>
       </div>
 
-      <p className="text-carelink-slate mb-4 line-clamp-2">{request.description}</p>
+      <p className="text-carefd-slate mb-4 line-clamp-2">{request.description}</p>
 
       <div className="space-y-2 mb-4">
         {request.specialization && (
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-carelink-navy">התמחות:</span>
-            <span className="bg-carelink-teal-pale text-carelink-teal text-sm px-3 py-1 rounded-full">
+            <span className="text-sm font-medium text-carefd-navy">התמחות:</span>
+            <span className="bg-carefd-teal-pale text-carefd-teal text-sm px-3 py-1 rounded-full">
               {request.specialization}
             </span>
           </div>
@@ -59,15 +59,15 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
 
         {request.budget && (
           <div className="flex items-center gap-2">
-            <FaMoneyBillWave className="text-carelink-teal" />
-            <span className="text-sm font-medium text-carelink-navy">תקציב:</span>
-            <span className="text-lg font-bold text-carelink-teal">₪{request.budget}</span>
+            <FaMoneyBillWave className="text-carefd-teal" />
+            <span className="text-sm font-medium text-carefd-navy">תקציב:</span>
+            <span className="text-lg font-bold text-carefd-teal">₪{request.budget}</span>
           </div>
         )}
 
         {request.location && (
-          <div className="flex items-center gap-2 text-sm text-carelink-gray">
-            <FaMapMarkerAlt className="text-carelink-teal" />
+          <div className="flex items-center gap-2 text-sm text-carefd-gray">
+            <FaMapMarkerAlt className="text-carefd-teal" />
             <span>{request.location.city}</span>
           </div>
         )}
@@ -75,7 +75,7 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
 
       <Link
         to={`/requests/${request.request_id}`}
-        className="block w-full text-center bg-carelink-navy text-white px-4 py-2 rounded-lg hover:bg-carelink-slate transition-colors font-medium"
+        className="block w-full text-center bg-carefd-navy text-white px-4 py-2 rounded-lg hover:bg-carefd-slate transition-colors font-medium"
         data-testid={`view-request-${request.request_id}`}
       >
         {showActions ? t('makeOffer') : t('viewOffers')}

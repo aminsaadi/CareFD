@@ -1,5 +1,5 @@
 """
-Test suite for CareLink new features:
+Test suite for CareFD new features:
 1. Landing page - Featured providers (/api/providers?recommended=true)
 2. Landing page - Popular services (/api/services)
 3. Static pages - About, Privacy, Terms, Contact
@@ -109,7 +109,7 @@ class TestAdminProviderEdit:
     def admin_token(self):
         """Login as admin and get token"""
         login_data = {
-            "email": "admin@carelink.co.il",
+            "email": "admin@carefd.com",
             "password": "password"
         }
         response = requests.post(f"{BASE_URL}/api/auth/login", json=login_data)

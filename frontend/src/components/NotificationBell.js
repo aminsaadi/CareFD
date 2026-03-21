@@ -36,7 +36,7 @@ const notificationColors = {
   offer_new: 'bg-amber-100 text-amber-600',
   offer_accepted: 'bg-green-100 text-green-600',
   review_new: 'bg-yellow-100 text-yellow-600',
-  system: 'bg-carelink-teal-pale text-carelink-teal'
+  system: 'bg-carefd-teal-pale text-carefd-teal'
 };
 
 const NotificationBell = () => {
@@ -118,7 +118,7 @@ const NotificationBell = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-lg hover:bg-carelink-teal-pale/30 text-carelink-slate hover:text-carelink-teal transition-colors"
+        className="relative p-2 rounded-lg hover:bg-carefd-teal-pale/30 text-carefd-slate hover:text-carefd-teal transition-colors"
         data-testid="notification-bell"
       >
         <FaBell className="text-xl" />
@@ -130,15 +130,15 @@ const NotificationBell = () => {
       </button>
 
       {isOpen && (
-        <div className="fixed md:absolute top-16 md:top-full md:mt-2 right-0 left-0 md:left-auto md:right-0 mx-2 md:mx-0 w-auto md:w-96 bg-white rounded-2xl shadow-xl border border-carelink-teal-pale overflow-hidden z-50 max-h-[80vh] md:max-h-none">
+        <div className="fixed md:absolute top-16 md:top-full md:mt-2 right-0 left-0 md:left-auto md:right-0 mx-2 md:mx-0 w-auto md:w-96 bg-white rounded-2xl shadow-xl border border-carefd-teal-pale overflow-hidden z-50 max-h-[80vh] md:max-h-none">
           {/* Header */}
-          <div className="bg-carelink-navy text-white p-4 flex items-center justify-between">
+          <div className="bg-carefd-navy text-white p-4 flex items-center justify-between">
             <h3 className="font-bold">התראות</h3>
             <div className="flex items-center gap-3">
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-sm text-carelink-teal-pale hover:text-white flex items-center gap-1"
+                  className="text-sm text-carefd-teal-pale hover:text-white flex items-center gap-1"
                 >
                   <FaCheck />
                   <span className="hidden sm:inline">סמן הכל כנקרא</span>
@@ -146,7 +146,7 @@ const NotificationBell = () => {
               )}
               <button
                 onClick={() => setIsOpen(false)}
-                className="md:hidden text-white hover:text-carelink-teal-pale"
+                className="md:hidden text-white hover:text-carefd-teal-pale"
               >
                 <FaTimes />
               </button>
@@ -156,8 +156,8 @@ const NotificationBell = () => {
           {/* Notifications List */}
           <div className="max-h-[60vh] md:max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="p-8 text-center text-carelink-gray">
-                <FaBell className="text-4xl mx-auto mb-2 text-carelink-teal-pale" />
+              <div className="p-8 text-center text-carefd-gray">
+                <FaBell className="text-4xl mx-auto mb-2 text-carefd-teal-pale" />
                 <p>אין התראות חדשות</p>
               </div>
             ) : (
@@ -173,8 +173,8 @@ const NotificationBell = () => {
                       if (!notification.is_read) markAsRead(notification.notification_id);
                       setIsOpen(false);
                     }}
-                    className={`block p-3 md:p-4 border-b border-carelink-teal-pale/50 hover:bg-carelink-teal-pale/10 transition ${
-                      !notification.is_read ? 'bg-carelink-teal-pale/20' : ''
+                    className={`block p-3 md:p-4 border-b border-carefd-teal-pale/50 hover:bg-carefd-teal-pale/10 transition ${
+                      !notification.is_read ? 'bg-carefd-teal-pale/20' : ''
                     }`}
                   >
                     <div className="flex gap-3">
@@ -183,23 +183,23 @@ const NotificationBell = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
-                          <p className={`text-sm ${!notification.is_read ? 'font-bold' : ''} text-carelink-navy truncate`}>
+                          <p className={`text-sm ${!notification.is_read ? 'font-bold' : ''} text-carefd-navy truncate`}>
                             {notification.title}
                           </p>
                           <button
                             onClick={(e) => deleteNotification(notification.notification_id, e)}
-                            className="text-carelink-gray hover:text-red-500 p-1 flex-shrink-0"
+                            className="text-carefd-gray hover:text-red-500 p-1 flex-shrink-0"
                           >
                             <FaTrash className="text-xs" />
                           </button>
                         </div>
-                        <p className="text-sm text-carelink-gray line-clamp-2">{notification.message}</p>
-                        <p className="text-xs text-carelink-gray mt-1">
+                        <p className="text-sm text-carefd-gray line-clamp-2">{notification.message}</p>
+                        <p className="text-xs text-carefd-gray mt-1">
                           {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: he })}
                         </p>
                       </div>
                       {!notification.is_read && (
-                        <div className="w-2 h-2 bg-carelink-teal rounded-full flex-shrink-0 mt-2"></div>
+                        <div className="w-2 h-2 bg-carefd-teal rounded-full flex-shrink-0 mt-2"></div>
                       )}
                     </div>
                   </Link>
@@ -212,7 +212,7 @@ const NotificationBell = () => {
           <Link
             to="/notifications"
             onClick={() => setIsOpen(false)}
-            className="block p-3 text-center text-carelink-teal font-medium hover:bg-carelink-teal-pale/20 transition"
+            className="block p-3 text-center text-carefd-teal font-medium hover:bg-carefd-teal-pale/20 transition"
           >
             צפה בכל ההתראות
           </Link>

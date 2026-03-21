@@ -48,7 +48,7 @@ const ProviderCard = ({ provider, showContact = true }) => {
     e.stopPropagation();
     if (!provider.phone) return;
     const phone = provider.phone.replace(/[^0-9]/g, '');
-    window.open(`https://wa.me/${phone}?text=שלום, מצאתי אתכם ב-CareLink ואשמח לקבל מידע נוסף`, '_blank');
+    window.open(`https://wa.me/${phone}?text=שלום, מצאתי אתכם ב-CareFD ואשמח לקבל מידע נוסף`, '_blank');
   };
 
   const handleCall = (e) => {
@@ -88,13 +88,13 @@ const ProviderCard = ({ provider, showContact = true }) => {
   return (
     <>
       <div
-        className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition-all border-2 border-carelink-teal-pale hover:border-carelink-teal relative group"
+        className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition-all border-2 border-carefd-teal-pale hover:border-carefd-teal relative group"
         data-testid={`provider-card-${provider.provider_id}`}
       >
         {/* Badges */}
         <div className="absolute -top-3 right-4 flex gap-2">
           {provider.is_verified && (
-            <span className="inline-flex items-center gap-1 bg-carelink-teal text-white text-xs px-3 py-1 rounded-full font-medium shadow-md" data-testid="verified-badge">
+            <span className="inline-flex items-center gap-1 bg-carefd-teal text-white text-xs px-3 py-1 rounded-full font-medium shadow-md" data-testid="verified-badge">
               <FaCheckCircle />
               מאומת
             </span>
@@ -109,29 +109,29 @@ const ProviderCard = ({ provider, showContact = true }) => {
 
         <div className="flex items-start justify-between mb-4 mt-2">
           <div className="flex-1">
-            <h3 className="text-xl font-bold text-carelink-navy mb-1">
+            <h3 className="text-xl font-bold text-carefd-navy mb-1">
               {provider.business_name || 'ספק שירותים'}
             </h3>
             {/* Profession Title */}
             {provider.profession_title && (
-              <p className="text-carelink-teal font-medium text-sm mb-1" data-testid="profession-title">
+              <p className="text-carefd-teal font-medium text-sm mb-1" data-testid="profession-title">
                 {getProfessionLabel(provider.profession_title)}
               </p>
             )}
-            <div className="flex items-center gap-2 text-sm text-carelink-gray">
-              <FaBriefcase className="text-carelink-teal" />
+            <div className="flex items-center gap-2 text-sm text-carefd-gray">
+              <FaBriefcase className="text-carefd-teal" />
               <span>{t(provider.provider_type)}</span>
             </div>
           </div>
-          <div className="flex items-center gap-1 bg-carelink-teal-pale px-3 py-1.5 rounded-full">
+          <div className="flex items-center gap-1 bg-carefd-teal-pale px-3 py-1.5 rounded-full">
             <FaStar className="text-yellow-500" />
-            <span className="font-bold text-carelink-navy">{(provider.rating || 0).toFixed(1)}</span>
-            <span className="text-xs text-carelink-gray">({provider.total_reviews || 0})</span>
+            <span className="font-bold text-carefd-navy">{(provider.rating || 0).toFixed(1)}</span>
+            <span className="text-xs text-carefd-gray">({provider.total_reviews || 0})</span>
           </div>
         </div>
 
         {provider.description && (
-          <p className="text-carelink-slate mb-4 line-clamp-2">{provider.description}</p>
+          <p className="text-carefd-slate mb-4 line-clamp-2">{provider.description}</p>
         )}
 
         {/* Service Types */}
@@ -159,13 +159,13 @@ const ProviderCard = ({ provider, showContact = true }) => {
               {provider.specializations.slice(0, 3).map((spec, idx) => (
                 <span
                   key={idx}
-                  className="bg-carelink-navy text-white text-xs px-3 py-1 rounded-full font-medium"
+                  className="bg-carefd-navy text-white text-xs px-3 py-1 rounded-full font-medium"
                 >
                   {spec}
                 </span>
               ))}
               {provider.specializations.length > 3 && (
-                <span className="text-xs text-carelink-gray py-1">
+                <span className="text-xs text-carefd-gray py-1">
                   +{provider.specializations.length - 3} עוד
                 </span>
               )}
@@ -174,8 +174,8 @@ const ProviderCard = ({ provider, showContact = true }) => {
         )}
 
         {provider.location && (
-          <div className="flex items-center text-sm text-carelink-gray mb-4">
-            <FaMapMarkerAlt className="text-carelink-teal ml-1" />
+          <div className="flex items-center text-sm text-carefd-gray mb-4">
+            <FaMapMarkerAlt className="text-carefd-teal ml-1" />
             <span>{provider.location.city}</span>
             {provider.distance_km != null && (
               <span className="mr-auto bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1" data-testid="distance-badge">
@@ -190,7 +190,7 @@ const ProviderCard = ({ provider, showContact = true }) => {
         <div className="flex gap-2 flex-wrap sm:flex-nowrap">
           <Link
             to={`/providers/${provider.provider_id}`}
-            className="flex-1 min-w-[140px] text-center bg-carelink-teal text-white px-4 py-2.5 rounded-xl hover:bg-carelink-teal-medium transition-colors font-medium text-sm sm:text-base"
+            className="flex-1 min-w-[140px] text-center bg-carefd-teal text-white px-4 py-2.5 rounded-xl hover:bg-carefd-teal-medium transition-colors font-medium text-sm sm:text-base"
             data-testid={`view-provider-${provider.provider_id}`}
             aria-label={`צפה בפרופיל של ${provider.business_name || 'ספק שירותים'}`}
           >
@@ -202,7 +202,7 @@ const ProviderCard = ({ provider, showContact = true }) => {
               {provider.phone && (
                 <button
                   onClick={handleCall}
-                  className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-carelink-navy text-white rounded-xl hover:bg-carelink-slate transition-colors"
+                  className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center bg-carefd-navy text-white rounded-xl hover:bg-carefd-slate transition-colors"
                   data-testid={`call-${provider.provider_id}`}
                   title="התקשר"
                   aria-label={`התקשר אל ${provider.business_name || 'ספק שירותים'}`}
@@ -239,14 +239,14 @@ const ProviderCard = ({ provider, showContact = true }) => {
       {showPhoneModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowPhoneModal(false)}>
           <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center" onClick={(e) => e.stopPropagation()}>
-            <div className="w-16 h-16 bg-carelink-teal rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-carefd-teal rounded-full flex items-center justify-center mx-auto mb-4">
               <FaPhone className="text-2xl text-white" />
             </div>
-            <h3 className="text-xl font-bold text-carelink-navy mb-2">מספר טלפון</h3>
-            <p className="text-carelink-gray mb-4">{provider.business_name || 'ספק שירותים'}</p>
+            <h3 className="text-xl font-bold text-carefd-navy mb-2">מספר טלפון</h3>
+            <p className="text-carefd-gray mb-4">{provider.business_name || 'ספק שירותים'}</p>
             
-            <div className="bg-carelink-teal-pale/30 px-6 py-4 rounded-xl mb-4">
-              <p className="text-2xl font-bold text-carelink-navy direction-ltr">
+            <div className="bg-carefd-teal-pale/30 px-6 py-4 rounded-xl mb-4">
+              <p className="text-2xl font-bold text-carefd-navy direction-ltr">
                 {provider.phone}
               </p>
             </div>
@@ -257,13 +257,13 @@ const ProviderCard = ({ provider, showContact = true }) => {
                   navigator.clipboard.writeText(provider.phone);
                   setShowPhoneModal(false);
                 }}
-                className="flex-1 bg-carelink-teal text-white py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition"
+                className="flex-1 bg-carefd-teal text-white py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition"
               >
                 העתק
               </button>
               <button
                 onClick={() => setShowPhoneModal(false)}
-                className="flex-1 bg-gray-100 text-carelink-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
+                className="flex-1 bg-gray-100 text-carefd-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
               >
                 סגור
               </button>

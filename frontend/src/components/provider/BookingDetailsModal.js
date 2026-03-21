@@ -115,10 +115,10 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
         data-testid="booking-details-modal"
       >
         {/* Header */}
-        <div className="bg-gradient-to-l from-carelink-navy to-carelink-slate p-6 rounded-t-2xl text-white flex items-center justify-between">
+        <div className="bg-gradient-to-l from-carefd-navy to-carefd-slate p-6 rounded-t-2xl text-white flex items-center justify-between">
           <div>
             <h3 className="text-xl font-bold">פרטי הזמנה</h3>
-            <p className="text-carelink-teal-pale text-sm mt-1">#{fullBooking.booking_number}</p>
+            <p className="text-carefd-teal-pale text-sm mt-1">#{fullBooking.booking_number}</p>
           </div>
           <button
             onClick={onClose}
@@ -136,23 +136,23 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
               <StatusIcon />
               {status.label}
             </span>
-            <span className="text-sm text-carelink-gray">
+            <span className="text-sm text-carefd-gray">
               {fullBooking.created_at && new Date(fullBooking.created_at).toLocaleDateString('he-IL')}
             </span>
           </div>
 
           {/* Service Info */}
-          <div className="bg-carelink-teal-pale/20 rounded-xl p-4">
-            <h4 className="font-bold text-carelink-navy text-lg mb-1">{fullBooking.service_name || 'שירות'}</h4>
+          <div className="bg-carefd-teal-pale/20 rounded-xl p-4">
+            <h4 className="font-bold text-carefd-navy text-lg mb-1">{fullBooking.service_name || 'שירות'}</h4>
             <div className="flex flex-wrap gap-3 mt-2">
               {fullBooking.service_category && (
-                <span className="bg-white px-3 py-1 rounded-lg text-xs font-medium text-carelink-navy">
+                <span className="bg-white px-3 py-1 rounded-lg text-xs font-medium text-carefd-navy">
                   {categoryLabels[fullBooking.service_category] || fullBooking.service_category}
                 </span>
               )}
               {fullBooking.delivery_type && (
-                <span className="bg-white px-3 py-1 rounded-lg text-xs font-medium text-carelink-navy flex items-center gap-1">
-                  <DeliveryIcon className="text-carelink-teal" />
+                <span className="bg-white px-3 py-1 rounded-lg text-xs font-medium text-carefd-navy flex items-center gap-1">
+                  <DeliveryIcon className="text-carefd-teal" />
                   {delivery.label || fullBooking.delivery_type}
                 </span>
               )}
@@ -161,27 +161,27 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
 
           {/* Client Info */}
           <div className="bg-blue-50 rounded-xl p-4" data-testid="booking-client-info">
-            <h4 className="font-bold text-carelink-navy mb-3 flex items-center gap-2">
+            <h4 className="font-bold text-carefd-navy mb-3 flex items-center gap-2">
               <FaUser className="text-blue-500" />
               פרטי לקוח
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
               <div className="flex items-center gap-2">
-                <FaUser className="text-carelink-gray" />
-                <span className="text-carelink-navy font-medium">{fullBooking.client_name || fullBooking.user_name || 'לקוח'}</span>
+                <FaUser className="text-carefd-gray" />
+                <span className="text-carefd-navy font-medium">{fullBooking.client_name || fullBooking.user_name || 'לקוח'}</span>
               </div>
               {(fullBooking.client_phone || fullBooking.user_info?.phone) && (
                 <div className="flex items-center gap-2">
-                  <FaPhone className="text-carelink-gray" />
-                  <a href={`tel:${fullBooking.client_phone || fullBooking.user_info?.phone}`} className="text-carelink-teal hover:underline">
+                  <FaPhone className="text-carefd-gray" />
+                  <a href={`tel:${fullBooking.client_phone || fullBooking.user_info?.phone}`} className="text-carefd-teal hover:underline">
                     {fullBooking.client_phone || fullBooking.user_info?.phone}
                   </a>
                 </div>
               )}
               {(fullBooking.client_email || fullBooking.user_info?.email) && (
                 <div className="flex items-center gap-2 md:col-span-2">
-                  <FaEnvelope className="text-carelink-gray" />
-                  <a href={`mailto:${fullBooking.client_email || fullBooking.user_info?.email}`} className="text-carelink-teal hover:underline">
+                  <FaEnvelope className="text-carefd-gray" />
+                  <a href={`mailto:${fullBooking.client_email || fullBooking.user_info?.email}`} className="text-carefd-teal hover:underline">
                     {fullBooking.client_email || fullBooking.user_info?.email}
                   </a>
                 </div>
@@ -191,7 +191,7 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
             {fullBooking.contact_person && !fullBooking.is_contact_same_as_requester && (
               <div className="mt-3 pt-3 border-t border-blue-200">
                 <p className="text-xs text-blue-600 font-medium mb-1">איש קשר:</p>
-                <p className="text-sm text-carelink-navy">
+                <p className="text-sm text-carefd-navy">
                   {fullBooking.contact_person.name}
                   {fullBooking.contact_person.phone && ` | ${fullBooking.contact_person.phone}`}
                   {fullBooking.contact_person.relationship && ` (${fullBooking.contact_person.relationship})`}
@@ -203,16 +203,16 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
           {/* Date & Time */}
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gray-50 rounded-xl p-4">
-              <p className="text-xs text-carelink-gray mb-1 flex items-center gap-1"><FaCalendarAlt className="text-carelink-teal" /> תאריך</p>
-              <p className="font-bold text-carelink-navy">
+              <p className="text-xs text-carefd-gray mb-1 flex items-center gap-1"><FaCalendarAlt className="text-carefd-teal" /> תאריך</p>
+              <p className="font-bold text-carefd-navy">
                 {fullBooking.booking_date
                   ? new Date(fullBooking.booking_date).toLocaleDateString('he-IL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
                   : 'יתואם טלפונית'}
               </p>
             </div>
             <div className="bg-gray-50 rounded-xl p-4">
-              <p className="text-xs text-carelink-gray mb-1 flex items-center gap-1"><FaClock className="text-carelink-teal" /> שעה</p>
-              <p className="font-bold text-carelink-navy">
+              <p className="text-xs text-carefd-gray mb-1 flex items-center gap-1"><FaClock className="text-carefd-teal" /> שעה</p>
+              <p className="font-bold text-carefd-navy">
                 {fullBooking.booking_time || 'לא צוין'}
               </p>
             </div>
@@ -223,26 +223,26 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
             <div className="grid grid-cols-2 gap-4">
               {fullBooking.selected_shift && (
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-xs text-carelink-gray mb-1">משמרת</p>
-                  <p className="font-medium text-carelink-navy">{shiftLabels[fullBooking.selected_shift] || fullBooking.selected_shift}</p>
+                  <p className="text-xs text-carefd-gray mb-1">משמרת</p>
+                  <p className="font-medium text-carefd-navy">{shiftLabels[fullBooking.selected_shift] || fullBooking.selected_shift}</p>
                 </div>
               )}
               {fullBooking.platform && (
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-xs text-carelink-gray mb-1">פלטפורמה</p>
-                  <p className="font-medium text-carelink-navy">{fullBooking.platform}</p>
+                  <p className="text-xs text-carefd-gray mb-1">פלטפורמה</p>
+                  <p className="font-medium text-carefd-navy">{fullBooking.platform}</p>
                 </div>
               )}
               {fullBooking.hours_booked && (
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-xs text-carelink-gray mb-1">שעות</p>
-                  <p className="font-medium text-carelink-navy">{fullBooking.hours_booked} שעות</p>
+                  <p className="text-xs text-carefd-gray mb-1">שעות</p>
+                  <p className="font-medium text-carefd-navy">{fullBooking.hours_booked} שעות</p>
                 </div>
               )}
               {fullBooking.num_sessions && (
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-xs text-carelink-gray mb-1">מספר מפגשים</p>
-                  <p className="font-medium text-carelink-navy">{fullBooking.num_sessions}</p>
+                  <p className="text-xs text-carefd-gray mb-1">מספר מפגשים</p>
+                  <p className="font-medium text-carefd-navy">{fullBooking.num_sessions}</p>
                 </div>
               )}
             </div>
@@ -251,25 +251,25 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
           {/* Location */}
           {fullBooking.service_location && (
             <div className="bg-orange-50 rounded-xl p-4" data-testid="booking-location-info">
-              <h4 className="font-bold text-carelink-navy mb-2 flex items-center gap-2">
+              <h4 className="font-bold text-carefd-navy mb-2 flex items-center gap-2">
                 <FaMapMarkerAlt className="text-orange-500" />
                 כתובת השירות
               </h4>
-              <p className="text-sm text-carelink-navy">
+              <p className="text-sm text-carefd-navy">
                 {fullBooking.service_location.address}
                 {fullBooking.service_location.city && `, ${fullBooking.service_location.city}`}
               </p>
               {(fullBooking.service_location.floor || fullBooking.service_location.apartment) && (
-                <p className="text-sm text-carelink-gray mt-1">
+                <p className="text-sm text-carefd-gray mt-1">
                   {fullBooking.service_location.floor && `קומה ${fullBooking.service_location.floor}`}
                   {fullBooking.service_location.apartment && `, דירה ${fullBooking.service_location.apartment}`}
                 </p>
               )}
               {fullBooking.service_location.entry_code && (
-                <p className="text-sm text-carelink-gray mt-1">קוד כניסה: {fullBooking.service_location.entry_code}</p>
+                <p className="text-sm text-carefd-gray mt-1">קוד כניסה: {fullBooking.service_location.entry_code}</p>
               )}
               {fullBooking.service_location.notes && (
-                <p className="text-sm text-carelink-gray mt-1">{fullBooking.service_location.notes}</p>
+                <p className="text-sm text-carefd-gray mt-1">{fullBooking.service_location.notes}</p>
               )}
             </div>
           )}
@@ -283,25 +283,25 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
             <div className="space-y-2 text-sm">
               {fullBooking.base_price != null && (
                 <div className="flex justify-between">
-                  <span className="text-carelink-gray">מחיר בסיס:</span>
+                  <span className="text-carefd-gray">מחיר בסיס:</span>
                   <span className="font-medium">&#8362;{fullBooking.base_price}</span>
                 </div>
               )}
               {fullBooking.travel_cost > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-carelink-gray">עלות נסיעה:</span>
+                  <span className="text-carefd-gray">עלות נסיעה:</span>
                   <span className="font-medium">&#8362;{fullBooking.travel_cost}</span>
                 </div>
               )}
               {fullBooking.weekend_addition > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-carelink-gray">תוספת סופ"ש:</span>
+                  <span className="text-carefd-gray">תוספת סופ"ש:</span>
                   <span className="font-medium">&#8362;{fullBooking.weekend_addition}</span>
                 </div>
               )}
               {fullBooking.shipping_cost > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-carelink-gray">דמי משלוח:</span>
+                  <span className="text-carefd-gray">דמי משלוח:</span>
                   <span className="font-medium">&#8362;{fullBooking.shipping_cost}</span>
                 </div>
               )}
@@ -315,13 +315,13 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
           {/* Notes */}
           {(fullBooking.notes || fullBooking.special_requirements) && (
             <div className="bg-gray-50 rounded-xl p-4">
-              <h4 className="font-bold text-carelink-navy mb-2 flex items-center gap-2">
-                <FaStickyNote className="text-carelink-teal" />
+              <h4 className="font-bold text-carefd-navy mb-2 flex items-center gap-2">
+                <FaStickyNote className="text-carefd-teal" />
                 הערות
               </h4>
-              {fullBooking.notes && <p className="text-sm text-carelink-slate">{fullBooking.notes}</p>}
+              {fullBooking.notes && <p className="text-sm text-carefd-slate">{fullBooking.notes}</p>}
               {fullBooking.special_requirements && (
-                <p className="text-sm text-carelink-slate mt-2">
+                <p className="text-sm text-carefd-slate mt-2">
                   <strong>דרישות מיוחדות:</strong> {fullBooking.special_requirements}
                 </p>
               )}
@@ -339,7 +339,7 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
                 {fullBooking.change_requests.map((cr, idx) => (
                   <div key={idx} className="bg-white rounded-lg p-3 text-sm border border-amber-200">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-carelink-navy">
+                      <span className="font-medium text-carefd-navy">
                         {cr.new_date && `תאריך: ${cr.new_date}`}
                         {cr.new_date && cr.new_time && ' | '}
                         {cr.new_time && `שעה: ${cr.new_time}`}
@@ -352,7 +352,7 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
                         {cr.status === 'approved' ? 'אושר' : cr.status === 'rejected' ? 'נדחה' : 'ממתין'}
                       </span>
                     </div>
-                    {cr.reason && <p className="text-carelink-gray text-xs">{cr.reason}</p>}
+                    {cr.reason && <p className="text-carefd-gray text-xs">{cr.reason}</p>}
                   </div>
                 ))}
               </div>
@@ -369,7 +369,7 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-1">תאריך חדש</label>
+                    <label className="block text-sm font-medium text-carefd-navy mb-1">תאריך חדש</label>
                     <input
                       type="date"
                       value={changeForm.new_date}
@@ -379,7 +379,7 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-1">שעה חדשה</label>
+                    <label className="block text-sm font-medium text-carefd-navy mb-1">שעה חדשה</label>
                     <input
                       type="time"
                       value={changeForm.new_time}
@@ -390,7 +390,7 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy mb-1">סיבה (אופציונלי)</label>
+                  <label className="block text-sm font-medium text-carefd-navy mb-1">סיבה (אופציונלי)</label>
                   <textarea
                     value={changeForm.reason}
                     onChange={(e) => setChangeForm({ ...changeForm, reason: e.target.value })}
@@ -433,7 +433,7 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
             )}
             <button
               onClick={handleContactUser}
-              className="flex-1 min-w-[140px] bg-carelink-teal text-white py-3 rounded-xl font-medium hover:bg-carelink-teal-medium transition flex items-center justify-center gap-2"
+              className="flex-1 min-w-[140px] bg-carefd-teal text-white py-3 rounded-xl font-medium hover:bg-carefd-teal-medium transition flex items-center justify-center gap-2"
               data-testid="contact-user-btn"
             >
               <FaComments />

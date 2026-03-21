@@ -606,7 +606,7 @@ const ProviderDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale/30 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale/30 flex flex-col">
       <Navbar />
       
       <div className="flex-1">
@@ -614,15 +614,15 @@ const ProviderDashboard = () => {
           {/* Header */}
           <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-carelink-navy font-heading mb-2">
+              <h1 className="text-3xl font-bold text-carefd-navy font-heading mb-2">
                 שלום, {provider?.business_name || user?.name}! 👋
               </h1>
-              <p className="text-carelink-gray">ניהול העסק שלך</p>
+              <p className="text-carefd-gray">ניהול העסק שלך</p>
             </div>
             {provider && (
               <div className="flex items-center gap-3 flex-wrap">
                 {provider.is_verified ? (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal text-white px-3 py-1 rounded-full text-sm">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal text-white px-3 py-1 rounded-full text-sm">
                     <FaCheckCircle /> מאומת
                   </span>
                 ) : (
@@ -641,7 +641,7 @@ const ProviderDashboard = () => {
                 )}
                 <Link
                   to={`/provider/edit/${provider.provider_id}`}
-                  className="bg-carelink-teal text-white px-4 py-2 rounded-xl font-medium hover:bg-carelink-teal-medium transition flex items-center gap-2"
+                  className="bg-carefd-teal text-white px-4 py-2 rounded-xl font-medium hover:bg-carefd-teal-medium transition flex items-center gap-2"
                   data-testid="edit-profile-btn"
                 >
                   <FaEdit />
@@ -649,7 +649,7 @@ const ProviderDashboard = () => {
                 </Link>
                 <Link
                   to={`/providers/${provider.provider_id}`}
-                  className="bg-carelink-navy text-white px-4 py-2 rounded-xl font-medium hover:bg-carelink-slate transition flex items-center gap-2"
+                  className="bg-carefd-navy text-white px-4 py-2 rounded-xl font-medium hover:bg-carefd-slate transition flex items-center gap-2"
                 >
                   <FaEye />
                   צפה בפרופיל
@@ -668,7 +668,7 @@ const ProviderDashboard = () => {
                       <Link
                         key={tab.id}
                         to={tab.link}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right transition text-carelink-gray hover:bg-carelink-teal-pale/30"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right transition text-carefd-gray hover:bg-carefd-teal-pale/30"
                       >
                         <tab.icon />
                         {tab.label}
@@ -679,8 +679,8 @@ const ProviderDashboard = () => {
                         onClick={() => setActiveTab(tab.id)}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right transition ${
                           activeTab === tab.id
-                            ? 'bg-carelink-teal text-white'
-                            : 'text-carelink-gray hover:bg-carelink-teal-pale/30'
+                            ? 'bg-carefd-teal text-white'
+                            : 'text-carefd-gray hover:bg-carefd-teal-pale/30'
                         }`}
                       >
                         <tab.icon />
@@ -696,7 +696,7 @@ const ProviderDashboard = () => {
             <div className="flex-1">
               {loading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="w-12 h-12 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-12 h-12 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
                 </div>
               ) : (
                 <>
@@ -731,8 +731,8 @@ const ProviderDashboard = () => {
                               <FaCalendarAlt className="text-blue-600 text-xl" />
                             </div>
                             <div>
-                              <div className="text-2xl font-bold text-carelink-navy">{stats.totalBookings}</div>
-                              <div className="text-sm text-carelink-gray">תורים</div>
+                              <div className="text-2xl font-bold text-carefd-navy">{stats.totalBookings}</div>
+                              <div className="text-sm text-carefd-gray">תורים</div>
                             </div>
                           </div>
                         </div>
@@ -742,8 +742,8 @@ const ProviderDashboard = () => {
                               <FaMoneyBillWave className="text-green-600 text-xl" />
                             </div>
                             <div>
-                              <div className="text-2xl font-bold text-carelink-navy">₪{stats.totalEarnings}</div>
-                              <div className="text-sm text-carelink-gray">הכנסות</div>
+                              <div className="text-2xl font-bold text-carefd-navy">₪{stats.totalEarnings}</div>
+                              <div className="text-sm text-carefd-gray">הכנסות</div>
                             </div>
                           </div>
                         </div>
@@ -753,8 +753,8 @@ const ProviderDashboard = () => {
                               <FaStar className="text-yellow-600 text-xl" />
                             </div>
                             <div>
-                              <div className="text-2xl font-bold text-carelink-navy">{stats.averageRating.toFixed(1)}</div>
-                              <div className="text-sm text-carelink-gray">{stats.totalReviews} ביקורות</div>
+                              <div className="text-2xl font-bold text-carefd-navy">{stats.averageRating.toFixed(1)}</div>
+                              <div className="text-sm text-carefd-gray">{stats.totalReviews} ביקורות</div>
                             </div>
                           </div>
                         </div>
@@ -764,8 +764,8 @@ const ProviderDashboard = () => {
                               <FaEye className="text-purple-600 text-xl" />
                             </div>
                             <div>
-                              <div className="text-2xl font-bold text-carelink-navy">{stats.profileViews}</div>
-                              <div className="text-sm text-carelink-gray">צפיות בפרופיל</div>
+                              <div className="text-2xl font-bold text-carefd-navy">{stats.profileViews}</div>
+                              <div className="text-sm text-carefd-gray">צפיות בפרופיל</div>
                             </div>
                           </div>
                         </div>
@@ -774,19 +774,19 @@ const ProviderDashboard = () => {
                       {/* Pending Bookings */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
                         <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-lg font-bold text-carelink-navy">
+                          <h3 className="text-lg font-bold text-carefd-navy">
                             תורים ממתינים לאישור ({stats.pendingBookings})
                           </h3>
                           <button
                             onClick={() => setActiveTab('bookings')}
-                            className="text-carelink-teal font-medium flex items-center gap-1"
+                            className="text-carefd-teal font-medium flex items-center gap-1"
                           >
                             צפה בכל
                             <FaChevronLeft className="rtl:rotate-180" />
                           </button>
                         </div>
                         {bookings.filter(b => b.status === 'pending').length === 0 ? (
-                          <div className="text-center py-6 text-carelink-gray">
+                          <div className="text-center py-6 text-carefd-gray">
                             <FaCheckCircle className="text-3xl mx-auto mb-2 text-green-500" />
                             <p>אין תורים ממתינים</p>
                           </div>
@@ -795,8 +795,8 @@ const ProviderDashboard = () => {
                             {bookings.filter(b => b.status === 'pending').sort((a, b) => new Date(b.created_at || b.booking_date) - new Date(a.created_at || a.booking_date)).slice(0, 3).map((booking) => (
                               <div key={booking.booking_id} className="flex items-center justify-between p-4 bg-yellow-50 rounded-xl border border-yellow-200">
                                 <div>
-                                  <p className="font-medium text-carelink-navy">{booking.user_name || 'לקוח'}</p>
-                                  <p className="text-sm text-carelink-gray">
+                                  <p className="font-medium text-carefd-navy">{booking.user_name || 'לקוח'}</p>
+                                  <p className="text-sm text-carefd-gray">
                                     {booking.service_name} • {new Date(booking.booking_date).toLocaleDateString('he-IL')}
                                   </p>
                                 </div>
@@ -823,21 +823,21 @@ const ProviderDashboard = () => {
                       {/* Quick Stats Row */}
                       <div className="grid md:grid-cols-2 gap-6">
                         <div className="bg-white p-6 rounded-2xl shadow-lg">
-                          <h3 className="text-lg font-bold text-carelink-navy mb-4">שירותים פעילים</h3>
-                          <div className="text-4xl font-bold text-carelink-teal mb-2">{services.length}</div>
+                          <h3 className="text-lg font-bold text-carefd-navy mb-4">שירותים פעילים</h3>
+                          <div className="text-4xl font-bold text-carefd-teal mb-2">{services.length}</div>
                           <button
                             onClick={() => setActiveTab('services')}
-                            className="text-carelink-teal font-medium text-sm"
+                            className="text-carefd-teal font-medium text-sm"
                           >
                             נהל שירותים →
                           </button>
                         </div>
                         <div className="bg-white p-6 rounded-2xl shadow-lg">
-                          <h3 className="text-lg font-bold text-carelink-navy mb-4">בקשות פתוחות</h3>
-                          <div className="text-4xl font-bold text-carelink-teal mb-2">{requests.length}</div>
+                          <h3 className="text-lg font-bold text-carefd-navy mb-4">בקשות פתוחות</h3>
+                          <div className="text-4xl font-bold text-carefd-teal mb-2">{requests.length}</div>
                           <button
                             onClick={() => setActiveTab('requests')}
-                            className="text-carelink-teal font-medium text-sm"
+                            className="text-carefd-teal font-medium text-sm"
                           >
                             צפה בבקשות →
                           </button>
@@ -850,12 +850,12 @@ const ProviderDashboard = () => {
                   {activeTab === 'bookings' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
                       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                        <h3 className="text-xl font-bold text-carelink-navy">ניהול תורים</h3>
+                        <h3 className="text-xl font-bold text-carefd-navy">ניהול תורים</h3>
                         <div className="relative">
                           <select
                             value={bookingSortBy}
                             onChange={(e) => setBookingSortBy(e.target.value)}
-                            className="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 pr-10 text-sm font-medium text-carelink-navy cursor-pointer hover:border-carelink-teal transition focus:outline-none focus:ring-2 focus:ring-carelink-teal/30"
+                            className="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 pr-10 text-sm font-medium text-carefd-navy cursor-pointer hover:border-carefd-teal transition focus:outline-none focus:ring-2 focus:ring-carefd-teal/30"
                             data-testid="provider-booking-sort-select"
                           >
                             <option value="date_desc">חדש ← ישן</option>
@@ -863,12 +863,12 @@ const ProviderDashboard = () => {
                             <option value="status">לפי סטטוס</option>
                             <option value="price_desc">לפי מחיר</option>
                           </select>
-                          <FaSort className="absolute left-3 top-1/2 -translate-y-1/2 text-carelink-gray pointer-events-none text-xs" />
+                          <FaSort className="absolute left-3 top-1/2 -translate-y-1/2 text-carefd-gray pointer-events-none text-xs" />
                         </div>
                       </div>
                       {bookings.length === 0 ? (
-                        <div className="text-center py-12 text-carelink-gray">
-                          <FaCalendarAlt className="text-5xl mx-auto mb-3 text-carelink-teal-pale" />
+                        <div className="text-center py-12 text-carefd-gray">
+                          <FaCalendarAlt className="text-5xl mx-auto mb-3 text-carefd-teal-pale" />
                           <p className="text-lg">אין תורים עדיין</p>
                         </div>
                       ) : (
@@ -878,7 +878,7 @@ const ProviderDashboard = () => {
                             return (
                             <div
                               key={booking.booking_id}
-                              className={`border-2 rounded-xl transition-all duration-200 overflow-hidden ${isExpanded ? 'border-carelink-teal shadow-md' : 'border-carelink-teal-pale hover:border-carelink-teal/40'}`}
+                              className={`border-2 rounded-xl transition-all duration-200 overflow-hidden ${isExpanded ? 'border-carefd-teal shadow-md' : 'border-carefd-teal-pale hover:border-carefd-teal/40'}`}
                               data-testid={`provider-booking-card-${booking.booking_id}`}
                             >
                               {/* Collapsed Header */}
@@ -888,23 +888,23 @@ const ProviderDashboard = () => {
                                 data-testid={`provider-booking-toggle-${booking.booking_id}`}
                               >
                                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                                  <div className="w-10 h-10 bg-carelink-navy/10 rounded-xl flex items-center justify-center text-carelink-navy font-bold text-sm flex-shrink-0">
+                                  <div className="w-10 h-10 bg-carefd-navy/10 rounded-xl flex items-center justify-center text-carefd-navy font-bold text-sm flex-shrink-0">
                                     {(booking.user_name || 'ל')[0]}
                                   </div>
                                   <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-2 flex-wrap">
-                                      <h4 className="font-bold text-carelink-navy text-sm">{booking.user_name || 'לקוח'}</h4>
-                                      <span className="text-xs text-carelink-gray">•</span>
-                                      <span className="text-xs text-carelink-gray">{booking.service_name || 'שירות'}</span>
+                                      <h4 className="font-bold text-carefd-navy text-sm">{booking.user_name || 'לקוח'}</h4>
+                                      <span className="text-xs text-carefd-gray">•</span>
+                                      <span className="text-xs text-carefd-gray">{booking.service_name || 'שירות'}</span>
                                     </div>
-                                    <div className="flex items-center gap-3 mt-0.5 text-xs text-carelink-gray">
+                                    <div className="flex items-center gap-3 mt-0.5 text-xs text-carefd-gray">
                                       <span className="flex items-center gap-1">
-                                        <FaCalendarAlt className="text-carelink-teal" />
+                                        <FaCalendarAlt className="text-carefd-teal" />
                                         {booking.booking_date ? new Date(booking.booking_date).toLocaleDateString('he-IL') : 'יתואם'}
                                       </span>
                                       {booking.booking_time && (
                                         <span className="flex items-center gap-1">
-                                          <FaClock className="text-carelink-teal" />
+                                          <FaClock className="text-carefd-teal" />
                                           {booking.booking_time}
                                         </span>
                                       )}
@@ -915,7 +915,7 @@ const ProviderDashboard = () => {
                                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
                                     {getStatusLabel(booking.status)}
                                   </span>
-                                  {isExpanded ? <FaChevronUp className="text-carelink-gray text-xs" /> : <FaChevronDown className="text-carelink-gray text-xs" />}
+                                  {isExpanded ? <FaChevronUp className="text-carefd-gray text-xs" /> : <FaChevronDown className="text-carefd-gray text-xs" />}
                                 </div>
                               </div>
 
@@ -924,31 +924,31 @@ const ProviderDashboard = () => {
                                 <div className="px-4 pb-4 border-t border-gray-100 pt-3">
                                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
                                     <div className="bg-gray-50 rounded-lg p-3 text-center">
-                                      <p className="text-xs text-carelink-gray">תאריך</p>
-                                      <p className="font-medium text-sm text-carelink-navy">{booking.booking_date ? new Date(booking.booking_date).toLocaleDateString('he-IL') : 'יתואם'}</p>
+                                      <p className="text-xs text-carefd-gray">תאריך</p>
+                                      <p className="font-medium text-sm text-carefd-navy">{booking.booking_date ? new Date(booking.booking_date).toLocaleDateString('he-IL') : 'יתואם'}</p>
                                     </div>
                                     <div className="bg-gray-50 rounded-lg p-3 text-center">
-                                      <p className="text-xs text-carelink-gray">שעה</p>
-                                      <p className="font-medium text-sm text-carelink-navy">{booking.booking_time || 'יתואם'}</p>
+                                      <p className="text-xs text-carefd-gray">שעה</p>
+                                      <p className="font-medium text-sm text-carefd-navy">{booking.booking_time || 'יתואם'}</p>
                                     </div>
                                     <div className="bg-gray-50 rounded-lg p-3 text-center">
-                                      <p className="text-xs text-carelink-gray">מחיר</p>
+                                      <p className="text-xs text-carefd-gray">מחיר</p>
                                       <p className="font-medium text-sm text-green-600">{booking.final_price ? `₪${booking.final_price}` : 'יתואם'}</p>
                                     </div>
                                     <div className="bg-gray-50 rounded-lg p-3 text-center">
-                                      <p className="text-xs text-carelink-gray">סוג</p>
-                                      <p className="font-medium text-sm text-carelink-navy">{booking.delivery_method || booking.service_type || '-'}</p>
+                                      <p className="text-xs text-carefd-gray">סוג</p>
+                                      <p className="font-medium text-sm text-carefd-navy">{booking.delivery_method || booking.service_type || '-'}</p>
                                     </div>
                                   </div>
                                   {booking.notes && (
-                                    <div className="bg-blue-50 rounded-lg p-3 mb-4 text-sm text-carelink-navy">
+                                    <div className="bg-blue-50 rounded-lg p-3 mb-4 text-sm text-carefd-navy">
                                       <span className="font-medium">הערות: </span>{booking.notes}
                                     </div>
                                   )}
                                   <div className="flex flex-wrap items-center gap-2">
                                     <button
                                       onClick={(e) => { e.stopPropagation(); setSelectedBooking(booking); }}
-                                      className="bg-carelink-navy/10 text-carelink-navy px-3 py-1.5 rounded-lg text-xs hover:bg-carelink-navy/20 transition font-medium flex items-center gap-1"
+                                      className="bg-carefd-navy/10 text-carefd-navy px-3 py-1.5 rounded-lg text-xs hover:bg-carefd-navy/20 transition font-medium flex items-center gap-1"
                                       data-testid={`view-booking-${booking.booking_id}`}
                                     >
                                       <FaEye className="text-xs" />
@@ -966,7 +966,7 @@ const ProviderDashboard = () => {
                                           navigate(`/chat/${res.data.room_id}`);
                                         } catch { toast.error('שגיאה ביצירת צ\'אט'); }
                                       }}
-                                      className="bg-carelink-teal/10 text-carelink-teal px-3 py-1.5 rounded-lg text-xs hover:bg-carelink-teal/20 transition font-medium flex items-center gap-1"
+                                      className="bg-carefd-teal/10 text-carefd-teal px-3 py-1.5 rounded-lg text-xs hover:bg-carefd-teal/20 transition font-medium flex items-center gap-1"
                                       data-testid={`contact-user-${booking.booking_id}`}
                                     >
                                       <FaComments className="text-xs" />
@@ -1068,22 +1068,22 @@ const ProviderDashboard = () => {
                   {/* Calendar Tab */}
                   {activeTab === 'calendar' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg" data-testid="provider-calendar">
-                      <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                        <FaClock className="text-carelink-teal" />
+                      <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                        <FaClock className="text-carefd-teal" />
                         לוח שנה - הזמנות מאושרות
                       </h3>
                       {getCalendarBookings().length === 0 ? (
-                        <div className="text-center py-12 text-carelink-gray">
-                          <FaCalendarAlt className="text-5xl mx-auto mb-3 text-carelink-teal-pale" />
+                        <div className="text-center py-12 text-carefd-gray">
+                          <FaCalendarAlt className="text-5xl mx-auto mb-3 text-carefd-teal-pale" />
                           <p className="text-lg">אין הזמנות מאושרות</p>
                           <p className="text-sm mt-2">כאשר תאשר הזמנות, הן יופיעו כאן בלוח השנה</p>
                         </div>
                       ) : (
                         <div className="space-y-6">
                           {groupBookingsByDate().map(([date, dayBookings]) => (
-                            <div key={date} className="border-r-4 border-carelink-teal pr-4">
+                            <div key={date} className="border-r-4 border-carefd-teal pr-4">
                               <div className="flex items-center gap-3 mb-3">
-                                <div className="bg-carelink-teal text-white px-4 py-2 rounded-xl text-sm font-bold">
+                                <div className="bg-carefd-teal text-white px-4 py-2 rounded-xl text-sm font-bold">
                                   {new Date(date).toLocaleDateString('he-IL', {
                                     weekday: 'long',
                                     year: 'numeric',
@@ -1091,7 +1091,7 @@ const ProviderDashboard = () => {
                                     day: 'numeric'
                                   })}
                                 </div>
-                                <span className="text-sm text-carelink-gray">
+                                <span className="text-sm text-carefd-gray">
                                   {dayBookings.length} הזמנות
                                 </span>
                               </div>
@@ -1104,16 +1104,16 @@ const ProviderDashboard = () => {
                                   >
                                     <div className="flex items-center gap-4">
                                       <div className="text-center min-w-[60px]">
-                                        <div className="text-lg font-bold text-carelink-navy">
+                                        <div className="text-lg font-bold text-carefd-navy">
                                           {booking.booking_time || '--:--'}
                                         </div>
                                       </div>
                                       <div className="border-r border-green-200 pr-4">
-                                        <p className="font-medium text-carelink-navy">{booking.user_name || 'לקוח'}</p>
-                                        <p className="text-sm text-carelink-gray">{booking.service_name}</p>
+                                        <p className="font-medium text-carefd-navy">{booking.user_name || 'לקוח'}</p>
+                                        <p className="text-sm text-carefd-gray">{booking.service_name}</p>
                                         {booking.service_city && (
-                                          <p className="text-xs text-carelink-gray flex items-center gap-1 mt-0.5">
-                                            <FaMapMarkerAlt className="text-carelink-teal" />
+                                          <p className="text-xs text-carefd-gray flex items-center gap-1 mt-0.5">
+                                            <FaMapMarkerAlt className="text-carefd-teal" />
                                             {booking.service_city}
                                           </p>
                                         )}
@@ -1121,7 +1121,7 @@ const ProviderDashboard = () => {
                                     </div>
                                     <div className="flex items-center gap-3">
                                       {booking.price && (
-                                        <span className="text-sm font-bold text-carelink-teal">₪{booking.price}</span>
+                                        <span className="text-sm font-bold text-carefd-teal">₪{booking.price}</span>
                                       )}
                                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
                                         {getStatusLabel(booking.status)}
@@ -1163,13 +1163,13 @@ const ProviderDashboard = () => {
                     <div className="space-y-6">
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
                         <div className="flex items-center justify-between mb-6">
-                          <h3 className="text-xl font-bold text-carelink-navy">ניהול שירותים</h3>
+                          <h3 className="text-xl font-bold text-carefd-navy">ניהול שירותים</h3>
                           <button
                             onClick={() => {
                               resetServiceForm();
                               setShowServiceForm(true);
                             }}
-                            className="bg-carelink-teal text-white px-4 py-2 rounded-xl font-medium hover:bg-carelink-teal-medium transition flex items-center gap-2"
+                            className="bg-carefd-teal text-white px-4 py-2 rounded-xl font-medium hover:bg-carefd-teal-medium transition flex items-center gap-2"
                           >
                             <FaPlus />
                             הוסף שירות חדש
@@ -1178,29 +1178,29 @@ const ProviderDashboard = () => {
 
                         {/* Service Form */}
                         {showServiceForm && (
-                          <div className="mb-6 p-6 bg-carelink-teal-pale/20 rounded-xl border-2 border-carelink-teal">
-                            <h4 className="font-bold text-carelink-navy mb-4 text-lg">
+                          <div className="mb-6 p-6 bg-carefd-teal-pale/20 rounded-xl border-2 border-carefd-teal">
+                            <h4 className="font-bold text-carefd-navy mb-4 text-lg">
                               {editingService ? 'עריכת שירות' : 'שירות חדש'}
                             </h4>
                             <div className="space-y-6">
                               {/* Basic Info */}
                               <div className="grid md:grid-cols-2 gap-4">
                                 <div className="md:col-span-2">
-                                  <label className="block text-sm font-medium text-carelink-navy mb-2">שם השירות *</label>
+                                  <label className="block text-sm font-medium text-carefd-navy mb-2">שם השירות *</label>
                                   <input
                                     type="text"
                                     value={serviceForm.name}
                                     onChange={(e) => setServiceForm({ ...serviceForm, name: e.target.value })}
-                                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                    className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                     placeholder="לדוגמה: טיפול פיזיותרפיה / שמירה פרטית"
                                   />
                                 </div>
                                 <div className="md:col-span-2">
-                                  <label className="block text-sm font-medium text-carelink-navy mb-2">תיאור השירות</label>
+                                  <label className="block text-sm font-medium text-carefd-navy mb-2">תיאור השירות</label>
                                   <textarea
                                     value={serviceForm.description}
                                     onChange={(e) => setServiceForm({ ...serviceForm, description: e.target.value })}
-                                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none h-24 resize-none"
+                                    className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none h-24 resize-none"
                                     placeholder="תאר את השירות..."
                                   />
                                 </div>
@@ -1254,14 +1254,14 @@ const ProviderDashboard = () => {
 
                                 return (
                                   <div className="bg-white p-4 rounded-xl">
-                                    <label className="block text-sm font-bold text-carelink-navy mb-2">
+                                    <label className="block text-sm font-bold text-carefd-navy mb-2">
                                       קטגוריות מקצועיות ({selectedCats.length}/3)
                                     </label>
-                                    <p className="text-xs text-carelink-gray mb-3">בחר 1-3 קטגוריות שהשירות שייך אליהן</p>
+                                    <p className="text-xs text-carefd-gray mb-3">בחר 1-3 קטגוריות שהשירות שייך אליהן</p>
                                     {selectedCats.length > 0 && (
                                       <div className="flex flex-wrap gap-2 mb-3">
                                         {selectedCats.map(cat => (
-                                          <span key={cat.category_id} className="inline-flex items-center gap-1 px-3 py-1 bg-carelink-teal/10 text-carelink-teal border border-carelink-teal/30 rounded-full text-sm">
+                                          <span key={cat.category_id} className="inline-flex items-center gap-1 px-3 py-1 bg-carefd-teal/10 text-carefd-teal border border-carefd-teal/30 rounded-full text-sm">
                                             {cat.name}
                                             <button onClick={() => toggleCat(cat)} className="mr-1 hover:text-red-500">×</button>
                                           </span>
@@ -1271,7 +1271,7 @@ const ProviderDashboard = () => {
                                     <div className="space-y-2">
                                       {Object.entries(grouped).map(([profName, cats]) => (
                                         <div key={profName}>
-                                          <p className="text-xs font-medium text-carelink-gray mb-1">{profName}</p>
+                                          <p className="text-xs font-medium text-carefd-gray mb-1">{profName}</p>
                                           <div className="flex flex-wrap gap-1.5">
                                             {cats.map(cat => (
                                               <button
@@ -1281,10 +1281,10 @@ const ProviderDashboard = () => {
                                                 disabled={!isCatSelected(cat.category_id) && selectedCats.length >= 3}
                                                 className={`px-3 py-1 rounded-full border text-xs transition ${
                                                   isCatSelected(cat.category_id)
-                                                    ? 'bg-carelink-teal text-white border-carelink-teal'
+                                                    ? 'bg-carefd-teal text-white border-carefd-teal'
                                                     : selectedCats.length >= 3
                                                       ? 'bg-gray-50 text-gray-400 border-gray-200'
-                                                      : 'bg-white text-carelink-navy border-gray-200 hover:border-carelink-teal'
+                                                      : 'bg-white text-carefd-navy border-gray-200 hover:border-carefd-teal'
                                                 }`}
                                               >
                                                 {cat.name}
@@ -1300,7 +1300,7 @@ const ProviderDashboard = () => {
 
                               {/* Service Category */}
                               <div className="bg-white p-4 rounded-xl">
-                                <label className="block text-sm font-bold text-carelink-navy mb-3">סוג שירות *</label>
+                                <label className="block text-sm font-bold text-carefd-navy mb-3">סוג שירות *</label>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                   {[
                                     { id: 'visit', name: 'שירות ביקור', icon: '🏠', desc: 'ביקור חד פעמי' },
@@ -1318,13 +1318,13 @@ const ProviderDashboard = () => {
                                       })}
                                       className={`p-4 rounded-xl border-2 text-center transition ${
                                         serviceForm.service_category === cat.id
-                                          ? 'border-carelink-teal bg-carelink-teal/10'
-                                          : 'border-gray-200 hover:border-carelink-teal/50'
+                                          ? 'border-carefd-teal bg-carefd-teal/10'
+                                          : 'border-gray-200 hover:border-carefd-teal/50'
                                       }`}
                                     >
                                       <span className="text-2xl">{cat.icon}</span>
-                                      <p className="font-medium text-carelink-navy mt-1">{cat.name}</p>
-                                      <p className="text-xs text-carelink-gray">{cat.desc}</p>
+                                      <p className="font-medium text-carefd-navy mt-1">{cat.name}</p>
+                                      <p className="text-xs text-carefd-gray">{cat.desc}</p>
                                     </button>
                                   ))}
                                 </div>
@@ -1332,7 +1332,7 @@ const ProviderDashboard = () => {
 
                               {/* Delivery Types */}
                               <div className="bg-white p-4 rounded-xl">
-                                <label className="block text-sm font-bold text-carelink-navy mb-3">היכן יינתן השירות?</label>
+                                <label className="block text-sm font-bold text-carefd-navy mb-3">היכן יינתן השירות?</label>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                   {[
                                     { id: 'home_visit', name: 'בבית', icon: '🏠' },
@@ -1352,12 +1352,12 @@ const ProviderDashboard = () => {
                                       }}
                                       className={`p-3 rounded-xl border-2 text-center transition ${
                                         (serviceForm.delivery_types || []).includes(dt.id)
-                                          ? 'border-carelink-teal bg-carelink-teal/10'
-                                          : 'border-gray-200 hover:border-carelink-teal/50'
+                                          ? 'border-carefd-teal bg-carefd-teal/10'
+                                          : 'border-gray-200 hover:border-carefd-teal/50'
                                       }`}
                                     >
                                       <span className="text-xl">{dt.icon}</span>
-                                      <p className="font-medium text-carelink-navy text-sm mt-1">{dt.name}</p>
+                                      <p className="font-medium text-carefd-navy text-sm mt-1">{dt.name}</p>
                                     </button>
                                   ))}
                                 </div>
@@ -1366,39 +1366,39 @@ const ProviderDashboard = () => {
                               {/* Pricing */}
                               <div className="grid md:grid-cols-3 gap-4">
                                 <div>
-                                  <label className="block text-sm font-medium text-carelink-navy mb-2">
+                                  <label className="block text-sm font-medium text-carefd-navy mb-2">
                                     מחיר (₪) * {serviceForm.service_category === 'hourly' && '(לשעה)'}
                                   </label>
                                   <input
                                     type="number"
                                     value={serviceForm.price}
                                     onChange={(e) => setServiceForm({ ...serviceForm, price: e.target.value })}
-                                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                    className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                     placeholder="0"
                                   />
                                 </div>
                                 <div>
-                                  <label className="block text-sm font-medium text-carelink-navy mb-2">משך (דקות)</label>
+                                  <label className="block text-sm font-medium text-carefd-navy mb-2">משך (דקות)</label>
                                   <input
                                     type="number"
                                     value={serviceForm.duration_minutes}
                                     onChange={(e) => setServiceForm({ ...serviceForm, duration_minutes: e.target.value })}
-                                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                    className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                     placeholder="45"
                                   />
                                 </div>
                                 {serviceForm.service_category === 'hourly' && (
                                   <div>
-                                    <label className="block text-sm font-medium text-carelink-navy mb-2">מינימום שעות *</label>
+                                    <label className="block text-sm font-medium text-carefd-navy mb-2">מינימום שעות *</label>
                                     <input
                                       type="number"
                                       step="0.5"
                                       value={serviceForm.minimum_hours}
                                       onChange={(e) => setServiceForm({ ...serviceForm, minimum_hours: e.target.value })}
-                                      className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                      className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                       placeholder="לדוגמה: 8"
                                     />
-                                    <p className="text-xs text-carelink-gray mt-1">למשל: שמירה פרטית - מינימום 8 שעות</p>
+                                    <p className="text-xs text-carefd-gray mt-1">למשל: שמירה פרטית - מינימום 8 שעות</p>
                                   </div>
                                 )}
                               </div>
@@ -1406,7 +1406,7 @@ const ProviderDashboard = () => {
                               {/* Weekend Pricing */}
                               <div className="bg-amber-50 p-4 rounded-xl">
                                 <div className="flex items-center justify-between mb-3">
-                                  <label className="text-sm font-bold text-carelink-navy">תעריף שישי/שבת</label>
+                                  <label className="text-sm font-bold text-carefd-navy">תעריף שישי/שבת</label>
                                   <select
                                     value={serviceForm.weekend_pricing_type}
                                     onChange={(e) => setServiceForm({ ...serviceForm, weekend_pricing_type: e.target.value })}
@@ -1443,7 +1443,7 @@ const ProviderDashboard = () => {
                                       onChange={(e) => setServiceForm({ ...serviceForm, has_travel_cost: e.target.checked })}
                                       className="w-5 h-5 text-blue-500 rounded border-gray-300 focus:ring-blue-500"
                                     />
-                                    <span className="text-sm font-bold text-carelink-navy">עלות נסיעה</span>
+                                    <span className="text-sm font-bold text-carefd-navy">עלות נסיעה</span>
                                   </label>
                                   {serviceForm.has_travel_cost && (
                                     <div className="mt-3 flex items-center gap-3">
@@ -1470,7 +1470,7 @@ const ProviderDashboard = () => {
                                       onChange={(e) => setServiceForm({ ...serviceForm, has_shipping: e.target.checked })}
                                       className="w-5 h-5 text-purple-500 rounded border-gray-300 focus:ring-purple-500"
                                     />
-                                    <span className="text-sm font-bold text-carelink-navy">אפשרות משלוח</span>
+                                    <span className="text-sm font-bold text-carefd-navy">אפשרות משלוח</span>
                                   </label>
                                   {serviceForm.has_shipping && (
                                     <div className="grid grid-cols-2 gap-3">
@@ -1514,14 +1514,14 @@ const ProviderDashboard = () => {
                                 <button
                                   onClick={handleSaveService}
                                   disabled={saving}
-                                  className="bg-carelink-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carelink-teal-medium transition flex items-center gap-2 disabled:opacity-50"
+                                  className="bg-carefd-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carefd-teal-medium transition flex items-center gap-2 disabled:opacity-50"
                                 >
                                   <FaSave />
                                   {saving ? 'שומר...' : 'שמור שירות'}
                                 </button>
                                 <button
                                   onClick={resetServiceForm}
-                                  className="bg-gray-200 text-carelink-navy px-6 py-3 rounded-xl font-medium hover:bg-gray-300 transition"
+                                  className="bg-gray-200 text-carefd-navy px-6 py-3 rounded-xl font-medium hover:bg-gray-300 transition"
                                 >
                                   ביטול
                                 </button>
@@ -1532,8 +1532,8 @@ const ProviderDashboard = () => {
 
                         {/* Services List */}
                         {services.length === 0 ? (
-                          <div className="text-center py-12 text-carelink-gray">
-                            <FaBriefcase className="text-5xl mx-auto mb-3 text-carelink-teal-pale" />
+                          <div className="text-center py-12 text-carefd-gray">
+                            <FaBriefcase className="text-5xl mx-auto mb-3 text-carefd-teal-pale" />
                             <p className="text-lg mb-2">אין שירותים עדיין</p>
                             <p className="text-sm">הוסף שירות ראשון כדי שלקוחות יוכלו להזמין</p>
                           </div>
@@ -1559,27 +1559,27 @@ const ProviderDashboard = () => {
                                 virtual: 'וירטואלי'
                               };
                               return (
-                                <div key={service.service_id} className="border-2 border-carelink-teal-pale rounded-xl p-5 hover:border-carelink-teal transition">
+                                <div key={service.service_id} className="border-2 border-carefd-teal-pale rounded-xl p-5 hover:border-carefd-teal transition">
                                   <div className="flex items-start justify-between mb-3">
                                     <div className="flex items-center gap-3">
-                                      <div className="w-12 h-12 bg-carelink-teal-pale rounded-xl flex items-center justify-center text-2xl">
+                                      <div className="w-12 h-12 bg-carefd-teal-pale rounded-xl flex items-center justify-center text-2xl">
                                         {categoryIcons[service.service_category] || '📋'}
                                       </div>
                                       <div>
-                                        <h4 className="font-bold text-carelink-navy">{service.name}</h4>
-                                        <span className="text-xs bg-carelink-navy text-white px-2 py-0.5 rounded-full">
+                                        <h4 className="font-bold text-carefd-navy">{service.name}</h4>
+                                        <span className="text-xs bg-carefd-navy text-white px-2 py-0.5 rounded-full">
                                           {categoryNames[service.service_category] || service.service_category}
                                         </span>
                                       </div>
                                     </div>
                                     <div className="text-left">
-                                      <span className="text-2xl font-bold text-carelink-teal">₪{service.price}</span>
+                                      <span className="text-2xl font-bold text-carefd-teal">₪{service.price}</span>
                                       {service.service_category === 'hourly' && (
-                                        <span className="block text-xs text-carelink-gray">/שעה</span>
+                                        <span className="block text-xs text-carefd-gray">/שעה</span>
                                       )}
                                     </div>
                                   </div>
-                                  <p className="text-sm text-carelink-gray mb-3 line-clamp-2">{service.description || 'ללא תיאור'}</p>
+                                  <p className="text-sm text-carefd-gray mb-3 line-clamp-2">{service.description || 'ללא תיאור'}</p>
                                   
                                   {/* Service details badges */}
                                   <div className="flex flex-wrap gap-2 mb-3">
@@ -1612,7 +1612,7 @@ const ProviderDashboard = () => {
                                   
                                   <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                                     {service.duration_minutes ? (
-                                      <span className="text-xs text-carelink-gray flex items-center gap-1">
+                                      <span className="text-xs text-carefd-gray flex items-center gap-1">
                                         <FaClock />
                                         {service.duration_minutes} דקות
                                       </span>
@@ -1620,7 +1620,7 @@ const ProviderDashboard = () => {
                                     <div className="flex items-center gap-2">
                                       <button
                                         onClick={() => handleEditService(service)}
-                                        className="text-carelink-teal hover:text-carelink-teal-medium p-2 hover:bg-carelink-teal/10 rounded-lg transition"
+                                        className="text-carefd-teal hover:text-carefd-teal-medium p-2 hover:bg-carefd-teal/10 rounded-lg transition"
                                       >
                                         <FaEdit />
                                       </button>
@@ -1644,10 +1644,10 @@ const ProviderDashboard = () => {
                   {/* Requests Tab */}
                   {activeTab === 'requests' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <h3 className="text-xl font-bold text-carelink-navy mb-6">בקשות פתוחות</h3>
+                      <h3 className="text-xl font-bold text-carefd-navy mb-6">בקשות פתוחות</h3>
                       {requests.length === 0 ? (
-                        <div className="text-center py-12 text-carelink-gray">
-                          <FaFileAlt className="text-5xl mx-auto mb-3 text-carelink-teal-pale" />
+                        <div className="text-center py-12 text-carefd-gray">
+                          <FaFileAlt className="text-5xl mx-auto mb-3 text-carefd-teal-pale" />
                           <p className="text-lg">אין בקשות פתוחות כרגע</p>
                         </div>
                       ) : (
@@ -1656,21 +1656,21 @@ const ProviderDashboard = () => {
                             <Link
                               key={request.request_id}
                               to={`/requests/${request.request_id}`}
-                              className="block p-4 border-2 border-carelink-teal-pale rounded-xl hover:border-carelink-teal transition"
+                              className="block p-4 border-2 border-carefd-teal-pale rounded-xl hover:border-carefd-teal transition"
                             >
                               <div className="flex items-start justify-between">
                                 <div>
-                                  <h4 className="font-bold text-carelink-navy mb-1">{request.title}</h4>
-                                  <p className="text-sm text-carelink-gray line-clamp-2">{request.description}</p>
-                                  <div className="flex items-center gap-4 mt-2 text-xs text-carelink-gray">
+                                  <h4 className="font-bold text-carefd-navy mb-1">{request.title}</h4>
+                                  <p className="text-sm text-carefd-gray line-clamp-2">{request.description}</p>
+                                  <div className="flex items-center gap-4 mt-2 text-xs text-carefd-gray">
                                     <span>{request.location?.city || 'לא צוין מיקום'}</span>
                                     <span>{new Date(request.created_at).toLocaleDateString('he-IL')}</span>
                                   </div>
                                 </div>
                                 {request.budget && (
                                   <div className="text-right">
-                                    <span className="text-xl font-bold text-carelink-teal">₪{request.budget}</span>
-                                    <p className="text-xs text-carelink-gray">תקציב</p>
+                                    <span className="text-xl font-bold text-carefd-teal">₪{request.budget}</span>
+                                    <p className="text-xs text-carefd-gray">תקציב</p>
                                   </div>
                                 )}
                               </div>
@@ -1684,15 +1684,15 @@ const ProviderDashboard = () => {
                   {/* Messages Tab */}
                   {activeTab === 'messages' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                        <FaComments className="text-carelink-teal" />
+                      <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                        <FaComments className="text-carefd-teal" />
                         שיחות צ'אט
                       </h3>
                       {chats.length === 0 ? (
                         <div className="text-center py-12">
-                          <FaComments className="text-5xl text-carelink-teal-pale mx-auto mb-4" />
-                          <p className="text-carelink-gray">אין שיחות עדיין</p>
-                          <p className="text-sm text-carelink-gray mt-2">כאשר לקוחות יפנו אליכם, השיחות יופיעו כאן</p>
+                          <FaComments className="text-5xl text-carefd-teal-pale mx-auto mb-4" />
+                          <p className="text-carefd-gray">אין שיחות עדיין</p>
+                          <p className="text-sm text-carefd-gray mt-2">כאשר לקוחות יפנו אליכם, השיחות יופיעו כאן</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
@@ -1700,28 +1700,28 @@ const ProviderDashboard = () => {
                             <Link
                               key={chat.room_id}
                               to={`/chat/${chat.room_id}`}
-                              className="flex items-center gap-4 p-4 bg-gray-50 hover:bg-carelink-teal-pale/30 rounded-xl transition group"
+                              className="flex items-center gap-4 p-4 bg-gray-50 hover:bg-carefd-teal-pale/30 rounded-xl transition group"
                             >
-                              <div className="w-12 h-12 bg-carelink-navy rounded-full flex items-center justify-center text-white font-bold text-lg">
+                              <div className="w-12 h-12 bg-carefd-navy rounded-full flex items-center justify-center text-white font-bold text-lg">
                                 {(chat.other_user?.name || chat.provider?.business_name || 'M')[0]}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between">
-                                  <p className="font-semibold text-carelink-navy group-hover:text-carelink-teal transition">
+                                  <p className="font-semibold text-carefd-navy group-hover:text-carefd-teal transition">
                                     {chat.other_user?.name || chat.provider?.business_name || 'משתמש'}
                                   </p>
-                                  <span className="text-xs text-carelink-gray">
+                                  <span className="text-xs text-carefd-gray">
                                     {chat.last_message?.created_at 
                                       ? new Date(chat.last_message.created_at).toLocaleDateString('he-IL')
                                       : ''}
                                   </span>
                                 </div>
-                                <p className="text-sm text-carelink-gray truncate">
+                                <p className="text-sm text-carefd-gray truncate">
                                   {chat.last_message?.content || 'לחצו כדי להתחיל שיחה'}
                                 </p>
                               </div>
                               {chat.unread_count > 0 && (
-                                <span className="bg-carelink-teal text-white text-xs font-bold px-2 py-1 rounded-full">
+                                <span className="bg-carefd-teal text-white text-xs font-bold px-2 py-1 rounded-full">
                                   {chat.unread_count}
                                 </span>
                               )}
@@ -1737,7 +1737,7 @@ const ProviderDashboard = () => {
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
                       <div className="flex items-center gap-6 mb-6">
                         <div className="text-center">
-                          <div className="text-5xl font-bold text-carelink-teal">{stats.averageRating.toFixed(1)}</div>
+                          <div className="text-5xl font-bold text-carefd-teal">{stats.averageRating.toFixed(1)}</div>
                           <div className="flex justify-center my-2">
                             {[...Array(5)].map((_, i) => (
                               <FaStar
@@ -1746,24 +1746,24 @@ const ProviderDashboard = () => {
                               />
                             ))}
                           </div>
-                          <div className="text-sm text-carelink-gray">{stats.totalReviews} ביקורות</div>
+                          <div className="text-sm text-carefd-gray">{stats.totalReviews} ביקורות</div>
                         </div>
                       </div>
                       {reviews.length === 0 ? (
-                        <div className="text-center py-8 text-carelink-gray">
-                          <FaStar className="text-4xl mx-auto mb-2 text-carelink-teal-pale" />
+                        <div className="text-center py-8 text-carefd-gray">
+                          <FaStar className="text-4xl mx-auto mb-2 text-carefd-teal-pale" />
                           <p>עדיין אין ביקורות</p>
                         </div>
                       ) : (
                         <div className="space-y-4">
                           {reviews.map((review) => (
-                            <div key={review.review_id} className="border-b border-carelink-teal-pale pb-4 last:border-0">
+                            <div key={review.review_id} className="border-b border-carefd-teal-pale pb-4 last:border-0">
                               <div className="flex items-center gap-3 mb-2">
-                                <div className="w-10 h-10 bg-carelink-navy rounded-full flex items-center justify-center text-white font-bold">
+                                <div className="w-10 h-10 bg-carefd-navy rounded-full flex items-center justify-center text-white font-bold">
                                   {(review.user?.name || 'M')[0]}
                                 </div>
                                 <div>
-                                  <p className="font-medium text-carelink-navy">{review.user?.name || 'משתמש'}</p>
+                                  <p className="font-medium text-carefd-navy">{review.user?.name || 'משתמש'}</p>
                                   <div className="flex">
                                     {[...Array(5)].map((_, i) => (
                                       <FaStar
@@ -1774,8 +1774,8 @@ const ProviderDashboard = () => {
                                   </div>
                                 </div>
                               </div>
-                              <p className="text-carelink-slate">{review.comment}</p>
-                              <p className="text-xs text-carelink-gray mt-2">
+                              <p className="text-carefd-slate">{review.comment}</p>
+                              <p className="text-xs text-carefd-gray mt-2">
                                 {new Date(review.created_at).toLocaleDateString('he-IL')}
                               </p>
                             </div>
@@ -1790,36 +1790,36 @@ const ProviderDashboard = () => {
                     <div className="space-y-6">
                       {/* Basic Info */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                          <FaUser className="text-carelink-teal" />
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                          <FaUser className="text-carefd-teal" />
                           פרטי העסק
                         </h3>
                         <div className="grid md:grid-cols-2 gap-6">
                           <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">שם העסק *</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">שם העסק *</label>
                             <input
                               type="text"
                               value={profileForm.business_name}
                               onChange={(e) => setProfileForm({ ...profileForm, business_name: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                               placeholder="שם המרפאה/העסק"
                             />
                           </div>
                           <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">תיאור העסק</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">תיאור העסק</label>
                             <textarea
                               value={profileForm.description}
                               onChange={(e) => setProfileForm({ ...profileForm, description: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none h-32 resize-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none h-32 resize-none"
                               placeholder="ספר על העסק שלך, הניסיון וההתמחויות..."
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">סוג ספק</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">סוג ספק</label>
                             <select
                               value={profileForm.provider_type}
                               onChange={(e) => setProfileForm({ ...profileForm, provider_type: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                             >
                               {providerTypeOptions.map((opt) => (
                                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -1827,12 +1827,12 @@ const ProviderDashboard = () => {
                             </select>
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">שנות ניסיון</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">שנות ניסיון</label>
                             <input
                               type="number"
                               value={profileForm.years_experience}
                               onChange={(e) => setProfileForm({ ...profileForm, years_experience: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                               placeholder="0"
                             />
                           </div>
@@ -1841,46 +1841,46 @@ const ProviderDashboard = () => {
 
                       {/* Contact Info */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                          <FaPhone className="text-carelink-teal" />
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                          <FaPhone className="text-carefd-teal" />
                           פרטי התקשרות
                         </h3>
                         <div className="grid md:grid-cols-2 gap-6">
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">טלפון</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">טלפון</label>
                             <div className="relative">
-                              <FaPhone className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
+                              <FaPhone className="absolute right-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
                               <input
                                 type="tel"
                                 value={profileForm.phone}
                                 onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-                                className="w-full px-4 py-3 pr-12 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                className="w-full px-4 py-3 pr-12 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                 placeholder="050-0000000"
                               />
                             </div>
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">אימייל</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">אימייל</label>
                             <div className="relative">
-                              <FaEnvelope className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
+                              <FaEnvelope className="absolute right-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
                               <input
                                 type="email"
                                 value={profileForm.email}
                                 onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
-                                className="w-full px-4 py-3 pr-12 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                className="w-full px-4 py-3 pr-12 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                 placeholder="your@email.com"
                               />
                             </div>
                           </div>
                           <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">אתר אינטרנט</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">אתר אינטרנט</label>
                             <div className="relative">
-                              <FaGlobe className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
+                              <FaGlobe className="absolute right-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
                               <input
                                 type="url"
                                 value={profileForm.website}
                                 onChange={(e) => setProfileForm({ ...profileForm, website: e.target.value })}
-                                className="w-full px-4 py-3 pr-12 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                className="w-full px-4 py-3 pr-12 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                 placeholder="https://www.example.com"
                               />
                             </div>
@@ -1890,28 +1890,28 @@ const ProviderDashboard = () => {
 
                       {/* Location */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                          <FaMapMarkerAlt className="text-carelink-teal" />
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                          <FaMapMarkerAlt className="text-carefd-teal" />
                           מיקום
                         </h3>
                         <div className="grid md:grid-cols-2 gap-6">
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">עיר</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">עיר</label>
                             <input
                               type="text"
                               value={profileForm.city}
                               onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                               placeholder="תל אביב"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">כתובת</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">כתובת</label>
                             <input
                               type="text"
                               value={profileForm.address}
                               onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                               placeholder="רחוב, מספר בית"
                             />
                           </div>
@@ -1920,11 +1920,11 @@ const ProviderDashboard = () => {
 
                       {/* Specializations */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                          <FaAward className="text-carelink-teal" />
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                          <FaAward className="text-carefd-teal" />
                           התמחויות
                         </h3>
-                        <p className="text-sm text-carelink-gray mb-4">בחר את ההתמחויות שלך (ניתן לבחור כמה)</p>
+                        <p className="text-sm text-carefd-gray mb-4">בחר את ההתמחויות שלך (ניתן לבחור כמה)</p>
                         <div className="flex flex-wrap gap-2">
                           {availableSpecializations.map((spec) => (
                             <button
@@ -1933,8 +1933,8 @@ const ProviderDashboard = () => {
                               onClick={() => toggleSpecialization(spec)}
                               className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                                 profileForm.specializations.includes(spec)
-                                  ? 'bg-carelink-teal text-white'
-                                  : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                                  ? 'bg-carefd-teal text-white'
+                                  : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
                               }`}
                             >
                               {spec}
@@ -1945,11 +1945,11 @@ const ProviderDashboard = () => {
 
                       {/* Service Types */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                          <FaBriefcase className="text-carelink-teal" />
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                          <FaBriefcase className="text-carefd-teal" />
                           סוגי שירות
                         </h3>
-                        <p className="text-sm text-carelink-gray mb-4">באילו דרכים אתה מציע שירות?</p>
+                        <p className="text-sm text-carefd-gray mb-4">באילו דרכים אתה מציע שירות?</p>
                         <div className="grid md:grid-cols-2 gap-3">
                           {serviceTypeOptions.map((type) => {
                             const Icon = type.icon;
@@ -1960,18 +1960,18 @@ const ProviderDashboard = () => {
                                 onClick={() => toggleServiceType(type.value)}
                                 className={`flex items-center gap-3 p-4 rounded-xl text-right font-medium transition border-2 ${
                                   profileForm.service_types.includes(type.value)
-                                    ? 'border-carelink-teal bg-carelink-teal-pale/30'
-                                    : 'border-carelink-teal-pale hover:border-carelink-teal'
+                                    ? 'border-carefd-teal bg-carefd-teal-pale/30'
+                                    : 'border-carefd-teal-pale hover:border-carefd-teal'
                                 }`}
                               >
                                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                                   profileForm.service_types.includes(type.value)
-                                    ? 'bg-carelink-teal text-white'
-                                    : 'bg-carelink-teal-pale text-carelink-teal'
+                                    ? 'bg-carefd-teal text-white'
+                                    : 'bg-carefd-teal-pale text-carefd-teal'
                                 }`}>
                                   <Icon />
                                 </div>
-                                <span className="text-carelink-navy">{type.label}</span>
+                                <span className="text-carefd-navy">{type.label}</span>
                               </button>
                             );
                           })}
@@ -1979,17 +1979,17 @@ const ProviderDashboard = () => {
                       </div>
 
                       {/* Advanced Profile Link */}
-                      <div className="bg-gradient-to-r from-carelink-teal-pale/50 to-blue-50 p-6 rounded-2xl border border-carelink-teal/20">
+                      <div className="bg-gradient-to-r from-carefd-teal-pale/50 to-blue-50 p-6 rounded-2xl border border-carefd-teal/20">
                         <div className="flex items-center justify-between">
                           <div>
-                            <h3 className="text-lg font-bold text-carelink-navy mb-1">עריכת פרופיל מתקדמת</h3>
-                            <p className="text-sm text-carelink-gray">
+                            <h3 className="text-lg font-bold text-carefd-navy mb-1">עריכת פרופיל מתקדמת</h3>
+                            <p className="text-sm text-carefd-gray">
                               עדכן השכלה, תעודות, קופות חולים, אמצעי תשלום, מדיניות ביטולים והגדרות פרטיות
                             </p>
                           </div>
                           <Link
                             to={`/provider/edit/${provider?.provider_id}`}
-                            className="bg-carelink-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carelink-teal-medium transition flex items-center gap-2"
+                            className="bg-carefd-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carefd-teal-medium transition flex items-center gap-2"
                           >
                             <FaEdit />
                             עריכה מתקדמת
@@ -2002,7 +2002,7 @@ const ProviderDashboard = () => {
                         <button
                           onClick={handleSaveProfile}
                           disabled={saving}
-                          className="bg-carelink-teal text-white px-8 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition flex items-center gap-2 disabled:opacity-50"
+                          className="bg-carefd-teal text-white px-8 py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition flex items-center gap-2 disabled:opacity-50"
                         >
                           <FaSave />
                           {saving ? 'שומר...' : 'שמור פרופיל'}
@@ -2019,36 +2019,36 @@ const ProviderDashboard = () => {
                       
                       {/* Provider-specific Settings */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6">הגדרות ספק</h3>
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6">הגדרות ספק</h3>
                         <div className="space-y-4">
                           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                             <div>
-                              <p className="font-medium text-carelink-navy">פרופיל פעיל</p>
-                              <p className="text-sm text-carelink-gray">הצג את הפרופיל שלי בחיפוש</p>
+                              <p className="font-medium text-carefd-navy">פרופיל פעיל</p>
+                              <p className="text-sm text-carefd-gray">הצג את הפרופיל שלי בחיפוש</p>
                             </div>
                             <label className="relative inline-flex items-center cursor-pointer">
                               <input type="checkbox" className="sr-only peer" defaultChecked />
-                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
+                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carefd-teal"></div>
                             </label>
                           </div>
                           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                             <div>
-                              <p className="font-medium text-carelink-navy">קבלת הזמנות אורחים</p>
-                              <p className="text-sm text-carelink-gray">אפשר הזמנות ממשתמשים לא רשומים</p>
+                              <p className="font-medium text-carefd-navy">קבלת הזמנות אורחים</p>
+                              <p className="text-sm text-carefd-gray">אפשר הזמנות ממשתמשים לא רשומים</p>
                             </div>
                             <label className="relative inline-flex items-center cursor-pointer">
                               <input type="checkbox" className="sr-only peer" defaultChecked />
-                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
+                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carefd-teal"></div>
                             </label>
                           </div>
                           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                             <div>
-                              <p className="font-medium text-carelink-navy">אישור אוטומטי</p>
-                              <p className="text-sm text-carelink-gray">אשר הזמנות אוטומטית (ללא אישור ידני)</p>
+                              <p className="font-medium text-carefd-navy">אישור אוטומטי</p>
+                              <p className="text-sm text-carefd-gray">אשר הזמנות אוטומטית (ללא אישור ידני)</p>
                             </div>
                             <label className="relative inline-flex items-center cursor-pointer">
                               <input type="checkbox" className="sr-only peer" />
-                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
+                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carefd-teal"></div>
                             </label>
                           </div>
                         </div>
@@ -2056,18 +2056,18 @@ const ProviderDashboard = () => {
 
                       {/* Account Settings */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6">הגדרות חשבון</h3>
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6">הגדרות חשבון</h3>
                         <div className="space-y-6">
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">שם העסק</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">שם העסק</label>
                             <input
                               type="text"
                               defaultValue={provider?.business_name}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">אימייל</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">אימייל</label>
                             <input
                               type="email"
                               defaultValue={user?.email}
@@ -2076,15 +2076,15 @@ const ProviderDashboard = () => {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">טלפון</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">טלפון</label>
                             <input
                               type="tel"
                               defaultValue={provider?.phone}
                               placeholder="050-0000000"
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                             />
                           </div>
-                          <button className="bg-carelink-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carelink-teal-medium transition">
+                          <button className="bg-carefd-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carefd-teal-medium transition">
                             שמור שינויים
                           </button>
                         </div>
@@ -2097,28 +2097,28 @@ const ProviderDashboard = () => {
                     <div className="space-y-6">
                       {/* Personal Info */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                          <FaUser className="text-carelink-teal" />
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                          <FaUser className="text-carefd-teal" />
                           פרטים אישיים
                         </h3>
                         <div className="grid md:grid-cols-2 gap-6">
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">שם פרטי</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">שם פרטי</label>
                             <input
                               type="text"
                               value={userInfoForm.first_name}
                               onChange={(e) => setUserInfoForm({ ...userInfoForm, first_name: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                               placeholder="שם פרטי"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">שם משפחה</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">שם משפחה</label>
                             <input
                               type="text"
                               value={userInfoForm.last_name}
                               onChange={(e) => setUserInfoForm({ ...userInfoForm, last_name: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                               placeholder="שם משפחה"
                             />
                           </div>
@@ -2127,58 +2127,58 @@ const ProviderDashboard = () => {
 
                       {/* Contact Info */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                          <FaPhone className="text-carelink-teal" />
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                          <FaPhone className="text-carefd-teal" />
                           פרטי התקשרות
                         </h3>
                         <div className="grid md:grid-cols-2 gap-6">
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">טלפון אישי</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">טלפון אישי</label>
                             <input
                               type="tel"
                               value={userInfoForm.personal_phone}
                               onChange={(e) => setUserInfoForm({ ...userInfoForm, personal_phone: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                               placeholder="050-0000000"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">אימייל</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">אימייל</label>
                             <input
                               type="email"
                               value={userInfoForm.personal_email}
                               disabled
                               className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-500"
                             />
-                            <p className="text-xs text-carelink-gray mt-1">לא ניתן לשנות את כתובת האימייל</p>
+                            <p className="text-xs text-carefd-gray mt-1">לא ניתן לשנות את כתובת האימייל</p>
                           </div>
                         </div>
                       </div>
 
                       {/* Address */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                          <FaHome className="text-carelink-teal" />
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                          <FaHome className="text-carefd-teal" />
                           כתובת מגורים
                         </h3>
                         <div className="grid md:grid-cols-2 gap-6">
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">עיר</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">עיר</label>
                             <CitySelect
                               name="personal_city"
                               value={userInfoForm.personal_city}
                               onChange={(e) => setUserInfoForm({ ...userInfoForm, personal_city: e.target.value })}
                               placeholder="בחר עיר..."
-                              inputClassName="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              inputClassName="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">כתובת</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">כתובת</label>
                             <input
                               type="text"
                               value={userInfoForm.personal_address}
                               onChange={(e) => setUserInfoForm({ ...userInfoForm, personal_address: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                               placeholder="רחוב, מספר בית"
                             />
                           </div>
@@ -2190,7 +2190,7 @@ const ProviderDashboard = () => {
                         <button
                           onClick={handleSaveUserInfo}
                           disabled={saving}
-                          className="bg-carelink-teal text-white px-8 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition flex items-center gap-2 disabled:opacity-50"
+                          className="bg-carefd-teal text-white px-8 py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition flex items-center gap-2 disabled:opacity-50"
                         >
                           <FaSave />
                           {saving ? 'שומר...' : 'שמור פרטים אישיים'}
@@ -2199,52 +2199,52 @@ const ProviderDashboard = () => {
 
                       {/* Password Change */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                          <FaCog className="text-carelink-teal" />
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                          <FaCog className="text-carefd-teal" />
                           שינוי סיסמה
                         </h3>
                         <div className="space-y-4 max-w-md">
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">סיסמה נוכחית</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">סיסמה נוכחית</label>
                             <div className="relative">
                               <input
                                 type={showPw.current ? 'text' : 'password'}
                                 value={userInfoForm.current_password}
                                 onChange={(e) => setUserInfoForm({ ...userInfoForm, current_password: e.target.value })}
-                                className="w-full px-4 py-3 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                className="w-full px-4 py-3 pl-12 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                 placeholder="הזן סיסמה נוכחית"
                               />
-                              <button type="button" onClick={() => setShowPw(p => ({...p, current: !p.current}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                              <button type="button" onClick={() => setShowPw(p => ({...p, current: !p.current}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
                                 {showPw.current ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                               </button>
                             </div>
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">סיסמה חדשה</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">סיסמה חדשה</label>
                             <div className="relative">
                               <input
                                 type={showPw.new_pw ? 'text' : 'password'}
                                 value={userInfoForm.new_password}
                                 onChange={(e) => setUserInfoForm({ ...userInfoForm, new_password: e.target.value })}
-                                className="w-full px-4 py-3 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                className="w-full px-4 py-3 pl-12 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                 placeholder="הזן סיסמה חדשה (לפחות 6 תווים)"
                               />
-                              <button type="button" onClick={() => setShowPw(p => ({...p, new_pw: !p.new_pw}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                              <button type="button" onClick={() => setShowPw(p => ({...p, new_pw: !p.new_pw}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
                                 {showPw.new_pw ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                               </button>
                             </div>
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">אימות סיסמה חדשה</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">אימות סיסמה חדשה</label>
                             <div className="relative">
                               <input
                                 type={showPw.confirm ? 'text' : 'password'}
                                 value={userInfoForm.confirm_password}
                                 onChange={(e) => setUserInfoForm({ ...userInfoForm, confirm_password: e.target.value })}
-                                className="w-full px-4 py-3 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                className="w-full px-4 py-3 pl-12 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                 placeholder="הזן שוב את הסיסמה החדשה"
                               />
-                              <button type="button" onClick={() => setShowPw(p => ({...p, confirm: !p.confirm}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                              <button type="button" onClick={() => setShowPw(p => ({...p, confirm: !p.confirm}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
                                 {showPw.confirm ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                               </button>
                             </div>

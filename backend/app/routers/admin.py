@@ -134,13 +134,13 @@ async def admin_test_email(
 
     result = await send_email_async(
         recipient,
-        "CareLink - בדיקת שליחת מייל",
+        "CareFD - בדיקת שליחת מייל",
         """
         <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #19B8BA;">בדיקת שליחת מייל</h2>
             <p>מייל זה נשלח כבדיקה מהמערכת.</p>
             <p>אם קיבלת את המייל הזה, שליחת המיילים עובדת כראוי.</p>
-            <p>בברכה,<br>צוות CareLink</p>
+            <p>בברכה,<br>צוות CareFD</p>
         </div>
         """
     )
@@ -826,14 +826,14 @@ async def admin_verify_provider(
         if provider_user:
             await send_email_async(
                 provider_user.get("email"),
-                "CareLink - החשבון שלך אומת!",
+                "CareFD - החשבון שלך אומת!",
                 f"""
                 <h1>ברכות! החשבון שלך אומת 🎉</h1>
                 <p>שלום {provider.get('business_name', 'ספק')},</p>
                 <p>אנו שמחים לבשר לך שהפרופיל שלך אומת בהצלחה!</p>
                 <p>כעת לקוחות יכולים לראות את תג האימות שלך ולהזמין את השירותים שלך.</p>
                 <p>בהצלחה!</p>
-                <p>צוות CareLink</p>
+                <p>צוות CareFD</p>
                 """
             )
     
@@ -1299,10 +1299,10 @@ async def get_public_settings():
     settings = await db.site_settings.find_one({}, {"_id": 0})
     if not settings:
         settings = {
-            "contact_email": "info@carelink.co.il",
+            "contact_email": "info@carefd.com",
             "contact_phone": "03-1234567",
             "contact_address": "תל אביב, ישראל",
-            "footer_text": "© 2025 CareLink. All rights reserved.",
+            "footer_text": "© 2025 CareFD. All rights reserved.",
             "social_facebook": "",
             "social_instagram": "",
             "social_twitter": "",
@@ -1333,14 +1333,14 @@ async def admin_get_settings(
     if not settings:
         # Return default settings
         settings = {
-            "site_name": "CareLink",
+            "site_name": "CareFD",
             "site_tagline": "Connecting Care Providers",
             "logo_url": "",
             "favicon_url": "",
-            "contact_email": "info@carelink.co.il",
+            "contact_email": "info@carefd.com",
             "contact_phone": "03-1234567",
             "contact_address": "תל אביב, ישראל",
-            "footer_text": "© 2024 CareLink. כל הזכויות שמורות.",
+            "footer_text": "© 2024 CareFD. כל הזכויות שמורות.",
             "social_facebook": "",
             "social_instagram": "",
             "social_twitter": "",

@@ -131,7 +131,7 @@ const WriteReview = () => {
   // Star rating component
   const StarRating = ({ value, onChange, size = 'text-2xl', label }) => (
     <div className="flex flex-col gap-2">
-      {label && <span className="text-sm text-carelink-gray">{label}</span>}
+      {label && <span className="text-sm text-carefd-gray">{label}</span>}
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
@@ -153,10 +153,10 @@ const WriteReview = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale">
+      <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale">
         <Navbar />
         <div className="flex items-center justify-center h-[calc(100vh-200px)]">
-          <FaSpinner className="animate-spin text-4xl text-carelink-teal" />
+          <FaSpinner className="animate-spin text-4xl text-carefd-teal" />
         </div>
       </div>
     );
@@ -164,15 +164,15 @@ const WriteReview = () => {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale">
+      <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale">
         <Navbar />
         <div className="max-w-2xl mx-auto px-4 py-12">
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center border-2 border-green-500">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <FaCheckCircle className="text-4xl text-green-500" />
             </div>
-            <h2 className="text-2xl font-bold text-carelink-navy mb-4">תודה על חוות הדעת!</h2>
-            <p className="text-carelink-gray mb-6">
+            <h2 className="text-2xl font-bold text-carefd-navy mb-4">תודה על חוות הדעת!</h2>
+            <p className="text-carefd-gray mb-6">
               חוות הדעת שלך נשלחה בהצלחה וממתינה לאישור המנהל.
               <br />
               לאחר האישור, חוות הדעת תופיע בפרופיל הספק.
@@ -180,13 +180,13 @@ const WriteReview = () => {
             <div className="flex gap-4 justify-center">
               <Link
                 to="/dashboard"
-                className="bg-carelink-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition"
+                className="bg-carefd-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition"
               >
                 חזור לדשבורד
               </Link>
               <Link
                 to={`/providers/${provider?.provider_id}`}
-                className="bg-white border-2 border-carelink-teal text-carelink-teal px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-pale transition"
+                className="bg-white border-2 border-carefd-teal text-carefd-teal px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-pale transition"
               >
                 צפה בפרופיל הספק
               </Link>
@@ -199,21 +199,21 @@ const WriteReview = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale">
+    <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale">
       <Navbar />
       
       <div className="max-w-3xl mx-auto px-4 py-8">
         {/* Back button */}
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-2 text-carelink-gray hover:text-carelink-teal transition mb-6"
+          className="inline-flex items-center gap-2 text-carefd-gray hover:text-carefd-teal transition mb-6"
         >
           <FaArrowRight />
           חזור לדשבורד
         </Link>
         
         {/* Provider Info */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 border-2 border-carelink-teal-pale">
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 border-2 border-carefd-teal-pale">
           <div className="flex items-center gap-4">
             {provider?.profile_image ? (
               <img 
@@ -222,14 +222,14 @@ const WriteReview = () => {
                 className="w-16 h-16 rounded-xl object-cover"
               />
             ) : (
-              <div className="w-16 h-16 bg-carelink-teal rounded-xl flex items-center justify-center text-white text-2xl font-bold">
+              <div className="w-16 h-16 bg-carefd-teal rounded-xl flex items-center justify-center text-white text-2xl font-bold">
                 {provider?.business_name?.[0] || 'S'}
               </div>
             )}
             <div>
-              <h2 className="text-xl font-bold text-carelink-navy">{provider?.business_name}</h2>
-              <p className="text-carelink-gray">{booking?.service_name}</p>
-              <p className="text-sm text-carelink-gray">
+              <h2 className="text-xl font-bold text-carefd-navy">{provider?.business_name}</h2>
+              <p className="text-carefd-gray">{booking?.service_name}</p>
+              <p className="text-sm text-carefd-gray">
                 {new Date(booking?.booking_date).toLocaleDateString('he-IL')}
               </p>
             </div>
@@ -238,13 +238,13 @@ const WriteReview = () => {
 
         {/* Review Form */}
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-carelink-navy mb-6 text-center">
+          <h2 className="text-2xl font-bold text-carefd-navy mb-6 text-center">
             כתוב חוות דעת
           </h2>
           
           {/* Overall Rating */}
           <div className="text-center mb-8">
-            <p className="text-lg font-semibold text-carelink-navy mb-3">דירוג כללי</p>
+            <p className="text-lg font-semibold text-carefd-navy mb-3">דירוג כללי</p>
             <div className="flex justify-center gap-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -262,7 +262,7 @@ const WriteReview = () => {
               ))}
             </div>
             {rating > 0 && (
-              <p className="text-carelink-gray mt-2">
+              <p className="text-carefd-gray mt-2">
                 {rating === 5 && 'מעולה!'}
                 {rating === 4 && 'טוב מאוד'}
                 {rating === 3 && 'טוב'}
@@ -275,7 +275,7 @@ const WriteReview = () => {
           {/* Detailed Ratings */}
           <div className="grid grid-cols-2 gap-6 mb-8">
             <div>
-              <p className="text-sm font-medium text-carelink-navy mb-2">איכות השירות</p>
+              <p className="text-sm font-medium text-carefd-navy mb-2">איכות השירות</p>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -291,7 +291,7 @@ const WriteReview = () => {
             </div>
             
             <div>
-              <p className="text-sm font-medium text-carelink-navy mb-2">דייקנות</p>
+              <p className="text-sm font-medium text-carefd-navy mb-2">דייקנות</p>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -307,7 +307,7 @@ const WriteReview = () => {
             </div>
             
             <div>
-              <p className="text-sm font-medium text-carelink-navy mb-2">תקשורת</p>
+              <p className="text-sm font-medium text-carefd-navy mb-2">תקשורת</p>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -323,7 +323,7 @@ const WriteReview = () => {
             </div>
             
             <div>
-              <p className="text-sm font-medium text-carelink-navy mb-2">תמורה למחיר</p>
+              <p className="text-sm font-medium text-carefd-navy mb-2">תמורה למחיר</p>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -341,24 +341,24 @@ const WriteReview = () => {
 
           {/* Comment */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-carelink-navy mb-2">
+            <label className="block text-sm font-medium text-carefd-navy mb-2">
               חוות הדעת שלך *
             </label>
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               rows={5}
-              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none resize-none"
+              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none resize-none"
               placeholder="ספר על החוויה שלך עם הספק, מה היה טוב ומה אפשר לשפר..."
               required
               minLength={10}
             />
-            <p className="text-xs text-carelink-gray mt-1">{comment.length} תווים (מינימום 10)</p>
+            <p className="text-xs text-carefd-gray mt-1">{comment.length} תווים (מינימום 10)</p>
           </div>
 
           {/* Would Recommend */}
           <div className="mb-8">
-            <p className="text-sm font-medium text-carelink-navy mb-3">האם היית ממליץ על הספק?</p>
+            <p className="text-sm font-medium text-carefd-navy mb-3">האם היית ממליץ על הספק?</p>
             <div className="flex gap-4">
               <button
                 type="button"
@@ -366,7 +366,7 @@ const WriteReview = () => {
                 className={`flex-1 py-3 rounded-xl font-medium transition flex items-center justify-center gap-2 ${
                   wouldRecommend 
                     ? 'bg-green-500 text-white' 
-                    : 'bg-gray-100 text-carelink-gray hover:bg-gray-200'
+                    : 'bg-gray-100 text-carefd-gray hover:bg-gray-200'
                 }`}
               >
                 <FaThumbsUp />
@@ -378,7 +378,7 @@ const WriteReview = () => {
                 className={`flex-1 py-3 rounded-xl font-medium transition flex items-center justify-center gap-2 ${
                   !wouldRecommend 
                     ? 'bg-red-500 text-white' 
-                    : 'bg-gray-100 text-carelink-gray hover:bg-gray-200'
+                    : 'bg-gray-100 text-carefd-gray hover:bg-gray-200'
                 }`}
               >
                 <FaThumbsUp className="transform rotate-180" />
@@ -388,8 +388,8 @@ const WriteReview = () => {
           </div>
 
           {/* Notice */}
-          <div className="bg-carelink-teal-pale/30 p-4 rounded-xl mb-6">
-            <p className="text-sm text-carelink-gray text-center">
+          <div className="bg-carefd-teal-pale/30 p-4 rounded-xl mb-6">
+            <p className="text-sm text-carefd-gray text-center">
               חוות הדעת תפורסם לאחר אישור מנהל המערכת
             </p>
           </div>
@@ -398,7 +398,7 @@ const WriteReview = () => {
           <button
             type="submit"
             disabled={submitting || rating === 0}
-            className="w-full bg-carelink-teal text-white py-4 rounded-xl font-bold text-lg hover:bg-carelink-teal-medium transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-carefd-teal text-white py-4 rounded-xl font-bold text-lg hover:bg-carefd-teal-medium transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {submitting ? (
               <>

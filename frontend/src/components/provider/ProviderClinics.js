@@ -103,13 +103,13 @@ const ProviderClinics = ({ provider }) => {
   return (
     <div className="space-y-4" data-testid="provider-clinics">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-carelink-navy flex items-center gap-2">
-          <FaBuilding className="text-carelink-teal" />
+        <h3 className="text-xl font-bold text-carefd-navy flex items-center gap-2">
+          <FaBuilding className="text-carefd-teal" />
           ניהול קליניקות / סניפים
         </h3>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="bg-carelink-teal text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-carelink-teal-medium transition flex items-center gap-2"
+          className="bg-carefd-teal text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-carefd-teal-medium transition flex items-center gap-2"
           data-testid="add-clinic-btn"
         >
           <FaPlus /> הוסף קליניקה
@@ -118,7 +118,7 @@ const ProviderClinics = ({ provider }) => {
 
       {/* Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl border-2 border-carelink-teal-pale shadow-sm space-y-4">
+        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl border-2 border-carefd-teal-pale shadow-sm space-y-4">
           <h4 className="font-semibold text-gray-900">{editingClinic ? 'עריכת קליניקה' : 'הוספת קליניקה חדשה'}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -147,7 +147,7 @@ const ProviderClinics = ({ provider }) => {
             </div>
           </div>
           <div className="flex gap-3">
-            <button type="submit" className="bg-carelink-teal text-white px-6 py-2.5 rounded-xl font-medium hover:bg-carelink-teal-medium transition flex items-center gap-2" data-testid="save-clinic-btn">
+            <button type="submit" className="bg-carefd-teal text-white px-6 py-2.5 rounded-xl font-medium hover:bg-carefd-teal-medium transition flex items-center gap-2" data-testid="save-clinic-btn">
               <FaSave /> {editingClinic ? 'עדכן' : 'הוסף'}
             </button>
             <button type="button" onClick={resetForm} className="border border-gray-300 text-gray-600 px-6 py-2.5 rounded-xl font-medium hover:bg-gray-50 transition">
@@ -160,7 +160,7 @@ const ProviderClinics = ({ provider }) => {
       {/* Clinics List */}
       {clinics.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-xl">
-          <FaBuilding className="text-4xl text-carelink-teal-pale mx-auto mb-3" />
+          <FaBuilding className="text-4xl text-carefd-teal-pale mx-auto mb-3" />
           <p className="text-gray-500">אין קליניקות עדיין</p>
           <p className="text-sm text-gray-400 mt-1">הוסף את הסניפים והמיקומים שלך</p>
         </div>
@@ -173,18 +173,18 @@ const ProviderClinics = ({ provider }) => {
                   <h4 className="font-bold text-gray-900 text-lg">{clinic.name}</h4>
                   <div className="mt-2 space-y-1.5 text-sm text-gray-600">
                     <p className="flex items-center gap-2">
-                      <FaMapMarkerAlt className="text-carelink-teal" />
+                      <FaMapMarkerAlt className="text-carefd-teal" />
                       {clinic.address}, {clinic.city}
                     </p>
                     {clinic.phone && (
                       <p className="flex items-center gap-2">
-                        <FaPhone className="text-carelink-teal" />
+                        <FaPhone className="text-carefd-teal" />
                         <span dir="ltr">{clinic.phone}</span>
                       </p>
                     )}
                     {clinic.working_hours && (
                       <p className="flex items-center gap-2">
-                        <FaClock className="text-carelink-teal" />
+                        <FaClock className="text-carefd-teal" />
                         {clinic.working_hours}
                       </p>
                     )}

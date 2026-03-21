@@ -15,25 +15,25 @@ module.exports = {
                         '4xl': '2rem',
                 },
                 colors: {
-                        // CareLink Premium Luxury - Deep Palette
-                        'carelink-deep': '#0F172A',
-                        'carelink-charcoal': '#1E293B',
-                        'carelink-navy': '#1E4D5F',
-                        'carelink-slate': '#4C6D7F',
-                        'carelink-gray': '#83959E',
-                        'carelink-light-gray': '#B8C2C9',
-                        'carelink-stone': '#F5F5F4',
-                        'carelink-cream': '#FAFAF9',
+                        // CareFD Premium Luxury - Deep Palette
+                        'carefd-deep': '#0F172A',
+                        'carefd-charcoal': '#1E293B',
+                        'carefd-navy': '#1E4D5F',
+                        'carefd-slate': '#4C6D7F',
+                        'carefd-gray': '#83959E',
+                        'carefd-light-gray': '#B8C2C9',
+                        'carefd-stone': '#F5F5F4',
+                        'carefd-cream': '#FAFAF9',
                         
                         // Accent - Champagne Gold
-                        'carelink-gold': '#D4B483',
-                        'carelink-gold-light': '#E8D4B8',
+                        'carefd-gold': '#D4B483',
+                        'carefd-gold-light': '#E8D4B8',
                         
-                        // CareLink Brand Colors - Teal Palette
-                        'carelink-teal': '#19B8BA',
-                        'carelink-teal-medium': '#41C9C2',
-                        'carelink-teal-light': '#75D9D2',
-                        'carelink-teal-pale': '#ACEDEA',
+                        // CareFD Brand Colors - Teal Palette
+                        'carefd-teal': '#19B8BA',
+                        'carefd-teal-medium': '#41C9C2',
+                        'carefd-teal-light': '#75D9D2',
+                        'carefd-teal-pale': '#ACEDEA',
                         
                         background: 'hsl(var(--background))',
                         foreground: 'hsl(var(--foreground))',

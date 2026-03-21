@@ -98,13 +98,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-carelink-navy via-carelink-slate to-carelink-teal flex">
+    <div className="min-h-screen bg-gradient-to-br from-carefd-navy via-carefd-slate to-carefd-teal flex">
       {/* Left Side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-center items-center p-12 relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-20 w-64 h-64 bg-white rounded-full"></div>
-          <div className="absolute bottom-20 right-20 w-48 h-48 bg-carelink-teal rounded-full"></div>
+          <div className="absolute bottom-20 right-20 w-48 h-48 bg-carefd-teal rounded-full"></div>
         </div>
         
         <div className="relative z-10 text-center text-white">
@@ -112,20 +112,20 @@ const Login = () => {
             <Logo size="large" />
           </div>
           <h1 className="text-4xl font-bold font-heading mb-4">ברוכים הבאים חזרה!</h1>
-          <p className="text-xl text-carelink-teal-pale max-w-md">
+          <p className="text-xl text-carefd-teal-pale max-w-md">
             התחברו לחשבון שלכם וגשו לכל השירותים והספקים המובילים בישראל
           </p>
           
           <div className="mt-12 grid grid-cols-2 gap-6 max-w-sm mx-auto">
             <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl">
-              <FaUsers className="text-3xl text-carelink-teal mb-2 mx-auto" />
+              <FaUsers className="text-3xl text-carefd-teal mb-2 mx-auto" />
               <div className="text-2xl font-bold">5000+</div>
-              <div className="text-sm text-carelink-teal-pale">לקוחות מרוצים</div>
+              <div className="text-sm text-carefd-teal-pale">לקוחות מרוצים</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm p-4 rounded-xl">
-              <FaUserMd className="text-3xl text-carelink-teal mb-2 mx-auto" />
+              <FaUserMd className="text-3xl text-carefd-teal mb-2 mx-auto" />
               <div className="text-2xl font-bold">250+</div>
-              <div className="text-sm text-carelink-teal-pale">ספקים מאומתים</div>
+              <div className="text-sm text-carefd-teal-pale">ספקים מאומתים</div>
             </div>
           </div>
         </div>
@@ -143,10 +143,10 @@ const Login = () => {
 
           <div className="bg-white rounded-3xl shadow-2xl p-8" data-testid="login-form">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-carelink-navy font-heading" data-testid="login-title">
+              <h2 className="text-3xl font-bold text-carefd-navy font-heading" data-testid="login-title">
                 {t('login')}
               </h2>
-              <p className="text-carelink-gray mt-2">התחברו לחשבון שלכם</p>
+              <p className="text-carefd-gray mt-2">התחברו לחשבון שלכם</p>
             </div>
 
             {error && (
@@ -163,7 +163,7 @@ const Login = () => {
                   type="button"
                   onClick={handleResendVerification}
                   disabled={resendingVerification}
-                  className="text-carelink-teal font-medium hover:underline text-sm disabled:opacity-50"
+                  className="text-carefd-teal font-medium hover:underline text-sm disabled:opacity-50"
                   data-testid="resend-verification-login-btn"
                 >
                   {resendingVerification ? 'שולח...' : 'שלח קישור אימות מחדש'}
@@ -174,11 +174,11 @@ const Login = () => {
             {/* Email/Password Login */}
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-carelink-navy mb-2">
+                <label htmlFor="email" className="block text-sm font-semibold text-carefd-navy mb-2">
                   {t('email')}
                 </label>
                 <div className="relative">
-                  <FaEnvelope className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
+                  <FaEnvelope className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
                   <input
                     id="email"
                     name="email"
@@ -186,7 +186,7 @@ const Login = () => {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 pr-12 rtl:pr-4 rtl:pl-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
+                    className="w-full px-4 py-3 pr-12 rtl:pr-4 rtl:pl-12 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal transition-colors"
                     placeholder="your@email.com"
                     data-testid="email-input"
                   />
@@ -194,11 +194,11 @@ const Login = () => {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-carelink-navy mb-2">
+                <label htmlFor="password" className="block text-sm font-semibold text-carefd-navy mb-2">
                   {t('password')}
                 </label>
                 <div className="relative">
-                  <FaLock className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
+                  <FaLock className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
                   <input
                     id="password"
                     name="password"
@@ -206,14 +206,14 @@ const Login = () => {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full px-12 py-3 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
+                    className="w-full px-12 py-3 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal transition-colors"
                     placeholder="••••••••"
                     data-testid="password-input"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-12 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition"
+                    className="absolute right-12 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition"
                     tabIndex={-1}
                     data-testid="toggle-password-visibility"
                   >
@@ -224,8 +224,8 @@ const Login = () => {
 
               <div className="flex items-center justify-between text-sm">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="w-4 h-4 text-carelink-teal rounded" />
-                  <span className="text-carelink-gray">זכור אותי</span>
+                  <input type="checkbox" className="w-4 h-4 text-carefd-teal rounded" />
+                  <span className="text-carefd-gray">זכור אותי</span>
                 </label>
                 <button 
                   type="button"
@@ -234,7 +234,7 @@ const Login = () => {
                     setForgotEmail('');
                     setResetSent(false);
                   }}
-                  className="text-carelink-teal hover:text-carelink-teal-medium font-medium"
+                  className="text-carefd-teal hover:text-carefd-teal-medium font-medium"
                 >
                   שכחת סיסמה?
                 </button>
@@ -243,7 +243,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-carelink-teal text-white py-4 rounded-xl hover:bg-carelink-teal-medium font-semibold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-carefd-teal text-white py-4 rounded-xl hover:bg-carefd-teal-medium font-semibold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 data-testid="submit-login-btn"
               >
                 {loading ? (
@@ -258,21 +258,21 @@ const Login = () => {
             </form>
 
             <div className="mt-8 text-center">
-              <p className="text-carelink-gray">
+              <p className="text-carefd-gray">
                 {t('dontHaveAccount')}{' '}
-                <Link to="/register" className="text-carelink-teal hover:text-carelink-teal-medium font-semibold" data-testid="register-link">
+                <Link to="/register" className="text-carefd-teal hover:text-carefd-teal-medium font-semibold" data-testid="register-link">
                   {t('registerNow')}
                 </Link>
               </p>
             </div>
 
             {/* Provider Registration Link */}
-            <div className="mt-6 pt-6 border-t-2 border-carelink-teal-pale">
+            <div className="mt-6 pt-6 border-t-2 border-carefd-teal-pale">
               <Link
                 to="/register/provider"
-                className="flex items-center justify-center gap-3 w-full bg-carelink-navy/5 text-carelink-navy py-3 rounded-xl hover:bg-carelink-navy/10 font-medium transition"
+                className="flex items-center justify-center gap-3 w-full bg-carefd-navy/5 text-carefd-navy py-3 rounded-xl hover:bg-carefd-navy/10 font-medium transition"
               >
-                <FaUserMd className="text-carelink-teal" />
+                <FaUserMd className="text-carefd-teal" />
                 הרשמה כספק שירותים
               </Link>
             </div>
@@ -294,29 +294,29 @@ const Login = () => {
           <div className="bg-white rounded-2xl w-full max-w-md p-6 relative">
             <button
               onClick={() => setShowForgotPassword(false)}
-              className="absolute top-4 left-4 text-carelink-gray hover:text-carelink-navy transition"
+              className="absolute top-4 left-4 text-carefd-gray hover:text-carefd-navy transition"
             >
               <FaTimes size={20} />
             </button>
             
-            <h2 className="text-xl font-bold text-carelink-navy mb-2">איפוס סיסמה</h2>
+            <h2 className="text-xl font-bold text-carefd-navy mb-2">איפוס סיסמה</h2>
             
             {!resetSent ? (
               <>
-                <p className="text-carelink-gray mb-6">
+                <p className="text-carefd-gray mb-6">
                   הזן את כתובת האימייל שלך ונשלח לך קישור לאיפוס הסיסמה
                 </p>
                 
                 <form onSubmit={handleForgotPassword}>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">אימייל</label>
+                    <label className="block text-sm font-medium text-carefd-navy mb-2">אימייל</label>
                     <div className="relative">
-                      <FaEnvelope className="absolute top-1/2 -translate-y-1/2 right-4 text-carelink-gray" />
+                      <FaEnvelope className="absolute top-1/2 -translate-y-1/2 right-4 text-carefd-gray" />
                       <input
                         type="email"
                         value={forgotEmail}
                         onChange={(e) => setForgotEmail(e.target.value)}
-                        className="w-full px-4 py-3 pr-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
+                        className="w-full px-4 py-3 pr-12 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal transition-colors"
                         placeholder="your@email.com"
                         required
                       />
@@ -326,7 +326,7 @@ const Login = () => {
                   <button
                     type="submit"
                     disabled={sendingReset}
-                    className="w-full bg-carelink-teal text-white py-3 rounded-xl hover:bg-carelink-teal-medium font-semibold transition disabled:opacity-50"
+                    className="w-full bg-carefd-teal text-white py-3 rounded-xl hover:bg-carefd-teal-medium font-semibold transition disabled:opacity-50"
                   >
                     {sendingReset ? (
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
@@ -341,15 +341,15 @@ const Login = () => {
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <FaEnvelope className="text-green-600 text-2xl" />
                 </div>
-                <h3 className="text-lg font-bold text-carelink-navy mb-2">בדוק את האימייל שלך</h3>
-                <p className="text-carelink-gray mb-6">
+                <h3 className="text-lg font-bold text-carefd-navy mb-2">בדוק את האימייל שלך</h3>
+                <p className="text-carefd-gray mb-6">
                   אם האימייל קיים במערכת, שלחנו לך קישור לאיפוס הסיסמה.
                   <br />
                   <span className="text-sm">הקישור תקף ל-1 שעה</span>
                 </p>
                 <button
                   onClick={() => setShowForgotPassword(false)}
-                  className="text-carelink-teal font-medium hover:underline"
+                  className="text-carefd-teal font-medium hover:underline"
                 >
                   חזור להתחברות
                 </button>

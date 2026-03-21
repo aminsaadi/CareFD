@@ -17,12 +17,12 @@ import os
 from datetime import datetime
 
 # Use the PUBLIC URL from frontend/.env for testing what users see
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://carelink-preview-5.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://carefd-preview-5.preview.emergentagent.com').rstrip('/')
 
 # Test credentials
-USER_CREDS = {"email": "user@carelink.co.il", "password": "password"}
-PROVIDER_CREDS = {"email": "provider@carelink.co.il", "password": "password"}
-ADMIN_CREDS = {"email": "admin@carelink.co.il", "password": "password"}
+USER_CREDS = {"email": "user@carefd.com", "password": "password"}
+PROVIDER_CREDS = {"email": "provider@carefd.com", "password": "password"}
+ADMIN_CREDS = {"email": "admin@carefd.com", "password": "password"}
 TEST_SERVICE_ID = "srv_2d5267fcaebb"
 
 

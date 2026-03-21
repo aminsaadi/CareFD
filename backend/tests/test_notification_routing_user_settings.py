@@ -229,7 +229,7 @@ class TestProviderUserSettings:
         """Login as provider before each test"""
         self.session = requests.Session()
         login_response = self.session.post(f"{BASE_URL}/api/auth/login", json={
-            "email": "provider@carelink.co.il",
+            "email": "provider@carefd.com",
             "password": "password"
         })
         if login_response.status_code == 200:
@@ -255,7 +255,7 @@ class TestAdminUserSettings:
         """Login as admin before each test"""
         self.session = requests.Session()
         login_response = self.session.post(f"{BASE_URL}/api/auth/login", json={
-            "email": "admin@carelink.co.il",
+            "email": "admin@carefd.com",
             "password": "password"
         })
         if login_response.status_code == 200:

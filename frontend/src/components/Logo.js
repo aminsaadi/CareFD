@@ -10,7 +10,7 @@ const Logo = ({ size = 'default', className = '' }) => {
   return (
     <img 
       src="/logo.svg" 
-      alt="CareLink" 
+      alt="CareFD" 
       className={`${sizeClasses[size] || sizeClasses.default} w-auto ${className}`}
       data-testid="logo"
     />

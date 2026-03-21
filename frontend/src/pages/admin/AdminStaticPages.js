@@ -127,12 +127,12 @@ const AdminStaticPages = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-carelink-navy">ניהול דפים סטטיים</h1>
-            <p className="text-carelink-gray mt-1">ערוך את תוכן הדפים הקבועים באתר</p>
+            <h1 className="text-2xl font-bold text-carefd-navy">ניהול דפים סטטיים</h1>
+            <p className="text-carefd-gray mt-1">ערוך את תוכן הדפים הקבועים באתר</p>
           </div>
           <button
             onClick={fetchPages}
-            className="flex items-center gap-2 px-4 py-2 bg-carelink-teal-pale text-carelink-teal rounded-lg hover:bg-carelink-teal hover:text-white transition"
+            className="flex items-center gap-2 px-4 py-2 bg-carefd-teal-pale text-carefd-teal rounded-lg hover:bg-carefd-teal hover:text-white transition"
           >
             <FiRefreshCw />
             רענן
@@ -143,12 +143,12 @@ const AdminStaticPages = () => {
           {/* Pages List */}
           <div className="w-64 flex-shrink-0">
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div className="bg-carelink-navy text-white px-4 py-3 font-bold">
+              <div className="bg-carefd-navy text-white px-4 py-3 font-bold">
                 דפים זמינים
               </div>
               {loading ? (
                 <div className="p-4 text-center">
-                  <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
+                  <div className="w-8 h-8 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
                 </div>
               ) : (
                 <div className="divide-y divide-gray-100">
@@ -156,14 +156,14 @@ const AdminStaticPages = () => {
                     <button
                       key={page.page_id}
                       onClick={() => handleSelectPage(page)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 text-right hover:bg-carelink-teal-pale/30 transition ${
-                        selectedPage?.page_id === page.page_id ? 'bg-carelink-teal-pale/50' : ''
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-right hover:bg-carefd-teal-pale/30 transition ${
+                        selectedPage?.page_id === page.page_id ? 'bg-carefd-teal-pale/50' : ''
                       }`}
                     >
                       <span className="text-xl">{getPageIcon(page.slug)}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-carelink-navy truncate">{page.title}</p>
-                        <p className="text-xs text-carelink-gray">/{page.slug}</p>
+                        <p className="font-medium text-carefd-navy truncate">{page.title}</p>
+                        <p className="text-xs text-carefd-gray">/{page.slug}</p>
                       </div>
                       {page.is_published === false && (
                         <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">טיוטה</span>
@@ -184,8 +184,8 @@ const AdminStaticPages = () => {
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{getPageIcon(selectedPage.slug)}</span>
                     <div>
-                      <h2 className="text-lg font-bold text-carelink-navy">עריכת: {editForm.title}</h2>
-                      <p className="text-sm text-carelink-gray">/{editForm.slug}</p>
+                      <h2 className="text-lg font-bold text-carefd-navy">עריכת: {editForm.title}</h2>
+                      <p className="text-sm text-carefd-gray">/{editForm.slug}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -203,7 +203,7 @@ const AdminStaticPages = () => {
                     <button
                       onClick={handleSave}
                       disabled={saving}
-                      className="flex items-center gap-2 px-6 py-2 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal-medium transition disabled:opacity-50"
+                      className="flex items-center gap-2 px-6 py-2 bg-carefd-teal text-white rounded-lg hover:bg-carefd-teal-medium transition disabled:opacity-50"
                     >
                       {saving ? (
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -219,30 +219,30 @@ const AdminStaticPages = () => {
                 <div className="p-6 space-y-6">
                   {/* Title */}
                   <div>
-                    <label className="block text-sm font-bold text-carelink-navy mb-2">כותרת הדף</label>
+                    <label className="block text-sm font-bold text-carefd-navy mb-2">כותרת הדף</label>
                     <input
                       type="text"
                       value={editForm.title}
                       onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-carelink-teal focus:outline-none"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-carefd-teal focus:outline-none"
                     />
                   </div>
 
                   {/* Meta Description */}
                   <div>
-                    <label className="block text-sm font-bold text-carelink-navy mb-2">תיאור לחיפוש (SEO)</label>
+                    <label className="block text-sm font-bold text-carefd-navy mb-2">תיאור לחיפוש (SEO)</label>
                     <textarea
                       value={editForm.meta_description}
                       onChange={(e) => setEditForm({ ...editForm, meta_description: e.target.value })}
                       rows={2}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-carelink-teal focus:outline-none resize-none"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-carefd-teal focus:outline-none resize-none"
                       placeholder="תיאור קצר של הדף לתוצאות חיפוש..."
                     />
                   </div>
 
                   {/* Content Editor */}
                   <div>
-                    <label className="block text-sm font-bold text-carelink-navy mb-2">תוכן הדף</label>
+                    <label className="block text-sm font-bold text-carefd-navy mb-2">תוכן הדף</label>
                     <div className="border-2 border-gray-200 rounded-xl overflow-hidden" dir="rtl">
                       <ReactQuill
                         theme="snow"
@@ -259,9 +259,9 @@ const AdminStaticPages = () => {
               </div>
             ) : (
               <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-                <FiFileText className="text-6xl text-carelink-teal-pale mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-carelink-navy mb-2">בחר דף לעריכה</h3>
-                <p className="text-carelink-gray">לחץ על אחד הדפים בצד ימין כדי להתחיל לערוך</p>
+                <FiFileText className="text-6xl text-carefd-teal-pale mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-carefd-navy mb-2">בחר דף לעריכה</h3>
+                <p className="text-carefd-gray">לחץ על אחד הדפים בצד ימין כדי להתחיל לערוך</p>
               </div>
             )}
           </div>

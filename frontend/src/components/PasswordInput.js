@@ -16,7 +16,7 @@ const PasswordInput = React.forwardRef(({ className = '', ...props }, ref) => {
       <button
         type="button"
         onClick={() => setShowPassword(!showPassword)}
-        className="absolute left-3 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition"
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition"
         tabIndex={-1}
         data-testid={`toggle-password-${props.name || props.id || 'default'}`}
       >

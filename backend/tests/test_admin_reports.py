@@ -19,7 +19,7 @@ class TestAdminReportsAPI:
         
         # Login as admin
         login_response = session.post(f"{BASE_URL}/api/auth/login", json={
-            "email": "admin_test@carelink.co.il",
+            "email": "admin_test@carefd.com",
             "password": "test123456"
         })
         

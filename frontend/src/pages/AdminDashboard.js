@@ -256,17 +256,17 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale/30 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale/30 flex flex-col">
       <Navbar />
       
       <div className="flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-carelink-navy font-heading mb-2">
+            <h1 className="text-3xl font-bold text-carefd-navy font-heading mb-2">
               פאנל ניהול 🛠️
             </h1>
-            <p className="text-carelink-gray">ניהול מלא של הפלטפורמה</p>
+            <p className="text-carefd-gray">ניהול מלא של הפלטפורמה</p>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-6">
@@ -292,7 +292,7 @@ const AdminDashboard = () => {
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-right transition ${
                         activeTab === tab.id
                           ? 'bg-purple-600 text-white'
-                          : 'text-carelink-gray hover:bg-purple-50'
+                          : 'text-carefd-gray hover:bg-purple-50'
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -331,8 +331,8 @@ const AdminDashboard = () => {
                               <FaUsers className="text-blue-600 text-xl" />
                             </div>
                             <div>
-                              <div className="text-2xl font-bold text-carelink-navy">{stats.total_users}</div>
-                              <div className="text-sm text-carelink-gray">משתמשים</div>
+                              <div className="text-2xl font-bold text-carefd-navy">{stats.total_users}</div>
+                              <div className="text-sm text-carefd-gray">משתמשים</div>
                             </div>
                           </div>
                           <div className="mt-3 text-xs text-green-600 flex items-center gap-1">
@@ -346,11 +346,11 @@ const AdminDashboard = () => {
                               <FaUserMd className="text-purple-600 text-xl" />
                             </div>
                             <div>
-                              <div className="text-2xl font-bold text-carelink-navy">{stats.total_providers}</div>
-                              <div className="text-sm text-carelink-gray">ספקים</div>
+                              <div className="text-2xl font-bold text-carefd-navy">{stats.total_providers}</div>
+                              <div className="text-sm text-carefd-gray">ספקים</div>
                             </div>
                           </div>
-                          <div className="mt-3 text-xs text-carelink-teal">
+                          <div className="mt-3 text-xs text-carefd-teal">
                             {stats.verified_providers} מאומתים
                           </div>
                         </div>
@@ -360,8 +360,8 @@ const AdminDashboard = () => {
                               <FaCalendarAlt className="text-green-600 text-xl" />
                             </div>
                             <div>
-                              <div className="text-2xl font-bold text-carelink-navy">{stats.total_bookings}</div>
-                              <div className="text-sm text-carelink-gray">תורים</div>
+                              <div className="text-2xl font-bold text-carefd-navy">{stats.total_bookings}</div>
+                              <div className="text-sm text-carefd-gray">תורים</div>
                             </div>
                           </div>
                           <div className="mt-3 text-xs text-yellow-600">
@@ -374,8 +374,8 @@ const AdminDashboard = () => {
                               <FaStar className="text-yellow-600 text-xl" />
                             </div>
                             <div>
-                              <div className="text-2xl font-bold text-carelink-navy">{stats.total_reviews}</div>
-                              <div className="text-sm text-carelink-gray">ביקורות</div>
+                              <div className="text-2xl font-bold text-carefd-navy">{stats.total_reviews}</div>
+                              <div className="text-sm text-carefd-gray">ביקורות</div>
                             </div>
                           </div>
                         </div>
@@ -384,53 +384,53 @@ const AdminDashboard = () => {
                       {/* Secondary Stats */}
                       <div className="grid md:grid-cols-3 gap-4">
                         <div className="bg-white p-6 rounded-2xl shadow-lg">
-                          <h3 className="font-bold text-carelink-navy mb-4">שירותים</h3>
-                          <div className="text-3xl font-bold text-carelink-teal">{stats.total_services}</div>
-                          <p className="text-sm text-carelink-gray">שירותים פעילים</p>
+                          <h3 className="font-bold text-carefd-navy mb-4">שירותים</h3>
+                          <div className="text-3xl font-bold text-carefd-teal">{stats.total_services}</div>
+                          <p className="text-sm text-carefd-gray">שירותים פעילים</p>
                         </div>
                         <div className="bg-white p-6 rounded-2xl shadow-lg">
-                          <h3 className="font-bold text-carelink-navy mb-4">בקשות</h3>
-                          <div className="text-3xl font-bold text-carelink-teal">{stats.total_requests}</div>
-                          <p className="text-sm text-carelink-gray">{stats.open_requests} פתוחות</p>
+                          <h3 className="font-bold text-carefd-navy mb-4">בקשות</h3>
+                          <div className="text-3xl font-bold text-carefd-teal">{stats.total_requests}</div>
+                          <p className="text-sm text-carefd-gray">{stats.open_requests} פתוחות</p>
                         </div>
                         <div className="bg-white p-6 rounded-2xl shadow-lg">
-                          <h3 className="font-bold text-carelink-navy mb-4">הודעות</h3>
-                          <div className="text-3xl font-bold text-carelink-teal">{stats.total_messages}</div>
-                          <p className="text-sm text-carelink-gray">בצ'אט הפנימי</p>
+                          <h3 className="font-bold text-carefd-navy mb-4">הודעות</h3>
+                          <div className="text-3xl font-bold text-carefd-teal">{stats.total_messages}</div>
+                          <p className="text-sm text-carefd-gray">בצ'אט הפנימי</p>
                         </div>
                       </div>
 
                       {/* Quick Actions */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="font-bold text-carelink-navy mb-4">פעולות מהירות</h3>
+                        <h3 className="font-bold text-carefd-navy mb-4">פעולות מהירות</h3>
                         <div className="grid md:grid-cols-4 gap-4">
                           <button
                             onClick={() => setActiveTab('providers')}
                             className="flex items-center gap-3 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition"
                           >
                             <FaCheckCircle className="text-purple-600" />
-                            <span className="font-medium text-carelink-navy">אמת ספקים</span>
+                            <span className="font-medium text-carefd-navy">אמת ספקים</span>
                           </button>
                           <button
                             onClick={() => setActiveTab('notifications')}
                             className="flex items-center gap-3 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition"
                           >
                             <FaBell className="text-blue-600" />
-                            <span className="font-medium text-carelink-navy">שלח הודעה</span>
+                            <span className="font-medium text-carefd-navy">שלח הודעה</span>
                           </button>
                           <button
                             onClick={() => setActiveTab('reports')}
                             className="flex items-center gap-3 p-4 bg-green-50 rounded-xl hover:bg-green-100 transition"
                           >
                             <FaDownload className="text-green-600" />
-                            <span className="font-medium text-carelink-navy">ייצא דוח</span>
+                            <span className="font-medium text-carefd-navy">ייצא דוח</span>
                           </button>
                           <button
                             onClick={() => setActiveTab('users')}
                             className="flex items-center gap-3 p-4 bg-yellow-50 rounded-xl hover:bg-yellow-100 transition"
                           >
                             <FaUsers className="text-yellow-600" />
-                            <span className="font-medium text-carelink-navy">נהל משתמשים</span>
+                            <span className="font-medium text-carefd-navy">נהל משתמשים</span>
                           </button>
                         </div>
                       </div>
@@ -441,22 +441,22 @@ const AdminDashboard = () => {
                   {activeTab === 'users' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                        <h3 className="text-xl font-bold text-carelink-navy">ניהול משתמשים</h3>
+                        <h3 className="text-xl font-bold text-carefd-navy">ניהול משתמשים</h3>
                         <div className="flex gap-3">
                           <div className="relative">
-                            <FaSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carelink-gray" />
+                            <FaSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carefd-gray" />
                             <input
                               type="text"
                               placeholder="חפש משתמש..."
                               value={searchQuery}
                               onChange={(e) => setSearchQuery(e.target.value)}
-                              className="pl-4 pr-10 py-2 border-2 border-carelink-teal-pale rounded-xl focus:border-purple-500 focus:outline-none"
+                              className="pl-4 pr-10 py-2 border-2 border-carefd-teal-pale rounded-xl focus:border-purple-500 focus:outline-none"
                             />
                           </div>
                           <select
                             value={selectedRole}
                             onChange={(e) => setSelectedRole(e.target.value)}
-                            className="px-4 py-2 border-2 border-carelink-teal-pale rounded-xl focus:border-purple-500 focus:outline-none"
+                            className="px-4 py-2 border-2 border-carefd-teal-pale rounded-xl focus:border-purple-500 focus:outline-none"
                           >
                             <option value="">כל התפקידים</option>
                             <option value="patient">משתמש</option>
@@ -474,17 +474,17 @@ const AdminDashboard = () => {
                         <div className="overflow-x-auto">
                           <table className="w-full">
                             <thead>
-                              <tr className="border-b border-carelink-teal-pale">
-                                <th className="text-right py-3 px-4 font-semibold text-carelink-navy">שם</th>
-                                <th className="text-right py-3 px-4 font-semibold text-carelink-navy">אימייל</th>
-                                <th className="text-right py-3 px-4 font-semibold text-carelink-navy">תפקיד</th>
-                                <th className="text-right py-3 px-4 font-semibold text-carelink-navy">תאריך הצטרפות</th>
-                                <th className="text-right py-3 px-4 font-semibold text-carelink-navy">פעולות</th>
+                              <tr className="border-b border-carefd-teal-pale">
+                                <th className="text-right py-3 px-4 font-semibold text-carefd-navy">שם</th>
+                                <th className="text-right py-3 px-4 font-semibold text-carefd-navy">אימייל</th>
+                                <th className="text-right py-3 px-4 font-semibold text-carefd-navy">תפקיד</th>
+                                <th className="text-right py-3 px-4 font-semibold text-carefd-navy">תאריך הצטרפות</th>
+                                <th className="text-right py-3 px-4 font-semibold text-carefd-navy">פעולות</th>
                               </tr>
                             </thead>
                             <tbody>
                               {users.map((u) => (
-                                <tr key={u.user_id} className="border-b border-carelink-teal-pale/50 hover:bg-gray-50">
+                                <tr key={u.user_id} className="border-b border-carefd-teal-pale/50 hover:bg-gray-50">
                                   <td className="py-4 px-4">{u.name}</td>
                                   <td className="py-4 px-4">{u.email}</td>
                                   <td className="py-4 px-4">
@@ -529,7 +529,7 @@ const AdminDashboard = () => {
                   {/* Providers Tab */}
                   {activeTab === 'providers' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <h3 className="text-xl font-bold text-carelink-navy mb-6">ניהול ספקים</h3>
+                      <h3 className="text-xl font-bold text-carefd-navy mb-6">ניהול ספקים</h3>
                       {loading ? (
                         <div className="text-center py-8">
                           <div className="w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
@@ -537,16 +537,16 @@ const AdminDashboard = () => {
                       ) : (
                         <div className="space-y-4">
                           {providers.map((provider) => (
-                            <div key={provider.provider_id} className="flex items-center justify-between p-4 border-2 border-carelink-teal-pale rounded-xl hover:border-purple-300">
+                            <div key={provider.provider_id} className="flex items-center justify-between p-4 border-2 border-carefd-teal-pale rounded-xl hover:border-purple-300">
                               <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-carelink-navy rounded-full flex items-center justify-center text-white font-bold">
+                                <div className="w-12 h-12 bg-carefd-navy rounded-full flex items-center justify-center text-white font-bold">
                                   {(provider.business_name || 'P')[0]}
                                 </div>
                                 <div>
                                   <div className="flex items-center gap-2">
-                                    <h4 className="font-bold text-carelink-navy">{provider.business_name}</h4>
+                                    <h4 className="font-bold text-carefd-navy">{provider.business_name}</h4>
                                     {provider.is_verified && (
-                                      <span className="bg-carelink-teal text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                                      <span className="bg-carefd-teal text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
                                         <FaCheckCircle /> מאומת
                                       </span>
                                     )}
@@ -556,7 +556,7 @@ const AdminDashboard = () => {
                                       </span>
                                     )}
                                   </div>
-                                  <p className="text-sm text-carelink-gray">
+                                  <p className="text-sm text-carefd-gray">
                                     {provider.location?.city} • {t(provider.provider_type)} • ⭐ {provider.rating?.toFixed(1) || '0.0'}
                                   </p>
                                 </div>
@@ -565,7 +565,7 @@ const AdminDashboard = () => {
                                 {!provider.is_verified && (
                                   <button
                                     onClick={() => verifyProvider(provider.provider_id)}
-                                    className="bg-carelink-teal text-white px-3 py-1 rounded-lg text-sm hover:bg-carelink-teal-medium"
+                                    className="bg-carefd-teal text-white px-3 py-1 rounded-lg text-sm hover:bg-carefd-teal-medium"
                                   >
                                     אמת
                                   </button>
@@ -580,7 +580,7 @@ const AdminDashboard = () => {
                                 )}
                                 <Link
                                   to={`/providers/${provider.provider_id}`}
-                                  className="text-carelink-gray hover:text-carelink-navy p-2"
+                                  className="text-carefd-gray hover:text-carefd-navy p-2"
                                 >
                                   <FaEye />
                                 </Link>
@@ -596,59 +596,59 @@ const AdminDashboard = () => {
                   {activeTab === 'reports' && (
                     <div className="space-y-6">
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6">דוחות וייצוא נתונים</h3>
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6">דוחות וייצוא נתונים</h3>
                         <div className="grid md:grid-cols-2 gap-4">
                           <button
                             onClick={() => exportData('users')}
-                            className="flex items-center justify-between p-4 border-2 border-carelink-teal-pale rounded-xl hover:border-purple-300 transition"
+                            className="flex items-center justify-between p-4 border-2 border-carefd-teal-pale rounded-xl hover:border-purple-300 transition"
                           >
                             <div className="flex items-center gap-3">
                               <FaUsers className="text-xl text-purple-600" />
                               <div className="text-right">
-                                <p className="font-bold text-carelink-navy">דוח משתמשים</p>
-                                <p className="text-sm text-carelink-gray">ייצוא כל המשתמשים</p>
+                                <p className="font-bold text-carefd-navy">דוח משתמשים</p>
+                                <p className="text-sm text-carefd-gray">ייצוא כל המשתמשים</p>
                               </div>
                             </div>
-                            <FaDownload className="text-carelink-gray" />
+                            <FaDownload className="text-carefd-gray" />
                           </button>
                           <button
                             onClick={() => exportData('providers')}
-                            className="flex items-center justify-between p-4 border-2 border-carelink-teal-pale rounded-xl hover:border-purple-300 transition"
+                            className="flex items-center justify-between p-4 border-2 border-carefd-teal-pale rounded-xl hover:border-purple-300 transition"
                           >
                             <div className="flex items-center gap-3">
                               <FaUserMd className="text-xl text-blue-600" />
                               <div className="text-right">
-                                <p className="font-bold text-carelink-navy">דוח ספקים</p>
-                                <p className="text-sm text-carelink-gray">ייצוא כל הספקים</p>
+                                <p className="font-bold text-carefd-navy">דוח ספקים</p>
+                                <p className="text-sm text-carefd-gray">ייצוא כל הספקים</p>
                               </div>
                             </div>
-                            <FaDownload className="text-carelink-gray" />
+                            <FaDownload className="text-carefd-gray" />
                           </button>
                           <button
                             onClick={() => exportData('bookings')}
-                            className="flex items-center justify-between p-4 border-2 border-carelink-teal-pale rounded-xl hover:border-purple-300 transition"
+                            className="flex items-center justify-between p-4 border-2 border-carefd-teal-pale rounded-xl hover:border-purple-300 transition"
                           >
                             <div className="flex items-center gap-3">
                               <FaCalendarAlt className="text-xl text-green-600" />
                               <div className="text-right">
-                                <p className="font-bold text-carelink-navy">דוח תורים</p>
-                                <p className="text-sm text-carelink-gray">ייצוא כל התורים</p>
+                                <p className="font-bold text-carefd-navy">דוח תורים</p>
+                                <p className="text-sm text-carefd-gray">ייצוא כל התורים</p>
                               </div>
                             </div>
-                            <FaDownload className="text-carelink-gray" />
+                            <FaDownload className="text-carefd-gray" />
                           </button>
                           <button
                             onClick={() => exportData('revenue')}
-                            className="flex items-center justify-between p-4 border-2 border-carelink-teal-pale rounded-xl hover:border-purple-300 transition"
+                            className="flex items-center justify-between p-4 border-2 border-carefd-teal-pale rounded-xl hover:border-purple-300 transition"
                           >
                             <div className="flex items-center gap-3">
                               <FaMoneyBillWave className="text-xl text-yellow-600" />
                               <div className="text-right">
-                                <p className="font-bold text-carelink-navy">דוח הכנסות</p>
-                                <p className="text-sm text-carelink-gray">סיכום כספי</p>
+                                <p className="font-bold text-carefd-navy">דוח הכנסות</p>
+                                <p className="text-sm text-carefd-gray">סיכום כספי</p>
                               </div>
                             </div>
-                            <FaDownload className="text-carelink-gray" />
+                            <FaDownload className="text-carefd-gray" />
                           </button>
                         </div>
                       </div>
@@ -658,33 +658,33 @@ const AdminDashboard = () => {
                   {/* Notifications Tab */}
                   {activeTab === 'notifications' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <h3 className="text-xl font-bold text-carelink-navy mb-6">שליחת הודעות</h3>
+                      <h3 className="text-xl font-bold text-carefd-navy mb-6">שליחת הודעות</h3>
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm font-medium text-carelink-navy mb-2">כותרת ההודעה</label>
+                          <label className="block text-sm font-medium text-carefd-navy mb-2">כותרת ההודעה</label>
                           <input
                             type="text"
                             value={broadcastTitle}
                             onChange={(e) => setBroadcastTitle(e.target.value)}
-                            className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-purple-500 focus:outline-none"
+                            className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-purple-500 focus:outline-none"
                             placeholder="הזן כותרת..."
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-carelink-navy mb-2">תוכן ההודעה</label>
+                          <label className="block text-sm font-medium text-carefd-navy mb-2">תוכן ההודעה</label>
                           <textarea
                             value={broadcastMessage}
                             onChange={(e) => setBroadcastMessage(e.target.value)}
-                            className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-purple-500 focus:outline-none h-32 resize-none"
+                            className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-purple-500 focus:outline-none h-32 resize-none"
                             placeholder="הזן את תוכן ההודעה..."
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-carelink-navy mb-2">שלח ל:</label>
+                          <label className="block text-sm font-medium text-carefd-navy mb-2">שלח ל:</label>
                           <select
                             value={broadcastRole}
                             onChange={(e) => setBroadcastRole(e.target.value)}
-                            className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-purple-500 focus:outline-none"
+                            className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-purple-500 focus:outline-none"
                           >
                             <option value="">כל המשתמשים</option>
                             <option value="patient">משתמשים רגילים</option>
@@ -706,14 +706,14 @@ const AdminDashboard = () => {
                   {activeTab === 'pending' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
                       <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-xl font-bold text-carelink-navy">ספקים ממתינים לאישור</h3>
+                        <h3 className="text-xl font-bold text-carefd-navy">ספקים ממתינים לאישור</h3>
                         <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium">
                           {pendingProviders.length} ממתינים
                         </span>
                       </div>
                       
                       {pendingProviders.length === 0 ? (
-                        <div className="text-center py-12 text-carelink-gray">
+                        <div className="text-center py-12 text-carefd-gray">
                           <FaCheckCircle className="text-5xl mx-auto mb-3 text-green-300" />
                           <p className="text-lg">אין ספקים ממתינים לאישור</p>
                         </div>
@@ -724,7 +724,7 @@ const AdminDashboard = () => {
                               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-3 mb-2">
-                                    <h4 className="font-bold text-carelink-navy text-lg">{provider.business_name || 'ללא שם'}</h4>
+                                    <h4 className="font-bold text-carefd-navy text-lg">{provider.business_name || 'ללא שם'}</h4>
                                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                                       provider.verification_status === 'documents_submitted' 
                                         ? 'bg-blue-100 text-blue-600' 
@@ -734,7 +734,7 @@ const AdminDashboard = () => {
                                     </span>
                                   </div>
                                   
-                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-carelink-gray">
+                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-carefd-gray">
                                     <div>
                                       <span className="font-medium">אימייל:</span> {provider.user_info?.email || provider.email || '-'}
                                     </div>
@@ -752,7 +752,7 @@ const AdminDashboard = () => {
                                   {/* Documents */}
                                   {provider.verification_documents?.length > 0 && (
                                     <div className="mt-3">
-                                      <p className="text-sm font-medium text-carelink-navy mb-2">מסמכים שהועלו:</p>
+                                      <p className="text-sm font-medium text-carefd-navy mb-2">מסמכים שהועלו:</p>
                                       <div className="flex flex-wrap gap-2">
                                         {provider.verification_documents.map((doc, idx) => (
                                           <a
@@ -810,12 +810,12 @@ const AdminDashboard = () => {
                   {/* Settings Tab */}
                   {activeTab === 'settings' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <h3 className="text-xl font-bold text-carelink-navy mb-6">הגדרות מערכת</h3>
+                      <h3 className="text-xl font-bold text-carefd-navy mb-6">הגדרות מערכת</h3>
                       <div className="space-y-6">
                         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                           <div>
-                            <p className="font-medium text-carelink-navy">אימות ספקים אוטומטי</p>
-                            <p className="text-sm text-carelink-gray">אשר ספקים חדשים אוטומטית</p>
+                            <p className="font-medium text-carefd-navy">אימות ספקים אוטומטי</p>
+                            <p className="text-sm text-carefd-gray">אשר ספקים חדשים אוטומטית</p>
                           </div>
                           <label className="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" className="sr-only peer" />
@@ -824,8 +824,8 @@ const AdminDashboard = () => {
                         </div>
                         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                           <div>
-                            <p className="font-medium text-carelink-navy">שליחת מיילים</p>
-                            <p className="text-sm text-carelink-gray">שלח התראות במייל</p>
+                            <p className="font-medium text-carefd-navy">שליחת מיילים</p>
+                            <p className="text-sm text-carefd-gray">שלח התראות במייל</p>
                           </div>
                           <label className="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" className="sr-only peer" defaultChecked />
@@ -834,8 +834,8 @@ const AdminDashboard = () => {
                         </div>
                         <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                           <div>
-                            <p className="font-medium text-carelink-navy">מצב תחזוקה</p>
-                            <p className="text-sm text-carelink-gray">השבת גישה לאתר למשתמשים</p>
+                            <p className="font-medium text-carefd-navy">מצב תחזוקה</p>
+                            <p className="text-sm text-carefd-gray">השבת גישה לאתר למשתמשים</p>
                           </div>
                           <label className="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" className="sr-only peer" />
@@ -850,14 +850,14 @@ const AdminDashboard = () => {
                   {activeTab === 'regions' && (
                     <div className="space-y-6">
                       <div className="bg-white rounded-2xl shadow-lg p-6">
-                        <h2 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
+                        <h2 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
                           <FaMapMarkerAlt className="text-purple-600" />
                           ניהול מחוזות וערים
                         </h2>
 
                         {/* Add New Region */}
                         <div className="bg-purple-50 rounded-xl p-4 mb-6">
-                          <h3 className="font-medium text-carelink-navy mb-3">הוסף מחוז חדש</h3>
+                          <h3 className="font-medium text-carefd-navy mb-3">הוסף מחוז חדש</h3>
                           <div className="flex gap-3">
                             <input
                               type="text"
@@ -896,10 +896,10 @@ const AdminDashboard = () => {
                                     autoFocus
                                   />
                                 ) : (
-                                  <h3 className="font-bold text-carelink-navy text-lg flex items-center gap-2">
+                                  <h3 className="font-bold text-carefd-navy text-lg flex items-center gap-2">
                                     <FaMapMarkerAlt className="text-purple-500" />
                                     {region.name}
-                                    <span className="text-sm font-normal text-carelink-gray">
+                                    <span className="text-sm font-normal text-carefd-gray">
                                       ({region.cities?.length || 0} ערים)
                                     </span>
                                   </h3>
@@ -961,7 +961,7 @@ const AdminDashboard = () => {
                           ))}
 
                           {regions.length === 0 && (
-                            <div className="text-center py-8 text-carelink-gray">
+                            <div className="text-center py-8 text-carefd-gray">
                               <FaMapMarkerAlt className="text-4xl mx-auto mb-3 text-gray-300" />
                               <p>אין מחוזות. הוסף מחוז ראשון למעלה.</p>
                             </div>
@@ -983,7 +983,7 @@ const AdminDashboard = () => {
       {showRejectDialog && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl w-full max-w-md p-6">
-            <h3 className="text-lg font-bold text-carelink-navy mb-4">דחיית בקשת אימות</h3>
+            <h3 className="text-lg font-bold text-carefd-navy mb-4">דחיית בקשת אימות</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
