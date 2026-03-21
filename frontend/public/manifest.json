@@ -1,7 +1,7 @@
 {
-  "short_name": "שירותי בריאות",
-  "name": "שירותי בריאות בישראל",
-  "description": "הפלטפורמה המובילה לשירותי בריאות בישראל",
+  "short_name": "CareZone",
+  "name": "CareZone - HealthCare Providers Zone",
+  "description": "CareZone - HealthCare Providers Zone",
   "icons": [
     {
       "src": "logo192.png",

@@ -1,17 +1,74 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { FaFileContract, FaUserCheck, FaExclamationTriangle, FaBan, FaGavel } from 'react-icons/fa';
 import { useSiteSettings } from '../context/SiteSettingsContext';
+import api from '../utils/api';
 
 const Terms = () => {
   const { siteName, settings } = useSiteSettings();
+  const [dbPage, setDbPage] = useState(null);
+  const [loading, setLoading] = useState(true);
   const lastUpdated = '22 בפברואר, 2026';
 
+  useEffect(() => {
+    const fetchPage = async () => {
+      try {
+        const response = await api.get('/pages/terms');
+        if (response.data && response.data.content) {
+          setDbPage(response.data);
+        }
+      } catch {
+        // No DB content, use hardcoded fallback
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPage();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white" dir="rtl">
+        <Navbar />
+        <div className="flex items-center justify-center h-96">
+          <div className="w-12 h-12 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // If DB has content for this page, render it
+  if (dbPage) {
+    return (
+      <div className="min-h-screen bg-white" dir="rtl">
+        <Navbar />
+        <section className="bg-gradient-to-br from-carelink-navy to-carelink-slate py-16">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <FaFileContract className="text-5xl text-carelink-teal mx-auto mb-4" />
+            <h1 className="text-4xl font-bold text-white mb-4">{dbPage.title}</h1>
+          </div>
+        </section>
+        <section className="py-12">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            <div
+              className="prose prose-lg max-w-none text-carelink-slate"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(dbPage.content) }}
+            />
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Fallback: hardcoded content
   return (
     <div className="min-h-screen bg-white" dir="rtl">
       <Navbar />
-      
+
       {/* Hero */}
       <section className="bg-gradient-to-br from-carelink-navy to-carelink-slate py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
@@ -25,7 +82,7 @@ const Terms = () => {
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="prose prose-lg max-w-none">
-            
+
             <div className="bg-amber-50 border-r-4 border-amber-400 p-4 rounded-lg mb-8">
               <p className="text-amber-800">
                 <strong>חשוב:</strong> השימוש באתר {siteName} מהווה הסכמה לתנאים אלה. אנא קראו אותם בעיון.
@@ -54,7 +111,7 @@ const Terms = () => {
 
             <h2 className="text-2xl font-bold text-carelink-navy mb-4">3. הזמנת שירותים</h2>
             <p className="text-carelink-slate mb-8">
-              בעת הזמנת שירות דרך האתר, נוצר הסכם ישיר בין המשתמש לספק. 
+              בעת הזמנת שירות דרך האתר, נוצר הסכם ישיר בין המשתמש לספק.
               {siteName} משמשת כפלטפורמה מתווכת בלבד ואינה צד להסכם זה.
               המשתמש אחראי לבדוק את התאמת הספק והשירות לצרכיו.
             </p>
@@ -71,8 +128,8 @@ const Terms = () => {
               5. הגבלת אחריות
             </h2>
             <p className="text-carelink-slate mb-8">
-              {siteName} אינה אחראית לאיכות השירותים הניתנים על ידי הספקים, 
-              לנזקים ישירים או עקיפים הנובעים משימוש באתר, 
+              {siteName} אינה אחראית לאיכות השירותים הניתנים על ידי הספקים,
+              לנזקים ישירים או עקיפים הנובעים משימוש באתר,
               או להפסקות זמניות בפעילות האתר.
             </p>
 
@@ -90,8 +147,8 @@ const Terms = () => {
 
             <h2 className="text-2xl font-bold text-carelink-navy mb-4">7. קניין רוחני</h2>
             <p className="text-carelink-slate mb-8">
-              כל הזכויות באתר, לרבות סימני מסחר, לוגואים ותכנים, 
-              שייכות לבעלי האתר או לבעלי הזכויות בהם. 
+              כל הזכויות באתר, לרבות סימני מסחר, לוגואים ותכנים,
+              שייכות לבעלי האתר או לבעלי הזכויות בהם.
               אין להעתיק, לשכפל או להפיץ תוכן מהאתר ללא אישור מראש.
             </p>
 
@@ -100,7 +157,7 @@ const Terms = () => {
               8. דין וסמכות שיפוט
             </h2>
             <p className="text-carelink-slate mb-8">
-              על תנאי שימוש אלה יחולו דיני מדינת ישראל. 
+              על תנאי שימוש אלה יחולו דיני מדינת ישראל.
               סמכות השיפוט הבלעדית נתונה לבתי המשפט בתל אביב-יפו.
             </p>
 
@@ -111,7 +168,7 @@ const Terms = () => {
             <div className="bg-gray-50 p-4 rounded-xl">
               <p className="text-carelink-slate">
                 <strong>אימייל:</strong> {settings.contact_email || 'legal@example.com'}<br />
-                <strong>טלפון:</strong> 03-1234567
+                <strong>טלפון:</strong> {settings.contact_phone || '03-1234567'}
               </p>
             </div>
           </div>

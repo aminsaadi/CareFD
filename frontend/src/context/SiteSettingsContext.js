@@ -29,7 +29,20 @@ export const SiteSettingsProvider = ({ children }) => {
       try {
         const response = await api.get('/settings/public');
         if (response.data) {
-          setSettings(prev => ({ ...prev, ...response.data }));
+          const newSettings = { ...DEFAULT_SETTINGS, ...response.data };
+          setSettings(newSettings);
+
+          // Update document title and meta from DB settings
+          if (newSettings.site_name) {
+            const tagline = newSettings.site_tagline;
+            document.title = tagline
+              ? `${newSettings.site_name} - ${tagline}`
+              : newSettings.site_name;
+          }
+          if (newSettings.site_tagline) {
+            const metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) metaDesc.setAttribute('content', newSettings.site_tagline);
+          }
         }
       } catch {
         // Use defaults
