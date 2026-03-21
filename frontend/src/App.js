@@ -57,6 +57,7 @@ import VerificationRequest from './pages/VerificationRequest';
 import WriteReview from './pages/WriteReview';
 import AdminReviews from './pages/admin/AdminReviews';
 import ScrollToTop from './components/ScrollToTop';
+import SplashScreen, { shouldShowSplash } from './components/SplashScreen';
 import GenericPage from './pages/GenericPage';
 import './i18n';
 import './App.css';
@@ -93,6 +94,12 @@ const NotFound = () => (
 );
 
 function AppRouter() {
+  const [showSplash, setShowSplash] = React.useState(() => shouldShowSplash());
+
+  if (showSplash) {
+    return <SplashScreen onComplete={() => setShowSplash(false)} />;
+  }
+
   return (
     <>
     <ScrollToTop />
