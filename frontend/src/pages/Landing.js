@@ -7,12 +7,13 @@ import ServiceCard from '../components/ServiceCard';
 import api from '../utils/api';
 import { israeliLocalities } from '../data/israeliLocalities';
 import { israeliRegions, healthcareProfessions, popularSearches as searchData } from '../data/searchData';
-import { 
-  FaUserNurse, FaWalking, FaUserMd, FaHeart, 
+import {
+  FaUserNurse, FaWalking, FaUserMd, FaHeart,
   FaHandHoldingHeart, FaSpa, FaStar, FaSearch,
   FaUsers, FaMapMarkerAlt, FaCheckCircle, FaArrowLeft,
   FaCrosshairs, FaSpinner, FaStethoscope, FaBaby,
-  FaBrain, FaHeartbeat, FaHome, FaHospital
+  FaBrain, FaHeartbeat, FaHome, FaHospital,
+  FaTooth, FaLeaf, FaEye, FaHandsHelping, FaAppleAlt
 } from 'react-icons/fa';
 
 // Custom hook for scroll animation
@@ -59,24 +60,80 @@ const AnimatedSection = ({ children, className = '', delay = 0 }) => {
   );
 };
 
-// Professions data
-const professions = [
-  { id: 'nurse', name: 'אחות/אח', icon: FaUserNurse, color: 'bg-pink-50 text-pink-600 shadow-soft hover:shadow-soft-md' },
-  { id: 'doctor', name: 'רופא/ה', icon: FaStethoscope, color: 'bg-blue-50 text-blue-600 shadow-soft hover:shadow-soft-md' },
-  { id: 'physiotherapist', name: 'פיזיותרפיסט/ית', icon: FaWalking, color: 'bg-green-50 text-green-600 shadow-soft hover:shadow-soft-md' },
-  { id: 'caregiver', name: 'מטפל/ת', icon: FaHeart, color: 'bg-red-50 text-red-600 shadow-soft hover:shadow-soft-md' },
-  { id: 'psychologist', name: 'פסיכולוג/ית', icon: FaBrain, color: 'bg-purple-50 text-purple-600 shadow-soft hover:shadow-soft-md' },
-  { id: 'dietitian', name: 'דיאטן/ית', icon: FaHeartbeat, color: 'bg-orange-50 text-orange-600 shadow-soft hover:shadow-soft-md' },
+// Icon mapping from DB icon names to React icon components
+const iconMap = {
+  'stethoscope': FaStethoscope,
+  'heart-pulse': FaHeartbeat,
+  'user-nurse': FaUserNurse,
+  'tooth': FaTooth,
+  'activity': FaWalking,
+  'brain': FaBrain,
+  'apple': FaAppleAlt,
+  'leaf': FaLeaf,
+  'spa': FaSpa,
+  'eye': FaEye,
+  'baby': FaBaby,
+  'helping-hand': FaHandsHelping,
+  'hands-helping': FaHandsHelping,
+  'heart': FaHeart,
+  'home': FaHome,
+  'hospital': FaHospital,
+};
+
+// Color palette for professions (cycled by index)
+const professionColors = [
+  'bg-blue-50 text-blue-600 shadow-soft hover:shadow-soft-md',
+  'bg-pink-50 text-pink-600 shadow-soft hover:shadow-soft-md',
+  'bg-cyan-50 text-cyan-600 shadow-soft hover:shadow-soft-md',
+  'bg-green-50 text-green-600 shadow-soft hover:shadow-soft-md',
+  'bg-purple-50 text-purple-600 shadow-soft hover:shadow-soft-md',
+  'bg-orange-50 text-orange-600 shadow-soft hover:shadow-soft-md',
+  'bg-emerald-50 text-emerald-600 shadow-soft hover:shadow-soft-md',
+  'bg-amber-50 text-amber-600 shadow-soft hover:shadow-soft-md',
+  'bg-rose-50 text-rose-600 shadow-soft hover:shadow-soft-md',
+  'bg-indigo-50 text-indigo-600 shadow-soft hover:shadow-soft-md',
 ];
 
-// Categories data
-const categories = [
-  { id: 'nursing', name: 'סיעוד', icon: FaUserNurse, description: 'טיפול סיעודי מקצועי בבית', color: 'from-pink-500 to-rose-500' },
-  { id: 'physiotherapy', name: 'פיזיותרפיה', icon: FaWalking, description: 'שיקום ופיזיותרפיה', color: 'from-green-500 to-emerald-500' },
-  { id: 'doctor', name: 'רופא בבית', icon: FaUserMd, description: 'ביקור רופא עד הבית', color: 'from-blue-500 to-cyan-500' },
-  { id: 'eldercare', name: 'טיפול בקשישים', icon: FaHeart, description: 'ליווי וטיפול בגיל השלישי', color: 'from-red-500 to-pink-500' },
-  { id: 'therapy', name: 'טיפול רגשי', icon: FaHandHoldingHeart, description: 'פסיכולוגיה וייעוץ', color: 'from-purple-500 to-violet-500' },
-  { id: 'baby', name: 'טיפול בתינוקות', icon: FaBaby, description: 'מטפלות ושמרטפות', color: 'from-amber-500 to-orange-500' },
+// Color palette for categories (gradient)
+const categoryColors = [
+  'from-blue-500 to-cyan-500',
+  'from-pink-500 to-rose-500',
+  'from-green-500 to-emerald-500',
+  'from-purple-500 to-violet-500',
+  'from-orange-500 to-amber-500',
+  'from-red-500 to-pink-500',
+  'from-teal-500 to-cyan-500',
+  'from-indigo-500 to-blue-500',
+  'from-yellow-500 to-orange-500',
+  'from-emerald-500 to-green-500',
+];
+
+// Fallback professions data (synced with DB defaults)
+const fallbackProfessions = [
+  { id: 'prof_medicine', name: 'רפואה', icon: FaStethoscope, color: professionColors[0] },
+  { id: 'prof_nursing', name: 'אחיות', icon: FaHeartbeat, color: professionColors[1] },
+  { id: 'prof_dental', name: 'רפואת שיניים', icon: FaTooth, color: professionColors[2] },
+  { id: 'prof_therapy', name: 'טיפולי שיקום', icon: FaWalking, color: professionColors[3] },
+  { id: 'prof_mental', name: 'בריאות הנפש', icon: FaBrain, color: professionColors[4] },
+  { id: 'prof_nutrition', name: 'תזונה ודיאטה', icon: FaAppleAlt, color: professionColors[5] },
+  { id: 'prof_alternative', name: 'רפואה משלימה', icon: FaLeaf, color: professionColors[6] },
+  { id: 'prof_optometry', name: 'אופטומטריה', icon: FaEye, color: professionColors[7] },
+  { id: 'prof_midwifery', name: 'מיילדות', icon: FaBaby, color: professionColors[8] },
+  { id: 'prof_caregiving', name: 'טיפול וסיוע', icon: FaHandsHelping, color: professionColors[9] },
+];
+
+// Fallback categories data (synced with DB default professions as top-level categories)
+const fallbackCategories = [
+  { id: 'prof_medicine', name: 'רפואה', icon: FaStethoscope, description: 'רופאי משפחה, ילדים, מומחים ועוד', color: 'from-blue-500 to-cyan-500' },
+  { id: 'prof_nursing', name: 'סיעוד', icon: FaUserNurse, description: 'טיפול סיעודי מקצועי בבית', color: 'from-pink-500 to-rose-500' },
+  { id: 'prof_therapy', name: 'טיפולי שיקום', icon: FaWalking, description: 'פיזיותרפיה, ריפוי בעיסוק ועוד', color: 'from-green-500 to-emerald-500' },
+  { id: 'prof_mental', name: 'בריאות הנפש', icon: FaBrain, description: 'פסיכולוגיה, פסיכיאטריה וייעוץ', color: 'from-purple-500 to-violet-500' },
+  { id: 'prof_caregiving', name: 'טיפול וסיוע', icon: FaHandsHelping, description: 'מטפלים סיעודיים וליווי רפואי', color: 'from-red-500 to-pink-500' },
+  { id: 'prof_midwifery', name: 'מיילדות', icon: FaBaby, description: 'ליווי הריון, לידה ולאחר לידה', color: 'from-amber-500 to-orange-500' },
+  { id: 'prof_dental', name: 'רפואת שיניים', icon: FaTooth, description: 'טיפולי שיניים, אורתודונטיה ועוד', color: 'from-cyan-500 to-teal-500' },
+  { id: 'prof_nutrition', name: 'תזונה ודיאטה', icon: FaAppleAlt, description: 'ייעוץ תזונתי ודיאטה קלינית', color: 'from-orange-500 to-amber-500' },
+  { id: 'prof_alternative', name: 'רפואה משלימה', icon: FaLeaf, description: 'דיקור, עיסוי, נטורופתיה ועוד', color: 'from-emerald-500 to-green-500' },
+  { id: 'prof_optometry', name: 'אופטומטריה', icon: FaEye, description: 'בדיקות ראייה והתאמת משקפיים', color: 'from-indigo-500 to-blue-500' },
 ];
 
 // Testimonials
@@ -98,6 +155,8 @@ const Landing = () => {
   const [selectedRadius, setSelectedRadius] = useState('');
   const [searchTab, setSearchTab] = useState('providers'); // 'providers' or 'services'
   const [dynamicPopularSearches, setDynamicPopularSearches] = useState(fallbackPopularSearches);
+  const [professions, setProfessions] = useState(fallbackProfessions);
+  const [categories, setCategories] = useState(fallbackCategories);
 
   // Dropdown states
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
@@ -154,12 +213,35 @@ const Landing = () => {
       // Use comprehensive localities list
       setCities(israeliLocalities);
 
-      // Fetch professions from backend for dynamic popular searches
+      // Fetch professions from backend - update professions, categories, and popular searches
       try {
         const professionsRes = await api.get('/professions');
         const profs = professionsRes.data?.professions || professionsRes.data || [];
         if (Array.isArray(profs) && profs.length > 0) {
-          const profNames = profs.map(p => p.name || p.name_he || p.label).filter(Boolean);
+          // Update professions bar
+          const mappedProfs = profs.map((p, idx) => ({
+            id: p.profession_id || p.id,
+            name: p.name,
+            icon: iconMap[p.icon] || FaStethoscope,
+            color: professionColors[idx % professionColors.length],
+          }));
+          if (mappedProfs.length > 0) setProfessions(mappedProfs);
+
+          // Update categories grid from professions
+          const mappedCats = profs.map((p, idx) => {
+            const subNames = (p.sub_professions || []).slice(0, 3).map(sp => sp.name).join(', ');
+            return {
+              id: p.profession_id || p.id,
+              name: p.name,
+              icon: iconMap[p.icon] || FaStethoscope,
+              description: subNames || p.name,
+              color: categoryColors[idx % categoryColors.length],
+            };
+          });
+          if (mappedCats.length > 0) setCategories(mappedCats);
+
+          // Update popular searches
+          const profNames = profs.map(p => p.name).filter(Boolean);
           if (profNames.length > 0) {
             setDynamicPopularSearches(prev => ({
               ...prev,
@@ -168,7 +250,7 @@ const Landing = () => {
           }
         }
       } catch {
-        // Keep fallback popular searches
+        // Keep fallback data
       }
 
       try {
@@ -648,7 +730,7 @@ const Landing = () => {
           </AnimatedSection>
           
           <AnimatedSection>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {categories.map((category) => (
                 <Link
                   key={category.id}
