@@ -555,7 +555,7 @@ const BookingForm = ({ service, provider, onClose, onSuccess }) => {
           onClose={() => setShowError(false)}
           onRetry={() => {
             setShowError(false);
-            handleSubmit(new Event('submit'));
+            handleSubmit({ preventDefault: () => {} });
           }}
         />
       )}

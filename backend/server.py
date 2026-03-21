@@ -61,11 +61,6 @@ async def health_check():
         "database": "connected" if db_connected else "disconnected"
     }
 
-# Debug: test POST endpoint
-@api_router.post("/debug/test-post")
-async def test_post():
-    return {"message": "POST works!", "cors_origins": cors_origins_env[:50] if cors_origins_env else "not set"}
-
 # Include the api router in the main app
 app.include_router(api_router)
 
@@ -109,6 +104,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Debug: test POST endpoint (only available in non-production)
+if not IS_PRODUCTION:
+    @api_router.post("/debug/test-post")
+    async def test_post():
+        return {"message": "POST works!", "cors_origins": cors_origins_env[:50] if cors_origins_env else "not set"}
 
 # Serve frontend static files if available
 STATIC_DIR = Path(__file__).parent / "static"

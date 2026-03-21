@@ -12,14 +12,14 @@ import {
 
 const AdminSettings = () => {
   const [settings, setSettings] = useState({
-    site_name: 'CareFD',
-    site_tagline: 'Connecting Care Providers',
+    site_name: '',
+    site_tagline: '',
     logo_url: '',
     favicon_url: '',
-    contact_email: 'info@carefd.com',
-    contact_phone: '03-1234567',
-    contact_address: 'תל אביב, ישראל',
-    footer_text: '© 2024 CareFD. כל הזכויות שמורות.',
+    contact_email: '',
+    contact_phone: '',
+    contact_address: '',
+    footer_text: '',
     social_facebook: '',
     social_instagram: '',
     social_twitter: '',
@@ -49,7 +49,42 @@ const AdminSettings = () => {
   });
   const [smtpLoading, setSmtpLoading] = useState(false);
   const [smtpStatus, setSmtpStatus] = useState(null);
+  const logoInputRef = React.useRef(null);
+  const faviconInputRef = React.useRef(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingFavicon, setUploadingFavicon] = useState(false);
   const { confirmState, confirm, closeConfirm } = useConfirm();
+
+  const handleFileUpload = async (file, type) => {
+    const setUploading = type === 'logo' ? setUploadingLogo : setUploadingFavicon;
+    const settingKey = type === 'logo' ? 'logo_url' : 'favicon_url';
+
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon'];
+    if (!allowed.includes(file.type)) {
+      toast.error('סוג קובץ לא נתמך. השתמש ב-PNG, JPG, WebP, GIF, SVG או ICO');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('הקובץ גדול מדי (מקסימום 5MB)');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await api.post('/upload/image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      updateSetting(settingKey, res.data.url);
+      toast.success(type === 'logo' ? 'הלוגו הועלה בהצלחה!' : 'הפאביקון הועלה בהצלחה!');
+    } catch (error) {
+      console.error(`Failed to upload ${type}:`, error);
+      toast.error(`שגיאה בהעלאת ${type === 'logo' ? 'הלוגו' : 'הפאביקון'}`);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   useEffect(() => {
     fetchSettings();
@@ -328,9 +363,10 @@ const AdminSettings = () => {
             {activeTab === 'appearance' && (
               <div className="space-y-6">
                 <h2 className="text-lg font-semibold text-carefd-navy mb-4">עיצוב</h2>
-                
+
+                {/* Logo Upload */}
                 <div>
-                  <label className="block text-sm text-carefd-slate mb-2">לוגו (URL)</label>
+                  <label className="block text-sm text-carefd-slate mb-2">לוגו</label>
                   <div className="flex gap-3">
                     <input
                       type="text"
@@ -340,28 +376,89 @@ const AdminSettings = () => {
                       className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                       dir="ltr"
                     />
-                    <button className="px-4 py-2.5 bg-white border border-gray-200 text-carefd-slate rounded-lg hover:bg-gray-50 transition flex items-center gap-2">
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files[0]) handleFileUpload(e.target.files[0], 'logo');
+                        e.target.value = '';
+                      }}
+                    />
+                    <button
+                      onClick={() => logoInputRef.current?.click()}
+                      disabled={uploadingLogo}
+                      className="px-4 py-2.5 bg-white border border-gray-200 text-carefd-slate rounded-lg hover:bg-gray-50 transition flex items-center gap-2 disabled:opacity-50"
+                    >
                       <FiUpload size={18} />
-                      העלה
+                      {uploadingLogo ? 'מעלה...' : 'העלה'}
                     </button>
+                    {settings.logo_url && (
+                      <button
+                        onClick={() => updateSetting('logo_url', '')}
+                        className="px-3 py-2.5 bg-white border border-red-200 text-red-500 rounded-lg hover:bg-red-50 transition"
+                        title="הסר לוגו"
+                      >
+                        <FiTrash2 size={18} />
+                      </button>
+                    )}
                   </div>
                   {settings.logo_url && (
                     <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <p className="text-xs text-carefd-slate mb-2">תצוגה מקדימה:</p>
                       <img src={settings.logo_url} alt="Logo preview" className="h-12 object-contain" />
                     </div>
                   )}
                 </div>
 
+                {/* Favicon Upload */}
                 <div>
-                  <label className="block text-sm text-carefd-slate mb-2">Favicon (URL)</label>
-                  <input
-                    type="text"
-                    value={settings.favicon_url}
-                    onChange={(e) => updateSetting('favicon_url', e.target.value)}
-                    placeholder="https://example.com/favicon.ico"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
-                    dir="ltr"
-                  />
+                  <label className="block text-sm text-carefd-slate mb-2">Favicon (אייקון הדפדפן)</label>
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      value={settings.favicon_url}
+                      onChange={(e) => updateSetting('favicon_url', e.target.value)}
+                      placeholder="https://example.com/favicon.ico"
+                      className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
+                      dir="ltr"
+                    />
+                    <input
+                      ref={faviconInputRef}
+                      type="file"
+                      accept="image/*,.ico"
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files[0]) handleFileUpload(e.target.files[0], 'favicon');
+                        e.target.value = '';
+                      }}
+                    />
+                    <button
+                      onClick={() => faviconInputRef.current?.click()}
+                      disabled={uploadingFavicon}
+                      className="px-4 py-2.5 bg-white border border-gray-200 text-carefd-slate rounded-lg hover:bg-gray-50 transition flex items-center gap-2 disabled:opacity-50"
+                    >
+                      <FiUpload size={18} />
+                      {uploadingFavicon ? 'מעלה...' : 'העלה'}
+                    </button>
+                    {settings.favicon_url && (
+                      <button
+                        onClick={() => updateSetting('favicon_url', '')}
+                        className="px-3 py-2.5 bg-white border border-red-200 text-red-500 rounded-lg hover:bg-red-50 transition"
+                        title="הסר favicon"
+                      >
+                        <FiTrash2 size={18} />
+                      </button>
+                    )}
+                  </div>
+                  {settings.favicon_url && (
+                    <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200 flex items-center gap-3">
+                      <p className="text-xs text-carefd-slate">תצוגה מקדימה:</p>
+                      <img src={settings.favicon_url} alt="Favicon preview" className="h-8 w-8 object-contain" />
+                    </div>
+                  )}
+                  <p className="text-xs text-carefd-gray mt-1">מומלץ: תמונה מרובעת בגודל 32x32 או 64x64 פיקסלים (ICO, PNG, SVG)</p>
                 </div>
               </div>
             )}
@@ -565,7 +662,7 @@ const AdminSettings = () => {
                       <label className="block text-sm text-carefd-slate mb-1">אימייל שולח</label>
                       <input type="email" value={smtpSettings.sender_email}
                         onChange={(e) => setSmtpSettings(p => ({...p, sender_email: e.target.value}))}
-                        placeholder="carefd.com@gmail.com" dir="ltr"
+                        placeholder="your-email@gmail.com" dir="ltr"
                         className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
                         data-testid="smtp-sender-email" />
                     </div>
@@ -581,7 +678,7 @@ const AdminSettings = () => {
                       <label className="block text-sm text-carefd-slate mb-1">שם משתמש SMTP</label>
                       <input type="text" value={smtpSettings.smtp_user}
                         onChange={(e) => setSmtpSettings(p => ({...p, smtp_user: e.target.value}))}
-                        placeholder="carefd.com@gmail.com" dir="ltr"
+                        placeholder="your-email@gmail.com" dir="ltr"
                         className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
                         data-testid="smtp-user" />
                     </div>

@@ -16,8 +16,9 @@ import {
 // Lazy load map component
 const ProvidersMap = lazy(() => import('../components/ProvidersMap'));
 
-// Popular searches data - use from searchData
-const popularSearches = searchData.providers;
+// Fallback popular searches - used until backend professions load
+const fallbackPopularSearches = searchData.providers;
+
 const Providers = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -30,6 +31,7 @@ const Providers = () => {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [locationQuery, setLocationQuery] = useState(searchParams.get('city') || '');
   const [isLocating, setIsLocating] = useState(false);
+  const [popularSearches, setPopularSearches] = useState(fallbackPopularSearches);
   
   // Dropdown states
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
@@ -40,8 +42,8 @@ const Providers = () => {
   const searchDropdownRef = useRef(null);
   const locationDropdownRef = useRef(null);
   
-  // Israeli regions for quick selection - use from searchData
-  const regions = israeliRegions;
+  // Israeli regions for quick selection - fetched from backend with fallback
+  const [regions, setRegions] = useState(israeliRegions);
 
   const radiusOptions = [
     { value: 5, label: '5 ק"מ' },
@@ -84,6 +86,37 @@ const Providers = () => {
       }
     };
     fetchCities();
+
+    // Fetch professions from backend for popular searches
+    const fetchProfessions = async () => {
+      try {
+        const res = await api.get('/professions');
+        const profs = res.data?.professions || res.data || [];
+        if (Array.isArray(profs) && profs.length > 0) {
+          const profNames = profs.map(p => p.name || p.name_he || p.label).filter(Boolean);
+          if (profNames.length > 0) {
+            setPopularSearches(profNames);
+          }
+        }
+      } catch {
+        // Keep fallback popular searches
+      }
+    };
+    fetchProfessions();
+
+    // Fetch regions from backend
+    const fetchRegions = async () => {
+      try {
+        const res = await api.get('/regions');
+        const backendRegions = res.data?.regions || [];
+        if (backendRegions.length > 0) {
+          setRegions(backendRegions);
+        }
+      } catch {
+        // Keep fallback regions
+      }
+    };
+    fetchRegions();
   }, []);
 
   // Close dropdowns when clicking outside
@@ -441,7 +474,7 @@ const Providers = () => {
                             <div className="p-2">
                               {regions.map((region) => (
                                 <button
-                                  key={region.id}
+                                  key={region.region_id || region.id}
                                   type="button"
                                   onClick={() => {
                                     setLocationQuery(region.name);
@@ -561,7 +594,7 @@ const Providers = () => {
                 <span className="text-sm text-carefd-gray">אזורים:</span>
                 {regions.map((region) => (
                   <button
-                    key={region.id}
+                    key={region.region_id || region.id}
                     type="button"
                     onClick={() => {
                       setLocationQuery(region.name);
@@ -829,8 +862,8 @@ const Providers = () => {
                               <p className="font-medium text-carefd-navy text-sm truncate group-hover:text-carefd-teal transition">{provider.name}</p>
                               <p className="text-xs text-carefd-gray truncate">{provider.profession_name || provider.profession} • {provider.location?.city}</p>
                               <div className="flex items-center gap-3 mt-0.5">
-                                {provider.rating > 0 && (
-                                  <span className="text-xs text-amber-500">⭐ {provider.rating.toFixed(1)}</span>
+                                {provider.rating != null && provider.rating > 0 && (
+                                  <span className="text-xs text-amber-500">⭐ {Number(provider.rating).toFixed(1)}</span>
                                 )}
                                 {provider.distance_km != null && (
                                   <span className="text-xs text-blue-500">{provider.distance_km} ק״מ</span>

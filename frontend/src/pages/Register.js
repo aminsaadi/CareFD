@@ -97,7 +97,7 @@ const Register = () => {
               </p>
               <p className="font-bold text-carefd-navy text-lg mb-6" dir="ltr">{formData.email}</p>
               <p className="text-sm text-carefd-gray mb-6">
-                לחץ על הלינק במייל כדי לאמת את החשבון שלך ולהתחיל להשתמש ב-CareFD.
+                לחץ על הלינק במייל כדי לאמת את החשבון שלך ולהתחיל להשתמש בפלטפורמה.
                 <br />הלינק תקף ל-24 שעות.
               </p>
               <button

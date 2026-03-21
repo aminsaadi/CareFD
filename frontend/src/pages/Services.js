@@ -72,6 +72,7 @@ const Services = () => {
   const [locationQuery, setLocationQuery] = useState(searchParams.get('city') || '');
   const [professionQuery, setProfessionQuery] = useState(searchParams.get('profession') || '');
   const [isLocating, setIsLocating] = useState(false);
+  const [apiProfessions, setApiProfessions] = useState([]);
 
   // Dropdown states
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
@@ -157,6 +158,29 @@ const Services = () => {
   // Initial fetch
   useEffect(() => {
     fetchServices(false);
+    // Fetch professions from API
+    api.get('/professions').then(res => {
+      const profs = res.data.professions || [];
+      // Flatten: main professions + their sub_professions as individual entries
+      const flatList = [];
+      profs.forEach(prof => {
+        flatList.push({
+          id: prof.profession_id,
+          name: prof.name,
+          searchTerms: prof.specializations || []
+        });
+        (prof.sub_professions || []).forEach(sub => {
+          flatList.push({
+            id: sub.sub_profession_id,
+            name: sub.name,
+            searchTerms: [sub.name, prof.name]
+          });
+        });
+      });
+      if (flatList.length > 0) {
+        setApiProfessions(flatList);
+      }
+    }).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -283,12 +307,13 @@ const Services = () => {
     ? israeliLocalities.filter(c => c.name?.includes(locationQuery)).slice(0, 10)
     : [];
 
+  const professionsList = apiProfessions.length > 0 ? apiProfessions : healthcareProfessions;
   const filteredProfessions = professionQuery.trim()
-    ? healthcareProfessions.filter(p =>
+    ? professionsList.filter(p =>
         p.name.includes(professionQuery) ||
-        p.searchTerms.some(t => t.includes(professionQuery))
+        (p.searchTerms || []).some(t => t.includes(professionQuery))
       )
-    : healthcareProfessions;
+    : professionsList;
 
   const activeFiltersCount = [
     filters.serviceType, filters.category, filters.priceMin,

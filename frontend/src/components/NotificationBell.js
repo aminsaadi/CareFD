@@ -55,20 +55,28 @@ const NotificationBell = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const [deletedIds, setDeletedIds] = useState(new Set());
+
   const deleteNotification = async (notificationId, e) => {
     e.stopPropagation();
+    e.preventDefault();
+    setDeletedIds(prev => new Set(prev).add(notificationId));
     try {
       const api = (await import('../utils/api')).default;
       await api.delete(`/notifications/${notificationId}`);
     } catch {
-      // ignore
+      setDeletedIds(prev => {
+        const next = new Set(prev);
+        next.delete(notificationId);
+        return next;
+      });
     }
   };
 
   const getNotificationLink = (notification) => {
     const data = notification.data || {};
-    const isProvider = user?.role === 'PROVIDER';
-    const isAdmin = user?.role === 'ADMIN';
+    const isProvider = user?.role === 'provider';
+    const isAdmin = user?.role === 'admin';
     
     switch (notification.type) {
       case 'booking_new':
@@ -119,6 +127,9 @@ const NotificationBell = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 rounded-lg hover:bg-carefd-teal-pale/30 text-carefd-slate hover:text-carefd-teal transition-colors"
+        aria-label={`התראות${unreadCount > 0 ? ` (${unreadCount} חדשות)` : ''}`}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
         data-testid="notification-bell"
       >
         <FaBell className="text-xl" />
@@ -155,13 +166,13 @@ const NotificationBell = () => {
 
           {/* Notifications List */}
           <div className="max-h-[60vh] md:max-h-96 overflow-y-auto">
-            {notifications.length === 0 ? (
+            {notifications.filter(n => !deletedIds.has(n.notification_id)).length === 0 ? (
               <div className="p-8 text-center text-carefd-gray">
                 <FaBell className="text-4xl mx-auto mb-2 text-carefd-teal-pale" />
                 <p>אין התראות חדשות</p>
               </div>
             ) : (
-              notifications.map((notification) => {
+              notifications.filter(n => !deletedIds.has(n.notification_id)).map((notification) => {
                 const Icon = notificationIcons[notification.type] || FaBell;
                 const colorClass = notificationColors[notification.type] || notificationColors.system;
                 
@@ -189,6 +200,7 @@ const NotificationBell = () => {
                           <button
                             onClick={(e) => deleteNotification(notification.notification_id, e)}
                             className="text-carefd-gray hover:text-red-500 p-1 flex-shrink-0"
+                            aria-label="מחק התראה"
                           >
                             <FaTrash className="text-xs" />
                           </button>

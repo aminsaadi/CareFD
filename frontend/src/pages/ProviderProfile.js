@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AddReviewForm from '../components/AddReviewForm';
@@ -14,7 +15,7 @@ import {
   FaCopy, FaCheck, FaInfoCircle, FaGraduationCap, FaCreditCard,
   FaHospital, FaFileContract, FaIdCard, FaCertificate
 } from 'react-icons/fa';
-import { dummyProviders, dummyServices } from '../data/dummyData';
+
 
 // Service type config
 const serviceTypeConfig = {
@@ -99,6 +100,7 @@ const ProviderProfile = () => {
   const { t } = useTranslation();
   const { providerId } = useParams();
   const { user, isAuthenticated } = useAuth();
+  const { siteName } = useSiteSettings();
   const navigate = useNavigate();
   const [provider, setProvider] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -125,13 +127,7 @@ const ProviderProfile = () => {
       setProvider(response.data);
     } catch (error) {
       console.error('Failed to fetch provider:', error);
-      // Fallback to dummy data
-      const dummyProvider = dummyProviders.find(p => p.provider_id === providerId);
-      if (dummyProvider) {
-        // Add services to dummy provider
-        const providerServices = dummyServices.filter(s => s.provider_id === providerId);
-        setProvider({ ...dummyProvider, services_list: providerServices });
-      }
+      setProvider(null);
     } finally {
       setLoading(false);
     }
@@ -140,11 +136,10 @@ const ProviderProfile = () => {
   const fetchReviews = async () => {
     try {
       const response = await api.get(`/providers/${providerId}/reviews`);
-      const apiReviews = response.data.reviews || [];
-      setReviews(apiReviews.length > 0 ? apiReviews : demoReviews);
+      setReviews(response.data.reviews || []);
     } catch (error) {
       console.error('Failed to fetch reviews:', error);
-      setReviews(demoReviews);
+      setReviews([]);
     }
   };
 
@@ -190,7 +185,7 @@ const ProviderProfile = () => {
 
   const shareToWhatsApp = () => {
     const url = window.location.href;
-    const text = `בדוק את ${provider?.business_name || 'הספק הזה'} ב-CareFD: ${url}`;
+    const text = `בדוק את ${provider?.business_name || 'הספק הזה'} ב-${siteName}: ${url}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -205,20 +200,19 @@ const ProviderProfile = () => {
   };
 
   const handleWhatsApp = () => {
-    const phone = provider?.phone?.replace(/[^0-9]/g, '') || '972500000000';
-    window.open(`https://wa.me/${phone}?text=שלום, מצאתי אתכם ב-CareFD ואשמח לקבל מידע נוסף`, '_blank');
+    if (!provider?.phone) return;
+    const phone = provider.phone.replace(/[^0-9]/g, '');
+    window.open(`https://wa.me/${phone}?text=שלום, מצאתי אתכם ב-${siteName} ואשמח לקבל מידע נוסף`, '_blank');
   };
 
   const handleCall = () => {
+    if (!provider?.phone) return;
     // Check if mobile device
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
+
     if (isMobile) {
-      // On mobile, directly call
-      const phone = provider?.phone || '050-0000000';
-      window.location.href = `tel:${phone}`;
+      window.location.href = `tel:${provider.phone}`;
     } else {
-      // On desktop, show phone number modal
       setShowPhoneModal(true);
     }
   };
@@ -325,11 +319,18 @@ const ProviderProfile = () => {
                 )}
               </div>
               
-              {/* Profession Title - NEW */}
-              {provider.profession_title && (
-                <p className="text-xl text-carefd-teal-pale font-medium mb-3" data-testid="profession-title">
-                  {getProfessionLabel(provider.profession_title)}
-                </p>
+              {/* Profession & Specialization */}
+              {(provider.profession_name || provider.profession_title) && (
+                <div className="mb-3" data-testid="profession-title">
+                  <p className="text-xl text-carefd-teal-pale font-medium mb-1">
+                    {provider.profession_name || getProfessionLabel(provider.profession_title)}
+                  </p>
+                  {provider.specialization_name && (
+                    <span className="bg-white/20 text-white px-3 py-1 rounded-full text-sm">
+                      {provider.specialization_name}
+                    </span>
+                  )}
+                </div>
               )}
 
               {/* Provider Number */}
@@ -861,7 +862,7 @@ const ProviderProfile = () => {
                   השכלה
                 </h3>
                 <div className="space-y-4">
-                  {provider.education.filter(e => e.institution || e.degree).map((edu, idx) => (
+                  {(provider.education || []).filter(e => e.institution || e.degree).map((edu, idx) => (
                     <div key={idx} className="border-r-4 border-carefd-teal pr-4">
                       <p className="font-semibold text-carefd-navy">
                         {educationLevelLabels[edu.degree] || edu.degree}
@@ -889,7 +890,7 @@ const ProviderProfile = () => {
                   תעודות ורישיונות
                 </h3>
                 <div className="space-y-4">
-                  {provider.certifications.filter(c => c.name || c.license_number).map((cert, idx) => (
+                  {(provider.certifications || []).filter(c => c.name || c.license_number).map((cert, idx) => (
                     <div key={idx} className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200">
                       <p className="font-semibold text-carefd-navy flex items-center gap-2">
                         <FaAward className="text-amber-500" />
@@ -1152,8 +1153,8 @@ const ProviderProfile = () => {
                 onClick={() => {
                   if (navigator.share) {
                     navigator.share({
-                      title: provider?.business_name || 'CareFD',
-                      text: `בדוק את ${provider?.business_name || 'הספק הזה'} ב-CareFD`,
+                      title: provider?.business_name || siteName,
+                      text: `בדוק את ${provider?.business_name || 'הספק הזה'} ב-${siteName}`,
                       url: window.location.href
                     });
                   }

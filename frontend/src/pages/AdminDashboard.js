@@ -25,6 +25,10 @@ const AdminDashboard = () => {
   const [providers, setProviders] = useState([]);
   const [pendingProviders, setPendingProviders] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [adminRequests, setAdminRequests] = useState([]);
+  const [adminOffers, setAdminOffers] = useState([]);
+  const [requestsTotal, setRequestsTotal] = useState(0);
+  const [requestStatusFilter, setRequestStatusFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
@@ -42,7 +46,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchAdminData();
-  }, [activeTab, searchQuery, selectedRole]);
+  }, [activeTab, searchQuery, selectedRole, requestStatusFilter]);
 
   const fetchAdminData = async () => {
     try {
@@ -79,6 +83,18 @@ const AdminDashboard = () => {
       if (activeTab === 'bookings') {
         const bookingsRes = await api.get('/admin/bookings');
         setBookings(bookingsRes.data.bookings || []);
+      }
+
+      // Fetch requests & offers
+      if (activeTab === 'admin_requests') {
+        const reqParams = new URLSearchParams();
+        if (requestStatusFilter) reqParams.append('status', requestStatusFilter);
+        const reqRes = await api.get(`/admin/requests?${reqParams.toString()}`);
+        setAdminRequests(reqRes.data.requests || []);
+        setRequestsTotal(reqRes.data.total || 0);
+
+        const offersRes = await api.get('/admin/offers');
+        setAdminOffers(offersRes.data.offers || []);
       }
 
       // Fetch regions
@@ -241,6 +257,7 @@ const AdminDashboard = () => {
     { id: 'providers', label: 'ספקים', icon: FaUserMd },
     { id: 'pending', label: 'ממתינים לאישור', icon: FaHourglass, badge: pendingProviders.length },
     { id: 'bookings', label: 'תורים', icon: FaCalendarAlt },
+    { id: 'admin_requests', label: 'בקשות והצעות', icon: FaFileContract },
     { id: 'reports', label: 'דוחות', icon: FaFileAlt },
     { id: 'notifications', label: 'התראות', icon: FaBell },
     { id: 'settings', label: 'הגדרות', icon: FaCog },
@@ -589,6 +606,132 @@ const AdminDashboard = () => {
                           ))}
                         </div>
                       )}
+                    </div>
+                  )}
+
+                  {/* Admin Requests & Offers Tab */}
+                  {activeTab === 'admin_requests' && (
+                    <div className="space-y-6">
+                      <div className="bg-white p-6 rounded-2xl shadow-lg">
+                        <div className="flex items-center justify-between mb-6">
+                          <h3 className="text-xl font-bold text-carefd-navy">ניהול בקשות ({requestsTotal})</h3>
+                          <select
+                            value={requestStatusFilter}
+                            onChange={(e) => setRequestStatusFilter(e.target.value)}
+                            className="px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                          >
+                            <option value="">כל הסטטוסים</option>
+                            <option value="open">פתוח</option>
+                            <option value="in_progress">בתהליך</option>
+                            <option value="completed">הושלם</option>
+                            <option value="cancelled">בוטל</option>
+                          </select>
+                        </div>
+
+                        {adminRequests.length === 0 ? (
+                          <div className="text-center py-8 text-carefd-gray">אין בקשות</div>
+                        ) : (
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                              <thead className="bg-carefd-teal-pale">
+                                <tr>
+                                  <th className="p-3 text-right font-semibold text-carefd-navy">כותרת</th>
+                                  <th className="p-3 text-right font-semibold text-carefd-navy">משתמש</th>
+                                  <th className="p-3 text-right font-semibold text-carefd-navy">סטטוס</th>
+                                  <th className="p-3 text-right font-semibold text-carefd-navy">הצעות</th>
+                                  <th className="p-3 text-right font-semibold text-carefd-navy">תקציב</th>
+                                  <th className="p-3 text-right font-semibold text-carefd-navy">תאריך</th>
+                                  <th className="p-3 text-right font-semibold text-carefd-navy">פעולות</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {adminRequests.map((req) => (
+                                  <tr key={req.request_id} className="border-b border-carefd-light-gray hover:bg-gray-50">
+                                    <td className="p-3">
+                                      <Link to={`/requests/${req.request_id}`} className="text-carefd-teal hover:underline font-medium">
+                                        {req.title}
+                                      </Link>
+                                    </td>
+                                    <td className="p-3 text-carefd-slate">{req.user_name || '-'}</td>
+                                    <td className="p-3">
+                                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                        req.status === 'open' ? 'bg-green-100 text-green-800' :
+                                        req.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                                        req.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                                        'bg-gray-100 text-gray-800'
+                                      }`}>
+                                        {req.status === 'open' ? 'פתוח' : req.status === 'in_progress' ? 'בתהליך' : req.status === 'completed' ? 'הושלם' : 'בוטל'}
+                                      </span>
+                                    </td>
+                                    <td className="p-3 text-center">{req.offer_count || 0}</td>
+                                    <td className="p-3">{req.budget ? `₪${req.budget}` : '-'}</td>
+                                    <td className="p-3 text-carefd-gray">{new Date(req.created_at).toLocaleDateString('he-IL')}</td>
+                                    <td className="p-3">
+                                      <button
+                                        onClick={async () => {
+                                          try {
+                                            await api.delete(`/admin/requests/${req.request_id}`);
+                                            toast.success('הבקשה נמחקה');
+                                            fetchAdminData();
+                                          } catch (err) {
+                                            toast.error('שגיאה במחיקה');
+                                          }
+                                        }}
+                                        className="text-red-500 hover:text-red-700 transition"
+                                        title="מחק"
+                                      >
+                                        <FaTrash />
+                                      </button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Offers section */}
+                      <div className="bg-white p-6 rounded-2xl shadow-lg">
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6">כל ההצעות ({adminOffers.length})</h3>
+                        {adminOffers.length === 0 ? (
+                          <div className="text-center py-8 text-carefd-gray">אין הצעות</div>
+                        ) : (
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                              <thead className="bg-carefd-teal-pale">
+                                <tr>
+                                  <th className="p-3 text-right font-semibold text-carefd-navy">בקשה</th>
+                                  <th className="p-3 text-right font-semibold text-carefd-navy">ספק</th>
+                                  <th className="p-3 text-right font-semibold text-carefd-navy">מחיר</th>
+                                  <th className="p-3 text-right font-semibold text-carefd-navy">סטטוס</th>
+                                  <th className="p-3 text-right font-semibold text-carefd-navy">תאריך</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {adminOffers.map((offer) => (
+                                  <tr key={offer.offer_id} className="border-b border-carefd-light-gray hover:bg-gray-50">
+                                    <td className="p-3 text-carefd-slate">{offer.request_title || '-'}</td>
+                                    <td className="p-3 text-carefd-slate">{offer.provider_name || '-'}</td>
+                                    <td className="p-3 font-medium text-carefd-teal">₪{offer.price}</td>
+                                    <td className="p-3">
+                                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                        offer.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                        offer.status === 'accepted' ? 'bg-green-100 text-green-800' :
+                                        offer.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                        'bg-gray-100 text-gray-800'
+                                      }`}>
+                                        {offer.status === 'pending' ? 'ממתין' : offer.status === 'accepted' ? 'התקבלה' : offer.status === 'rejected' ? 'נדחתה' : 'נמשכה'}
+                                      </span>
+                                    </td>
+                                    <td className="p-3 text-carefd-gray">{new Date(offer.created_at).toLocaleDateString('he-IL')}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 

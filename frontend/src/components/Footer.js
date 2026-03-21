@@ -3,13 +3,15 @@ import { Link } from 'react-router-dom';
 import Logo from './Logo';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaPhone, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
 import api from '../utils/api';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 
 const Footer = () => {
+  const { settings: siteSettings, siteName } = useSiteSettings();
   const [settings, setSettings] = useState({
     contact_phone: '03-1234567',
-    contact_email: 'info@carefd.com',
+    contact_email: '',
     contact_address: 'תל אביב, ישראל',
-    footer_text: '© 2025 CareFD. All rights reserved.',
+    footer_text: '',
     social_facebook: '',
     social_instagram: '',
     social_twitter: '',
@@ -52,6 +54,7 @@ const Footer = () => {
       const pages = (response.data.pages || []).filter(p => p.is_active !== false);
       setStaticPages(pages);
     } catch (error) {
+      // Falls back to default links if admin endpoint is not accessible
       setStaticPages([]);
     }
   };
@@ -87,7 +90,7 @@ const Footer = () => {
               <Logo />
             </div>
             <p className="text-carefd-teal-light mb-4 text-sm">
-              Connecting Care Providers
+              {siteSettings.site_tagline || 'Connecting Care Providers'}
             </p>
             <p className="text-carefd-light-gray text-sm">
               פלטפורמה משולבת המחברת בין מטופלים לספקי שירותי בריאות.

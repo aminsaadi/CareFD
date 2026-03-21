@@ -302,8 +302,8 @@ const AdminUsers = () => {
                             {user.name?.[0] || 'U'}
                           </div>
                           <div>
-                            <p className="text-carefd-navy font-medium">{user.name || 'ללא שם'}</p>
-                            <p className="text-carefd-gray text-sm">{user.email}</p>
+                            <p className="text-carefd-navy font-medium" dir="auto">{user.name || 'ללא שם'}</p>
+                            <p className="text-carefd-gray text-sm" dir="ltr">{user.email}</p>
                           </div>
                         </div>
                       </td>
@@ -460,7 +460,7 @@ const AdminUsers = () => {
                     {userDetails.user?.name?.[0] || 'U'}
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-lg font-bold text-carefd-navy">{userDetails.user?.name}</h4>
+                    <h4 className="text-lg font-bold text-carefd-navy" dir="auto">{userDetails.user?.name}</h4>
                     <p className="text-carefd-teal font-mono text-sm">{userDetails.user?.user_number}</p>
                     <div className="flex items-center gap-4 mt-2 text-sm text-carefd-slate">
                       <span className="flex items-center gap-1"><FiMail size={14} /> {userDetails.user?.email}</span>

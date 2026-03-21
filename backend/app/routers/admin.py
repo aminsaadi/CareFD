@@ -8,7 +8,7 @@ from app.database import db
 from app.localities import ISRAEL_LOCALITIES
 from app.models import (
     UserRole, NotificationType, VerificationStatus, BookingStatus,
-    SubscriptionTier, SubscriptionPlan
+    SubscriptionTier, SubscriptionPlan, RequestStatus, OfferStatus
 )
 from app.utils import (
     get_current_user, send_email_async, create_notification,
@@ -1299,10 +1299,14 @@ async def get_public_settings():
     settings = await db.site_settings.find_one({}, {"_id": 0})
     if not settings:
         settings = {
-            "contact_email": "info@carefd.com",
-            "contact_phone": "03-1234567",
-            "contact_address": "תל אביב, ישראל",
-            "footer_text": "© 2025 CareFD. All rights reserved.",
+            "site_name": "",
+            "site_tagline": "Connecting Care Providers",
+            "logo_url": "",
+            "favicon_url": "",
+            "contact_email": "",
+            "contact_phone": "",
+            "contact_address": "",
+            "footer_text": "",
             "social_facebook": "",
             "social_instagram": "",
             "social_twitter": "",
@@ -1315,7 +1319,7 @@ async def get_public_settings():
         "contact_email", "contact_phone", "contact_address",
         "footer_text", "social_facebook", "social_instagram",
         "social_twitter", "social_linkedin", "social_youtube",
-        "footer_links", "site_name", "site_tagline"
+        "footer_links", "site_name", "site_tagline", "logo_url", "favicon_url"
     ]
     return {k: v for k, v in settings.items() if k in public_fields}
 
@@ -1333,14 +1337,14 @@ async def admin_get_settings(
     if not settings:
         # Return default settings
         settings = {
-            "site_name": "CareFD",
+            "site_name": "",
             "site_tagline": "Connecting Care Providers",
             "logo_url": "",
             "favicon_url": "",
-            "contact_email": "info@carefd.com",
-            "contact_phone": "03-1234567",
-            "contact_address": "תל אביב, ישראל",
-            "footer_text": "© 2024 CareFD. כל הזכויות שמורות.",
+            "contact_email": "",
+            "contact_phone": "",
+            "contact_address": "",
+            "footer_text": "",
             "social_facebook": "",
             "social_instagram": "",
             "social_twitter": "",
@@ -1864,10 +1868,10 @@ def _get_default_professions(ts: str):
                 ],
                 "created_at": ts
             },
-            # ==================== סיעוד ====================
+            # ==================== אחיות ====================
             {
                 "profession_id": "prof_nursing",
-                "name": "סיעוד",
+                "name": "אחיות",
                 "name_en": "Nursing",
                 "icon": "heart-pulse",
                 "specializations": ["סיעוד ביתי", "טיפול בקשישים", "סיעוד אחרי ניתוח", "טיפול פליאטיבי", "סיעוד ילדים", "סיעוד נפשי", "סיעוד אונקולוגי"],
@@ -2873,6 +2877,173 @@ async def admin_get_reports(
         "top_providers": top_providers,
         "revenue_by_date": [{"date": k, "revenue": v} for k, v in revenue_by_date.items()]
     }
+
+# ==================== REQUESTS & OFFERS MANAGEMENT ====================
+
+@router.get("/admin/requests")
+async def admin_get_requests(
+    authorization: Optional[str] = Header(None),
+    request: Request = None,
+    status: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 50
+):
+    """Admin: Get all requests with filters"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    query = {}
+    if status:
+        query["status"] = status
+
+    requests_list = await db.requests.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.requests.count_documents(query)
+
+    # Enrich with user info
+    for req in requests_list:
+        user = await db.users.find_one({"user_id": req["user_id"]}, {"_id": 0, "name": 1, "email": 1})
+        if user:
+            req["user_name"] = user.get("name")
+            req["user_email"] = user.get("email")
+
+    return {"requests": requests_list, "total": total, "skip": skip, "limit": limit}
+
+
+@router.get("/admin/requests/{request_id}")
+async def admin_get_request_details(
+    request_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Get request details with all offers"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    req = await db.requests.find_one({"request_id": request_id}, {"_id": 0})
+    if not req:
+        raise HTTPException(status_code=404, detail="Request not found")
+
+    # Enrich with user info
+    user = await db.users.find_one({"user_id": req["user_id"]}, {"_id": 0, "name": 1, "email": 1, "phone": 1})
+    if user:
+        req["user_name"] = user.get("name")
+        req["user_email"] = user.get("email")
+        req["user_phone"] = user.get("phone")
+
+    # Get all offers
+    offers = await db.offers.find({"request_id": request_id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    for offer in offers:
+        provider = await db.providers.find_one({"provider_id": offer["provider_id"]}, {"_id": 0})
+        if provider:
+            offer["provider"] = {
+                "provider_id": provider["provider_id"],
+                "business_name": provider.get("business_name"),
+                "rating": provider.get("rating", 0)
+            }
+
+    req["offers"] = offers
+
+    # Get linked booking if exists
+    if req.get("booking_id"):
+        booking = await db.bookings.find_one({"booking_id": req["booking_id"]}, {"_id": 0})
+        if booking:
+            req["booking"] = booking
+
+    return req
+
+
+@router.put("/admin/requests/{request_id}/status")
+async def admin_update_request_status(
+    request_id: str,
+    status_data: dict,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Update request status"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    new_status = status_data.get("status")
+    valid_statuses = [RequestStatus.OPEN, RequestStatus.IN_PROGRESS, RequestStatus.COMPLETED, RequestStatus.CANCELLED]
+    if new_status not in valid_statuses:
+        raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {valid_statuses}")
+
+    req = await db.requests.find_one({"request_id": request_id}, {"_id": 0})
+    if not req:
+        raise HTTPException(status_code=404, detail="Request not found")
+
+    now = datetime.now(timezone.utc)
+    update_fields = {"status": new_status, "updated_at": now.isoformat()}
+
+    if new_status == RequestStatus.CANCELLED:
+        update_fields["cancelled_at"] = now.isoformat()
+        update_fields["cancellation_reason"] = status_data.get("reason", "Cancelled by admin")
+
+    await db.requests.update_one(
+        {"request_id": request_id},
+        {"$set": update_fields}
+    )
+
+    return {"message": f"Request status updated to {new_status}"}
+
+
+@router.delete("/admin/requests/{request_id}")
+async def admin_delete_request(
+    request_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Admin: Delete a request and its offers"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    req = await db.requests.find_one({"request_id": request_id}, {"_id": 0})
+    if not req:
+        raise HTTPException(status_code=404, detail="Request not found")
+
+    await db.requests.delete_one({"request_id": request_id})
+    await db.offers.delete_many({"request_id": request_id})
+
+    return {"message": "Request and associated offers deleted"}
+
+
+@router.get("/admin/offers")
+async def admin_get_offers(
+    authorization: Optional[str] = Header(None),
+    request: Request = None,
+    status: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 50
+):
+    """Admin: Get all offers"""
+    admin = await get_current_user(authorization, request)
+    if admin.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+
+    query = {}
+    if status:
+        query["status"] = status
+
+    offers = await db.offers.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.offers.count_documents(query)
+
+    # Enrich with request and provider info
+    for offer in offers:
+        req = await db.requests.find_one({"request_id": offer["request_id"]}, {"_id": 0, "title": 1, "status": 1})
+        if req:
+            offer["request_title"] = req.get("title")
+            offer["request_status"] = req.get("status")
+
+        provider = await db.providers.find_one({"provider_id": offer["provider_id"]}, {"_id": 0})
+        if provider:
+            offer["provider_name"] = provider.get("business_name")
+
+    return {"offers": offers, "total": total, "skip": skip, "limit": limit}
+
 
 # ==================== SUBSCRIPTION PLANS ====================
 

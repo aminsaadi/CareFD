@@ -307,37 +307,37 @@ export const dummyRequests = [
 
 export const serviceCategories = [
   {
-    id: "nursing",
-    name: "סיעוד",
-    icon: "FaUserNurse",
+    id: "prof_medicine",
+    name: "רפואה",
+    icon: "FaStethoscope",
+    description: "רופאי משפחה, ילדים, מומחים ועוד"
+  },
+  {
+    id: "prof_nursing",
+    name: "אחיות/סיעוד",
+    icon: "FaHeartbeat",
     description: "טיפול סיעודי מקצועי בבית או במוסד"
   },
   {
-    id: "physiotherapy",
-    name: "פיזיותרפיה",
+    id: "prof_dental",
+    name: "רפואת שיניים",
+    icon: "FaTooth",
+    description: "טיפולי שיניים, אורתודונטיה ועוד"
+  },
+  {
+    id: "prof_therapy",
+    name: "טיפולי שיקום",
     icon: "FaWalking",
-    description: "שיקום ופיזיותרפיה לכל הגילאים"
+    description: "פיזיותרפיה, ריפוי בעיסוק ועוד"
   },
   {
-    id: "doctor",
-    name: "רופא בבית",
-    icon: "FaUserMd",
-    description: "ביקור רופא בנוחות הבית שלך"
+    id: "prof_mental",
+    name: "בריאות הנפש",
+    icon: "FaBrain",
+    description: "פסיכולוגיה, פסיכיאטריה וייעוץ"
   },
   {
-    id: "eldercare",
-    name: "טיפול בקשישים",
-    icon: "FaHeart",
-    description: "שירותי טיפול מקיפים לקשישים"
-  },
-  {
-    id: "therapy",
-    name: "ריפוי בעיסוק",
-    icon: "FaHandHoldingHeart",
-    description: "שיפור תפקוד יומיומי ועצמאות"
-  },
-  {
-    id: "alternative",
+    id: "prof_alternative",
     name: "רפואה משלימה",
     icon: "FaSpa",
     description: "דיקור, עיסוי רפואי ועוד"

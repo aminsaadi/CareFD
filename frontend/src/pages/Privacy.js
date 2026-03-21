@@ -1,15 +1,74 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { FaShieldAlt, FaLock, FaEye, FaUserShield, FaDatabase, FaCookie } from 'react-icons/fa';
+import { useSiteSettings } from '../context/SiteSettingsContext';
+import api from '../utils/api';
 
 const Privacy = () => {
+  const { siteName, settings } = useSiteSettings();
+  const [dbPage, setDbPage] = useState(null);
+  const [loading, setLoading] = useState(true);
   const lastUpdated = '22 בפברואר, 2026';
 
+  useEffect(() => {
+    const fetchPage = async () => {
+      try {
+        const response = await api.get('/pages/privacy');
+        if (response.data && response.data.content) {
+          setDbPage(response.data);
+        }
+      } catch {
+        // No DB content, use hardcoded fallback
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPage();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white" dir="rtl">
+        <Navbar />
+        <div className="flex items-center justify-center h-96">
+          <div className="w-12 h-12 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // If DB has content for this page, render it
+  if (dbPage) {
+    return (
+      <div className="min-h-screen bg-white" dir="rtl">
+        <Navbar />
+        <section className="bg-gradient-to-br from-carefd-navy to-carefd-slate py-16">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <FaShieldAlt className="text-5xl text-carefd-teal mx-auto mb-4" />
+            <h1 className="text-4xl font-bold text-white mb-4">{dbPage.title}</h1>
+          </div>
+        </section>
+        <section className="py-12">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            <div
+              className="prose prose-lg max-w-none text-carefd-slate"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(dbPage.content) }}
+            />
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Fallback: hardcoded content
   return (
     <div className="min-h-screen bg-white" dir="rtl">
       <Navbar />
-      
+
       {/* Hero */}
       <section className="bg-gradient-to-br from-carefd-navy to-carefd-slate py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
@@ -23,14 +82,14 @@ const Privacy = () => {
       <section className="py-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="prose prose-lg max-w-none">
-            
+
             <div className="bg-carefd-teal-pale/20 p-6 rounded-xl mb-8">
               <h2 className="text-xl font-bold text-carefd-navy mb-3 flex items-center gap-2">
                 <FaLock className="text-carefd-teal" />
                 התחייבותנו לפרטיותך
               </h2>
               <p className="text-carefd-slate">
-                ב-CareFD, הפרטיות שלך חשובה לנו. מסמך זה מסביר כיצד אנו אוספים, משתמשים ומגנים על המידע האישי שלך.
+                ב-{siteName}, הפרטיות שלך חשובה לנו. מסמך זה מסביר כיצד אנו אוספים, משתמשים ומגנים על המידע האישי שלך.
               </p>
             </div>
 
@@ -75,7 +134,7 @@ const Privacy = () => {
               עוגיות (Cookies)
             </h2>
             <p className="text-carefd-slate mb-8">
-              אנו משתמשים בעוגיות כדי לשפר את חוויית הגלישה שלך, לזכור את ההעדפות שלך ולנתח את השימוש באתר. 
+              אנו משתמשים בעוגיות כדי לשפר את חוויית הגלישה שלך, לזכור את ההעדפות שלך ולנתח את השימוש באתר.
               באפשרותך לנהל את הגדרות העוגיות דרך הדפדפן שלך.
             </p>
 
@@ -94,8 +153,8 @@ const Privacy = () => {
             </p>
             <div className="bg-gray-50 p-4 rounded-xl">
               <p className="text-carefd-slate">
-                <strong>אימייל:</strong> privacy@carefd.com<br />
-                <strong>טלפון:</strong> 03-1234567
+                <strong>אימייל:</strong> {settings.contact_email || 'privacy@example.com'}<br />
+                <strong>טלפון:</strong> {settings.contact_phone || '03-1234567'}
               </p>
             </div>
           </div>

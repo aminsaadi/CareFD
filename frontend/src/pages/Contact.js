@@ -4,11 +4,13 @@ import Footer from '../components/Footer';
 import api from '../utils/api';
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock, FaPaperPlane, FaCheckCircle } from 'react-icons/fa';
 import { toast } from 'sonner';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 
 const Contact = () => {
+  const { siteName } = useSiteSettings();
   const [settings, setSettings] = useState({
     contact_phone: '03-1234567',
-    contact_email: 'info@carefd.com',
+    contact_email: '',
     contact_address: 'תל אביב, ישראל'
   });
   const [formData, setFormData] = useState({
@@ -65,7 +67,7 @@ const Contact = () => {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold text-white mb-4">צור קשר</h1>
           <p className="text-xl text-carefd-teal-pale">
-            נשמח לשמוע מכם! צוות CareFD כאן לכל שאלה
+            נשמח לשמוע מכם! הצוות שלנו כאן לכל שאלה
           </p>
         </div>
       </section>

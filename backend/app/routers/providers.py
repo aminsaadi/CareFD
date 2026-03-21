@@ -149,17 +149,26 @@ async def get_provider(provider_id: str):
     provider = await db.providers.find_one({"provider_id": provider_id}, {"_id": 0})
     if not provider:
         raise HTTPException(status_code=404, detail="Provider not found")
-    
+
     # Increment view count
     await db.providers.update_one(
         {"provider_id": provider_id},
         {"$inc": {"views_count": 1}}
     )
-    
+
+    # Resolve profession name from professions collection (in case it was renamed)
+    if provider.get("profession_id"):
+        profession = await db.professions.find_one(
+            {"profession_id": provider["profession_id"]},
+            {"_id": 0, "name": 1}
+        )
+        if profession and profession.get("name"):
+            provider["profession_name"] = profession["name"]
+
     # Get services
     services = await db.services.find({"provider_id": provider_id, "is_active": True}, {"_id": 0}).to_list(100)
     provider['services_list'] = services
-    
+
     return provider
 
 @router.get("/providers")
@@ -365,7 +374,20 @@ async def search_providers(
     
     # Apply pagination after filtering and sorting
     providers = providers[skip:skip + limit]
-    
+
+    # Resolve profession names from professions collection
+    prof_ids = list({p.get("profession_id") for p in providers if p.get("profession_id")})
+    if prof_ids:
+        prof_docs = await db.professions.find(
+            {"profession_id": {"$in": prof_ids}},
+            {"_id": 0, "profession_id": 1, "name": 1}
+        ).to_list(100)
+        prof_name_map = {p["profession_id"]: p["name"] for p in prof_docs if p.get("name")}
+        for prov in providers:
+            pid = prov.get("profession_id")
+            if pid and pid in prof_name_map:
+                prov["profession_name"] = prof_name_map[pid]
+
     return {
         "providers": providers,
         "total": total,
@@ -505,21 +527,37 @@ async def update_provider(
     if provider["user_id"] != user["user_id"]:
         raise HTTPException(status_code=403, detail="Not authorized")
     
+    # Whitelist allowed fields to prevent mass assignment attacks
+    ALLOWED_FIELDS = {
+        "business_name", "description", "phone", "email", "website",
+        "provider_type", "location", "address", "city", "professions",
+        "sub_professions", "categories", "languages", "education",
+        "experience_years", "about", "specializations", "target_audiences",
+        "profile_image", "cover_image", "gallery", "working_hours",
+        "availability", "services", "social_links", "gender",
+        "shifts", "travel_radius", "home_visit", "online_service",
+        "instant_booking", "cancellation_policy", "payment_methods",
+        "insurance_accepted", "certifications", "awards",
+    }
+
+    # Filter out any non-allowed fields
+    filtered_updates = {k: v for k, v in updates.items() if k in ALLOWED_FIELDS}
+
     # Auto-geocode location if city is provided but coordinates are missing
-    if "location" in updates and updates["location"]:
-        loc = updates["location"]
+    if "location" in filtered_updates and filtered_updates["location"]:
+        loc = filtered_updates["location"]
         city_name = loc.get("city", "")
         if city_name and (not loc.get("latitude") or not loc.get("longitude")):
             coords = get_locality_coords(city_name)
             if coords:
-                updates["location"]["latitude"] = coords["lat"]
-                updates["location"]["longitude"] = coords["lng"]
-    
-    updates["updated_at"] = datetime.now(timezone.utc).isoformat()
-    
+                filtered_updates["location"]["latitude"] = coords["lat"]
+                filtered_updates["location"]["longitude"] = coords["lng"]
+
+    filtered_updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+
     await db.providers.update_one(
         {"provider_id": provider_id},
-        {"$set": updates}
+        {"$set": filtered_updates}
     )
     
     return {"message": "Provider updated successfully"}

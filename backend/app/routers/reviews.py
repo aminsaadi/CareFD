@@ -18,27 +18,33 @@ async def create_review(
     """Create a review - only allowed after booking is completed"""
     user = await get_current_user(authorization, request)
     
-    # Check if booking_id is provided and if the booking is completed
-    if review_data.booking_id:
-        booking = await db.bookings.find_one({"booking_id": review_data.booking_id}, {"_id": 0})
-        if not booking:
-            raise HTTPException(status_code=404, detail="Booking not found")
-        
-        # Check if user is the booking owner
-        if booking.get("user_id") != user["user_id"]:
-            raise HTTPException(status_code=403, detail="You can only review your own bookings")
-        
-        # Check if booking is completed
-        if booking.get("status") != BookingStatus.COMPLETED:
-            raise HTTPException(status_code=400, detail="ניתן לכתוב חוות דעת רק לאחר השלמת ההזמנה")
-        
-        # Check if already reviewed
-        existing_review = await db.reviews.find_one({
-            "booking_id": review_data.booking_id,
-            "user_id": user["user_id"]
-        })
-        if existing_review:
-            raise HTTPException(status_code=400, detail="כבר כתבת חוות דעת להזמנה זו")
+    # Validate rating range
+    if review_data.rating is not None and (review_data.rating < 1.0 or review_data.rating > 5.0):
+        raise HTTPException(status_code=400, detail="Rating must be between 1.0 and 5.0")
+
+    # Require booking_id for reviews - prevents fake reviews
+    if not review_data.booking_id:
+        raise HTTPException(status_code=400, detail="booking_id is required to write a review")
+
+    booking = await db.bookings.find_one({"booking_id": review_data.booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+
+    # Check if user is the booking owner
+    if booking.get("user_id") != user["user_id"]:
+        raise HTTPException(status_code=403, detail="You can only review your own bookings")
+
+    # Check if booking is completed
+    if booking.get("status") != BookingStatus.COMPLETED:
+        raise HTTPException(status_code=400, detail="ניתן לכתוב חוות דעת רק לאחר השלמת ההזמנה")
+
+    # Check if already reviewed
+    existing_review = await db.reviews.find_one({
+        "booking_id": review_data.booking_id,
+        "user_id": user["user_id"]
+    })
+    if existing_review:
+        raise HTTPException(status_code=400, detail="כבר כתבת חוות דעת להזמנה זו")
     
     review = Review(
         user_id=user["user_id"],
@@ -315,12 +321,12 @@ async def delete_review(
             avg_rating = sum(r["rating"] for r in remaining) / len(remaining)
             await db.providers.update_one(
                 {"provider_id": provider_id},
-                {"$set": {"rating": round(avg_rating, 1), "review_count": len(remaining)}}
+                {"$set": {"rating": round(avg_rating, 1), "total_reviews": len(remaining)}}
             )
         else:
             await db.providers.update_one(
                 {"provider_id": provider_id},
-                {"$set": {"rating": 0, "review_count": 0}}
+                {"$set": {"rating": 0, "total_reviews": 0}}
             )
     
     return {"message": "Review deleted successfully"}

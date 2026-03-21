@@ -1,9 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { FaHeart, FaUsers, FaShieldAlt, FaHandshake, FaLightbulb, FaStar } from 'react-icons/fa';
+import { FaHeart, FaShieldAlt, FaHandshake, FaLightbulb, FaStar } from 'react-icons/fa';
+import { useSiteSettings } from '../context/SiteSettingsContext';
+import api from '../utils/api';
 
 const About = () => {
+  const { siteName } = useSiteSettings();
+  const [dbPage, setDbPage] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPage = async () => {
+      try {
+        const response = await api.get('/pages/about');
+        if (response.data && response.data.content) {
+          setDbPage(response.data);
+        }
+      } catch {
+        // No DB content, use hardcoded fallback
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPage();
+  }, []);
+
   const values = [
     { icon: FaHeart, title: 'אכפתיות', desc: 'אנחנו מאמינים שכל אדם ראוי לטיפול איכותי ונגיש' },
     { icon: FaShieldAlt, title: 'אמינות', desc: 'כל הספקים שלנו עוברים תהליך אימות קפדני' },
@@ -11,24 +34,56 @@ const About = () => {
     { icon: FaLightbulb, title: 'חדשנות', desc: 'טכנולוגיה מתקדמת לחוויית משתמש מיטבית' }
   ];
 
-  const team = [
-    { name: 'ד"ר שרה כהן', role: 'מייסדת ומנכ"לית', image: '' },
-    { name: 'יוסי לוי', role: 'סמנכ"ל טכנולוגיות', image: '' },
-    { name: 'מיכל אברהם', role: 'מנהלת תפעול', image: '' }
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white" dir="rtl">
+        <Navbar />
+        <div className="flex items-center justify-center h-96">
+          <div className="w-12 h-12 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
+  // If DB has content for this page, render it
+  if (dbPage) {
+    return (
+      <div className="min-h-screen bg-white" dir="rtl">
+        <Navbar />
+        <section className="bg-gradient-to-br from-carefd-navy to-carefd-teal py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              {dbPage.title}
+            </h1>
+          </div>
+        </section>
+        <section className="py-16">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            <div
+              className="prose prose-lg max-w-none text-carefd-slate"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(dbPage.content) }}
+            />
+          </div>
+        </section>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Fallback: hardcoded content
   return (
     <div className="min-h-screen bg-white" dir="rtl">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-carefd-navy to-carefd-teal py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            אודות CareFD
+            אודות {siteName}
           </h1>
           <p className="text-xl text-carefd-teal-pale max-w-3xl mx-auto">
-            אנחנו מחברים בין מטופלים לספקי שירותי בריאות מובילים בישראל, 
+            אנחנו מחברים בין מטופלים לספקי שירותי בריאות מובילים בישראל,
             כדי להנגיש טיפול איכותי לכל אחד.
           </p>
         </div>
@@ -41,10 +96,10 @@ const About = () => {
             <div>
               <h2 className="text-3xl font-bold text-carefd-navy mb-6">המשימה שלנו</h2>
               <p className="text-carefd-slate text-lg mb-4">
-                CareFD נוסדה מתוך אמונה שכל אדם ראוי לגישה נוחה ומהירה לשירותי בריאות איכותיים.
+                הפלטפורמה נוסדה מתוך אמונה שכל אדם ראוי לגישה נוחה ומהירה לשירותי בריאות איכותיים.
               </p>
               <p className="text-carefd-slate text-lg mb-4">
-                אנחנו מספקים פלטפורמה שמאפשרת למטופלים למצוא בקלות ספקי שירותים מאומתים, 
+                אנחנו מספקים פלטפורמה שמאפשרת למטופלים למצוא בקלות ספקי שירותים מאומתים,
                 להשוות ביניהם ולהזמין שירותים בלחיצת כפתור.
               </p>
               <p className="text-carefd-slate text-lg">
