@@ -313,7 +313,7 @@ const Notifications = () => {
                               {notification.message}
                             </p>
                             <p className="text-xs text-carelink-gray mt-2">
-                              {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: he })}
+                              {notification.created_at ? formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: he }) : ''}
                             </p>
                           </div>
                           

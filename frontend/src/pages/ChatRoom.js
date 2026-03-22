@@ -81,7 +81,7 @@ const ChatRoom = () => {
     setNewMessage('');
     
     const tempMessage = {
-      message_id: `temp_${Date.now()}`,
+      message_id: `temp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       sender_id: user?.user_id,
       content: messageContent,
       created_at: new Date().toISOString(),
@@ -148,7 +148,7 @@ const ChatRoom = () => {
 
   const getMessageStatus = (message) => {
     if (message.status === 'sending') return <FaClock className="text-gray-400" />;
-    if (message.read_at) return <FaCheckDouble className="text-blue-400" />;
+    if (message.read_at || message.is_read) return <FaCheckDouble className="text-blue-400" />;
     return <FaCheck className="text-gray-400" />;
   };
 
@@ -321,6 +321,7 @@ const ChatRoom = () => {
                 }}
                 placeholder="כתוב הודעה..."
                 rows={1}
+                maxLength={2000}
                 className="w-full px-4 py-3 bg-white/20 text-white placeholder-white/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-white/30 resize-none border border-white/20"
                 style={{ maxHeight: '120px' }}
                 disabled={sending}

@@ -241,17 +241,17 @@ async def get_messages(
     if not is_participant:
         raise HTTPException(status_code=403, detail="Not authorized")
     
-    messages = await db.messages.find(
-        {"room_id": room_id},
-        {"_id": 0}
-    ).sort("created_at", 1).skip(skip).limit(limit).to_list(limit)
-    
-    # Mark messages as read
+    # Mark messages as read first, then fetch
     await db.messages.update_many(
         {"room_id": room_id, "sender_id": {"$ne": user["user_id"]}, "is_read": False},
         {"$set": {"is_read": True}}
     )
-    
+
+    messages = await db.messages.find(
+        {"room_id": room_id},
+        {"_id": 0}
+    ).sort("created_at", 1).skip(skip).limit(limit).to_list(limit)
+
     return {"messages": messages}
 
 # ==================== ARCHIVE & DELETE ====================
