@@ -84,7 +84,6 @@ export const usePushNotifications = () => {
     
     try {
       const registration = await navigator.serviceWorker.register('/sw-push.js');
-      console.log('Service Worker registered:', registration);
       return registration;
     } catch (err) {
       console.error('Service Worker registration failed:', err);

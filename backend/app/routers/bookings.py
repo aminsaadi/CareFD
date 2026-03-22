@@ -8,6 +8,7 @@ import os
 from app.database import db
 from app.models import Booking, BookingCreate, BookingStatus, ContactPerson, ServiceLocation, NotificationType
 from app.utils import get_current_user, send_email_async, create_notification, send_push_to_user
+from app.rate_limiter import rate_limiter, get_client_ip
 
 SITE_URL = os.environ.get('SITE_URL', 'https://carelink.co.il').rstrip('/')
 
@@ -20,7 +21,10 @@ async def create_booking(
     request: Request = None
 ):
     """Create a booking with full details - supports both authenticated users and guests"""
-    
+    # Rate limit: 10 bookings per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"create_booking:{get_client_ip(request)}", max_requests=10, window_seconds=900)
+
     # Check if this is a guest booking (must use bool() to avoid Python's and returning last truthy value)
     is_guest_booking = bool(booking_data.guest_booking and booking_data.guest_name and booking_data.guest_phone)
     

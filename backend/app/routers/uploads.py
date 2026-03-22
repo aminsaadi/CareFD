@@ -117,8 +117,22 @@ async def upload_image(
     # Generate unique filename with sanitized extension
     ext = _sanitize_extension(file.filename, 'jpg')
 
-    # SVG and ICO files skip magic byte verification
-    if ext not in ('svg', 'ico'):
+    # SVG files: check for embedded JavaScript/event handlers
+    if ext == 'svg':
+        try:
+            svg_text = content.decode('utf-8', errors='ignore').lower()
+            dangerous_patterns = ['<script', 'javascript:', 'onerror=', 'onload=', 'onclick=', 'onmouseover=', 'onfocus=', 'eval(', 'expression(']
+            for pattern in dangerous_patterns:
+                if pattern in svg_text:
+                    raise HTTPException(status_code=400, detail="SVG file contains potentially dangerous content")
+        except HTTPException:
+            raise
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid SVG file")
+    elif ext == 'ico':
+        # ICO files skip magic byte verification
+        pass
+    else:
         # Verify file content matches claimed type
         if not _verify_file_magic(content, ext):
             raise HTTPException(status_code=400, detail="File content does not match image type")

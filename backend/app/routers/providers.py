@@ -267,9 +267,10 @@ async def search_providers(
                 ]})
         else:
             # It's a specific city name - match location OR service_areas
+            safe_city = re.escape(city)
             query["$and"].append({"$or": [
-                {"location.city": {"$regex": re.escape(city), "$options": "i"}},
-                {"service_areas": city},
+                {"location.city": {"$regex": safe_city, "$options": "i"}},
+                {"service_areas": {"$regex": f"^{safe_city}$", "$options": "i"}},
             ]})
     
     # Specialization filter (single)

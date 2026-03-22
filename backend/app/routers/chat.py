@@ -6,6 +6,7 @@ import uuid
 from app.database import db
 from app.models import ChatRoom, Message, MessageCreate
 from app.utils import get_current_user, send_email_async, create_notification, send_push_to_user
+from app.rate_limiter import rate_limiter, get_client_ip
 
 router = APIRouter()
 
@@ -16,6 +17,9 @@ async def create_chat_room(
     request: Request = None
 ):
     """Create a chat room"""
+    # Rate limit: 20 chat rooms per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"create_chat:{get_client_ip(request)}", max_requests=20, window_seconds=900)
     user = await get_current_user(authorization, request)
 
     # Verify the authenticated user is one of the participants

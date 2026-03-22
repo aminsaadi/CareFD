@@ -162,17 +162,23 @@ async def get_my_requests(
 
 
 @router.get("/requests/{request_id}")
-async def get_request(request_id: str):
-    """Get a specific request"""
+async def get_request(
+    request_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Get a specific request - requires authentication"""
+    user = await get_current_user(authorization, request)
+
     request_doc = await db.requests.find_one({"request_id": request_id}, {"_id": 0})
     if not request_doc:
         raise HTTPException(status_code=404, detail="Request not found")
 
-    # Enrich with user info
-    user = await db.users.find_one({"user_id": request_doc["user_id"]}, {"_id": 0, "name": 1, "picture": 1})
-    if user:
-        request_doc["user_name"] = user.get("name")
-        request_doc["user_picture"] = user.get("picture")
+    # Enrich with user info (exclude sensitive fields like email)
+    req_user = await db.users.find_one({"user_id": request_doc["user_id"]}, {"_id": 0, "name": 1, "picture": 1})
+    if req_user:
+        request_doc["user_name"] = req_user.get("name")
+        request_doc["user_picture"] = req_user.get("picture")
 
     return request_doc
 
@@ -184,9 +190,12 @@ async def get_requests(
     urgency: Optional[str] = None,
     request_type: Optional[str] = None,
     skip: int = 0,
-    limit: int = 20
+    limit: int = 20,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
 ):
-    """Get service requests"""
+    """Get service requests - requires authentication"""
+    await get_current_user(authorization, request)
     query = {}
     if status:
         query["status"] = status
