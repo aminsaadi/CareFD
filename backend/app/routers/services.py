@@ -144,19 +144,22 @@ async def search_services(
     # Build MongoDB query for the services collection
     service_query = {"is_active": True}
 
+    # Build query using $and for proper combination with $or
+    conditions = [{"is_active": True}]
+
     # Text search with $regex (case-insensitive) on service name and description
     if search:
         escaped = re.escape(search)
-        service_query["$or"] = [
+        conditions.append({"$or": [
             {"name": {"$regex": escaped, "$options": "i"}},
             {"description": {"$regex": escaped, "$options": "i"}},
-        ]
+        ]})
 
     if service_type:
-        service_query["service_type"] = service_type
+        conditions.append({"service_type": service_type})
 
     if service_category:
-        service_query["service_category"] = service_category
+        conditions.append({"service_category": service_category})
 
     # Price range filters
     if price_min is not None or price_max is not None:
@@ -165,13 +168,11 @@ async def search_services(
             price_filter["$gte"] = price_min
         if price_max is not None:
             price_filter["$lte"] = price_max
-        service_query["price"] = price_filter
+        conditions.append({"price": price_filter})
 
-    # Total count of services matching the DB query (before provider post-filters)
-    total_before_filters = await db.services.count_documents(service_query)
+    service_query = {"$and": conditions} if len(conditions) > 1 else conditions[0]
 
-    # Fetch services — we may need extra documents to compensate for post-fetch
-    # filtering, so fetch a larger batch when provider-level filters are active.
+    # Determine if we need provider-level post-filtering
     has_provider_filters = any([
         city, region, profession, gender, languages, health_funds,
         min_rating, verified_only, recommended_only,
@@ -179,19 +180,23 @@ async def search_services(
     ])
 
     if has_provider_filters:
-        # Fetch more to account for filtering losses
-        fetch_limit = (skip + limit) * 5
-        raw_services = await db.services.find(service_query, {"_id": 0}).to_list(fetch_limit)
+        # Fetch all matching services for post-filtering (up to reasonable limit)
+        raw_services = await db.services.find(service_query, {"_id": 0}).to_list(2000)
     else:
         raw_services = await db.services.find(service_query, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
 
-    # Enrich each service with full provider info
+    # Batch-fetch all providers at once (avoid N+1 queries)
+    provider_ids = list({s.get("provider_id") for s in raw_services if s.get("provider_id")})
     provider_cache = {}
+    if provider_ids:
+        provider_docs = await db.providers.find(
+            {"provider_id": {"$in": provider_ids}}, {"_id": 0}
+        ).to_list(len(provider_ids))
+        provider_cache = {p["provider_id"]: p for p in provider_docs}
+
+    # Enrich each service with provider info
     for service in raw_services:
         pid = service.get("provider_id")
-        if pid and pid not in provider_cache:
-            provider_cache[pid] = await db.providers.find_one({"provider_id": pid}, {"_id": 0})
-
         provider = provider_cache.get(pid)
         if provider:
             total_reviews = provider.get("total_reviews") or provider.get("review_count", 0)
@@ -210,6 +215,15 @@ async def search_services(
                 "profession_title": provider.get("profession_title"),
                 "is_verified": provider.get("is_verified", False),
                 "is_recommended": provider.get("is_recommended", False),
+            }
+        else:
+            service["provider"] = {
+                "provider_id": pid,
+                "business_name": "",
+                "rating": 0,
+                "total_reviews": 0,
+                "is_verified": False,
+                "is_recommended": False,
             }
 
     services = raw_services
@@ -271,18 +285,14 @@ async def search_services(
         required_langs = {l.strip().lower() for l in languages.split(",") if l.strip()}
         services = [
             s for s in services
-            if required_langs.issubset(
-                {l.lower() for l in s.get("provider", {}).get("languages", [])}
-            )
+            if required_langs & {l.lower() for l in s.get("provider", {}).get("languages", [])}
         ]
 
     if health_funds:
         required_funds = {f.strip().lower() for f in health_funds.split(",") if f.strip()}
         services = [
             s for s in services
-            if required_funds.issubset(
-                {f.lower() for f in s.get("provider", {}).get("health_funds", [])}
-            )
+            if required_funds & {f.lower() for f in s.get("provider", {}).get("health_funds", [])}
         ]
 
     if min_rating is not None:
@@ -303,8 +313,6 @@ async def search_services(
             if s.get("provider", {}).get("is_recommended") is True
         ]
 
-    filtered_total = len(services)
-
     # --- Sorting ---
     if sort_by == "price_low":
         services.sort(key=lambda s: s.get("price") or 0)
@@ -319,13 +327,16 @@ async def search_services(
             key=lambda s: s.get("provider", {}).get("total_reviews", 0), reverse=True
         )
 
-    # Apply pagination when provider filters were used (we fetched extra earlier)
+    # Total after all filtering (accurate count)
+    filtered_total = len(services)
+
+    # Apply pagination when provider filters were used (we fetched all earlier)
     if has_provider_filters:
         services = services[skip: skip + limit]
 
     return {
         "services": services,
-        "total": total_before_filters,
+        "total": filtered_total,
         "filtered_total": filtered_total,
         "skip": skip,
         "limit": limit,

@@ -302,28 +302,28 @@ async def search_providers(
     
     # Provider type filter
     if provider_type:
-        query["provider_type"] = provider_type
-    
+        query["$and"].append({"provider_type": provider_type})
+
     # Service type filter (need to check services)
     if service_type:
-        query["service_types"] = {"$in": [service_type]}
-    
+        query["$and"].append({"service_types": {"$in": [service_type]}})
+
     # Rating filter
     if min_rating:
-        query["rating"] = {"$gte": min_rating}
-    
+        query["$and"].append({"rating": {"$gte": min_rating}})
+
     # Verified filter
     if verified_only:
-        query["is_verified"] = True
-    
+        query["$and"].append({"is_verified": True})
+
     # Recommended filter
     if recommended_only:
-        query["is_recommended"] = True
-    
+        query["$and"].append({"is_recommended": True})
+
     # Experience filter (in years)
     if min_experience:
         cutoff_date = datetime.now(timezone.utc) - timedelta(days=min_experience * 365)
-        query["created_at"] = {"$lte": cutoff_date.isoformat()}
+        query["$and"].append({"created_at": {"$lte": cutoff_date.isoformat()}})
     
     # Execute query
     providers = await db.providers.find(query, {"_id": 0}).to_list(1000)
@@ -365,11 +365,12 @@ async def search_providers(
     
     # Sorting
     if sort_by == "distance" and latitude is not None:
-        providers.sort(key=lambda x: x.get("distance_km") or float('inf'), reverse=(sort_order == "desc"))
+        # Distance: always closest first (ascending), None values go last
+        providers.sort(key=lambda x: x.get("distance_km") if x.get("distance_km") is not None else float('inf'))
     elif sort_by == "rating":
-        providers.sort(key=lambda x: x.get("rating") or 0, reverse=(sort_order == "desc"))
+        providers.sort(key=lambda x: x.get("rating") or 0, reverse=True)
     elif sort_by == "reviews":
-        providers.sort(key=lambda x: x.get("total_reviews") or 0, reverse=(sort_order == "desc"))
+        providers.sort(key=lambda x: x.get("total_reviews") or 0, reverse=True)
     
     total = len(providers)
     

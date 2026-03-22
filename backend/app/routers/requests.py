@@ -203,7 +203,10 @@ async def get_requests(
         query["status"] = RequestStatus.OPEN
 
     if specialization:
-        query["specialization"] = specialization
+        query["$or"] = [
+            {"specialization": specialization},
+            {"professions": {"$in": [specialization]}}
+        ]
     if urgency:
         query["urgency"] = urgency
     if request_type:

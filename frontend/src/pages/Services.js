@@ -18,15 +18,7 @@ const SESSION_STORAGE_KEY = 'carelink_services_filters';
 const PAGE_LIMIT = 12;
 
 const loadFiltersFromSession = (searchParams) => {
-  try {
-    const saved = sessionStorage.getItem(SESSION_STORAGE_KEY);
-    if (saved) {
-      return JSON.parse(saved);
-    }
-  } catch (e) {
-    // ignore parse errors
-  }
-  return {
+  const fromUrl = {
     serviceType: searchParams.get('type') || '',
     category: searchParams.get('category') || '',
     priceMin: searchParams.get('priceMin') || '',
@@ -41,6 +33,22 @@ const loadFiltersFromSession = (searchParams) => {
     verifiedOnly: searchParams.get('verifiedOnly') === 'true',
     recommendedOnly: searchParams.get('recommendedOnly') === 'true'
   };
+
+  // If URL has meaningful params, prefer them over sessionStorage
+  const hasUrlParams = Array.from(searchParams.keys()).some(k => k !== 'search');
+  if (hasUrlParams) {
+    return fromUrl;
+  }
+
+  try {
+    const saved = sessionStorage.getItem(SESSION_STORAGE_KEY);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch (e) {
+    // ignore parse errors
+  }
+  return fromUrl;
 };
 
 const SkeletonCard = () => (
