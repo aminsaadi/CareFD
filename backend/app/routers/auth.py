@@ -110,7 +110,7 @@ async def register(user_data: UserRegister, request: Request = None):
     
     await send_email_async(
         user.email,
-        "CareLink - אימות כתובת הדואר האלקטרוני",
+        "CareFD - אימות כתובת הדואר האלקטרוני",
         f"""
         <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 30px;">
@@ -120,7 +120,7 @@ async def register(user_data: UserRegister, request: Request = None):
             <p style="font-size: 16px; color: #1E4D5F;">שלום {user.name},</p>
             
             <p style="font-size: 16px; color: #4C6D7F;">
-                תודה שנרשמת ל-CareLink!
+                תודה שנרשמת ל-CareFD!
                 כדי להשלים את ההרשמה ולהפעיל את החשבון שלך, אנא אמת את כתובת הדואר האלקטרוני שלך.
             </p>
             
@@ -135,7 +135,7 @@ async def register(user_data: UserRegister, request: Request = None):
             </p>
             
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">
-                <p>צוות CareLink</p>
+                <p>צוות CareFD</p>
             </div>
         </div>
         """
@@ -266,7 +266,7 @@ async def resend_verification(data: dict, request: Request = None):
     
     await send_email_async(
         email,
-        "CareLink - אימות כתובת הדואר האלקטרוני",
+        "CareFD - אימות כתובת הדואר האלקטרוני",
         f"""
         <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 30px;">
@@ -281,7 +281,7 @@ async def resend_verification(data: dict, request: Request = None):
             </div>
             <p style="font-size: 14px; color: #888; text-align: center;">הלינק תקף ל-24 שעות.</p>
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">
-                <p>צוות CareLink</p>
+                <p>צוות CareFD</p>
             </div>
         </div>
         """
@@ -417,7 +417,7 @@ async def forgot_password(data: dict, request: Request = None):
     # Send password reset email
     await send_email_async(
         email,
-        "איפוס סיסמה - CareLink",
+        "איפוס סיסמה - CareFD",
         f"""
         <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 30px;">
@@ -442,7 +442,7 @@ async def forgot_password(data: dict, request: Request = None):
             </p>
             
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">
-                <p>צוות CareLink</p>
+                <p>צוות CareFD</p>
             </div>
         </div>
         """

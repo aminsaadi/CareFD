@@ -61,14 +61,14 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
 
   return (
     <div
-      className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border-2 border-carelink-teal-pale"
+      className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-all border-2 border-carefd-teal-pale"
       data-testid={`request-card-${request.request_id}`}
     >
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
-          <h3 className="text-xl font-bold text-carelink-navy mb-1">{request.title}</h3>
-          <div className="flex items-center gap-2 text-sm text-carelink-gray">
-            <FaCalendar className="text-carelink-teal" />
+          <h3 className="text-xl font-bold text-carefd-navy mb-1">{request.title}</h3>
+          <div className="flex items-center gap-2 text-sm text-carefd-gray">
+            <FaCalendar className="text-carefd-teal" />
             <span>{request.created_at ? format(new Date(request.created_at), 'dd/MM/yyyy') : ''}</span>
           </div>
         </div>
@@ -85,15 +85,15 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
         </div>
       </div>
 
-      <p className="text-carelink-slate mb-4 line-clamp-2">{request.description}</p>
+      <p className="text-carefd-slate mb-4 line-clamp-2">{request.description}</p>
 
       <div className="space-y-2 mb-4">
         {/* Professions */}
         {request.professions && request.professions.length > 0 && (
           <div className="flex flex-wrap items-center gap-1">
-            <span className="text-sm font-medium text-carelink-navy">מקצוע:</span>
+            <span className="text-sm font-medium text-carefd-navy">מקצוע:</span>
             {request.professions.map((prof, idx) => (
-              <span key={idx} className="bg-carelink-teal-pale text-carelink-teal text-xs px-2 py-0.5 rounded-full">
+              <span key={idx} className="bg-carefd-teal-pale text-carefd-teal text-xs px-2 py-0.5 rounded-full">
                 {prof}
               </span>
             ))}
@@ -103,8 +103,8 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
         {/* Legacy specialization fallback */}
         {(!request.professions || request.professions.length === 0) && request.specialization && (
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-carelink-navy">{t('specialization')}:</span>
-            <span className="bg-carelink-teal-pale text-carelink-teal text-sm px-3 py-1 rounded-full">
+            <span className="text-sm font-medium text-carefd-navy">{t('specialization')}:</span>
+            <span className="bg-carefd-teal-pale text-carefd-teal text-sm px-3 py-1 rounded-full">
               {request.specialization}
             </span>
           </div>
@@ -112,12 +112,12 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
 
         {request.budget && (
           <div className="flex items-center gap-2">
-            <FaMoneyBillWave className="text-carelink-teal" />
-            <span className="text-sm font-medium text-carelink-navy">{t('budget')}:</span>
-            <span className="text-lg font-bold text-carelink-teal">
+            <FaMoneyBillWave className="text-carefd-teal" />
+            <span className="text-sm font-medium text-carefd-navy">{t('budget')}:</span>
+            <span className="text-lg font-bold text-carefd-teal">
               ₪{request.budget}
               {request.budget_type && (
-                <span className="text-sm font-normal text-carelink-gray mr-1">
+                <span className="text-sm font-normal text-carefd-gray mr-1">
                   {BUDGET_TYPE_LABELS[request.budget_type] || request.budget_type}
                 </span>
               )}
@@ -126,15 +126,15 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
         )}
 
         {request.location && (
-          <div className="flex items-center gap-2 text-sm text-carelink-gray">
-            <FaMapMarkerAlt className="text-carelink-teal" />
+          <div className="flex items-center gap-2 text-sm text-carefd-gray">
+            <FaMapMarkerAlt className="text-carefd-teal" />
             <span>{request.location.city}</span>
           </div>
         )}
 
         {request.preferred_date && (
-          <div className="flex items-center gap-2 text-sm text-carelink-gray">
-            <FaCalendar className="text-carelink-teal" />
+          <div className="flex items-center gap-2 text-sm text-carefd-gray">
+            <FaCalendar className="text-carefd-teal" />
             <span>
               {t('preferredDate')}: {request.preferred_date ? format(new Date(request.preferred_date), 'dd/MM/yyyy') : ''}
               {request.preferred_time && ` בשעה ${request.preferred_time}`}
@@ -143,15 +143,15 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
         )}
 
         {request.gender_preference && request.gender_preference !== 'no_preference' && (
-          <div className="flex items-center gap-2 text-sm text-carelink-gray">
-            <FaUser className="text-carelink-teal" />
+          <div className="flex items-center gap-2 text-sm text-carefd-gray">
+            <FaUser className="text-carefd-teal" />
             <span>העדפת מגדר: {GENDER_LABELS[request.gender_preference] || request.gender_preference}</span>
           </div>
         )}
 
         {request.language_preferences && request.language_preferences.length > 0 && (
-          <div className="flex items-center gap-2 text-sm text-carelink-gray">
-            <FaGlobe className="text-carelink-teal" />
+          <div className="flex items-center gap-2 text-sm text-carefd-gray">
+            <FaGlobe className="text-carefd-teal" />
             <span>שפות: {request.language_preferences.map(l => LANGUAGE_LABELS[l] || l).join(', ')}</span>
           </div>
         )}
@@ -167,15 +167,15 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
 
       {/* Offer count badge */}
       {(request.offer_count > 0) && (
-        <div className="flex items-center gap-1 mb-3 text-sm text-carelink-gray">
-          <FaComments className="text-carelink-teal" />
+        <div className="flex items-center gap-1 mb-3 text-sm text-carefd-gray">
+          <FaComments className="text-carefd-teal" />
           <span>{request.offer_count} {t('offerCount')}</span>
         </div>
       )}
 
       <Link
         to={`/requests/${request.request_id}`}
-        className="block w-full text-center bg-carelink-navy text-white px-4 py-2 rounded-lg hover:bg-carelink-slate transition-colors font-medium"
+        className="block w-full text-center bg-carefd-navy text-white px-4 py-2 rounded-lg hover:bg-carefd-slate transition-colors font-medium"
         data-testid={`view-request-${request.request_id}`}
       >
         {showActions ? t('makeOffer') : t('viewOffers')}

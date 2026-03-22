@@ -39,7 +39,7 @@ const notificationColors = {
   offer_new: 'bg-amber-100 text-amber-600',
   offer_accepted: 'bg-green-100 text-green-600',
   review_new: 'bg-yellow-100 text-yellow-600',
-  system: 'bg-carelink-teal-pale text-carelink-teal'
+  system: 'bg-carefd-teal-pale text-carefd-teal'
 };
 
 const Notifications = () => {
@@ -186,11 +186,11 @@ const Notifications = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-carelink-navy flex items-center gap-3">
-              <FaBell className="text-carelink-teal" />
+            <h1 className="text-2xl font-bold text-carefd-navy flex items-center gap-3">
+              <FaBell className="text-carefd-teal" />
               התראות
             </h1>
-            <p className="text-carelink-gray mt-1">
+            <p className="text-carefd-gray mt-1">
               {unreadCount > 0 ? `${unreadCount} התראות שלא נקראו` : 'כל ההתראות נקראו'}
             </p>
           </div>
@@ -198,7 +198,7 @@ const Notifications = () => {
           {unreadCount > 0 && (
             <button
               onClick={markAllAsRead}
-              className="px-4 py-2 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal-medium transition flex items-center gap-2"
+              className="px-4 py-2 bg-carefd-teal text-white rounded-lg hover:bg-carefd-teal-medium transition flex items-center gap-2"
               data-testid="mark-all-read-btn"
             >
               <FaCheck />
@@ -211,8 +211,8 @@ const Notifications = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
           <div className="flex flex-wrap gap-4 items-center">
             <div className="flex items-center gap-2">
-              <FaFilter className="text-carelink-gray" />
-              <span className="text-sm text-carelink-gray">סינון:</span>
+              <FaFilter className="text-carefd-gray" />
+              <span className="text-sm text-carefd-gray">סינון:</span>
             </div>
             
             {/* Read/Unread Filter */}
@@ -227,8 +227,8 @@ const Notifications = () => {
                   onClick={() => setFilter(option.value)}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                     filter === option.value
-                      ? 'bg-carelink-teal text-white'
-                      : 'bg-gray-100 text-carelink-slate hover:bg-gray-200'
+                      ? 'bg-carefd-teal text-white'
+                      : 'bg-gray-100 text-carefd-slate hover:bg-gray-200'
                   }`}
                 >
                   {option.label}
@@ -252,8 +252,8 @@ const Notifications = () => {
                   onClick={() => setTypeFilter(option.value)}
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5 ${
                     typeFilter === option.value
-                      ? 'bg-carelink-navy text-white'
-                      : 'bg-gray-100 text-carelink-slate hover:bg-gray-200'
+                      ? 'bg-carefd-navy text-white'
+                      : 'bg-gray-100 text-carefd-slate hover:bg-gray-200'
                   }`}
                 >
                   {option.icon && <option.icon className="text-xs" />}
@@ -268,14 +268,14 @@ const Notifications = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           {loading ? (
             <div className="p-12 text-center">
-              <div className="animate-spin w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-carelink-gray">טוען התראות...</p>
+              <div className="animate-spin w-8 h-8 border-4 border-carefd-teal border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-carefd-gray">טוען התראות...</p>
             </div>
           ) : filteredNotifications.length === 0 ? (
             <div className="p-12 text-center">
               <FaBell className="mx-auto text-5xl text-gray-200 mb-4" />
-              <p className="text-carelink-gray text-lg">אין התראות</p>
-              <p className="text-carelink-gray text-sm mt-1">
+              <p className="text-carefd-gray text-lg">אין התראות</p>
+              <p className="text-carefd-gray text-sm mt-1">
                 {filter !== 'all' || typeFilter !== 'all' 
                   ? 'נסה לשנות את הסינון' 
                   : 'כשתקבל התראות חדשות, הן יופיעו כאן'}
@@ -291,7 +291,7 @@ const Notifications = () => {
                   <div
                     key={notification.notification_id}
                     className={`p-4 hover:bg-gray-50 transition cursor-pointer ${
-                      !notification.is_read ? 'bg-carelink-teal-pale/20' : ''
+                      !notification.is_read ? 'bg-carefd-teal-pale/20' : ''
                     }`}
                     onClick={() => handleNotificationClick(notification)}
                     data-testid={`notification-${notification.notification_id}`}
@@ -306,13 +306,13 @@ const Notifications = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <div>
-                            <h3 className={`font-medium ${!notification.is_read ? 'text-carelink-navy font-bold' : 'text-carelink-slate'}`}>
+                            <h3 className={`font-medium ${!notification.is_read ? 'text-carefd-navy font-bold' : 'text-carefd-slate'}`}>
                               {notification.title}
                             </h3>
-                            <p className="text-carelink-gray text-sm mt-1 line-clamp-2">
+                            <p className="text-carefd-gray text-sm mt-1 line-clamp-2">
                               {notification.message}
                             </p>
-                            <p className="text-xs text-carelink-gray mt-2">
+                            <p className="text-xs text-carefd-gray mt-2">
                               {notification.created_at ? formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: he }) : ''}
                             </p>
                           </div>
@@ -320,14 +320,14 @@ const Notifications = () => {
                           {/* Actions */}
                           <div className="flex items-center gap-2 flex-shrink-0">
                             {!notification.is_read && (
-                              <span className="w-3 h-3 bg-carelink-teal rounded-full"></span>
+                              <span className="w-3 h-3 bg-carefd-teal rounded-full"></span>
                             )}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 deleteNotification(notification.notification_id);
                               }}
-                              className="p-2 text-carelink-gray hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                              className="p-2 text-carefd-gray hover:text-red-500 hover:bg-red-50 rounded-lg transition"
                               title="מחק"
                             >
                               <FaTrash className="text-sm" />

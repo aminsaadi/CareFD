@@ -155,8 +155,8 @@ const AdminProviders = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-carelink-navy">ניהול ספקים</h1>
-            <p className="text-carelink-slate mt-1">{pagination.total} ספקים במערכת</p>
+            <h1 className="text-2xl font-bold text-carefd-navy">ניהול ספקים</h1>
+            <p className="text-carefd-slate mt-1">{pagination.total} ספקים במערכת</p>
           </div>
         </div>
 
@@ -164,20 +164,20 @@ const AdminProviders = () => {
         <div className="bg-white rounded-xl p-4 border border-gray-100">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carelink-slate" size={18} />
+              <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carefd-slate" size={18} />
               <input
                 type="text"
                 placeholder="חפש לפי שם, עיר..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg pr-10 pl-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal outline-none"
+                className="w-full bg-gray-50 border border-gray-200 rounded-lg pr-10 pl-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal outline-none"
                 data-testid="search-providers-input"
               />
             </div>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal outline-none min-w-[150px]"
+              className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal outline-none min-w-[150px]"
               data-testid="filter-providers-status"
             >
               <option value="">כל הסטטוסים</option>
@@ -191,23 +191,23 @@ const AdminProviders = () => {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-carelink-slate text-sm">סה"כ ספקים</p>
-            <p className="text-2xl font-bold text-carelink-navy mt-1">{providers.length}</p>
+            <p className="text-carefd-slate text-sm">סה"כ ספקים</p>
+            <p className="text-2xl font-bold text-carefd-navy mt-1">{providers.length}</p>
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-carelink-slate text-sm">מאומתים</p>
+            <p className="text-carefd-slate text-sm">מאומתים</p>
             <p className="text-2xl font-bold text-emerald-500 mt-1">{providers.filter(p => p.is_verified).length}</p>
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-carelink-slate text-sm">ממתינים לאימות</p>
+            <p className="text-carefd-slate text-sm">ממתינים לאימות</p>
             <p className="text-2xl font-bold text-amber-500 mt-1">{providers.filter(p => !p.is_verified && !p.needs_profile).length}</p>
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-carelink-slate text-sm">ללא פרופיל</p>
+            <p className="text-carefd-slate text-sm">ללא פרופיל</p>
             <p className="text-2xl font-bold text-red-400 mt-1">{providers.filter(p => p.needs_profile).length}</p>
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-carelink-slate text-sm">מומלצים</p>
+            <p className="text-carefd-slate text-sm">מומלצים</p>
             <p className="text-2xl font-bold text-purple-500 mt-1">{providers.filter(p => p.is_recommended).length}</p>
           </div>
         </div>
@@ -218,26 +218,26 @@ const AdminProviders = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/50">
-                  <th className="text-right py-3 px-4 text-carelink-slate font-medium text-sm">מזהה ספק</th>
-                  <th className="text-right py-3 px-4 text-carelink-slate font-medium text-sm">מזהה משתמש</th>
-                  <th className="text-right py-3 px-4 text-carelink-slate font-medium text-sm">ספק</th>
-                  <th className="text-right py-3 px-4 text-carelink-slate font-medium text-sm">מיקום</th>
-                  <th className="text-right py-3 px-4 text-carelink-slate font-medium text-sm">דירוג</th>
-                  <th className="text-right py-3 px-4 text-carelink-slate font-medium text-sm">סטטוס</th>
-                  <th className="text-right py-3 px-4 text-carelink-slate font-medium text-sm">אימות</th>
-                  <th className="text-right py-3 px-4 text-carelink-slate font-medium text-sm">פעולות</th>
+                  <th className="text-right py-3 px-4 text-carefd-slate font-medium text-sm">מזהה ספק</th>
+                  <th className="text-right py-3 px-4 text-carefd-slate font-medium text-sm">מזהה משתמש</th>
+                  <th className="text-right py-3 px-4 text-carefd-slate font-medium text-sm">ספק</th>
+                  <th className="text-right py-3 px-4 text-carefd-slate font-medium text-sm">מיקום</th>
+                  <th className="text-right py-3 px-4 text-carefd-slate font-medium text-sm">דירוג</th>
+                  <th className="text-right py-3 px-4 text-carefd-slate font-medium text-sm">סטטוס</th>
+                  <th className="text-right py-3 px-4 text-carefd-slate font-medium text-sm">אימות</th>
+                  <th className="text-right py-3 px-4 text-carefd-slate font-medium text-sm">פעולות</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
                     <td colSpan={8} className="py-12 text-center">
-                      <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
+                      <div className="w-8 h-8 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
                     </td>
                   </tr>
                 ) : providers.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="py-12 text-center text-carelink-slate">
+                    <td colSpan={8} className="py-12 text-center text-carefd-slate">
                       לא נמצאו ספקים
                     </td>
                   </tr>
@@ -245,47 +245,47 @@ const AdminProviders = () => {
                   providers.map((provider) => (
                     <tr 
                       key={provider.provider_id || `orphan_${provider.user_id}`} 
-                      className={`border-b border-gray-50 hover:bg-carelink-teal-pale/10 transition cursor-pointer ${provider.is_active === false ? 'bg-red-50/30' : ''}`}
+                      className={`border-b border-gray-50 hover:bg-carefd-teal-pale/10 transition cursor-pointer ${provider.is_active === false ? 'bg-red-50/30' : ''}`}
                       onClick={() => !provider.needs_profile && openProviderModal(provider)}
                       data-testid={`provider-row-${provider.provider_id}`}
                     >
                       {/* Provider ID */}
                       <td className="py-3 px-4">
-                        <span className="text-xs font-mono text-carelink-teal bg-carelink-teal-pale/30 px-2 py-1 rounded">
+                        <span className="text-xs font-mono text-carefd-teal bg-carefd-teal-pale/30 px-2 py-1 rounded">
                           {provider.provider_id ? provider.provider_id.slice(-8) : '-'}
                         </span>
                       </td>
                       {/* User ID */}
                       <td className="py-3 px-4">
-                        <span className="text-xs font-mono text-carelink-slate">
+                        <span className="text-xs font-mono text-carefd-slate">
                           {provider.user_id ? provider.user_id.slice(-8) : '-'}
                         </span>
                       </td>
                       {/* Provider Name */}
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-carelink-teal to-carelink-navy rounded-full flex items-center justify-center text-white font-medium flex-shrink-0">
+                          <div className="w-10 h-10 bg-gradient-to-br from-carefd-teal to-carefd-navy rounded-full flex items-center justify-center text-white font-medium flex-shrink-0">
                             {provider.business_name?.[0] || 'P'}
                           </div>
                           <div className="min-w-0">
                             <div className="flex items-center gap-1.5">
-                              <p className="text-carelink-navy font-medium truncate">{provider.business_name}</p>
+                              <p className="text-carefd-navy font-medium truncate">{provider.business_name}</p>
                               {provider.is_recommended && <FiAward className="text-amber-400 flex-shrink-0" size={13} />}
                             </div>
-                            <p className="text-carelink-gray text-xs">{provider.provider_type || 'individual'}</p>
+                            <p className="text-carefd-gray text-xs">{provider.provider_type || 'individual'}</p>
                           </div>
                         </div>
                       </td>
                       {/* Location */}
                       <td className="py-3 px-4">
-                        <span className="text-carelink-slate text-sm">{provider.location?.city || provider.city || '-'}</span>
+                        <span className="text-carefd-slate text-sm">{provider.location?.city || provider.city || '-'}</span>
                       </td>
                       {/* Rating */}
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-1 text-sm">
                           <FiStar className="text-amber-400" size={13} />
-                          <span className="text-carelink-navy">{provider.rating?.toFixed(1) || '0.0'}</span>
-                          <span className="text-carelink-gray text-xs">({provider.reviews_count || 0})</span>
+                          <span className="text-carefd-navy">{provider.rating?.toFixed(1) || '0.0'}</span>
+                          <span className="text-carefd-gray text-xs">({provider.reviews_count || 0})</span>
                         </div>
                       </td>
                       {/* Status */}
@@ -299,7 +299,7 @@ const AdminProviders = () => {
                             <button
                               onClick={() => createProviderProfile(provider.user_id, provider.business_name)}
                               disabled={creatingProfile === provider.user_id}
-                              className="flex items-center gap-1 px-3 py-1.5 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal-medium transition text-xs disabled:opacity-50"
+                              className="flex items-center gap-1 px-3 py-1.5 bg-carefd-teal text-white rounded-lg hover:bg-carefd-teal-medium transition text-xs disabled:opacity-50"
                               data-testid={`create-profile-${provider.user_id}`}
                             >
                               {creatingProfile === provider.user_id ? (
@@ -312,7 +312,7 @@ const AdminProviders = () => {
                             <>
                               <button
                                 onClick={() => openProviderModal(provider)}
-                                className="p-1.5 text-carelink-slate hover:text-carelink-teal hover:bg-carelink-teal-pale rounded-lg transition"
+                                className="p-1.5 text-carefd-slate hover:text-carefd-teal hover:bg-carefd-teal-pale rounded-lg transition"
                                 title="פרטים"
                                 data-testid={`view-provider-${provider.provider_id}`}
                               >
@@ -328,7 +328,7 @@ const AdminProviders = () => {
                               </button>
                               <button
                                 onClick={() => setShowDeleteModal(provider)}
-                                className="p-1.5 text-carelink-slate hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                                className="p-1.5 text-carefd-slate hover:text-red-500 hover:bg-red-50 rounded-lg transition"
                                 title="מחק"
                               >
                                 <FiTrash2 size={15} />
@@ -347,7 +347,7 @@ const AdminProviders = () => {
           {/* Pagination */}
           {pagination.total > pagination.limit && (
             <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
-              <p className="text-carelink-slate text-sm">
+              <p className="text-carefd-slate text-sm">
                 מציג {(pagination.page - 1) * pagination.limit + 1} - {Math.min(pagination.page * pagination.limit, pagination.total)} מתוך {pagination.total}
               </p>
               <div className="flex gap-2">
@@ -376,7 +376,7 @@ const AdminProviders = () => {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={() => setShowProviderModal(null)}>
           <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()} data-testid="provider-details-modal">
             {/* Modal Header */}
-            <div className="bg-gradient-to-l from-carelink-navy to-carelink-slate p-6 rounded-t-2xl text-white">
+            <div className="bg-gradient-to-l from-carefd-navy to-carefd-slate p-6 rounded-t-2xl text-white">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-2xl font-bold">
@@ -407,31 +407,31 @@ const AdminProviders = () => {
 
             {loadingDetails ? (
               <div className="p-12 flex justify-center">
-                <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-8 h-8 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
               </div>
             ) : (
               <div className="p-6 space-y-5">
                 {/* IDs Section */}
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <h4 className="text-sm font-bold text-carelink-navy mb-3 flex items-center gap-2"><FiHash size={14} /> מזהים</h4>
+                  <h4 className="text-sm font-bold text-carefd-navy mb-3 flex items-center gap-2"><FiHash size={14} /> מזהים</h4>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <p className="text-carelink-gray text-xs">מזהה ספק</p>
+                      <p className="text-carefd-gray text-xs">מזהה ספק</p>
                       <div className="flex items-center gap-1">
-                        <code className="text-carelink-teal font-mono text-xs bg-white px-2 py-0.5 rounded">{prov?.provider_id || '-'}</code>
-                        {prov?.provider_id && <button onClick={() => copyToClipboard(prov.provider_id)} className="text-carelink-gray hover:text-carelink-teal"><FiCopy size={12} /></button>}
+                        <code className="text-carefd-teal font-mono text-xs bg-white px-2 py-0.5 rounded">{prov?.provider_id || '-'}</code>
+                        {prov?.provider_id && <button onClick={() => copyToClipboard(prov.provider_id)} className="text-carefd-gray hover:text-carefd-teal"><FiCopy size={12} /></button>}
                       </div>
                     </div>
                     <div>
-                      <p className="text-carelink-gray text-xs">מזהה משתמש</p>
+                      <p className="text-carefd-gray text-xs">מזהה משתמש</p>
                       <div className="flex items-center gap-1">
-                        <code className="text-carelink-slate font-mono text-xs bg-white px-2 py-0.5 rounded">{prov?.user_id || '-'}</code>
-                        {prov?.user_id && <button onClick={() => copyToClipboard(prov.user_id)} className="text-carelink-gray hover:text-carelink-teal"><FiCopy size={12} /></button>}
+                        <code className="text-carefd-slate font-mono text-xs bg-white px-2 py-0.5 rounded">{prov?.user_id || '-'}</code>
+                        {prov?.user_id && <button onClick={() => copyToClipboard(prov.user_id)} className="text-carefd-gray hover:text-carefd-teal"><FiCopy size={12} /></button>}
                       </div>
                     </div>
                     {prov?.provider_number && (
                       <div>
-                        <p className="text-carelink-gray text-xs">מספר ספק</p>
+                        <p className="text-carefd-gray text-xs">מספר ספק</p>
                         <span className="font-mono text-sm">{prov.provider_number}</span>
                       </div>
                     )}
@@ -440,18 +440,18 @@ const AdminProviders = () => {
 
                 {/* Contact Info */}
                 <div className="bg-blue-50 rounded-xl p-4">
-                  <h4 className="text-sm font-bold text-carelink-navy mb-3 flex items-center gap-2"><FiUser size={14} /> פרטי קשר</h4>
+                  <h4 className="text-sm font-bold text-carefd-navy mb-3 flex items-center gap-2"><FiUser size={14} /> פרטי קשר</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                     {prov?.email && (
                       <div className="flex items-center gap-2">
                         <FiMail className="text-blue-500 flex-shrink-0" size={14} />
-                        <a href={`mailto:${prov.email}`} className="text-carelink-teal hover:underline truncate">{prov.email}</a>
+                        <a href={`mailto:${prov.email}`} className="text-carefd-teal hover:underline truncate">{prov.email}</a>
                       </div>
                     )}
                     {prov?.phone && (
                       <div className="flex items-center gap-2">
                         <FiPhone className="text-blue-500 flex-shrink-0" size={14} />
-                        <a href={`tel:${prov.phone}`} className="text-carelink-teal hover:underline">{prov.phone}</a>
+                        <a href={`tel:${prov.phone}`} className="text-carefd-teal hover:underline">{prov.phone}</a>
                       </div>
                     )}
                     {(prov?.location?.city || prov?.city) && (
@@ -463,52 +463,52 @@ const AdminProviders = () => {
                     {prov?.website && (
                       <div className="flex items-center gap-2">
                         <FiGlobe className="text-blue-500 flex-shrink-0" size={14} />
-                        <a href={prov.website} target="_blank" rel="noreferrer" className="text-carelink-teal hover:underline truncate">{prov.website}</a>
+                        <a href={prov.website} target="_blank" rel="noreferrer" className="text-carefd-teal hover:underline truncate">{prov.website}</a>
                       </div>
                     )}
                   </div>
                 </div>
 
                 {/* Business Info */}
-                <div className="bg-carelink-teal-pale/20 rounded-xl p-4">
-                  <h4 className="text-sm font-bold text-carelink-navy mb-3 flex items-center gap-2"><FiFileText size={14} /> פרטים עסקיים</h4>
+                <div className="bg-carefd-teal-pale/20 rounded-xl p-4">
+                  <h4 className="text-sm font-bold text-carefd-navy mb-3 flex items-center gap-2"><FiFileText size={14} /> פרטים עסקיים</h4>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
                     <div>
-                      <p className="text-carelink-gray text-xs">דירוג</p>
+                      <p className="text-carefd-gray text-xs">דירוג</p>
                       <div className="flex items-center gap-1 mt-0.5">
                         <FiStar className="text-amber-400" size={14} />
-                        <span className="font-bold text-carelink-navy">{prov?.rating?.toFixed(1) || '0.0'}</span>
-                        <span className="text-carelink-gray text-xs">({prov?.reviews_count || 0} ביקורות)</span>
+                        <span className="font-bold text-carefd-navy">{prov?.rating?.toFixed(1) || '0.0'}</span>
+                        <span className="text-carefd-gray text-xs">({prov?.reviews_count || 0} ביקורות)</span>
                       </div>
                     </div>
                     {prov?.experience_years != null && (
                       <div>
-                        <p className="text-carelink-gray text-xs">שנות ניסיון</p>
-                        <span className="font-medium text-carelink-navy">{prov.experience_years || prov.years_experience || 0}</span>
+                        <p className="text-carefd-gray text-xs">שנות ניסיון</p>
+                        <span className="font-medium text-carefd-navy">{prov.experience_years || prov.years_experience || 0}</span>
                       </div>
                     )}
                     {prov?.license_number && (
                       <div>
-                        <p className="text-carelink-gray text-xs">מספר רישיון</p>
-                        <span className="font-mono text-carelink-navy text-xs">{prov.license_number}</span>
+                        <p className="text-carefd-gray text-xs">מספר רישיון</p>
+                        <span className="font-mono text-carefd-navy text-xs">{prov.license_number}</span>
                       </div>
                     )}
                     {prov?.subscription_tier && (
                       <div>
-                        <p className="text-carelink-gray text-xs">מנוי</p>
-                        <span className={`font-medium ${prov.subscription_tier === 'gold' ? 'text-amber-600' : prov.subscription_tier === 'pro' ? 'text-purple-600' : 'text-carelink-navy'}`}>
+                        <p className="text-carefd-gray text-xs">מנוי</p>
+                        <span className={`font-medium ${prov.subscription_tier === 'gold' ? 'text-amber-600' : prov.subscription_tier === 'pro' ? 'text-purple-600' : 'text-carefd-navy'}`}>
                           {prov.subscription_tier === 'gold' ? 'Gold' : prov.subscription_tier === 'pro' ? 'Pro' : 'Free'}
                         </span>
                       </div>
                     )}
                     <div>
-                      <p className="text-carelink-gray text-xs">תאריך הצטרפות</p>
-                      <span className="text-carelink-navy text-xs">{prov?.created_at ? new Date(prov.created_at).toLocaleDateString('he-IL') : '-'}</span>
+                      <p className="text-carefd-gray text-xs">תאריך הצטרפות</p>
+                      <span className="text-carefd-navy text-xs">{prov?.created_at ? new Date(prov.created_at).toLocaleDateString('he-IL') : '-'}</span>
                     </div>
                     {prov?.services_count != null && (
                       <div>
-                        <p className="text-carelink-gray text-xs">שירותים</p>
-                        <span className="font-medium text-carelink-navy">{prov.services_count || 0}</span>
+                        <p className="text-carefd-gray text-xs">שירותים</p>
+                        <span className="font-medium text-carefd-navy">{prov.services_count || 0}</span>
                       </div>
                     )}
                   </div>
@@ -517,10 +517,10 @@ const AdminProviders = () => {
                 {/* Specializations & Languages */}
                 {(prov?.specializations?.length > 0 || prov?.languages?.length > 0) && (
                   <div className="bg-purple-50 rounded-xl p-4">
-                    <h4 className="text-sm font-bold text-carelink-navy mb-3 flex items-center gap-2"><FiAward size={14} /> התמחות ושפות</h4>
+                    <h4 className="text-sm font-bold text-carefd-navy mb-3 flex items-center gap-2"><FiAward size={14} /> התמחות ושפות</h4>
                     {prov?.specializations?.length > 0 && (
                       <div className="mb-2">
-                        <p className="text-carelink-gray text-xs mb-1">התמחויות:</p>
+                        <p className="text-carefd-gray text-xs mb-1">התמחויות:</p>
                         <div className="flex flex-wrap gap-1.5">
                           {prov.specializations.map((s, i) => (
                             <span key={i} className="bg-white px-2.5 py-1 rounded-lg text-xs text-purple-700 border border-purple-200">{s}</span>
@@ -530,7 +530,7 @@ const AdminProviders = () => {
                     )}
                     {prov?.languages?.length > 0 && (
                       <div>
-                        <p className="text-carelink-gray text-xs mb-1">שפות:</p>
+                        <p className="text-carefd-gray text-xs mb-1">שפות:</p>
                         <div className="flex flex-wrap gap-1.5">
                           {prov.languages.map((l, i) => (
                             <span key={i} className="bg-white px-2.5 py-1 rounded-lg text-xs text-blue-700 border border-blue-200">{l}</span>
@@ -544,8 +544,8 @@ const AdminProviders = () => {
                 {/* Bio / About */}
                 {(prov?.bio || prov?.about || prov?.description) && (
                   <div className="bg-gray-50 rounded-xl p-4">
-                    <h4 className="text-sm font-bold text-carelink-navy mb-2">אודות</h4>
-                    <p className="text-sm text-carelink-slate leading-relaxed">{prov.bio || prov.about || prov.description}</p>
+                    <h4 className="text-sm font-bold text-carefd-navy mb-2">אודות</h4>
+                    <p className="text-sm text-carefd-slate leading-relaxed">{prov.bio || prov.about || prov.description}</p>
                   </div>
                 )}
 
@@ -553,7 +553,7 @@ const AdminProviders = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-gray-200">
                   <Link
                     to={`/providers/${prov?.provider_id}`}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-carelink-navy text-white rounded-xl text-sm font-medium hover:bg-carelink-slate transition"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-carefd-navy text-white rounded-xl text-sm font-medium hover:bg-carefd-slate transition"
                     data-testid="modal-view-profile"
                   >
                     <FiEye size={15} />
@@ -561,7 +561,7 @@ const AdminProviders = () => {
                   </Link>
                   <Link
                     to={`/admin/providers/${prov?.provider_id}/edit`}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-carelink-teal text-white rounded-xl text-sm font-medium hover:bg-carelink-teal-medium transition"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 bg-carefd-teal text-white rounded-xl text-sm font-medium hover:bg-carefd-teal-medium transition"
                     data-testid="modal-edit-provider"
                   >
                     <FiEdit size={15} />
@@ -625,14 +625,14 @@ const AdminProviders = () => {
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-200 shadow-xl">
-            <h3 className="text-lg font-bold text-carelink-navy mb-2">מחיקת ספק</h3>
-            <p className="text-carelink-slate mb-4">
+            <h3 className="text-lg font-bold text-carefd-navy mb-2">מחיקת ספק</h3>
+            <p className="text-carefd-slate mb-4">
               האם אתה בטוח שברצונך למחוק את הספק "{showDeleteModal.business_name}"?
               <br />
               <span className="text-red-500 text-sm">פעולה זו תמחק גם את כל השירותים של הספק ולא ניתנת לביטול.</span>
             </p>
             <div className="flex gap-3">
-              <button onClick={() => setShowDeleteModal(null)} className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition">ביטול</button>
+              <button onClick={() => setShowDeleteModal(null)} className="flex-1 px-4 py-2.5 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition">ביטול</button>
               <button onClick={() => deleteProvider(showDeleteModal.provider_id)} className="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">מחק</button>
             </div>
           </div>
@@ -643,17 +643,17 @@ const AdminProviders = () => {
       {showToggleModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-200 shadow-xl">
-            <h3 className="text-lg font-bold text-carelink-navy mb-2">
+            <h3 className="text-lg font-bold text-carefd-navy mb-2">
               {showToggleModal.is_active === false ? 'הפעלת ספק' : 'השבתת ספק'}
             </h3>
-            <p className="text-carelink-slate mb-4">
+            <p className="text-carefd-slate mb-4">
               {showToggleModal.is_active === false 
                 ? `האם אתה בטוח שברצונך להפעיל את הספק "${showToggleModal.business_name}"? הספק יופיע שוב בתוצאות החיפוש.`
                 : `האם אתה בטוח שברצונך להשבית את הספק "${showToggleModal.business_name}"? הספק לא יופיע בתוצאות החיפוש.`
               }
             </p>
             <div className="flex gap-3">
-              <button onClick={() => setShowToggleModal(null)} className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition">ביטול</button>
+              <button onClick={() => setShowToggleModal(null)} className="flex-1 px-4 py-2.5 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition">ביטול</button>
               <button
                 onClick={() => toggleProviderStatus(showToggleModal.provider_id, showToggleModal.is_active !== false)}
                 className={`flex-1 px-4 py-2.5 text-white rounded-lg transition ${showToggleModal.is_active === false ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-amber-500 hover:bg-amber-600'}`}

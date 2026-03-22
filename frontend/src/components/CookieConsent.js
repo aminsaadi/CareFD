@@ -64,9 +64,9 @@ const CookieConsent = () => {
       {/* Cookie Banner */}
       <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full pointer-events-auto animate-slide-up overflow-hidden">
         {/* Header */}
-        <div className="bg-carelink-navy px-6 py-4 flex items-center justify-between">
+        <div className="bg-carefd-navy px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <FaCookieBite className="text-2xl text-carelink-teal" />
+            <FaCookieBite className="text-2xl text-carefd-teal" />
             <h3 className="text-lg font-bold text-white">הגדרות עוגיות</h3>
           </div>
           <button 
@@ -79,7 +79,7 @@ const CookieConsent = () => {
 
         {/* Content */}
         <div className="p-6">
-          <p className="text-carelink-slate mb-4">
+          <p className="text-carefd-slate mb-4">
             אנו משתמשים בעוגיות כדי לשפר את חוויית הגלישה שלך, לנתח את השימוש באתר ולהציג לך תוכן מותאם אישית. 
             באפשרותך לבחור אילו עוגיות לאפשר.
           </p>
@@ -89,23 +89,23 @@ const CookieConsent = () => {
             <div className="space-y-4 mb-6 border-t border-gray-200 pt-4">
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div>
-                  <h4 className="font-semibold text-carelink-navy">עוגיות הכרחיות</h4>
-                  <p className="text-sm text-carelink-gray">נדרשות לפעולה תקינה של האתר</p>
+                  <h4 className="font-semibold text-carefd-navy">עוגיות הכרחיות</h4>
+                  <p className="text-sm text-carefd-gray">נדרשות לפעולה תקינה של האתר</p>
                 </div>
-                <div className="bg-carelink-teal text-white px-3 py-1 rounded-full text-sm">
+                <div className="bg-carefd-teal text-white px-3 py-1 rounded-full text-sm">
                   תמיד פעיל
                 </div>
               </div>
 
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div>
-                  <h4 className="font-semibold text-carelink-navy">עוגיות אנליטיקה</h4>
-                  <p className="text-sm text-carelink-gray">עוזרות לנו להבין כיצד גולשים משתמשים באתר</p>
+                  <h4 className="font-semibold text-carefd-navy">עוגיות אנליטיקה</h4>
+                  <p className="text-sm text-carefd-gray">עוזרות לנו להבין כיצד גולשים משתמשים באתר</p>
                 </div>
                 <button
                   onClick={() => setPreferences(p => ({ ...p, analytics: !p.analytics }))}
                   className={`relative w-12 h-6 rounded-full transition-colors ${
-                    preferences.analytics ? 'bg-carelink-teal' : 'bg-gray-300'
+                    preferences.analytics ? 'bg-carefd-teal' : 'bg-gray-300'
                   }`}
                 >
                   <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
@@ -116,13 +116,13 @@ const CookieConsent = () => {
 
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div>
-                  <h4 className="font-semibold text-carelink-navy">עוגיות שיווק</h4>
-                  <p className="text-sm text-carelink-gray">משמשות להצגת פרסומות רלוונטיות</p>
+                  <h4 className="font-semibold text-carefd-navy">עוגיות שיווק</h4>
+                  <p className="text-sm text-carefd-gray">משמשות להצגת פרסומות רלוונטיות</p>
                 </div>
                 <button
                   onClick={() => setPreferences(p => ({ ...p, marketing: !p.marketing }))}
                   className={`relative w-12 h-6 rounded-full transition-colors ${
-                    preferences.marketing ? 'bg-carelink-teal' : 'bg-gray-300'
+                    preferences.marketing ? 'bg-carefd-teal' : 'bg-gray-300'
                   }`}
                 >
                   <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
@@ -137,7 +137,7 @@ const CookieConsent = () => {
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={handleAcceptAll}
-              className="flex-1 bg-carelink-teal text-white py-3 px-6 rounded-xl font-semibold hover:bg-carelink-teal-medium transition flex items-center justify-center gap-2"
+              className="flex-1 bg-carefd-teal text-white py-3 px-6 rounded-xl font-semibold hover:bg-carefd-teal-medium transition flex items-center justify-center gap-2"
             >
               <FaCheck />
               קבל הכל
@@ -146,14 +146,14 @@ const CookieConsent = () => {
             {showDetails ? (
               <button
                 onClick={handleAcceptSelected}
-                className="flex-1 bg-carelink-navy text-white py-3 px-6 rounded-xl font-semibold hover:bg-carelink-slate transition"
+                className="flex-1 bg-carefd-navy text-white py-3 px-6 rounded-xl font-semibold hover:bg-carefd-slate transition"
               >
                 שמור העדפות
               </button>
             ) : (
               <button
                 onClick={() => setShowDetails(true)}
-                className="flex-1 bg-gray-100 text-carelink-navy py-3 px-6 rounded-xl font-semibold hover:bg-gray-200 transition"
+                className="flex-1 bg-gray-100 text-carefd-navy py-3 px-6 rounded-xl font-semibold hover:bg-gray-200 transition"
               >
                 התאמה אישית
               </button>
@@ -161,16 +161,16 @@ const CookieConsent = () => {
             
             <button
               onClick={handleRejectAll}
-              className="flex-1 border border-gray-300 text-carelink-slate py-3 px-6 rounded-xl font-semibold hover:bg-gray-50 transition"
+              className="flex-1 border border-gray-300 text-carefd-slate py-3 px-6 rounded-xl font-semibold hover:bg-gray-50 transition"
             >
               דחה הכל
             </button>
           </div>
 
           {/* Privacy Link */}
-          <p className="text-center text-sm text-carelink-gray mt-4">
+          <p className="text-center text-sm text-carefd-gray mt-4">
             למידע נוסף, קראו את{' '}
-            <Link to="/privacy" className="text-carelink-teal hover:underline">
+            <Link to="/privacy" className="text-carefd-teal hover:underline">
               מדיניות הפרטיות
             </Link>
           </p>

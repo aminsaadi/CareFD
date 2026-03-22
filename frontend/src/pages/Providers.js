@@ -360,17 +360,17 @@ const Providers = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale/30 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale/30 flex flex-col">
       <Navbar />
       
       <div className="flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-carelink-navy font-heading mb-2" data-testid="providers-title">
+            <h1 className="text-3xl font-bold text-carefd-navy font-heading mb-2" data-testid="providers-title">
               {t('providers')}
             </h1>
-            <p className="text-carelink-gray">מצאו את נותני השירות המתאימים לכם</p>
+            <p className="text-carefd-gray">מצאו את נותני השירות המתאימים לכם</p>
           </div>
 
           {/* Search and Filter Bar */}
@@ -380,7 +380,7 @@ const Providers = () => {
               <div className="grid md:grid-cols-2 gap-3">
                 {/* Column 1: Profession/Category with Dropdown */}
                 <div className="relative">
-                  <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray z-10" />
+                  <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-carefd-gray z-10" />
                   <input
                     ref={searchInputRef}
                     type="text"
@@ -388,7 +388,7 @@ const Providers = () => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => setShowSearchDropdown(true)}
                     placeholder="מקצוע, התמחות, שם ספק..."
-                    className="w-full px-4 py-3 pr-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
+                    className="w-full px-4 py-3 pr-12 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal"
                     aria-label="חיפוש לפי מקצוע, התמחות או שם ספק"
                     data-testid="search-input"
                   />
@@ -401,7 +401,7 @@ const Providers = () => {
                       data-testid="search-dropdown"
                     >
                       <div className="p-3 border-b border-gray-100">
-                        <span className="text-xs font-semibold text-carelink-gray">חיפושים נפוצים</span>
+                        <span className="text-xs font-semibold text-carefd-gray">חיפושים נפוצים</span>
                       </div>
                       <div className="p-2">
                         {filteredSearches.map((search, index) => (
@@ -412,9 +412,9 @@ const Providers = () => {
                               setSearchQuery(search);
                               setShowSearchDropdown(false);
                             }}
-                            className="w-full text-right px-3 py-2.5 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carelink-navy"
+                            className="w-full text-right px-3 py-2.5 hover:bg-carefd-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carefd-navy"
                           >
-                            <FaSearch className="text-carelink-gray text-sm" />
+                            <FaSearch className="text-carefd-gray text-sm" />
                             <span>{search}</span>
                           </button>
                         ))}
@@ -426,7 +426,7 @@ const Providers = () => {
                 {/* Column 2: Location with Dropdown */}
                 <div className="flex gap-2">
                   <div className="flex-1 relative">
-                    <FaMapMarkerAlt className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray z-10" />
+                    <FaMapMarkerAlt className="absolute right-4 top-1/2 -translate-y-1/2 text-carefd-gray z-10" />
                     <input
                       ref={locationInputRef}
                       type="text"
@@ -440,7 +440,7 @@ const Providers = () => {
                       }}
                       onFocus={() => setShowLocationDropdown(true)}
                       placeholder="עיר או אזור"
-                      className="w-full px-4 py-3 pr-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal"
+                      className="w-full px-4 py-3 pr-12 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal"
                       aria-label="חיפוש לפי עיר או אזור"
                       data-testid="location-input"
                     />
@@ -458,7 +458,7 @@ const Providers = () => {
                           onClick={() => {
                             handleGetLocation();
                           }}
-                          className="w-full text-right px-4 py-3 hover:bg-carelink-teal-pale/30 transition-colors flex items-center gap-3 text-carelink-teal border-b border-gray-100"
+                          className="w-full text-right px-4 py-3 hover:bg-carefd-teal-pale/30 transition-colors flex items-center gap-3 text-carefd-teal border-b border-gray-100"
                         >
                           <FaCrosshairs className="text-lg" />
                           <span className="font-medium">השתמש במיקום שלי</span>
@@ -469,7 +469,7 @@ const Providers = () => {
                         {!locationQuery && (
                           <>
                             <div className="p-3 border-b border-gray-100">
-                              <span className="text-xs font-semibold text-carelink-gray">אזורים</span>
+                              <span className="text-xs font-semibold text-carefd-gray">אזורים</span>
                             </div>
                             <div className="p-2">
                               {regions.map((region) => (
@@ -488,9 +488,9 @@ const Providers = () => {
                                     }));
                                     setShowLocationDropdown(false);
                                   }}
-                                  className="w-full text-right px-3 py-2.5 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carelink-navy"
+                                  className="w-full text-right px-3 py-2.5 hover:bg-carefd-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carefd-navy"
                                 >
-                                  <FaMapMarkerAlt className="text-carelink-gray text-sm" />
+                                  <FaMapMarkerAlt className="text-carefd-gray text-sm" />
                                   <span>{region.name}</span>
                                 </button>
                               ))}
@@ -502,7 +502,7 @@ const Providers = () => {
                         {locationQuery && filteredCities.length > 0 && (
                           <>
                             <div className="p-3 border-b border-gray-100">
-                              <span className="text-xs font-semibold text-carelink-gray">ערים</span>
+                              <span className="text-xs font-semibold text-carefd-gray">ערים</span>
                             </div>
                             <div className="p-2">
                               {filteredCities.map((city) => (
@@ -524,11 +524,11 @@ const Providers = () => {
                                     }));
                                     setShowLocationDropdown(false);
                                   }}
-                                  className="w-full text-right px-3 py-2.5 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carelink-navy"
+                                  className="w-full text-right px-3 py-2.5 hover:bg-carefd-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carefd-navy"
                                 >
-                                  <FaMapMarkerAlt className="text-carelink-gray text-sm" />
+                                  <FaMapMarkerAlt className="text-carefd-gray text-sm" />
                                   <span>{city.name || city.name_he}</span>
-                                  {city.region && <span className="text-xs text-carelink-gray mr-auto">{city.region}</span>}
+                                  {city.region && <span className="text-xs text-carefd-gray mr-auto">{city.region}</span>}
                                 </button>
                               ))}
                             </div>
@@ -543,7 +543,7 @@ const Providers = () => {
                     type="button"
                     onClick={handleGetLocation}
                     disabled={isLocating}
-                    className="px-4 border-2 border-carelink-teal-pale rounded-xl hover:bg-carelink-teal-pale/30 transition-colors disabled:opacity-50 flex items-center justify-center text-carelink-teal"
+                    className="px-4 border-2 border-carefd-teal-pale rounded-xl hover:bg-carefd-teal-pale/30 transition-colors disabled:opacity-50 flex items-center justify-center text-carefd-teal"
                     title="השתמש במיקום שלי"
                     data-testid="gps-btn"
                   >
@@ -557,7 +557,7 @@ const Providers = () => {
                   {/* Search Button */}
                   <button
                     type="submit"
-                    className="px-6 py-3 bg-carelink-teal text-white rounded-xl font-semibold hover:bg-carelink-teal-medium transition-colors flex items-center gap-2"
+                    className="px-6 py-3 bg-carefd-teal text-white rounded-xl font-semibold hover:bg-carefd-teal-medium transition-colors flex items-center gap-2"
                     data-testid="search-btn"
                   >
                     <FaSearch />
@@ -568,8 +568,8 @@ const Providers = () => {
 
               {/* Radius selector (appears when using GPS or city with coordinates) */}
               {(filters.useMyLocation || (filters.latitude && filters.longitude)) && (
-                <div className="flex items-center gap-3 pt-2 border-t border-carelink-teal-pale">
-                  <span className="text-sm text-carelink-gray">רדיוס חיפוש:</span>
+                <div className="flex items-center gap-3 pt-2 border-t border-carefd-teal-pale">
+                  <span className="text-sm text-carefd-gray">רדיוס חיפוש:</span>
                   <div className="flex gap-2">
                     {radiusOptions.map((option) => (
                       <button
@@ -578,8 +578,8 @@ const Providers = () => {
                         onClick={() => handleRadiusChange(option.value)}
                         className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
                           filters.radius === option.value
-                            ? 'bg-carelink-teal text-white'
-                            : 'bg-carelink-teal-pale/50 text-carelink-navy hover:bg-carelink-teal-pale'
+                            ? 'bg-carefd-teal text-white'
+                            : 'bg-carefd-teal-pale/50 text-carefd-navy hover:bg-carefd-teal-pale'
                         }`}
                       >
                         {option.label}
@@ -591,7 +591,7 @@ const Providers = () => {
 
               {/* Quick Region Tags */}
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm text-carelink-gray">אזורים:</span>
+                <span className="text-sm text-carefd-gray">אזורים:</span>
                 {regions.map((region) => (
                   <button
                     key={region.region_id || region.id}
@@ -609,8 +609,8 @@ const Providers = () => {
                     }}
                     className={`text-sm px-3 py-1 rounded-full transition-colors ${
                       locationQuery === region.name
-                        ? 'bg-carelink-teal text-white'
-                        : 'bg-carelink-teal-pale/50 text-carelink-navy hover:bg-carelink-teal-pale'
+                        ? 'bg-carefd-teal text-white'
+                        : 'bg-carefd-teal-pale/50 text-carefd-navy hover:bg-carefd-teal-pale'
                     }`}
                     data-testid={`region-${region.id}`}
                   >
@@ -621,17 +621,17 @@ const Providers = () => {
             </form>
 
             {/* Action Buttons Row */}
-            <div className="flex items-center justify-between mt-4 pt-4 border-t border-carelink-teal-pale">
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-carefd-teal-pale">
               <div className="flex gap-3">
                 {/* Filter Toggle (Mobile) */}
                 <button
                   onClick={() => setShowFilters(true)}
-                  className="lg:hidden flex items-center gap-2 px-4 py-2 bg-carelink-navy text-white rounded-xl font-medium"
+                  className="lg:hidden flex items-center gap-2 px-4 py-2 bg-carefd-navy text-white rounded-xl font-medium"
                 >
                   <FaFilter />
                   סינון מתקדם
                   {activeFiltersCount > 0 && (
-                    <span className="bg-carelink-teal px-2 py-0.5 rounded-full text-xs">
+                    <span className="bg-carefd-teal px-2 py-0.5 rounded-full text-xs">
                       {activeFiltersCount}
                     </span>
                   )}
@@ -641,7 +641,7 @@ const Providers = () => {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="px-4 py-2 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal bg-white text-sm"
+                  className="px-4 py-2 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal bg-white text-sm"
                 >
                   <option value="rating">מיון: דירוג</option>
                   <option value="reviews">מיון: ביקורות</option>
@@ -650,10 +650,10 @@ const Providers = () => {
               </div>
 
               {/* View Mode */}
-              <div className="hidden md:flex border-2 border-carelink-teal-pale rounded-xl overflow-hidden">
+              <div className="hidden md:flex border-2 border-carefd-teal-pale rounded-xl overflow-hidden">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`px-3 py-2 ${viewMode === 'grid' ? 'bg-carelink-teal text-white' : 'bg-white text-carelink-gray'}`}
+                  className={`px-3 py-2 ${viewMode === 'grid' ? 'bg-carefd-teal text-white' : 'bg-white text-carefd-gray'}`}
                   title="תצוגת רשת"
                   aria-label="תצוגת רשת"
                   aria-pressed={viewMode === 'grid'}
@@ -662,7 +662,7 @@ const Providers = () => {
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`px-3 py-2 ${viewMode === 'list' ? 'bg-carelink-teal text-white' : 'bg-white text-carelink-gray'}`}
+                  className={`px-3 py-2 ${viewMode === 'list' ? 'bg-carefd-teal text-white' : 'bg-white text-carefd-gray'}`}
                   title="תצוגת רשימה"
                   aria-label="תצוגת רשימה"
                   aria-pressed={viewMode === 'list'}
@@ -671,7 +671,7 @@ const Providers = () => {
                 </button>
                 <button
                   onClick={() => setViewMode('map')}
-                  className={`px-3 py-2 ${viewMode === 'map' ? 'bg-carelink-teal text-white' : 'bg-white text-carelink-gray'}`}
+                  className={`px-3 py-2 ${viewMode === 'map' ? 'bg-carefd-teal text-white' : 'bg-white text-carefd-gray'}`}
                   title="תצוגת מפה"
                   aria-label="תצוגת מפה"
                   aria-pressed={viewMode === 'map'}
@@ -684,7 +684,7 @@ const Providers = () => {
 
             {/* Active Filters Tags */}
             {activeFiltersCount > 0 && (
-              <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-carelink-teal-pale">
+              <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-carefd-teal-pale">
                 {filters.useMyLocation && (
                   <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
                     <FaMapMarkerAlt /> המיקום שלי
@@ -696,7 +696,7 @@ const Providers = () => {
                   </span>
                 )}
                 {filters.city && !filters.useMyLocation && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-navy px-3 py-1 rounded-full text-sm">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
                     <FaMapMarkerAlt /> {filters.city}
                     {filters.radius && filters.latitude && ` (${filters.radius} ק"מ)`}
                     <button onClick={() => {
@@ -706,7 +706,7 @@ const Providers = () => {
                   </span>
                 )}
                 {filters.search && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-navy px-3 py-1 rounded-full text-sm">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
                     חיפוש: {filters.search}
                     <button onClick={() => {
                       setFilters(prev => ({ ...prev, search: '' }));
@@ -715,13 +715,13 @@ const Providers = () => {
                   </span>
                 )}
                 {filters.category && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-navy px-3 py-1 rounded-full text-sm">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
                     קטגוריה: {filters.category}
                     <button onClick={() => setFilters(prev => ({ ...prev, category: null }))}><FaTimes className="text-xs" /></button>
                   </span>
                 )}
                 {filters.verifiedOnly && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal text-white px-3 py-1 rounded-full text-sm">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal text-white px-3 py-1 rounded-full text-sm">
                     מאומתים בלבד
                   </span>
                 )}
@@ -732,7 +732,7 @@ const Providers = () => {
                 )}
                 <button
                   onClick={handleResetFilters}
-                  className="text-sm text-carelink-teal hover:underline"
+                  className="text-sm text-carefd-teal hover:underline"
                 >
                   נקה הכל
                 </button>
@@ -758,15 +758,15 @@ const Providers = () => {
             <div className="flex-1">
               {/* Results Count */}
               <div className="flex items-center justify-between mb-4">
-                <p className="text-carelink-gray">
-                  נמצאו <span className="font-bold text-carelink-navy">{totalProviders}</span> ספקים
+                <p className="text-carefd-gray">
+                  נמצאו <span className="font-bold text-carefd-navy">{totalProviders}</span> ספקים
                 </p>
               </div>
 
               {loading ? (
                 <div className="grid md:grid-cols-2 gap-6" aria-label="טוען ספקים">
                   {[...Array(4)].map((_, i) => (
-                    <div key={i} className="bg-white p-6 rounded-2xl shadow-md border-2 border-carelink-teal-pale animate-pulse">
+                    <div key={i} className="bg-white p-6 rounded-2xl shadow-md border-2 border-carefd-teal-pale animate-pulse">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
                           <div className="h-6 bg-gray-200 rounded-lg w-3/4 mb-2"></div>
@@ -790,10 +790,10 @@ const Providers = () => {
                 </div>
               ) : providers.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-2xl shadow-lg">
-                  <FaSearch className="text-5xl text-carelink-teal-pale mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-carelink-navy mb-2">לא נמצאו ספקים</h3>
-                  <p className="text-carelink-gray mb-4">נסו לשנות את הסינון או מילות החיפוש</p>
-                  <div className="space-y-3 max-w-md mx-auto text-sm text-carelink-slate mb-6">
+                  <FaSearch className="text-5xl text-carefd-teal-pale mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-carefd-navy mb-2">לא נמצאו ספקים</h3>
+                  <p className="text-carefd-gray mb-4">נסו לשנות את הסינון או מילות החיפוש</p>
+                  <div className="space-y-3 max-w-md mx-auto text-sm text-carefd-slate mb-6">
                     <p>הנה כמה טיפים לשיפור החיפוש:</p>
                     <ul className="text-right list-disc list-inside space-y-1">
                       <li>נסו להרחיב את אזור החיפוש</li>
@@ -803,7 +803,7 @@ const Providers = () => {
                   </div>
                   <button
                     onClick={handleResetFilters}
-                    className="px-6 py-2 bg-carelink-teal text-white rounded-lg font-medium hover:bg-carelink-teal-medium transition"
+                    className="px-6 py-2 bg-carefd-teal text-white rounded-lg font-medium hover:bg-carefd-teal-medium transition"
                   >
                     נקה סינון והצג הכל
                   </button>
@@ -815,7 +815,7 @@ const Providers = () => {
                   <div className="flex-1 min-h-[350px] lg:min-h-0">
                     <Suspense fallback={
                       <div className="h-full bg-gray-100 rounded-xl flex items-center justify-center">
-                        <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-8 h-8 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
                       </div>
                     }>
                       <ProvidersMap
@@ -831,15 +831,15 @@ const Providers = () => {
                   {/* Provider list sidebar */}
                   <div className="lg:w-80 xl:w-96 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden">
                     <div className="p-4 border-b border-gray-100 bg-gray-50/50">
-                      <h3 className="font-bold text-carelink-navy flex items-center gap-2">
-                        <FaMapMarkerAlt className="text-carelink-teal" />
+                      <h3 className="font-bold text-carefd-navy flex items-center gap-2">
+                        <FaMapMarkerAlt className="text-carefd-teal" />
                         ספקים באזור
-                        <span className="text-sm font-normal text-carelink-gray">({providers.length})</span>
+                        <span className="text-sm font-normal text-carefd-gray">({providers.length})</span>
                       </h3>
                     </div>
                     <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
                       {providers.length === 0 ? (
-                        <div className="p-8 text-center text-carelink-gray">
+                        <div className="p-8 text-center text-carefd-gray">
                           <FaSearch className="mx-auto text-3xl text-gray-300 mb-3" />
                           <p className="font-medium">לא נמצאו ספקים</p>
                           <p className="text-sm mt-1">נסו לשנות את הסינון</p>
@@ -849,18 +849,18 @@ const Providers = () => {
                           <a
                             key={provider.provider_id}
                             href={`/providers/${provider.provider_id}`}
-                            className="flex items-center gap-3 p-3 hover:bg-carelink-teal/5 transition group"
+                            className="flex items-center gap-3 p-3 hover:bg-carefd-teal/5 transition group"
                           >
                             {provider.profile_image ? (
-                              <img src={provider.profile_image} alt={provider.business_name || ''} className="w-11 h-11 rounded-full object-cover flex-shrink-0 ring-2 ring-gray-100 group-hover:ring-carelink-teal/30" />
+                              <img src={provider.profile_image} alt={provider.business_name || ''} className="w-11 h-11 rounded-full object-cover flex-shrink-0 ring-2 ring-gray-100 group-hover:ring-carefd-teal/30" />
                             ) : (
-                              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-carelink-teal/20 to-carelink-navy/10 flex items-center justify-center text-carelink-teal font-bold flex-shrink-0">
+                              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-carefd-teal/20 to-carefd-navy/10 flex items-center justify-center text-carefd-teal font-bold flex-shrink-0">
                                 {(provider.business_name || '?').charAt(0)}
                               </div>
                             )}
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-carelink-navy text-sm truncate group-hover:text-carelink-teal transition">{provider.business_name}</p>
-                              <p className="text-xs text-carelink-gray truncate">{provider.profession_name || provider.profession} • {provider.location?.city}</p>
+                              <p className="font-medium text-carefd-navy text-sm truncate group-hover:text-carefd-teal transition">{provider.business_name}</p>
+                              <p className="text-xs text-carefd-gray truncate">{provider.profession_name || provider.profession} • {provider.location?.city}</p>
                               <div className="flex items-center gap-3 mt-0.5">
                                 {provider.rating != null && provider.rating > 0 && (
                                   <span className="text-xs text-amber-500">⭐ {Number(provider.rating).toFixed(1)}</span>
@@ -870,7 +870,7 @@ const Providers = () => {
                                 )}
                               </div>
                             </div>
-                            <FaChevronLeft className="text-gray-300 group-hover:text-carelink-teal text-xs flex-shrink-0" />
+                            <FaChevronLeft className="text-gray-300 group-hover:text-carefd-teal text-xs flex-shrink-0" />
                           </a>
                         ))
                       )}

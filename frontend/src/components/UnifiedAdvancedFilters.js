@@ -174,16 +174,16 @@ const UnifiedAdvancedFilters = ({
 
   // Filter Section Component
   const FilterSection = ({ title, icon: Icon, sectionKey, children }) => (
-    <div className="border-b border-carelink-teal-pale/50 last:border-0">
+    <div className="border-b border-carefd-teal-pale/50 last:border-0">
       <button
         onClick={() => toggleSection(sectionKey)}
-        className="w-full flex items-center justify-between py-3 px-4 hover:bg-carelink-teal-pale/10 transition"
+        className="w-full flex items-center justify-between py-3 px-4 hover:bg-carefd-teal-pale/10 transition"
       >
-        <div className="flex items-center gap-2 font-semibold text-carelink-navy text-sm">
-          <Icon className="text-carelink-teal" />
+        <div className="flex items-center gap-2 font-semibold text-carefd-navy text-sm">
+          <Icon className="text-carefd-teal" />
           {title}
         </div>
-        {expandedSections[sectionKey] ? <FaChevronUp className="text-carelink-gray text-xs" /> : <FaChevronDown className="text-carelink-gray text-xs" />}
+        {expandedSections[sectionKey] ? <FaChevronUp className="text-carefd-gray text-xs" /> : <FaChevronDown className="text-carefd-gray text-xs" />}
       </button>
       {expandedSections[sectionKey] && (
         <div className="px-4 pb-4">
@@ -196,12 +196,12 @@ const UnifiedAdvancedFilters = ({
   return (
     <div className={`bg-white rounded-2xl shadow-lg overflow-hidden ${showMobile ? 'fixed inset-0 z-50 overflow-y-auto' : ''}`}>
       {/* Header */}
-      <div className="bg-carelink-navy text-white p-4 flex items-center justify-between">
+      <div className="bg-carefd-navy text-white p-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FaFilter />
           <span className="font-bold">סינון מתקדם</span>
           {activeFiltersCount > 0 && (
-            <span className="bg-carelink-teal text-white text-xs px-2 py-0.5 rounded-full">
+            <span className="bg-carefd-teal text-white text-xs px-2 py-0.5 rounded-full">
               {activeFiltersCount}
             </span>
           )}
@@ -209,7 +209,7 @@ const UnifiedAdvancedFilters = ({
         <div className="flex items-center gap-2">
           <button 
             onClick={onReset}
-            className="text-sm text-carelink-teal-pale hover:text-white transition"
+            className="text-sm text-carefd-teal-pale hover:text-white transition"
           >
             נקה הכל
           </button>
@@ -230,8 +230,8 @@ const UnifiedAdvancedFilters = ({
             disabled={isLocating}
             className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium transition text-sm ${
               filters.city === 'המיקום שלי'
-                ? 'bg-carelink-teal text-white'
-                : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                ? 'bg-carefd-teal text-white'
+                : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
             }`}
           >
             {isLocating ? <FaSpinner className="animate-spin" /> : <FaCrosshairs />}
@@ -240,7 +240,7 @@ const UnifiedAdvancedFilters = ({
 
           {/* Location Search Input */}
           <div className="relative">
-            <FaSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carelink-gray text-sm" />
+            <FaSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carefd-gray text-sm" />
             <input
               ref={locationInputRef}
               type="text"
@@ -251,7 +251,7 @@ const UnifiedAdvancedFilters = ({
               }}
               onFocus={() => setShowLocationDropdown(true)}
               placeholder="חפש עיר או אזור..."
-              className="w-full px-4 py-2.5 pr-10 border border-gray-200 rounded-xl focus:border-carelink-teal outline-none text-sm"
+              className="w-full px-4 py-2.5 pr-10 border border-gray-200 rounded-xl focus:border-carefd-teal outline-none text-sm"
             />
             
             {/* Location Dropdown */}
@@ -264,7 +264,7 @@ const UnifiedAdvancedFilters = ({
                 {!locationSearch && (
                   <>
                     <div className="p-2 border-b border-gray-100">
-                      <span className="text-xs font-semibold text-carelink-gray px-2">אזורים</span>
+                      <span className="text-xs font-semibold text-carefd-gray px-2">אזורים</span>
                     </div>
                     <div className="p-1">
                       {israeliRegions.map((region) => (
@@ -276,8 +276,8 @@ const UnifiedAdvancedFilters = ({
                             onFilterChange({ ...filters, region: region.name, city: '' });
                             setShowLocationDropdown(false);
                           }}
-                          className={`w-full text-right px-3 py-2 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-2 text-sm ${
-                            filters.region === region.name ? 'bg-carelink-teal text-white' : 'text-carelink-navy'
+                          className={`w-full text-right px-3 py-2 hover:bg-carefd-teal-pale/30 rounded-lg transition-colors flex items-center gap-2 text-sm ${
+                            filters.region === region.name ? 'bg-carefd-teal text-white' : 'text-carefd-navy'
                           }`}
                         >
                           <FaMapMarkerAlt className="text-xs" />
@@ -292,7 +292,7 @@ const UnifiedAdvancedFilters = ({
                 {locationSearch && filteredCities.length > 0 && (
                   <>
                     <div className="p-2 border-b border-gray-100">
-                      <span className="text-xs font-semibold text-carelink-gray px-2">ערים</span>
+                      <span className="text-xs font-semibold text-carefd-gray px-2">ערים</span>
                     </div>
                     <div className="p-1">
                       {filteredCities.map((city, index) => (
@@ -305,13 +305,13 @@ const UnifiedAdvancedFilters = ({
                             onFilterChange({ ...filters, city: cityName, region: '' });
                             setShowLocationDropdown(false);
                           }}
-                          className={`w-full text-right px-3 py-2 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-2 text-sm ${
-                            filters.city === (city.name || city) ? 'bg-carelink-teal text-white' : 'text-carelink-navy'
+                          className={`w-full text-right px-3 py-2 hover:bg-carefd-teal-pale/30 rounded-lg transition-colors flex items-center gap-2 text-sm ${
+                            filters.city === (city.name || city) ? 'bg-carefd-teal text-white' : 'text-carefd-navy'
                           }`}
                         >
                           <FaMapMarkerAlt className="text-xs" />
                           <span>{city.name || city}</span>
-                          {city.region && <span className="text-xs text-carelink-gray mr-auto">({city.region})</span>}
+                          {city.region && <span className="text-xs text-carefd-gray mr-auto">({city.region})</span>}
                         </button>
                       ))}
                     </div>
@@ -319,7 +319,7 @@ const UnifiedAdvancedFilters = ({
                 )}
                 
                 {locationSearch && filteredCities.length === 0 && (
-                  <div className="p-4 text-center text-carelink-gray text-sm">
+                  <div className="p-4 text-center text-carefd-gray text-sm">
                     לא נמצאו תוצאות
                   </div>
                 )}
@@ -329,15 +329,15 @@ const UnifiedAdvancedFilters = ({
 
           {/* Selected Location Display */}
           {(filters.city || filters.region) && (
-            <div className="flex items-center gap-2 bg-carelink-teal-pale/30 px-3 py-2 rounded-lg">
-              <FaMapMarkerAlt className="text-carelink-teal text-sm" />
-              <span className="text-sm text-carelink-navy">{filters.city || filters.region}</span>
+            <div className="flex items-center gap-2 bg-carefd-teal-pale/30 px-3 py-2 rounded-lg">
+              <FaMapMarkerAlt className="text-carefd-teal text-sm" />
+              <span className="text-sm text-carefd-navy">{filters.city || filters.region}</span>
               <button 
                 onClick={() => {
                   setLocationSearch('');
                   onFilterChange({ ...filters, city: '', region: '' });
                 }}
-                className="mr-auto text-carelink-gray hover:text-red-500"
+                className="mr-auto text-carefd-gray hover:text-red-500"
               >
                 <FaTimes className="text-xs" />
               </button>
@@ -355,8 +355,8 @@ const UnifiedAdvancedFilters = ({
               onClick={() => onFilterChange({...filters, category: filters.category === cat.id ? '' : cat.id})}
               className={`px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 filters.category === cat.id
-                  ? 'bg-carelink-teal text-white'
-                  : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
               }`}
             >
               {cat.name}
@@ -376,8 +376,8 @@ const UnifiedAdvancedFilters = ({
                 onClick={() => onFilterChange({...filters, serviceType: filters.serviceType === type.id ? '' : type.id})}
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                   filters.serviceType === type.id
-                    ? 'bg-carelink-teal text-white'
-                    : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                    ? 'bg-carefd-teal text-white'
+                    : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
                 }`}
               >
                 <Icon className="text-sm" />
@@ -397,8 +397,8 @@ const UnifiedAdvancedFilters = ({
               onClick={() => onFilterChange({...filters, profession: filters.profession === prof.name ? '' : prof.name})}
               className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                 filters.profession === prof.name
-                  ? 'bg-carelink-teal text-white'
-                  : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
               }`}
             >
               <FaUserMd className="text-xs" />
@@ -419,8 +419,8 @@ const UnifiedAdvancedFilters = ({
                 onClick={() => onFilterChange({...filters, gender: filters.gender === option.id ? '' : option.id})}
                 className={`flex-1 flex flex-col items-center gap-1 px-3 py-2.5 rounded-lg text-xs font-medium transition-all ${
                   filters.gender === option.id
-                    ? 'bg-carelink-teal text-white'
-                    : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                    ? 'bg-carefd-teal text-white'
+                    : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
                 }`}
               >
                 <Icon className="text-lg" />
@@ -448,8 +448,8 @@ const UnifiedAdvancedFilters = ({
                 }}
                 className={`px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${
                   isSelected
-                    ? 'bg-carelink-teal text-white'
-                    : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                    ? 'bg-carefd-teal text-white'
+                    : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
                 }`}
               >
                 {lang.name}
@@ -476,8 +476,8 @@ const UnifiedAdvancedFilters = ({
                 }}
                 className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                   isSelected
-                    ? 'bg-carelink-teal text-white'
-                    : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                    ? 'bg-carefd-teal text-white'
+                    : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
                 }`}
               >
                 <span 
@@ -497,23 +497,23 @@ const UnifiedAdvancedFilters = ({
         <div className="space-y-3">
           <div className="flex gap-2">
             <div className="flex-1">
-              <label className="text-xs text-carelink-gray mb-1 block">מ-</label>
+              <label className="text-xs text-carefd-gray mb-1 block">מ-</label>
               <input
                 type="number"
                 placeholder="₪0"
                 value={filters.priceMin || ''}
                 onChange={(e) => onFilterChange({...filters, priceMin: e.target.value})}
-                className="w-full p-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none text-sm"
+                className="w-full p-2 border border-gray-200 rounded-lg focus:border-carefd-teal outline-none text-sm"
               />
             </div>
             <div className="flex-1">
-              <label className="text-xs text-carelink-gray mb-1 block">עד</label>
+              <label className="text-xs text-carefd-gray mb-1 block">עד</label>
               <input
                 type="number"
                 placeholder="₪999"
                 value={filters.priceMax || ''}
                 onChange={(e) => onFilterChange({...filters, priceMax: e.target.value})}
-                className="w-full p-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none text-sm"
+                className="w-full p-2 border border-gray-200 rounded-lg focus:border-carefd-teal outline-none text-sm"
               />
             </div>
           </div>
@@ -530,8 +530,8 @@ const UnifiedAdvancedFilters = ({
                 onClick={() => onFilterChange({...filters, priceMin: range.min, priceMax: range.max})}
                 className={`px-2 py-1 rounded-lg text-xs font-medium transition-all ${
                   filters.priceMin === range.min && filters.priceMax === range.max
-                    ? 'bg-carelink-teal text-white'
-                    : 'bg-gray-100 text-carelink-navy hover:bg-gray-200'
+                    ? 'bg-carefd-teal text-white'
+                    : 'bg-gray-100 text-carefd-navy hover:bg-gray-200'
                 }`}
               >
                 {range.label}
@@ -550,8 +550,8 @@ const UnifiedAdvancedFilters = ({
               onClick={() => onFilterChange({...filters, minRating: filters.minRating === option.value ? null : option.value})}
               className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                 filters.minRating === option.value
-                  ? 'bg-carelink-teal text-white'
-                  : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
               }`}
             >
               <div className="flex items-center gap-0.5">
@@ -568,35 +568,35 @@ const UnifiedAdvancedFilters = ({
       {/* Badges Filter */}
       <FilterSection title="תגיות מיוחדות" icon={FaAward} sectionKey="badges">
         <div className="space-y-2">
-          <label className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-carelink-teal-pale/20 transition">
+          <label className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-carefd-teal-pale/20 transition">
             <input
               type="checkbox"
               checked={filters.verifiedOnly || false}
               onChange={(e) => onFilterChange({...filters, verifiedOnly: e.target.checked})}
-              className="w-4 h-4 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
+              className="w-4 h-4 text-carefd-teal rounded border-gray-300 focus:ring-carefd-teal"
             />
-            <FaCheckCircle className="text-carelink-teal text-sm" />
-            <span className="text-xs font-medium text-carelink-navy">מאומתים בלבד</span>
+            <FaCheckCircle className="text-carefd-teal text-sm" />
+            <span className="text-xs font-medium text-carefd-navy">מאומתים בלבד</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-carelink-teal-pale/20 transition">
+          <label className="flex items-center gap-2 cursor-pointer p-2 rounded-lg hover:bg-carefd-teal-pale/20 transition">
             <input
               type="checkbox"
               checked={filters.recommendedOnly || false}
               onChange={(e) => onFilterChange({...filters, recommendedOnly: e.target.checked})}
-              className="w-4 h-4 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
+              className="w-4 h-4 text-carefd-teal rounded border-gray-300 focus:ring-carefd-teal"
             />
             <FaAward className="text-amber-500 text-sm" />
-            <span className="text-xs font-medium text-carelink-navy">מומלצים בלבד</span>
+            <span className="text-xs font-medium text-carefd-navy">מומלצים בלבד</span>
           </label>
         </div>
       </FilterSection>
 
       {/* Mobile Apply Button */}
       {showMobile && (
-        <div className="p-4 border-t border-carelink-teal-pale bg-white sticky bottom-0">
+        <div className="p-4 border-t border-carefd-teal-pale bg-white sticky bottom-0">
           <button
             onClick={onClose}
-            className="w-full py-3 bg-carelink-teal text-white rounded-xl font-semibold"
+            className="w-full py-3 bg-carefd-teal text-white rounded-xl font-semibold"
           >
             הצג תוצאות ({resultsCount})
           </button>

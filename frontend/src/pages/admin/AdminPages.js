@@ -174,12 +174,12 @@ const AdminPages = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-carelink-navy">דפים סטטיים</h1>
-            <p className="text-carelink-slate mt-1">ניהול דפי תוכן קבועים באתר</p>
+            <h1 className="text-2xl font-bold text-carefd-navy">דפים סטטיים</h1>
+            <p className="text-carefd-slate mt-1">ניהול דפי תוכן קבועים באתר</p>
           </div>
           <button
             onClick={() => openEditor()}
-            className="flex items-center gap-2 px-4 py-2 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition"
+            className="flex items-center gap-2 px-4 py-2 bg-carefd-teal text-carefd-navy rounded-lg hover:bg-carefd-teal/90 transition"
             data-testid="create-page-btn"
           >
             <FiPlus size={18} />
@@ -192,23 +192,23 @@ const AdminPages = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">כותרת</th>
-                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">נתיב</th>
-                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">סטטוס</th>
-                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">עדכון אחרון</th>
-                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">פעולות</th>
+                <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">כותרת</th>
+                <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">נתיב</th>
+                <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">סטטוס</th>
+                <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">עדכון אחרון</th>
+                <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">פעולות</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
                   <td colSpan={5} className="py-12 text-center">
-                    <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    <div className="w-8 h-8 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
                   </td>
                 </tr>
               ) : pages.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-carelink-slate">
+                  <td colSpan={5} className="py-12 text-center text-carefd-slate">
                     <FiFileText className="mx-auto mb-3" size={32} />
                     אין דפים. צור דף ראשון.
                   </td>
@@ -218,14 +218,14 @@ const AdminPages = () => {
                   <tr key={page.page_id} className="border-b border-gray-100/50 hover:bg-gray-50/30 transition" data-testid={`page-row-${page.slug}`}>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-carelink-teal/20 rounded-lg flex items-center justify-center">
-                          <FiFileText className="text-carelink-teal" size={18} />
+                        <div className="w-10 h-10 bg-carefd-teal/20 rounded-lg flex items-center justify-center">
+                          <FiFileText className="text-carefd-teal" size={18} />
                         </div>
-                        <span className="text-carelink-navy font-medium">{page.title}</span>
+                        <span className="text-carefd-navy font-medium">{page.title}</span>
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <code className="text-carelink-slate bg-gray-50 px-2 py-1 rounded text-sm">/{page.slug}</code>
+                      <code className="text-carefd-slate bg-gray-50 px-2 py-1 rounded text-sm">/{page.slug}</code>
                     </td>
                     <td className="py-4 px-6">
                       <button
@@ -233,7 +233,7 @@ const AdminPages = () => {
                         className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm ${
                           page.is_published 
                             ? 'bg-emerald-500/20 text-emerald-600' 
-                            : 'bg-gray-100 text-carelink-slate'
+                            : 'bg-gray-100 text-carefd-slate'
                         }`}
                         data-testid={`toggle-publish-${page.slug}`}
                       >
@@ -250,7 +250,7 @@ const AdminPages = () => {
                         )}
                       </button>
                     </td>
-                    <td className="py-4 px-6 text-carelink-slate text-sm">
+                    <td className="py-4 px-6 text-carefd-slate text-sm">
                       {page.updated_at ? new Date(page.updated_at).toLocaleDateString('he-IL') : '-'}
                     </td>
                     <td className="py-4 px-6">
@@ -259,7 +259,7 @@ const AdminPages = () => {
                           href={`/${page.slug}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-2 text-carelink-slate hover:text-carelink-navy hover:bg-gray-50 rounded-lg transition"
+                          className="p-2 text-carefd-slate hover:text-carefd-navy hover:bg-gray-50 rounded-lg transition"
                           title="צפה בדף"
                           data-testid={`view-page-${page.slug}`}
                         >
@@ -267,7 +267,7 @@ const AdminPages = () => {
                         </a>
                         <button
                           onClick={() => openEditor(page)}
-                          className="p-2 text-carelink-slate hover:text-carelink-teal hover:bg-carelink-teal/10 rounded-lg transition"
+                          className="p-2 text-carefd-slate hover:text-carefd-teal hover:bg-carefd-teal/10 rounded-lg transition"
                           title="ערוך"
                           data-testid={`edit-page-${page.slug}`}
                         >
@@ -275,7 +275,7 @@ const AdminPages = () => {
                         </button>
                         <button
                           onClick={() => deletePage(page.page_id)}
-                          className="p-2 text-carelink-slate hover:text-red-500 hover:bg-red-500/10 rounded-lg transition"
+                          className="p-2 text-carefd-slate hover:text-red-500 hover:bg-red-500/10 rounded-lg transition"
                           title="מחק"
                           data-testid={`delete-page-${page.slug}`}
                         >
@@ -297,12 +297,12 @@ const AdminPages = () => {
           <div className="bg-white rounded-xl w-full max-w-5xl max-h-[90vh] overflow-hidden border border-gray-100 flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
-              <h2 className="text-lg font-bold text-carelink-navy">
+              <h2 className="text-lg font-bold text-carefd-navy">
                 {editingPage ? 'עריכת דף' : 'דף חדש'}
               </h2>
               <button
                 onClick={() => setShowEditor(false)}
-                className="p-2 text-carelink-slate hover:text-carelink-navy hover:bg-gray-50 rounded-lg transition"
+                className="p-2 text-carefd-slate hover:text-carefd-navy hover:bg-gray-50 rounded-lg transition"
               >
                 <FiX size={20} />
               </button>
@@ -312,26 +312,26 @@ const AdminPages = () => {
             <div className="flex-1 overflow-y-auto p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2">כותרת הדף *</label>
+                  <label className="block text-sm text-carefd-slate mb-2">כותרת הדף *</label>
                   <input
                     type="text"
                     value={currentPage.title}
                     onChange={(e) => setCurrentPage(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="לדוגמה: אודות"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                     data-testid="page-title-input"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2">נתיב (Slug) *</label>
-                  <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg overflow-hidden focus-within:border-carelink-teal focus-within:ring-1 focus-within:ring-carelink-teal">
-                    <span className="px-3 text-carelink-gray">/</span>
+                  <label className="block text-sm text-carefd-slate mb-2">נתיב (Slug) *</label>
+                  <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg overflow-hidden focus-within:border-carefd-teal focus-within:ring-1 focus-within:ring-carefd-teal">
+                    <span className="px-3 text-carefd-gray">/</span>
                     <input
                       type="text"
                       value={currentPage.slug}
                       onChange={(e) => handleSlugChange(e.target.value)}
                       placeholder="about"
-                      className="flex-1 bg-transparent py-2.5 text-carelink-navy placeholder-carelink-gray outline-none"
+                      className="flex-1 bg-transparent py-2.5 text-carefd-navy placeholder-carefd-gray outline-none"
                       dir="ltr"
                       data-testid="page-slug-input"
                     />
@@ -340,19 +340,19 @@ const AdminPages = () => {
               </div>
 
               <div>
-                <label className="block text-sm text-carelink-slate mb-2">תיאור מטא (SEO)</label>
+                <label className="block text-sm text-carefd-slate mb-2">תיאור מטא (SEO)</label>
                 <input
                   type="text"
                   value={currentPage.meta_description}
                   onChange={(e) => setCurrentPage(prev => ({ ...prev, meta_description: e.target.value }))}
                   placeholder="תיאור קצר לתוצאות חיפוש..."
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                   data-testid="page-meta-input"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-carelink-slate mb-2">תוכן הדף</label>
+                <label className="block text-sm text-carefd-slate mb-2">תוכן הדף</label>
                 <div className="quill-rtl border border-gray-200 rounded-lg overflow-hidden" data-testid="page-content-editor">
                   <ReactQuill
                     theme="snow"
@@ -375,9 +375,9 @@ const AdminPages = () => {
                     className="sr-only peer"
                     data-testid="page-publish-toggle"
                   />
-                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
+                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carefd-teal"></div>
                 </label>
-                <span className="text-carelink-slate">פרסם דף (גלוי לציבור)</span>
+                <span className="text-carefd-slate">פרסם דף (גלוי לציבור)</span>
               </div>
             </div>
 
@@ -385,7 +385,7 @@ const AdminPages = () => {
             <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-100">
               <button
                 onClick={() => setShowEditor(false)}
-                className="px-6 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+                className="px-6 py-2.5 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition"
                 data-testid="cancel-page-btn"
               >
                 ביטול
@@ -393,7 +393,7 @@ const AdminPages = () => {
               <button
                 onClick={savePage}
                 disabled={!currentPage.title.trim() || !currentPage.slug.trim() || saving}
-                className="flex items-center gap-2 px-6 py-2.5 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 py-2.5 bg-carefd-teal text-carefd-navy rounded-lg hover:bg-carefd-teal/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 data-testid="save-page-btn"
               >
                 {saving ? (

@@ -182,14 +182,14 @@ const AdminRegions = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-carelink-navy">אזורים וערים</h1>
-            <p className="text-carelink-slate mt-1">
+            <h1 className="text-2xl font-bold text-carefd-navy">אזורים וערים</h1>
+            <p className="text-carefd-slate mt-1">
               ניהול אזורים גיאוגרפיים • {regions.length} אזורים • {totalCities} ערים
             </p>
           </div>
           <button
             onClick={() => setShowAddRegion(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition"
+            className="flex items-center gap-2 px-4 py-2 bg-carefd-teal text-carefd-navy rounded-lg hover:bg-carefd-teal/90 transition"
             data-testid="add-region-btn"
           >
             <FiPlus size={18} />
@@ -200,13 +200,13 @@ const AdminRegions = () => {
         {/* Search */}
         <div className="bg-white rounded-xl p-4 border border-gray-100">
           <div className="relative">
-            <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carelink-slate" size={18} />
+            <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carefd-slate" size={18} />
             <input
               type="text"
               placeholder="חפש אזור או עיר..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg pr-10 pl-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg pr-10 pl-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
               data-testid="search-region-input"
             />
           </div>
@@ -216,12 +216,12 @@ const AdminRegions = () => {
         <div className="space-y-3">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-10 h-10 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-10 h-10 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : filteredRegions.length === 0 ? (
             <div className="bg-white rounded-xl p-12 text-center border border-gray-100">
               <FiMap className="mx-auto text-slate-600 mb-4" size={48} />
-              <p className="text-carelink-slate">לא נמצאו אזורים</p>
+              <p className="text-carefd-slate">לא נמצאו אזורים</p>
             </div>
           ) : (
             filteredRegions.map((region) => (
@@ -232,12 +232,12 @@ const AdminRegions = () => {
                   onClick={() => setExpandedRegion(expandedRegion === region.region_id ? null : region.region_id)}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-carelink-teal/20 rounded-lg flex items-center justify-center">
-                      <FiGlobe className="text-carelink-teal" size={20} />
+                    <div className="w-10 h-10 bg-carefd-teal/20 rounded-lg flex items-center justify-center">
+                      <FiGlobe className="text-carefd-teal" size={20} />
                     </div>
                     <div>
-                      <h3 className="text-carelink-navy font-medium">{region.name}</h3>
-                      <p className="text-carelink-slate text-sm">
+                      <h3 className="text-carefd-navy font-medium">{region.name}</h3>
+                      <p className="text-carefd-slate text-sm">
                         {region.name_en && `${region.name_en} • `}
                         {region.cities?.length || 0} ערים
                       </p>
@@ -249,7 +249,7 @@ const AdminRegions = () => {
                         e.stopPropagation();
                         openEditRegion(region);
                       }}
-                      className="p-2 text-carelink-slate hover:text-carelink-teal hover:bg-carelink-teal/10 rounded-lg transition"
+                      className="p-2 text-carefd-slate hover:text-carefd-teal hover:bg-carefd-teal/10 rounded-lg transition"
                       title="ערוך אזור"
                     >
                       <FiEdit2 size={18} />
@@ -259,7 +259,7 @@ const AdminRegions = () => {
                         e.stopPropagation();
                         setShowAddCity(region.region_id);
                       }}
-                      className="p-2 text-carelink-slate hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition"
+                      className="p-2 text-carefd-slate hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition"
                       title="הוסף עיר"
                     >
                       <FiPlus size={18} />
@@ -269,13 +269,13 @@ const AdminRegions = () => {
                         e.stopPropagation();
                         deleteRegion(region.region_id, region.name);
                       }}
-                      className="p-2 text-carelink-slate hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
+                      className="p-2 text-carefd-slate hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
                       title="מחק אזור"
                     >
                       <FiTrash2 size={18} />
                     </button>
                     <FiChevronDown 
-                      className={`text-carelink-slate transition-transform ${expandedRegion === region.region_id ? 'rotate-180' : ''}`}
+                      className={`text-carefd-slate transition-transform ${expandedRegion === region.region_id ? 'rotate-180' : ''}`}
                       size={20}
                     />
                   </div>
@@ -285,19 +285,19 @@ const AdminRegions = () => {
                 {expandedRegion === region.region_id && (
                   <div className="border-t border-gray-100 p-4">
                     {!region.cities || region.cities.length === 0 ? (
-                      <p className="text-carelink-gray text-center py-4">אין ערים באזור זה</p>
+                      <p className="text-carefd-gray text-center py-4">אין ערים באזור זה</p>
                     ) : (
                       <div className="flex flex-wrap gap-2">
                         {region.cities.map((city, idx) => (
                           <div
                             key={idx}
-                            className="inline-flex items-center gap-2 bg-gray-50 border border-gray-200 px-3 py-2 rounded-lg group hover:border-carelink-teal/50 transition"
+                            className="inline-flex items-center gap-2 bg-gray-50 border border-gray-200 px-3 py-2 rounded-lg group hover:border-carefd-teal/50 transition"
                           >
-                            <FiMapPin className="text-carelink-teal" size={14} />
+                            <FiMapPin className="text-carefd-teal" size={14} />
                             <div className="flex flex-col">
-                              <span className="text-carelink-navy text-sm font-medium">{getCityName(city)}</span>
+                              <span className="text-carefd-navy text-sm font-medium">{getCityName(city)}</span>
                               {getCityNameEn(city) && (
-                                <span className="text-carelink-gray text-xs">{getCityNameEn(city)}</span>
+                                <span className="text-carefd-gray text-xs">{getCityNameEn(city)}</span>
                               )}
                             </div>
                             {hasCoordinates(city) && (
@@ -307,7 +307,7 @@ const AdminRegions = () => {
                             )}
                             <button
                               onClick={() => removeCity(region.region_id, city)}
-                              className="text-carelink-gray hover:text-red-400 opacity-0 group-hover:opacity-100 transition"
+                              className="text-carefd-gray hover:text-red-400 opacity-0 group-hover:opacity-100 transition"
                               title="הסר עיר"
                             >
                               <FiX size={14} />
@@ -328,29 +328,29 @@ const AdminRegions = () => {
       {(showAddRegion || editingRegion) && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-100">
-            <h3 className="text-lg font-bold text-carelink-navy mb-4">
+            <h3 className="text-lg font-bold text-carefd-navy mb-4">
               {editingRegion ? 'עריכת אזור' : 'הוסף אזור חדש'}
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-carelink-slate mb-1">שם האזור בעברית *</label>
+                <label className="block text-sm text-carefd-slate mb-1">שם האזור בעברית *</label>
                 <input
                   type="text"
                   value={regionForm.name}
                   onChange={(e) => setRegionForm(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="לדוגמה: צפון"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                   data-testid="region-name-input"
                 />
               </div>
               <div>
-                <label className="block text-sm text-carelink-slate mb-1">שם באנגלית</label>
+                <label className="block text-sm text-carefd-slate mb-1">שם באנגלית</label>
                 <input
                   type="text"
                   value={regionForm.name_en}
                   onChange={(e) => setRegionForm(prev => ({ ...prev, name_en: e.target.value }))}
                   placeholder="e.g. North"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                   dir="ltr"
                   data-testid="region-name-en-input"
                 />
@@ -363,14 +363,14 @@ const AdminRegions = () => {
                   setEditingRegion(null);
                   setRegionForm({ name: '', name_en: '' });
                 }}
-                className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition"
               >
                 ביטול
               </button>
               <button
                 onClick={editingRegion ? updateRegion : addRegion}
                 disabled={!regionForm.name.trim() || saving}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-carefd-teal text-carefd-navy rounded-lg hover:bg-carefd-teal/90 transition disabled:opacity-50"
                 data-testid="save-region-btn"
               >
                 {saving ? <FiLoader className="animate-spin" size={18} /> : <FiSave size={18} />}
@@ -385,58 +385,58 @@ const AdminRegions = () => {
       {showAddCity && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-100">
-            <h3 className="text-lg font-bold text-carelink-navy mb-4">הוסף עיר חדשה</h3>
+            <h3 className="text-lg font-bold text-carefd-navy mb-4">הוסף עיר חדשה</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-carelink-slate mb-1">שם העיר בעברית *</label>
+                <label className="block text-sm text-carefd-slate mb-1">שם העיר בעברית *</label>
                 <input
                   type="text"
                   value={cityForm.name}
                   onChange={(e) => setCityForm(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="לדוגמה: תל אביב"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                   data-testid="city-name-input"
                 />
               </div>
               <div>
-                <label className="block text-sm text-carelink-slate mb-1">שם באנגלית</label>
+                <label className="block text-sm text-carefd-slate mb-1">שם באנגלית</label>
                 <input
                   type="text"
                   value={cityForm.name_en}
                   onChange={(e) => setCityForm(prev => ({ ...prev, name_en: e.target.value }))}
                   placeholder="e.g. Tel Aviv"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                   dir="ltr"
                   data-testid="city-name-en-input"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-1">קו רוחב (Lat)</label>
+                  <label className="block text-sm text-carefd-slate mb-1">קו רוחב (Lat)</label>
                   <input
                     type="number"
                     step="0.0001"
                     value={cityForm.lat}
                     onChange={(e) => setCityForm(prev => ({ ...prev, lat: e.target.value }))}
                     placeholder="32.0853"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                     dir="ltr"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-1">קו אורך (Lng)</label>
+                  <label className="block text-sm text-carefd-slate mb-1">קו אורך (Lng)</label>
                   <input
                     type="number"
                     step="0.0001"
                     value={cityForm.lng}
                     onChange={(e) => setCityForm(prev => ({ ...prev, lng: e.target.value }))}
                     placeholder="34.7818"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                     dir="ltr"
                   />
                 </div>
               </div>
-              <p className="text-xs text-carelink-gray">
+              <p className="text-xs text-carefd-gray">
                 💡 ניתן למצוא קואורדינטות ב-Google Maps (לחיצה ימנית על מיקום)
               </p>
             </div>
@@ -446,14 +446,14 @@ const AdminRegions = () => {
                   setShowAddCity(null);
                   setCityForm({ name: '', name_en: '', lat: '', lng: '' });
                 }}
-                className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition"
               >
                 ביטול
               </button>
               <button
                 onClick={addCity}
                 disabled={!cityForm.name.trim() || saving}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-carefd-teal text-carefd-navy rounded-lg hover:bg-carefd-teal/90 transition disabled:opacity-50"
                 data-testid="save-city-btn"
               >
                 {saving ? <FiLoader className="animate-spin" size={18} /> : <FiPlus size={18} />}

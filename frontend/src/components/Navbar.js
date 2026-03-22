@@ -74,7 +74,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-md border-b border-carelink-light-gray sticky top-0 z-40" data-testid="navbar">
+    <nav className="bg-white shadow-md border-b border-carefd-light-gray sticky top-0 z-40" data-testid="navbar">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20">
           <div className="flex items-center">
@@ -86,14 +86,14 @@ const Navbar = () => {
             <div className="hidden md:flex mr-10 gap-1">
               <Link
                 to="/providers"
-                className="text-carelink-slate hover:text-carelink-teal px-4 py-2 rounded-lg transition-colors font-medium hover:bg-carelink-teal-pale/20"
+                className="text-carefd-slate hover:text-carefd-teal px-4 py-2 rounded-lg transition-colors font-medium hover:bg-carefd-teal-pale/20"
                 data-testid="nav-providers"
               >
                 ספקים
               </Link>
               <Link
                 to="/services"
-                className="text-carelink-slate hover:text-carelink-teal px-4 py-2 rounded-lg transition-colors font-medium hover:bg-carelink-teal-pale/20"
+                className="text-carefd-slate hover:text-carefd-teal px-4 py-2 rounded-lg transition-colors font-medium hover:bg-carefd-teal-pale/20"
                 data-testid="nav-services"
               >
                 שירותים
@@ -101,7 +101,7 @@ const Navbar = () => {
               {isAuthenticated && (
                 <Link
                   to="/requests"
-                  className="text-carelink-slate hover:text-carelink-teal px-4 py-2 rounded-lg transition-colors font-medium hover:bg-carelink-teal-pale/20"
+                  className="text-carefd-slate hover:text-carefd-teal px-4 py-2 rounded-lg transition-colors font-medium hover:bg-carefd-teal-pale/20"
                   data-testid="nav-requests"
                 >
                   בקשות
@@ -114,7 +114,7 @@ const Navbar = () => {
             {/* Search Icon */}
             <button
               onClick={() => setShowSearch(!showSearch)}
-              className="p-2.5 rounded-lg hover:bg-carelink-teal-pale/30 text-carelink-slate hover:text-carelink-teal transition-colors"
+              className="p-2.5 rounded-lg hover:bg-carefd-teal-pale/30 text-carefd-slate hover:text-carefd-teal transition-colors"
               data-testid="search-icon-btn"
             >
               <FaSearch className="text-lg" />
@@ -124,7 +124,7 @@ const Navbar = () => {
             {isAuthenticated && (
               <Link
                 to="/chats"
-                className="relative p-2.5 rounded-lg hover:bg-carelink-teal-pale/30 text-carelink-slate hover:text-carelink-teal transition-colors"
+                className="relative p-2.5 rounded-lg hover:bg-carefd-teal-pale/30 text-carefd-slate hover:text-carefd-teal transition-colors"
                 data-testid="chat-icon"
               >
                 <FaComments className="text-lg" />
@@ -145,29 +145,29 @@ const Navbar = () => {
                 <div className="relative" ref={profileDropdownRef}>
                   <button
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-carelink-teal-pale/30 transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-carefd-teal-pale/30 transition-colors"
                     data-testid="profile-dropdown-btn"
                   >
                     {user?.picture ? (
                       <img
                         src={user.picture}
                         alt={user.name}
-                        className="w-9 h-9 rounded-full object-cover border-2 border-carelink-teal"
+                        className="w-9 h-9 rounded-full object-cover border-2 border-carefd-teal"
                       />
                     ) : (
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-carelink-teal to-carelink-navy flex items-center justify-center text-white text-sm font-bold">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-carefd-teal to-carefd-navy flex items-center justify-center text-white text-sm font-bold">
                         {getUserInitials()}
                       </div>
                     )}
                     <div className="text-right hidden lg:block">
-                      <span className="text-sm font-medium text-carelink-navy leading-tight block">
+                      <span className="text-sm font-medium text-carefd-navy leading-tight block">
                         שלום, {user?.name?.split(' ')[0] || 'משתמש'}
                       </span>
-                      <span className="text-xs text-carelink-gray leading-tight block">
+                      <span className="text-xs text-carefd-gray leading-tight block">
                         {user?.role === 'admin' ? 'מנהל' : user?.role === 'provider' ? 'ספק' : 'משתמש'}
                       </span>
                     </div>
-                    <FaChevronDown className={`text-xs text-carelink-gray transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+                    <FaChevronDown className={`text-xs text-carefd-gray transition-transform duration-200 ${profileDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {/* Profile Dropdown */}
@@ -180,16 +180,16 @@ const Navbar = () => {
                             <img
                               src={user.picture}
                               alt={user.name}
-                              className="w-11 h-11 rounded-full object-cover border-2 border-carelink-teal"
+                              className="w-11 h-11 rounded-full object-cover border-2 border-carefd-teal"
                             />
                           ) : (
-                            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-carelink-teal to-carelink-navy flex items-center justify-center text-white font-bold">
+                            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-carefd-teal to-carefd-navy flex items-center justify-center text-white font-bold">
                               {getUserInitials()}
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-carelink-navy text-sm truncate">{user?.name}</p>
-                            <p className="text-xs text-carelink-gray truncate">{user?.email}</p>
+                            <p className="font-semibold text-carefd-navy text-sm truncate">{user?.name}</p>
+                            <p className="text-xs text-carefd-gray truncate">{user?.email}</p>
                           </div>
                         </div>
                       </div>
@@ -199,26 +199,26 @@ const Navbar = () => {
                         <Link
                           to={getDashboardPath()}
                           onClick={() => setProfileDropdownOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-carelink-slate hover:bg-carelink-teal-pale/30 hover:text-carelink-teal transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-carefd-slate hover:bg-carefd-teal-pale/30 hover:text-carefd-teal transition-colors"
                           data-testid="nav-dashboard"
                         >
-                          <FaTachometerAlt className="text-carelink-gray" />
+                          <FaTachometerAlt className="text-carefd-gray" />
                           <span>לוח בקרה</span>
                         </Link>
                         <Link
                           to="/dashboard?tab=overview"
                           onClick={() => setProfileDropdownOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-carelink-slate hover:bg-carelink-teal-pale/30 hover:text-carelink-teal transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-carefd-slate hover:bg-carefd-teal-pale/30 hover:text-carefd-teal transition-colors"
                         >
-                          <FaUser className="text-carelink-gray" />
+                          <FaUser className="text-carefd-gray" />
                           <span>הפרופיל שלי</span>
                         </Link>
                         <Link
                           to="/dashboard?tab=settings"
                           onClick={() => setProfileDropdownOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-carelink-slate hover:bg-carelink-teal-pale/30 hover:text-carelink-teal transition-colors"
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-carefd-slate hover:bg-carefd-teal-pale/30 hover:text-carefd-teal transition-colors"
                         >
-                          <FaCog className="text-carelink-gray" />
+                          <FaCog className="text-carefd-gray" />
                           <span>הגדרות</span>
                         </Link>
                       </div>
@@ -241,14 +241,14 @@ const Navbar = () => {
                 <div className="flex items-center gap-3">
                   <Link
                     to="/login"
-                    className="text-carelink-slate hover:text-carelink-teal transition-colors font-medium px-3 py-2"
+                    className="text-carefd-slate hover:text-carefd-teal transition-colors font-medium px-3 py-2"
                     data-testid="nav-login"
                   >
                     התחברות
                   </Link>
                   <Link
                     to="/register"
-                    className="bg-carelink-teal text-white px-5 py-2.5 rounded-lg hover:bg-carelink-teal-medium transition-colors font-medium"
+                    className="bg-carefd-teal text-white px-5 py-2.5 rounded-lg hover:bg-carefd-teal-medium transition-colors font-medium"
                     data-testid="nav-register"
                   >
                     הרשמה
@@ -260,7 +260,7 @@ const Navbar = () => {
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2.5 rounded-lg hover:bg-carelink-teal-pale/30 text-carelink-slate"
+              className="md:hidden p-2.5 rounded-lg hover:bg-carefd-teal-pale/30 text-carefd-slate"
             >
               {mobileMenuOpen ? <FaTimes /> : <FaBars />}
             </button>
@@ -276,13 +276,13 @@ const Navbar = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="חפש ספקים, שירותים..."
-                className="w-full px-4 py-3 pr-12 rounded-xl border-2 border-carelink-teal-pale focus:border-carelink-teal focus:outline-none"
+                className="w-full px-4 py-3 pr-12 rounded-xl border-2 border-carefd-teal-pale focus:border-carefd-teal focus:outline-none"
                 autoFocus
                 data-testid="navbar-search-input"
               />
               <button
                 type="submit"
-                className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 text-carelink-teal hover:text-carelink-teal-medium"
+                className="absolute left-3 rtl:left-auto rtl:right-3 top-1/2 -translate-y-1/2 text-carefd-teal hover:text-carefd-teal-medium"
               >
                 <FaSearch />
               </button>
@@ -292,18 +292,18 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden pb-4 border-t border-carelink-teal-pale pt-4">
+          <div className="md:hidden pb-4 border-t border-carefd-teal-pale pt-4">
             <div className="flex flex-col gap-2">
               <Link
                 to="/providers"
-                className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium"
+                className="text-carefd-slate hover:text-carefd-teal px-3 py-2 transition-colors font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 ספקים
               </Link>
               <Link
                 to="/services"
-                className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium"
+                className="text-carefd-slate hover:text-carefd-teal px-3 py-2 transition-colors font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 שירותים
@@ -311,29 +311,29 @@ const Navbar = () => {
               {isAuthenticated ? (
                 <>
                   {/* Mobile user info */}
-                  <div className="flex items-center gap-3 px-3 py-3 mb-2 bg-carelink-teal-pale/20 rounded-xl">
+                  <div className="flex items-center gap-3 px-3 py-3 mb-2 bg-carefd-teal-pale/20 rounded-xl">
                     {user?.picture ? (
-                      <img src={user.picture} alt={user.name} className="w-10 h-10 rounded-full object-cover border-2 border-carelink-teal" />
+                      <img src={user.picture} alt={user.name} className="w-10 h-10 rounded-full object-cover border-2 border-carefd-teal" />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-carelink-teal to-carelink-navy flex items-center justify-center text-white font-bold">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-carefd-teal to-carefd-navy flex items-center justify-center text-white font-bold">
                         {getUserInitials()}
                       </div>
                     )}
                     <div>
-                      <p className="font-semibold text-carelink-navy text-sm">שלום, {user?.name || 'משתמש'}</p>
-                      <p className="text-xs text-carelink-gray">{user?.email}</p>
+                      <p className="font-semibold text-carefd-navy text-sm">שלום, {user?.name || 'משתמש'}</p>
+                      <p className="text-xs text-carefd-gray">{user?.email}</p>
                     </div>
                   </div>
                   <Link
                     to="/requests"
-                    className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium"
+                    className="text-carefd-slate hover:text-carefd-teal px-3 py-2 transition-colors font-medium"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     בקשות
                   </Link>
                   <Link
                     to="/chats"
-                    className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium flex items-center gap-2"
+                    className="text-carefd-slate hover:text-carefd-teal px-3 py-2 transition-colors font-medium flex items-center gap-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <FaComments />
@@ -344,7 +344,7 @@ const Navbar = () => {
                   </Link>
                   <Link
                     to={getDashboardPath()}
-                    className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium flex items-center gap-2"
+                    className="text-carefd-slate hover:text-carefd-teal px-3 py-2 transition-colors font-medium flex items-center gap-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <FaTachometerAlt />
@@ -352,7 +352,7 @@ const Navbar = () => {
                   </Link>
                   <Link
                     to="/dashboard?tab=overview"
-                    className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium flex items-center gap-2"
+                    className="text-carefd-slate hover:text-carefd-teal px-3 py-2 transition-colors font-medium flex items-center gap-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <FaUser />
@@ -360,7 +360,7 @@ const Navbar = () => {
                   </Link>
                   <Link
                     to="/dashboard?tab=settings"
-                    className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium flex items-center gap-2"
+                    className="text-carefd-slate hover:text-carefd-teal px-3 py-2 transition-colors font-medium flex items-center gap-2"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <FaCog />
@@ -378,14 +378,14 @@ const Navbar = () => {
                 <>
                   <Link
                     to="/login"
-                    className="text-carelink-slate hover:text-carelink-teal px-3 py-2 transition-colors font-medium"
+                    className="text-carefd-slate hover:text-carefd-teal px-3 py-2 transition-colors font-medium"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     התחברות
                   </Link>
                   <Link
                     to="/register"
-                    className="bg-carelink-teal text-white px-3 py-2 rounded-lg text-center font-medium"
+                    className="bg-carefd-teal text-white px-3 py-2 rounded-lg text-center font-medium"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     הרשמה

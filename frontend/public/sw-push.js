@@ -1,8 +1,8 @@
 /* eslint-disable no-restricted-globals */
 
-// Service Worker for Push Notifications - CareLink
+// Service Worker for Push Notifications - CareFD
 
-const CACHE_NAME = 'carelink-v1';
+const CACHE_NAME = 'carefd-v1';
 
 // Install event
 self.addEventListener('install', (event) => {
@@ -21,7 +21,7 @@ self.addEventListener('push', (event) => {
   console.log('Push notification received', event);
   
   let notificationData = {
-    title: 'CareLink',
+    title: 'CareFD',
     body: 'יש לך הודעה חדשה',
     icon: '/logo192.png',
     badge: '/logo192.png',
@@ -50,7 +50,7 @@ self.addEventListener('push', (event) => {
     icon: notificationData.icon,
     badge: notificationData.badge,
     vibrate: [200, 100, 200],
-    tag: 'carelink-notification',
+    tag: 'carefd-notification',
     renotify: true,
     requireInteraction: false,
     data: notificationData.data,

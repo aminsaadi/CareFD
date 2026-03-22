@@ -16,7 +16,7 @@ const Logo = ({ size = 'default', variant, className = '' }) => {
     large: 'text-4xl'
   };
 
-  const textColorClass = variant === 'white' ? 'text-white' : 'text-carelink-navy';
+  const textColorClass = variant === 'white' ? 'text-white' : 'text-carefd-navy';
 
   if (settings.logo_url) {
     return (

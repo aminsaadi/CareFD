@@ -120,16 +120,16 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
   };
 
   const FilterSection = ({ title, icon: Icon, sectionKey, children }) => (
-    <div className="border-b border-carelink-teal-pale/50 last:border-0">
+    <div className="border-b border-carefd-teal-pale/50 last:border-0">
       <button
         onClick={() => toggleSection(sectionKey)}
-        className="w-full flex items-center justify-between py-3 px-4 hover:bg-carelink-teal-pale/10 transition"
+        className="w-full flex items-center justify-between py-3 px-4 hover:bg-carefd-teal-pale/10 transition"
       >
-        <div className="flex items-center gap-2 font-semibold text-carelink-navy">
-          <Icon className="text-carelink-teal" />
+        <div className="flex items-center gap-2 font-semibold text-carefd-navy">
+          <Icon className="text-carefd-teal" />
           {title}
         </div>
-        {expandedSections[sectionKey] ? <FaChevronUp className="text-carelink-gray" /> : <FaChevronDown className="text-carelink-gray" />}
+        {expandedSections[sectionKey] ? <FaChevronUp className="text-carefd-gray" /> : <FaChevronDown className="text-carefd-gray" />}
       </button>
       {expandedSections[sectionKey] && (
         <div className="px-4 pb-4">
@@ -142,7 +142,7 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
   return (
     <div className={`bg-white rounded-2xl shadow-lg overflow-hidden ${showMobile ? 'fixed inset-0 z-50 overflow-y-auto' : ''}`}>
       {/* Header */}
-      <div className="bg-carelink-navy text-white p-4 flex items-center justify-between">
+      <div className="bg-carefd-navy text-white p-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FaFilter />
           <span className="font-bold">סינון מתקדם</span>
@@ -163,8 +163,8 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
             disabled={gettingLocation}
             className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl font-medium transition ${
               filters.useMyLocation
-                ? 'bg-carelink-teal text-white'
-                : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                ? 'bg-carefd-teal text-white'
+                : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
             }`}
           >
             <FaCrosshairs className={gettingLocation ? 'animate-spin' : ''} />
@@ -174,7 +174,7 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
           {filters.useMyLocation && (
             <button
               onClick={clearLocation}
-              className="text-sm text-carelink-teal hover:underline"
+              className="text-sm text-carefd-teal hover:underline"
             >
               נקה מיקום
             </button>
@@ -183,7 +183,7 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
           {/* Radius */}
           {filters.useMyLocation && (
             <div>
-              <label className="block text-sm font-medium text-carelink-navy mb-2">רדיוס חיפוש</label>
+              <label className="block text-sm font-medium text-carefd-navy mb-2">רדיוס חיפוש</label>
               <div className="flex flex-wrap gap-2">
                 {radiusOptions.map((option) => (
                   <button
@@ -191,8 +191,8 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
                     onClick={() => onFilterChange({ ...filters, radius: option.value })}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                       filters.radius === option.value
-                        ? 'bg-carelink-teal text-white'
-                        : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                        ? 'bg-carefd-teal text-white'
+                        : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
                     }`}
                   >
                     {option.label}
@@ -204,13 +204,13 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
 
           {/* City Select */}
           <div>
-            <label className="block text-sm font-medium text-carelink-navy mb-2">או בחר עיר</label>
+            <label className="block text-sm font-medium text-carefd-navy mb-2">או בחר עיר</label>
             <CitySelect
               name="city"
               value={filters.city || ''}
               onChange={(e) => onFilterChange({ ...filters, city: e.target.value || null, latitude: null, longitude: null, useMyLocation: false, radius: null })}
               placeholder="כל הערים"
-              inputClassName="w-full px-4 py-2 rounded-xl border-2 border-carelink-teal-pale focus:border-carelink-teal focus:outline-none"
+              inputClassName="w-full px-4 py-2 rounded-xl border-2 border-carefd-teal-pale focus:border-carefd-teal focus:outline-none"
             />
           </div>
         </div>
@@ -228,8 +228,8 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
               })}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                 filters.category === cat.id
-                  ? 'bg-carelink-teal text-white'
-                  : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
               }`}
             >
               {cat.name}
@@ -252,8 +252,8 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
                 })}
                 className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition ${
                   filters.serviceType === key
-                    ? 'bg-carelink-teal text-white'
-                    : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                    ? 'bg-carefd-teal text-white'
+                    : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
                 }`}
               >
                 <Icon />
@@ -278,8 +278,8 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
                 })}
                 className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition ${
                   filters.providerType === key
-                    ? 'bg-carelink-teal text-white'
-                    : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                    ? 'bg-carefd-teal text-white'
+                    : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
                 }`}
               >
                 <Icon />
@@ -303,7 +303,7 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
               className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                 filters.minRating === option.value
                   ? 'bg-yellow-500 text-white'
-                  : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                  : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
               }`}
             >
               <FaStar className="text-xs" />
@@ -325,8 +325,8 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
               })}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
                 filters.minExperience === option.value
-                  ? 'bg-carelink-teal text-white'
-                  : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
               }`}
             >
               {option.label}
@@ -342,8 +342,8 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
             onClick={() => onFilterChange({ ...filters, verifiedOnly: !filters.verifiedOnly })}
             className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition ${
               filters.verifiedOnly
-                ? 'bg-carelink-teal text-white'
-                : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                ? 'bg-carefd-teal text-white'
+                : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
             }`}
           >
             <FaCheckCircle />
@@ -354,7 +354,7 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
             className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition ${
               filters.recommendedOnly
                 ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
-                : 'bg-carelink-teal-pale/30 text-carelink-navy hover:bg-carelink-teal-pale'
+                : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
             }`}
           >
             <FaAward />
@@ -367,13 +367,13 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
       <div className="p-4 bg-gray-50 flex gap-3">
         <button
           onClick={onReset}
-          className="flex-1 py-3 rounded-xl border-2 border-carelink-teal-pale text-carelink-navy font-semibold hover:bg-carelink-teal-pale/30 transition"
+          className="flex-1 py-3 rounded-xl border-2 border-carefd-teal-pale text-carefd-navy font-semibold hover:bg-carefd-teal-pale/30 transition"
         >
           נקה הכל
         </button>
         <button
           onClick={onApply}
-          className="flex-1 py-3 rounded-xl bg-carelink-teal text-white font-semibold hover:bg-carelink-teal-medium transition"
+          className="flex-1 py-3 rounded-xl bg-carefd-teal text-white font-semibold hover:bg-carefd-teal-medium transition"
         >
           החל סינון
         </button>

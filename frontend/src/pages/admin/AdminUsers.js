@@ -160,7 +160,7 @@ const AdminUsers = () => {
       case 'admin':
         return 'bg-purple-100 text-purple-700 border-purple-200';
       case 'provider':
-        return 'bg-carelink-teal-pale text-carelink-teal border-carelink-teal-light';
+        return 'bg-carefd-teal-pale text-carefd-teal border-carefd-teal-light';
       default:
         return 'bg-gray-100 text-gray-600 border-gray-200';
     }
@@ -201,15 +201,15 @@ const AdminUsers = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-carelink-navy">ניהול משתמשים</h1>
-            <p className="text-carelink-slate mt-1">{pagination.total} משתמשים במערכת</p>
+            <h1 className="text-2xl font-bold text-carefd-navy">ניהול משתמשים</h1>
+            <p className="text-carefd-slate mt-1">{pagination.total} משתמשים במערכת</p>
           </div>
           <div className="flex gap-3">
-            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-carelink-slate rounded-lg hover:bg-gray-50 transition">
+            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-carefd-slate rounded-lg hover:bg-gray-50 transition">
               <FiDownload size={18} />
               ייצוא
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal/90 transition shadow-md">
+            <button className="flex items-center gap-2 px-4 py-2 bg-carefd-teal text-white rounded-lg hover:bg-carefd-teal/90 transition shadow-md">
               <FiUserPlus size={18} />
               הוסף משתמש
             </button>
@@ -220,19 +220,19 @@ const AdminUsers = () => {
         <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carelink-gray" size={18} />
+              <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carefd-gray" size={18} />
               <input
                 type="text"
                 placeholder="חפש לפי שם, אימייל, מספר משתמש..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg pr-10 pl-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                className="w-full bg-gray-50 border border-gray-200 rounded-lg pr-10 pl-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
               />
             </div>
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
-              className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none min-w-[150px]"
+              className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none min-w-[150px]"
             >
               <option value="">כל התפקידים</option>
               <option value="patient">משתמשים</option>
@@ -253,28 +253,28 @@ const AdminUsers = () => {
                       type="checkbox"
                       checked={selectedUsers.length === users.length && users.length > 0}
                       onChange={toggleSelectAll}
-                      className="w-4 h-4 rounded border-gray-300 text-carelink-teal focus:ring-carelink-teal"
+                      className="w-4 h-4 rounded border-gray-300 text-carefd-teal focus:ring-carefd-teal"
                     />
                   </th>
-                  <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">מזהה</th>
-                  <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">משתמש</th>
-                  <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">תפקיד</th>
-                  <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">תאריך הצטרפות</th>
-                  <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">סטטוס</th>
-                  <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">אימות</th>
-                  <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">פעולות</th>
+                  <th className="text-right py-4 px-4 text-carefd-slate font-medium text-sm">מזהה</th>
+                  <th className="text-right py-4 px-4 text-carefd-slate font-medium text-sm">משתמש</th>
+                  <th className="text-right py-4 px-4 text-carefd-slate font-medium text-sm">תפקיד</th>
+                  <th className="text-right py-4 px-4 text-carefd-slate font-medium text-sm">תאריך הצטרפות</th>
+                  <th className="text-right py-4 px-4 text-carefd-slate font-medium text-sm">סטטוס</th>
+                  <th className="text-right py-4 px-4 text-carefd-slate font-medium text-sm">אימות</th>
+                  <th className="text-right py-4 px-4 text-carefd-slate font-medium text-sm">פעולות</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
                     <td colSpan={8} className="py-12 text-center">
-                      <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
+                      <div className="w-8 h-8 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
                     </td>
                   </tr>
                 ) : users.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="py-12 text-center text-carelink-gray">
+                    <td colSpan={8} className="py-12 text-center text-carefd-gray">
                       לא נמצאו משתמשים
                     </td>
                   </tr>
@@ -282,7 +282,7 @@ const AdminUsers = () => {
                   users.map((user) => (
                     <tr 
                       key={user.user_id} 
-                      className={`border-b border-gray-50 hover:bg-carelink-teal-pale/10 transition cursor-pointer ${user.is_suspended ? 'bg-red-50/50' : ''}`}
+                      className={`border-b border-gray-50 hover:bg-carefd-teal-pale/10 transition cursor-pointer ${user.is_suspended ? 'bg-red-50/50' : ''}`}
                       onClick={() => openUserModal(user)}
                     >
                       <td className="py-4 px-4" onClick={(e) => e.stopPropagation()}>
@@ -290,20 +290,20 @@ const AdminUsers = () => {
                           type="checkbox"
                           checked={selectedUsers.includes(user.user_id)}
                           onChange={() => toggleSelectUser(user.user_id)}
-                          className="w-4 h-4 rounded border-gray-300 text-carelink-teal focus:ring-carelink-teal"
+                          className="w-4 h-4 rounded border-gray-300 text-carefd-teal focus:ring-carefd-teal"
                         />
                       </td>
                       <td className="py-4 px-4">
-                        <span className="text-sm font-mono text-carelink-teal">{user.user_number || 'N/A'}</span>
+                        <span className="text-sm font-mono text-carefd-teal">{user.user_number || 'N/A'}</span>
                       </td>
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-carelink-teal to-carelink-navy rounded-full flex items-center justify-center text-white font-medium">
+                          <div className="w-10 h-10 bg-gradient-to-br from-carefd-teal to-carefd-navy rounded-full flex items-center justify-center text-white font-medium">
                             {user.name?.[0] || 'U'}
                           </div>
                           <div>
-                            <p className="text-carelink-navy font-medium" dir="auto">{user.name || 'ללא שם'}</p>
-                            <p className="text-carelink-gray text-sm" dir="ltr">{user.email}</p>
+                            <p className="text-carefd-navy font-medium" dir="auto">{user.name || 'ללא שם'}</p>
+                            <p className="text-carefd-gray text-sm" dir="ltr">{user.email}</p>
                           </div>
                         </div>
                       </td>
@@ -318,7 +318,7 @@ const AdminUsers = () => {
                           <option value="admin">מנהל</option>
                         </select>
                       </td>
-                      <td className="py-4 px-4 text-carelink-slate text-sm">
+                      <td className="py-4 px-4 text-carefd-slate text-sm">
                         {user.created_at ? new Date(user.created_at).toLocaleDateString('he-IL') : '-'}
                       </td>
                       <td className="py-4 px-4">
@@ -356,21 +356,21 @@ const AdminUsers = () => {
                         <div className="flex items-center gap-1">
                           <button 
                             onClick={() => openUserModal(user)}
-                            className="p-2 text-carelink-slate hover:text-carelink-teal hover:bg-carelink-teal-pale rounded-lg transition"
+                            className="p-2 text-carefd-slate hover:text-carefd-teal hover:bg-carefd-teal-pale rounded-lg transition"
                             title="צפה בפרטים"
                           >
                             <FiEye size={16} />
                           </button>
                           <button 
                             onClick={() => setShowEditModal(user)}
-                            className="p-2 text-carelink-slate hover:text-carelink-navy hover:bg-gray-100 rounded-lg transition"
+                            className="p-2 text-carefd-slate hover:text-carefd-navy hover:bg-gray-100 rounded-lg transition"
                             title="ערוך"
                           >
                             <FiEdit2 size={16} />
                           </button>
                           <button 
                             onClick={() => setShowMessageModal(user)}
-                            className="p-2 text-carelink-slate hover:text-blue-500 hover:bg-blue-50 rounded-lg transition"
+                            className="p-2 text-carefd-slate hover:text-blue-500 hover:bg-blue-50 rounded-lg transition"
                             title="שלח הודעה"
                           >
                             <FiMessageSquare size={16} />
@@ -380,7 +380,7 @@ const AdminUsers = () => {
                               setShowResetPasswordModal(user);
                               setNewPassword('');
                             }}
-                            className="p-2 text-carelink-slate hover:text-purple-500 hover:bg-purple-50 rounded-lg transition"
+                            className="p-2 text-carefd-slate hover:text-purple-500 hover:bg-purple-50 rounded-lg transition"
                             title="איפוס סיסמה"
                           >
                             <FiKey size={16} />
@@ -394,7 +394,7 @@ const AdminUsers = () => {
                           </button>
                           <button 
                             onClick={() => setShowDeleteModal(user)}
-                            className="p-2 text-carelink-slate hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                            className="p-2 text-carefd-slate hover:text-red-500 hover:bg-red-50 rounded-lg transition"
                             title="מחק"
                           >
                             <FiTrash2 size={16} />
@@ -411,21 +411,21 @@ const AdminUsers = () => {
           {/* Pagination */}
           {pagination.total > pagination.limit && (
             <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
-              <p className="text-carelink-slate text-sm">
+              <p className="text-carefd-slate text-sm">
                 מציג {(pagination.page - 1) * pagination.limit + 1} - {Math.min(pagination.page * pagination.limit, pagination.total)} מתוך {pagination.total}
               </p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                   disabled={pagination.page === 1}
-                  className="px-4 py-2 bg-white border border-gray-200 text-carelink-navy rounded-lg hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-white border border-gray-200 text-carefd-navy rounded-lg hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   הקודם
                 </button>
                 <button
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                   disabled={pagination.page * pagination.limit >= pagination.total}
-                  className="px-4 py-2 bg-white border border-gray-200 text-carelink-navy rounded-lg hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-white border border-gray-200 text-carefd-navy rounded-lg hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   הבא
                 </button>
@@ -441,8 +441,8 @@ const AdminUsers = () => {
           <div className="bg-white rounded-xl w-full max-w-3xl my-8 border border-gray-200 shadow-xl">
             <div className="p-6 border-b border-gray-100">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-carelink-navy">פרטי משתמש</h3>
-                <button onClick={() => { setShowUserModal(null); setUserDetails(null); }} className="text-carelink-gray hover:text-carelink-navy">
+                <h3 className="text-xl font-bold text-carefd-navy">פרטי משתמש</h3>
+                <button onClick={() => { setShowUserModal(null); setUserDetails(null); }} className="text-carefd-gray hover:text-carefd-navy">
                   <FiX size={24} />
                 </button>
               </div>
@@ -450,19 +450,19 @@ const AdminUsers = () => {
             
             {loadingDetails ? (
               <div className="p-12 text-center">
-                <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <div className="w-8 h-8 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
               </div>
             ) : userDetails ? (
               <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
                 {/* User Info */}
                 <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-carelink-teal to-carelink-navy rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                  <div className="w-16 h-16 bg-gradient-to-br from-carefd-teal to-carefd-navy rounded-full flex items-center justify-center text-white text-2xl font-bold">
                     {userDetails.user?.name?.[0] || 'U'}
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-lg font-bold text-carelink-navy" dir="auto">{userDetails.user?.name}</h4>
-                    <p className="text-carelink-teal font-mono text-sm">{userDetails.user?.user_number}</p>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-carelink-slate">
+                    <h4 className="text-lg font-bold text-carefd-navy" dir="auto">{userDetails.user?.name}</h4>
+                    <p className="text-carefd-teal font-mono text-sm">{userDetails.user?.user_number}</p>
+                    <div className="flex items-center gap-4 mt-2 text-sm text-carefd-slate">
                       <span className="flex items-center gap-1"><FiMail size={14} /> {userDetails.user?.email}</span>
                       {userDetails.user?.phone && <span className="flex items-center gap-1"><FiPhone size={14} /> {userDetails.user?.phone}</span>}
                     </div>
@@ -483,42 +483,42 @@ const AdminUsers = () => {
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-4">
                   <div className="bg-gray-50 rounded-lg p-4 text-center">
-                    <p className="text-2xl font-bold text-carelink-navy">{userDetails.stats?.bookings_count || 0}</p>
-                    <p className="text-sm text-carelink-slate">הזמנות</p>
+                    <p className="text-2xl font-bold text-carefd-navy">{userDetails.stats?.bookings_count || 0}</p>
+                    <p className="text-sm text-carefd-slate">הזמנות</p>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4 text-center">
-                    <p className="text-2xl font-bold text-carelink-navy">{userDetails.stats?.messages_count || 0}</p>
-                    <p className="text-sm text-carelink-slate">הודעות</p>
+                    <p className="text-2xl font-bold text-carefd-navy">{userDetails.stats?.messages_count || 0}</p>
+                    <p className="text-sm text-carefd-slate">הודעות</p>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4 text-center">
-                    <p className="text-2xl font-bold text-carelink-navy">
+                    <p className="text-2xl font-bold text-carefd-navy">
                       {userDetails.user?.created_at ? new Date(userDetails.user.created_at).toLocaleDateString('he-IL') : '-'}
                     </p>
-                    <p className="text-sm text-carelink-slate">תאריך הצטרפות</p>
+                    <p className="text-sm text-carefd-slate">תאריך הצטרפות</p>
                   </div>
                 </div>
 
                 {/* Provider Info */}
                 {userDetails.provider && (
-                  <div className="bg-carelink-teal-pale/20 rounded-lg p-4">
-                    <h5 className="font-semibold text-carelink-navy mb-3 flex items-center gap-2">
+                  <div className="bg-carefd-teal-pale/20 rounded-lg p-4">
+                    <h5 className="font-semibold text-carefd-navy mb-3 flex items-center gap-2">
                       <FiShield size={16} /> פרטי ספק
                     </h5>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-carelink-slate">מספר ספק:</span>
-                        <span className="font-mono text-carelink-teal mr-2">{userDetails.provider.provider_number}</span>
+                        <span className="text-carefd-slate">מספר ספק:</span>
+                        <span className="font-mono text-carefd-teal mr-2">{userDetails.provider.provider_number}</span>
                       </div>
                       <div>
-                        <span className="text-carelink-slate">שם עסק:</span>
-                        <span className="text-carelink-navy mr-2">{userDetails.provider.business_name || '-'}</span>
+                        <span className="text-carefd-slate">שם עסק:</span>
+                        <span className="text-carefd-navy mr-2">{userDetails.provider.business_name || '-'}</span>
                       </div>
                       <div>
-                        <span className="text-carelink-slate">סוג:</span>
-                        <span className="text-carelink-navy mr-2">{userDetails.provider.provider_type}</span>
+                        <span className="text-carefd-slate">סוג:</span>
+                        <span className="text-carefd-navy mr-2">{userDetails.provider.provider_type}</span>
                       </div>
                       <div>
-                        <span className="text-carelink-slate">סטטוס אימות:</span>
+                        <span className="text-carefd-slate">סטטוס אימות:</span>
                         <span className={`mr-2 ${userDetails.provider.is_verified ? 'text-emerald-600' : 'text-amber-500'}`}>
                           {userDetails.provider.is_verified ? 'מאומת' : 'לא מאומת'}
                         </span>
@@ -530,17 +530,17 @@ const AdminUsers = () => {
                 {/* Verification Documents */}
                 {userDetails.verification?.documents?.length > 0 && (
                   <div>
-                    <h5 className="font-semibold text-carelink-navy mb-3 flex items-center gap-2">
+                    <h5 className="font-semibold text-carefd-navy mb-3 flex items-center gap-2">
                       <FiFileText size={16} /> מסמכי אימות
                     </h5>
                     <div className="space-y-2">
                       {userDetails.verification.documents.map((doc) => (
                         <div key={doc.document_id} className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
                           <div className="flex items-center gap-3">
-                            <FiFileText className="text-carelink-teal" size={20} />
+                            <FiFileText className="text-carefd-teal" size={20} />
                             <div>
-                              <p className="text-sm font-medium text-carelink-navy">{getDocumentTypeLabel(doc.document_type)}</p>
-                              <p className="text-xs text-carelink-gray">{doc.file_name}</p>
+                              <p className="text-sm font-medium text-carefd-navy">{getDocumentTypeLabel(doc.document_type)}</p>
+                              <p className="text-xs text-carefd-gray">{doc.file_name}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
@@ -549,7 +549,7 @@ const AdminUsers = () => {
                               href={doc.file_url} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="text-carelink-teal hover:underline text-sm"
+                              className="text-carefd-teal hover:underline text-sm"
                             >
                               צפה
                             </a>
@@ -564,7 +564,7 @@ const AdminUsers = () => {
                 <div className="flex gap-3 pt-4 border-t border-gray-100">
                   <button
                     onClick={() => { setShowUserModal(null); setShowEditModal(showUserModal); }}
-                    className="flex-1 px-4 py-2.5 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal/90 transition flex items-center justify-center gap-2"
+                    className="flex-1 px-4 py-2.5 bg-carefd-teal text-white rounded-lg hover:bg-carefd-teal/90 transition flex items-center justify-center gap-2"
                   >
                     <FiEdit2 size={16} /> ערוך פרטים
                   </button>
@@ -618,21 +618,21 @@ const AdminUsers = () => {
       {showResetPasswordModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-200 shadow-xl">
-            <h3 className="text-lg font-bold text-carelink-navy mb-2">איפוס סיסמה</h3>
-            <p className="text-carelink-slate mb-4">
+            <h3 className="text-lg font-bold text-carefd-navy mb-2">איפוס סיסמה</h3>
+            <p className="text-carefd-slate mb-4">
               הגדר סיסמה חדשה עבור המשתמש: <strong>{showResetPasswordModal.name}</strong>
             </p>
             <div className="mb-6">
-              <label className="block text-sm font-medium text-carelink-navy mb-2">סיסמה חדשה</label>
+              <label className="block text-sm font-medium text-carefd-navy mb-2">סיסמה חדשה</label>
               <div className="relative">
                 <input
                   type={showAdminPw ? 'text' : 'password'}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="הזן סיסמה חדשה (מינימום 6 תווים)"
-                  className="w-full px-4 py-3 pl-12 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                  className="w-full px-4 py-3 pl-12 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                 />
-                <button type="button" onClick={() => setShowAdminPw(!showAdminPw)} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                <button type="button" onClick={() => setShowAdminPw(!showAdminPw)} className="absolute left-4 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
                   {showAdminPw ? <FiEyeOff size={16} /> : <FiEye size={16} />}
                 </button>
               </div>
@@ -643,7 +643,7 @@ const AdminUsers = () => {
                   setShowResetPasswordModal(null);
                   setNewPassword('');
                 }}
-                className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition"
               >
                 ביטול
               </button>
@@ -662,15 +662,15 @@ const AdminUsers = () => {
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-200 shadow-xl">
-            <h3 className="text-lg font-bold text-carelink-navy mb-2">מחיקת משתמש</h3>
-            <p className="text-carelink-slate mb-6">
+            <h3 className="text-lg font-bold text-carefd-navy mb-2">מחיקת משתמש</h3>
+            <p className="text-carefd-slate mb-6">
               האם אתה בטוח שברצונך למחוק את המשתמש "{showDeleteModal.name}"? 
               פעולה זו לא ניתנת לביטול.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteModal(null)}
-                className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition"
               >
                 ביטול
               </button>
@@ -705,33 +705,33 @@ const EditUserModal = ({ user, onClose, onSave }) => {
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-200 shadow-xl">
-        <h3 className="text-lg font-bold text-carelink-navy mb-4">עריכת משתמש</h3>
+        <h3 className="text-lg font-bold text-carefd-navy mb-4">עריכת משתמש</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-carelink-navy mb-1">שם</label>
+            <label className="block text-sm font-medium text-carefd-navy mb-1">שם</label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-carelink-navy mb-1">אימייל</label>
+            <label className="block text-sm font-medium text-carefd-navy mb-1">אימייל</label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-carelink-navy mb-1">טלפון</label>
+            <label className="block text-sm font-medium text-carefd-navy mb-1">טלפון</label>
             <input
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -740,21 +740,21 @@ const EditUserModal = ({ user, onClose, onSave }) => {
               id="is_verified"
               checked={formData.is_verified}
               onChange={(e) => setFormData({ ...formData, is_verified: e.target.checked })}
-              className="w-4 h-4 rounded border-gray-300 text-carelink-teal focus:ring-carelink-teal"
+              className="w-4 h-4 rounded border-gray-300 text-carefd-teal focus:ring-carefd-teal"
             />
-            <label htmlFor="is_verified" className="text-sm text-carelink-navy">משתמש מאומת</label>
+            <label htmlFor="is_verified" className="text-sm text-carefd-navy">משתמש מאומת</label>
           </div>
           <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+              className="flex-1 px-4 py-2.5 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition"
             >
               ביטול
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2.5 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal/90 transition"
+              className="flex-1 px-4 py-2.5 bg-carefd-teal text-white rounded-lg hover:bg-carefd-teal/90 transition"
             >
               שמור
             </button>
@@ -781,10 +781,10 @@ const SuspendUserModal = ({ user, onClose, onSuspend }) => {
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-200 shadow-xl">
-        <h3 className="text-lg font-bold text-carelink-navy mb-2">
+        <h3 className="text-lg font-bold text-carefd-navy mb-2">
           {isSuspended ? 'ביטול השעיה' : 'השעיית משתמש'}
         </h3>
-        <p className="text-carelink-slate mb-4">
+        <p className="text-carefd-slate mb-4">
           {isSuspended 
             ? `האם אתה בטוח שברצונך לבטל את ההשעיה של "${user.name}"?`
             : `האם אתה בטוח שברצונך להשעות את "${user.name}"?`
@@ -793,13 +793,13 @@ const SuspendUserModal = ({ user, onClose, onSuspend }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isSuspended && (
             <div>
-              <label className="block text-sm font-medium text-carelink-navy mb-1">סיבת ההשעיה</label>
+              <label className="block text-sm font-medium text-carefd-navy mb-1">סיבת ההשעיה</label>
               <textarea
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="הזן סיבה להשעיה..."
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none resize-none"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none resize-none"
               />
             </div>
           )}
@@ -807,7 +807,7 @@ const SuspendUserModal = ({ user, onClose, onSuspend }) => {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+              className="flex-1 px-4 py-2.5 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition"
             >
               ביטול
             </button>
@@ -840,34 +840,34 @@ const SendMessageModal = ({ user, onClose, onSend }) => {
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-200 shadow-xl">
-        <h3 className="text-lg font-bold text-carelink-navy mb-4">שליחת הודעה ל-{user.name}</h3>
+        <h3 className="text-lg font-bold text-carefd-navy mb-4">שליחת הודעה ל-{user.name}</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-carelink-navy mb-1">נושא</label>
+            <label className="block text-sm font-medium text-carefd-navy mb-1">נושא</label>
             <input
               type="text"
               value={formData.subject}
               onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
               placeholder="הודעה ממנהל המערכת"
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-carelink-navy mb-1">תוכן ההודעה *</label>
+            <label className="block text-sm font-medium text-carefd-navy mb-1">תוכן ההודעה *</label>
             <textarea
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               placeholder="כתוב את ההודעה..."
               rows={5}
               required
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none resize-none"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none resize-none"
             />
           </div>
           <div className="flex gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+              className="flex-1 px-4 py-2.5 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition"
             >
               ביטול
             </button>

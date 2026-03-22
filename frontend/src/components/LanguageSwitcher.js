@@ -39,22 +39,22 @@ const LanguageSwitcher = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-carelink-teal-pale/30 hover:bg-carelink-teal-pale/50 text-carelink-navy transition-colors"
+        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-carefd-teal-pale/30 hover:bg-carefd-teal-pale/50 text-carefd-navy transition-colors"
         data-testid="language-dropdown-btn"
       >
-        <FaGlobe className="text-carelink-teal" />
+        <FaGlobe className="text-carefd-teal" />
         <span className="text-sm font-medium">{currentLang.flag} {currentLang.name}</span>
         <FaChevronDown className={`text-xs transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute top-full mt-2 right-0 rtl:right-auto rtl:left-0 bg-white rounded-xl shadow-lg border border-carelink-teal-pale overflow-hidden z-50 min-w-[160px]">
+        <div className="absolute top-full mt-2 right-0 rtl:right-auto rtl:left-0 bg-white rounded-xl shadow-lg border border-carefd-teal-pale overflow-hidden z-50 min-w-[160px]">
           {languages.map((lang) => (
             <button
               key={lang.code}
               onClick={() => changeLanguage(lang.code)}
-              className={`w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-carelink-teal-pale/30 transition-colors ${
-                i18n.language === lang.code ? 'bg-carelink-teal-pale/20 text-carelink-teal' : 'text-carelink-navy'
+              className={`w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-carefd-teal-pale/30 transition-colors ${
+                i18n.language === lang.code ? 'bg-carefd-teal-pale/20 text-carefd-teal' : 'text-carefd-navy'
               }`}
               data-testid={`lang-${lang.code}-btn`}
             >
@@ -62,7 +62,7 @@ const LanguageSwitcher = () => {
                 <span>{lang.flag}</span>
                 <span className="font-medium">{lang.name}</span>
               </span>
-              {i18n.language === lang.code && <FaCheck className="text-carelink-teal" />}
+              {i18n.language === lang.code && <FaCheck className="text-carefd-teal" />}
             </button>
           ))}
         </div>

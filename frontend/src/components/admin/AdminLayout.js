@@ -138,18 +138,18 @@ const AdminLayout = ({ children }) => {
         } flex flex-col`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-100 bg-gradient-to-l from-carelink-teal/5 to-white">
+        <div className="h-16 flex items-center justify-between px-4 border-b border-gray-100 bg-gradient-to-l from-carefd-teal/5 to-white">
           {sidebarOpen && (
             <Link to="/admin" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-carelink-teal to-carelink-navy rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-carefd-teal to-carefd-navy rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">CL</span>
               </div>
-              <span className="text-carelink-navy font-bold">Admin Panel</span>
+              <span className="text-carefd-navy font-bold">Admin Panel</span>
             </Link>
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 text-carelink-slate hover:text-carelink-navy hover:bg-carelink-teal/10 rounded-lg transition"
+            className="p-2 text-carefd-slate hover:text-carefd-navy hover:bg-carefd-teal/10 rounded-lg transition"
           >
             {sidebarOpen ? <FiX size={20} /> : <FiMenu size={20} />}
           </button>
@@ -165,8 +165,8 @@ const AdminLayout = ({ children }) => {
                     onClick={() => toggleMenu(item.id)}
                     className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition ${
                       expandedMenus.includes(item.id)
-                        ? 'bg-carelink-teal/10 text-carelink-navy'
-                        : 'text-carelink-slate hover:text-carelink-navy hover:bg-gray-50'
+                        ? 'bg-carefd-teal/10 text-carefd-navy'
+                        : 'text-carefd-slate hover:text-carefd-navy hover:bg-gray-50'
                     }`}
                   >
                     <div className="flex items-center gap-3">
@@ -188,8 +188,8 @@ const AdminLayout = ({ children }) => {
                           to={subItem.path}
                           className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${
                             isActive(subItem.path)
-                              ? 'bg-carelink-teal text-white shadow-md shadow-carelink-teal/30'
-                              : 'text-carelink-slate hover:text-carelink-navy hover:bg-gray-50'
+                              ? 'bg-carefd-teal text-white shadow-md shadow-carefd-teal/30'
+                              : 'text-carefd-slate hover:text-carefd-navy hover:bg-gray-50'
                           }`}
                         >
                           <subItem.icon size={16} />
@@ -209,8 +209,8 @@ const AdminLayout = ({ children }) => {
                   to={item.path}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
                     isActive(item.path)
-                      ? 'bg-carelink-teal text-white shadow-md shadow-carelink-teal/30'
-                      : 'text-carelink-slate hover:text-carelink-navy hover:bg-gray-50'
+                      ? 'bg-carefd-teal text-white shadow-md shadow-carefd-teal/30'
+                      : 'text-carefd-slate hover:text-carefd-navy hover:bg-gray-50'
                   }`}
                 >
                   <item.icon size={18} />
@@ -224,15 +224,15 @@ const AdminLayout = ({ children }) => {
         {/* User Section */}
         <div className="p-4 border-t border-gray-100 bg-gray-50/50">
           <div className={`flex items-center ${sidebarOpen ? 'gap-3' : 'justify-center'}`}>
-            <div className="w-10 h-10 bg-gradient-to-br from-carelink-teal to-carelink-navy rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 bg-gradient-to-br from-carefd-teal to-carefd-navy rounded-full flex items-center justify-center flex-shrink-0">
               <span className="text-white font-medium">
                 {user?.name?.[0] || 'A'}
               </span>
             </div>
             {sidebarOpen && (
               <div className="flex-1 min-w-0">
-                <p className="text-carelink-navy text-sm font-medium truncate">{user?.name || 'Admin'}</p>
-                <p className="text-carelink-gray text-xs truncate">{user?.email}</p>
+                <p className="text-carefd-navy text-sm font-medium truncate">{user?.name || 'Admin'}</p>
+                <p className="text-carefd-gray text-xs truncate">{user?.email}</p>
               </div>
             )}
           </div>
@@ -240,7 +240,7 @@ const AdminLayout = ({ children }) => {
             <div className="mt-3 flex gap-2">
               <Link
                 to="/"
-                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white border border-gray-200 text-carelink-slate rounded-lg text-sm hover:bg-gray-50 transition"
+                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-white border border-gray-200 text-carefd-slate rounded-lg text-sm hover:bg-gray-50 transition"
               >
                 <FiGlobe size={14} />
                 לאתר
@@ -262,12 +262,12 @@ const AdminLayout = ({ children }) => {
         {/* Top Bar */}
         <header className="h-16 bg-white/80 backdrop-blur-sm border-b border-gray-100 flex items-center justify-between px-6 sticky top-0 z-40">
           <div>
-            <h1 className="text-carelink-navy font-semibold">פאנל ניהול</h1>
+            <h1 className="text-carefd-navy font-semibold">פאנל ניהול</h1>
           </div>
           <div className="flex items-center gap-4">
             <Link 
               to="/admin/notifications"
-              className="relative p-2 text-carelink-slate hover:text-carelink-navy hover:bg-carelink-teal/10 rounded-lg transition"
+              className="relative p-2 text-carefd-slate hover:text-carefd-navy hover:bg-carefd-teal/10 rounded-lg transition"
               title="הודעות מערכת"
             >
               <FiBell size={20} />
@@ -275,7 +275,7 @@ const AdminLayout = ({ children }) => {
             </Link>
             <Link 
               to="/admin/messages"
-              className="relative p-2 text-carelink-slate hover:text-carelink-navy hover:bg-carelink-teal/10 rounded-lg transition"
+              className="relative p-2 text-carefd-slate hover:text-carefd-navy hover:bg-carefd-teal/10 rounded-lg transition"
               title="הודעות"
             >
               <FiMessageSquare size={20} />

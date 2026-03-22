@@ -8,7 +8,7 @@ const SPLASH_KEY = 'carezone_onboarding_seen';
 const slides = [
   {
     icon: FaMapMarkerAlt,
-    color: 'from-carelink-teal to-emerald-500',
+    color: 'from-carefd-teal to-emerald-500',
     title: 'מצא ספקי שירות בקרבתך',
     description: 'חפש רופאים, אחיות, פיזיותרפיסטים ועוד מאות ספקי שירותי בריאות לפי מיקום ומקצוע',
   },
@@ -74,7 +74,7 @@ const SplashScreen = ({ onComplete }) => {
       <div className="flex items-center justify-between p-4 pt-safe">
         <button
           onClick={handleSkip}
-          className="text-carelink-gray hover:text-carelink-teal text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-gray-100 transition"
+          className="text-carefd-gray hover:text-carefd-teal text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-gray-100 transition"
         >
           דלג
         </button>
@@ -82,7 +82,7 @@ const SplashScreen = ({ onComplete }) => {
           {siteSettings.logo_url ? (
             <img src={siteSettings.logo_url} alt={siteSettings.site_name || 'CareLink'} className="h-8 w-auto" />
           ) : (
-            <span className="text-xl font-bold text-carelink-navy">{siteSettings.site_name || 'CareLink'}</span>
+            <span className="text-xl font-bold text-carefd-navy">{siteSettings.site_name || 'CareFD'}</span>
           )}
         </div>
         <div className="w-16"></div>
@@ -103,13 +103,13 @@ const SplashScreen = ({ onComplete }) => {
 
         {/* Text */}
         <h2
-          className="text-2xl font-bold text-carelink-navy text-center mb-4 font-heading transition-opacity duration-300"
+          className="text-2xl font-bold text-carefd-navy text-center mb-4 font-heading transition-opacity duration-300"
           style={{ opacity: isAnimating ? 0 : 1 }}
         >
           {slide.title}
         </h2>
         <p
-          className="text-carelink-gray text-center max-w-sm leading-relaxed transition-opacity duration-300"
+          className="text-carefd-gray text-center max-w-sm leading-relaxed transition-opacity duration-300"
           style={{ opacity: isAnimating ? 0 : 1 }}
         >
           {slide.description}
@@ -126,7 +126,7 @@ const SplashScreen = ({ onComplete }) => {
               onClick={() => { setIsAnimating(true); setCurrentSlide(idx); setTimeout(() => setIsAnimating(false), 300); }}
               className={`h-2 rounded-full transition-all duration-300 ${
                 idx === currentSlide
-                  ? 'w-8 bg-carelink-teal'
+                  ? 'w-8 bg-carefd-teal'
                   : 'w-2 bg-gray-200 hover:bg-gray-300'
               }`}
             />
@@ -136,7 +136,7 @@ const SplashScreen = ({ onComplete }) => {
         {/* Action Button */}
         <button
           onClick={handleNext}
-          className="w-full bg-gradient-to-l from-carelink-teal to-carelink-teal-medium text-white py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+          className="w-full bg-gradient-to-l from-carefd-teal to-carefd-teal-medium text-white py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
         >
           {isLast ? (
             <>

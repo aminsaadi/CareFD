@@ -23,7 +23,7 @@ if not db_name:
     raise RuntimeError("DB_NAME environment variable is required")
 
 # MongoDB database names are case-sensitive. Normalize to lowercase to avoid
-# "db already exists with different case" errors (e.g. CARELINK vs carelink).
+# "db already exists with different case" errors (e.g. CAREFD vs carefd).
 db_name = db_name.lower()
 logger.info(f"Using database name (normalized to lowercase): {db_name}")
 

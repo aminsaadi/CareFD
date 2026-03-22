@@ -47,7 +47,7 @@ async def submit_contact_form(contact_data: dict):
     # Send confirmation email to user
     await send_email_async(
         email,
-        "קיבלנו את הפנייה שלך - CareLink",
+        "קיבלנו את הפנייה שלך - CareFD",
         f"""
         <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #19B8BA;">תודה שפנית אלינו!</h2>
@@ -58,7 +58,7 @@ async def submit_contact_form(contact_data: dict):
                 <strong>ההודעה שלך:</strong><br>
                 {html_module.escape(message)}
             </div>
-            <p>בברכה,<br>צוות CareLink</p>
+            <p>בברכה,<br>צוות CareFD</p>
         </div>
         """
     )

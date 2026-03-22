@@ -34,7 +34,7 @@ const notificationColors = {
   offer_accepted: 'text-green-500 bg-green-50',
   review_new: 'text-yellow-500 bg-yellow-50',
   provider_registered: 'text-blue-500 bg-blue-50',
-  system: 'text-carelink-teal bg-carelink-teal-pale'
+  system: 'text-carefd-teal bg-carefd-teal-pale'
 };
 
 const AdminNotifications = () => {
@@ -138,8 +138,8 @@ const AdminNotifications = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-carelink-navy">התראות מערכת</h1>
-            <p className="text-carelink-slate">
+            <h1 className="text-2xl font-bold text-carefd-navy">התראות מערכת</h1>
+            <p className="text-carefd-slate">
               {unreadCount > 0 ? `${unreadCount} התראות שלא נקראו` : 'כל ההתראות נקראו'}
             </p>
           </div>
@@ -148,7 +148,7 @@ const AdminNotifications = () => {
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+              className="px-4 py-2 border border-gray-200 rounded-lg focus:border-carefd-teal outline-none"
             >
               <option value="all">הכל</option>
               <option value="unread">לא נקראו</option>
@@ -158,7 +158,7 @@ const AdminNotifications = () => {
             {unreadCount > 0 && (
               <button
                 onClick={markAllAsRead}
-                className="px-4 py-2 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal-medium transition flex items-center gap-2"
+                className="px-4 py-2 bg-carefd-teal text-white rounded-lg hover:bg-carefd-teal-medium transition flex items-center gap-2"
               >
                 <FiCheck />
                 סמן הכל כנקרא
@@ -170,14 +170,14 @@ const AdminNotifications = () => {
         {/* Notifications List */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           {loading ? (
-            <div className="p-8 text-center text-carelink-gray">
-              <div className="animate-spin w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full mx-auto mb-4"></div>
+            <div className="p-8 text-center text-carefd-gray">
+              <div className="animate-spin w-8 h-8 border-4 border-carefd-teal border-t-transparent rounded-full mx-auto mb-4"></div>
               טוען...
             </div>
           ) : filteredNotifications.length === 0 ? (
             <div className="p-8 text-center">
               <FiBell className="mx-auto text-4xl text-gray-300 mb-3" />
-              <p className="text-carelink-gray">אין התראות</p>
+              <p className="text-carefd-gray">אין התראות</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-100">
@@ -198,15 +198,15 @@ const AdminNotifications = () => {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <h3 className={`font-medium ${!notification.is_read ? 'text-carelink-navy font-bold' : 'text-carelink-slate'}`}>
+                        <h3 className={`font-medium ${!notification.is_read ? 'text-carefd-navy font-bold' : 'text-carefd-slate'}`}>
                           {notification.title}
                         </h3>
                         {!notification.is_read && (
-                          <span className="w-2 h-2 bg-carelink-teal rounded-full"></span>
+                          <span className="w-2 h-2 bg-carefd-teal rounded-full"></span>
                         )}
                       </div>
-                      <p className="text-carelink-gray text-sm">{notification.message}</p>
-                      <span className="text-xs text-carelink-gray">
+                      <p className="text-carefd-gray text-sm">{notification.message}</p>
+                      <span className="text-xs text-carefd-gray">
                         {notification.created_at && formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: he })}
                       </span>
                     </div>
@@ -217,7 +217,7 @@ const AdminNotifications = () => {
                             e.stopPropagation();
                             markAsRead(notification.notification_id);
                           }}
-                          className="p-2 text-carelink-teal hover:bg-carelink-teal-pale rounded-lg transition"
+                          className="p-2 text-carefd-teal hover:bg-carefd-teal-pale rounded-lg transition"
                           title="סמן כנקרא"
                         >
                           <FiCheck />

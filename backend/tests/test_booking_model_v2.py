@@ -14,9 +14,9 @@ from datetime import datetime, timedelta
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
 # Test credentials
-USER_EMAIL = "user@carelink.co.il"
+USER_EMAIL = "user@carefd.com"
 USER_PASSWORD = "password"
-PROVIDER_EMAIL = "provider@carelink.co.il"
+PROVIDER_EMAIL = "provider@carefd.com"
 PROVIDER_PASSWORD = "password"
 
 # Test service IDs from the problem statement

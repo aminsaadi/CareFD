@@ -54,10 +54,10 @@ const SHIFT_OPTIONS = [
 
 // Section wrapper component
 const FormSection = ({ icon: Icon, title, children, testId }) => (
-  <div className="bg-white rounded-2xl shadow-lg border-2 border-carelink-teal-pale overflow-hidden" data-testid={testId}>
-    <div className="bg-carelink-teal-pale/30 px-4 sm:px-6 py-3 border-b border-carelink-teal-pale flex items-center gap-2">
-      <Icon className="text-carelink-teal" />
-      <h2 className="font-bold text-carelink-navy text-sm sm:text-base">{title}</h2>
+  <div className="bg-white rounded-2xl shadow-lg border-2 border-carefd-teal-pale overflow-hidden" data-testid={testId}>
+    <div className="bg-carefd-teal-pale/30 px-4 sm:px-6 py-3 border-b border-carefd-teal-pale flex items-center gap-2">
+      <Icon className="text-carefd-teal" />
+      <h2 className="font-bold text-carefd-navy text-sm sm:text-base">{title}</h2>
     </div>
     <div className="p-4 sm:p-6">{children}</div>
   </div>
@@ -307,10 +307,10 @@ const BookService = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale">
+      <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale">
         <Navbar />
         <div className="flex items-center justify-center h-[calc(100vh-200px)]">
-          <FaSpinner className="animate-spin text-4xl text-carelink-teal" />
+          <FaSpinner className="animate-spin text-4xl text-carefd-teal" />
         </div>
       </div>
     );
@@ -318,11 +318,11 @@ const BookService = () => {
 
   if (!service || !provider) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale">
+      <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale">
         <Navbar />
         <div className="text-center py-12">
-          <p className="text-carelink-gray text-lg">שירות לא נמצא</p>
-          <Link to="/services" className="text-carelink-teal hover:underline mt-4 inline-block">חזור לשירותים</Link>
+          <p className="text-carefd-gray text-lg">שירות לא נמצא</p>
+          <Link to="/services" className="text-carefd-teal hover:underline mt-4 inline-block">חזור לשירותים</Link>
         </div>
       </div>
     );
@@ -335,15 +335,15 @@ const BookService = () => {
 
   if (bookingSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale">
+      <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale">
         <Navbar />
         <div className="max-w-2xl mx-auto px-4 py-12">
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center border-2 border-green-500">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <FaCheckCircle className="text-4xl text-green-500" />
             </div>
-            <h2 className="text-2xl font-bold text-carelink-navy mb-4">ההזמנה נקלטה בהצלחה!</h2>
-            <div className="bg-carelink-teal-pale/30 rounded-xl p-6 text-right mb-6 space-y-2 text-sm">
+            <h2 className="text-2xl font-bold text-carefd-navy mb-4">ההזמנה נקלטה בהצלחה!</h2>
+            <div className="bg-carefd-teal-pale/30 rounded-xl p-6 text-right mb-6 space-y-2 text-sm">
               <p><strong>שירות:</strong> {service.name}</p>
               <p><strong>ספק:</strong> {provider.business_name}</p>
               {selectedDeliveryType && <p><strong>מיקום:</strong> {DELIVERY_TYPES[selectedDeliveryType]?.label}</p>}
@@ -352,16 +352,16 @@ const BookService = () => {
               {selectedShift && <p><strong>משמרת:</strong> {selectedShift.label}</p>}
               {skipTimeSelection && <p><strong>תיאום:</strong> יתואם טלפונית</p>}
               {selectedPlatform && <p><strong>פלטפורמה:</strong> {TELEMEDICINE_PLATFORMS.find(p => p.id === selectedPlatform)?.label}</p>}
-              <div className="border-t border-carelink-teal-pale my-3"></div>
-              <p className="text-xl font-bold text-carelink-teal">סה"כ: ₪{totalPrice}</p>
-              {bookingId && <p className="text-xs text-carelink-gray">מספר הזמנה: {bookingId}</p>}
+              <div className="border-t border-carefd-teal-pale my-3"></div>
+              <p className="text-xl font-bold text-carefd-teal">סה"כ: ₪{totalPrice}</p>
+              {bookingId && <p className="text-xs text-carefd-gray">מספר הזמנה: {bookingId}</p>}
             </div>
             <div className="flex gap-3">
-              <Link to="/services" className="flex-1 bg-carelink-teal text-white py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition">
+              <Link to="/services" className="flex-1 bg-carefd-teal text-white py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition">
                 חזור לשירותים
               </Link>
               {isAuthenticated && (
-                <Link to="/dashboard" className="flex-1 bg-white border-2 border-carelink-teal text-carelink-teal py-3 rounded-xl font-semibold hover:bg-carelink-teal-pale transition">
+                <Link to="/dashboard" className="flex-1 bg-white border-2 border-carefd-teal text-carefd-teal py-3 rounded-xl font-semibold hover:bg-carefd-teal-pale transition">
                   ההזמנות שלי
                 </Link>
               )}
@@ -376,7 +376,7 @@ const BookService = () => {
   // ==================== MAIN FORM ====================
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale">
+    <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale">
       <Navbar />
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -407,13 +407,13 @@ const BookService = () => {
                             step.num < currentStep
                               ? 'bg-green-500 text-white'
                               : step.num === currentStep
-                              ? 'bg-carelink-teal text-white'
+                              ? 'bg-carefd-teal text-white'
                               : 'bg-gray-200 text-gray-500'
                           }`}>
                             {step.num < currentStep ? <FaCheckCircle className="text-sm sm:text-base" /> : step.num}
                           </div>
                           <span className={`mt-1 text-center leading-tight ${
-                            step.num === currentStep ? 'font-semibold text-carelink-teal' : 'text-carelink-gray'
+                            step.num === currentStep ? 'font-semibold text-carefd-teal' : 'text-carefd-gray'
                           } text-[10px] sm:text-xs`}>
                             <span className="hidden sm:inline">{step.label}</span>
                             <span className="sm:hidden">{step.shortLabel}</span>
@@ -434,17 +434,17 @@ const BookService = () => {
             {/* ===== AUTH BANNER (for unauthenticated, non-guest users) ===== */}
             {!isAuthenticated && !guestMode && !authChecked && (
               <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 sm:p-5" data-testid="auth-banner">
-                <p className="text-sm font-semibold text-carelink-navy mb-3 text-center">
+                <p className="text-sm font-semibold text-carefd-navy mb-3 text-center">
                   <FaInfoCircle className="inline ml-1 text-amber-500" />
                   כדי להשלים הזמנה, התחבר או המשך כאורח
                 </p>
                 <div className="flex gap-3 justify-center">
                   <Link to={`/login?redirect=/book/${serviceId}`}
-                    className="bg-carelink-teal text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-carelink-teal-medium transition flex items-center gap-1.5">
+                    className="bg-carefd-teal text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-carefd-teal-medium transition flex items-center gap-1.5">
                     <FaSignInAlt /> התחבר
                   </Link>
                   <button onClick={() => { setGuestMode(true); setAuthChecked(true); }}
-                    className="bg-white border-2 border-carelink-teal text-carelink-teal px-4 py-2 rounded-xl text-sm font-semibold hover:bg-carelink-teal-pale transition flex items-center gap-1.5">
+                    className="bg-white border-2 border-carefd-teal text-carefd-teal px-4 py-2 rounded-xl text-sm font-semibold hover:bg-carefd-teal-pale transition flex items-center gap-1.5">
                     <FaUser /> המשך כאורח
                   </button>
                 </div>
@@ -453,47 +453,47 @@ const BookService = () => {
 
             {/* ===== GUEST DETAILS INLINE (shown when guest mode selected) ===== */}
             {!isAuthenticated && guestMode && (
-              <div className="bg-white rounded-2xl shadow-lg border-2 border-carelink-teal-pale p-4 sm:p-5" data-testid="guest-details-inline">
-                <h3 className="font-bold text-carelink-navy text-sm sm:text-base mb-3 flex items-center gap-2">
-                  <FaUser className="text-carelink-teal" /> פרטי אורח
+              <div className="bg-white rounded-2xl shadow-lg border-2 border-carefd-teal-pale p-4 sm:p-5" data-testid="guest-details-inline">
+                <h3 className="font-bold text-carefd-navy text-sm sm:text-base mb-3 flex items-center gap-2">
+                  <FaUser className="text-carefd-teal" /> פרטי אורח
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <input type="text" value={guestDetails.name} placeholder="שם מלא *"
                     onChange={(e) => setGuestDetails({...guestDetails, name: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
+                    className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm" />
                   <input type="email" value={guestDetails.email} placeholder="אימייל *"
                     onChange={(e) => setGuestDetails({...guestDetails, email: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
+                    className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm" />
                   <input type="tel" value={guestDetails.phone} placeholder="טלפון *"
                     onChange={(e) => setGuestDetails({...guestDetails, phone: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
+                    className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm" />
                 </div>
               </div>
             )}
 
             {/* ===== STEP 1: SERVICE TYPE & DELIVERY ===== */}
             {currentStep === 1 && (<>
-            <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-5 border-2 border-carelink-teal" data-testid="service-header">
+            <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-5 border-2 border-carefd-teal" data-testid="service-header">
               <div className="flex items-start gap-3 sm:gap-4">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-carelink-teal-pale rounded-xl flex items-center justify-center flex-shrink-0">
-                  <CategoryIcon className="text-xl sm:text-2xl text-carelink-teal" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-carefd-teal-pale rounded-xl flex items-center justify-center flex-shrink-0">
+                  <CategoryIcon className="text-xl sm:text-2xl text-carefd-teal" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-base sm:text-xl font-bold text-carelink-navy leading-tight">{service.name}</h1>
-                  <p className="text-carelink-gray text-sm mt-0.5">{provider.business_name} &bull; {categoryConfig.label}</p>
+                  <h1 className="text-base sm:text-xl font-bold text-carefd-navy leading-tight">{service.name}</h1>
+                  <p className="text-carefd-gray text-sm mt-0.5">{provider.business_name} &bull; {categoryConfig.label}</p>
                   <div className="mt-2 sm:hidden">
-                    <span className="text-xl font-bold text-carelink-teal">₪{isSeries && service.series_price ? service.series_price : service.price}</span>
-                    <span className="text-xs text-carelink-gray mr-1">{isSeries && service.series_price ? 'לסדרה' : categoryConfig.pricingLabel}</span>
+                    <span className="text-xl font-bold text-carefd-teal">₪{isSeries && service.series_price ? service.series_price : service.price}</span>
+                    <span className="text-xs text-carefd-gray mr-1">{isSeries && service.series_price ? 'לסדרה' : categoryConfig.pricingLabel}</span>
                   </div>
                 </div>
                 <div className="text-left flex-shrink-0 hidden sm:block">
-                  <div className="text-2xl font-bold text-carelink-teal">₪{isSeries && service.series_price ? service.series_price : service.price}</div>
-                  <span className="text-xs text-carelink-gray">{isSeries && service.series_price ? 'לסדרה' : categoryConfig.pricingLabel}</span>
+                  <div className="text-2xl font-bold text-carefd-teal">₪{isSeries && service.series_price ? service.series_price : service.price}</div>
+                  <span className="text-xs text-carefd-gray">{isSeries && service.series_price ? 'לסדרה' : categoryConfig.pricingLabel}</span>
                 </div>
               </div>
               {isSeries && service.num_sessions && (
-                <div className="mt-3 bg-carelink-teal-pale/40 rounded-lg px-4 py-2 text-sm flex items-center gap-2">
-                  <FaRedoAlt className="text-carelink-teal" />
+                <div className="mt-3 bg-carefd-teal-pale/40 rounded-lg px-4 py-2 text-sm flex items-center gap-2">
+                  <FaRedoAlt className="text-carefd-teal" />
                   <span>סדרה של <strong>{service.num_sessions}</strong> מפגשים</span>
                   {service.session_duration_minutes && <span> &bull; {service.session_duration_minutes} דקות למפגש</span>}
                 </div>
@@ -513,24 +513,24 @@ const BookService = () => {
                         data-testid={`delivery-type-${dt}`}
                         className={`p-3 sm:p-4 rounded-xl border-2 text-center transition ${
                           selectedDeliveryType === dt
-                            ? 'border-carelink-teal bg-carelink-teal-pale'
-                            : 'border-gray-200 hover:border-carelink-teal-pale'
+                            ? 'border-carefd-teal bg-carefd-teal-pale'
+                            : 'border-gray-200 hover:border-carefd-teal-pale'
                         }`}>
-                        <DtIcon className="text-lg sm:text-xl text-carelink-teal mx-auto mb-1" />
-                        <div className="font-semibold text-carelink-navy text-xs sm:text-sm">{dtConfig.label}</div>
+                        <DtIcon className="text-lg sm:text-xl text-carefd-teal mx-auto mb-1" />
+                        <div className="font-semibold text-carefd-navy text-xs sm:text-sm">{dtConfig.label}</div>
                       </button>
                     );
                   })}
                 </div>
               ) : deliveryTypes.length === 1 ? (
-                <div className="flex items-center gap-3 text-carelink-navy">
-                  {(() => { const DtIcon = DELIVERY_TYPES[deliveryTypes[0]]?.icon || FaMapMarkerAlt; return <DtIcon className="text-lg text-carelink-teal" />; })()}
+                <div className="flex items-center gap-3 text-carefd-navy">
+                  {(() => { const DtIcon = DELIVERY_TYPES[deliveryTypes[0]]?.icon || FaMapMarkerAlt; return <DtIcon className="text-lg text-carefd-teal" />; })()}
                   <span className="font-medium">{DELIVERY_TYPES[deliveryTypes[0]]?.label}</span>
                 </div>
               ) : (
-                <div className="flex items-center gap-3 text-carelink-navy">
-                  <FaMapMarkerAlt className="text-lg text-carelink-teal" />
-                  <span className="font-medium text-sm text-carelink-gray">יתואם עם הספק</span>
+                <div className="flex items-center gap-3 text-carefd-navy">
+                  <FaMapMarkerAlt className="text-lg text-carefd-teal" />
+                  <span className="font-medium text-sm text-carefd-gray">יתואם עם הספק</span>
                 </div>
               )}
             </FormSection>
@@ -543,28 +543,28 @@ const BookService = () => {
               {/* Shift for hourly */}
               {isHourly && (
                 <div className="mb-5">
-                  <p className="text-sm font-medium text-carelink-navy mb-3">בחר משמרת / שעות</p>
+                  <p className="text-sm font-medium text-carefd-navy mb-3">בחר משמרת / שעות</p>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
                     {SHIFT_OPTIONS.map(shift => (
                       <button key={shift.id} onClick={() => setSelectedShift(shift)}
                         data-testid={`shift-${shift.id}`}
                         className={`p-3 rounded-xl border-2 text-center transition text-sm ${
                           selectedShift?.id === shift.id
-                            ? 'border-carelink-teal bg-carelink-teal-pale'
-                            : 'border-gray-200 hover:border-carelink-teal-pale'
+                            ? 'border-carefd-teal bg-carefd-teal-pale'
+                            : 'border-gray-200 hover:border-carefd-teal-pale'
                         }`}>
-                        <div className="font-semibold text-carelink-navy">{shift.label}</div>
-                        <div className="text-xs text-carelink-gray">{shift.hours}</div>
+                        <div className="font-semibold text-carefd-navy">{shift.label}</div>
+                        <div className="text-xs text-carefd-gray">{shift.hours}</div>
                       </button>
                     ))}
                   </div>
                   {selectedShift?.id === 'custom' && (
                     <div className="flex items-center gap-3">
-                      <label className="text-sm text-carelink-navy">מספר שעות (מינימום {service.minimum_hours || 4}):</label>
+                      <label className="text-sm text-carefd-navy">מספר שעות (מינימום {service.minimum_hours || 4}):</label>
                       <input type="number" min={service.minimum_hours || 4}
                         value={customHours || service.minimum_hours || 4}
                         onChange={(e) => setCustomHours(Math.max(service.minimum_hours || 4, parseInt(e.target.value) || 0))}
-                        className="w-24 px-3 py-2 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-center"
+                        className="w-24 px-3 py-2 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-center"
                         data-testid="custom-hours-input" />
                     </div>
                   )}
@@ -575,10 +575,10 @@ const BookService = () => {
               <label className="flex items-center gap-3 cursor-pointer mb-5 p-3 bg-amber-50 rounded-xl border border-amber-200" data-testid="skip-time-checkbox">
                 <input type="checkbox" checked={skipTimeSelection}
                   onChange={(e) => setSkipTimeSelection(e.target.checked)}
-                  className="w-5 h-5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal" />
+                  className="w-5 h-5 text-carefd-teal rounded border-gray-300 focus:ring-carefd-teal" />
                 <div>
-                  <span className="font-semibold text-carelink-navy text-sm">תאם מועד מאוחר יותר</span>
-                  <p className="text-xs text-carelink-gray">הספק יתקשר לתיאום מועד</p>
+                  <span className="font-semibold text-carefd-navy text-sm">תאם מועד מאוחר יותר</span>
+                  <p className="text-xs text-carefd-gray">הספק יתקשר לתיאום מועד</p>
                 </div>
               </label>
 
@@ -591,9 +591,9 @@ const BookService = () => {
                     bookedSlots={bookedSlots.map(slot => slot.split(' ')[0])}
                   />
                   {selectedDate && (
-                    <div className="mt-5 pt-5 border-t border-carelink-teal-pale">
-                      <p className="text-sm font-medium text-carelink-navy mb-3 flex items-center gap-2">
-                        <FaClock className="text-carelink-teal" />
+                    <div className="mt-5 pt-5 border-t border-carefd-teal-pale">
+                      <p className="text-sm font-medium text-carefd-navy mb-3 flex items-center gap-2">
+                        <FaClock className="text-carefd-teal" />
                         {isHourly ? 'בחר שעת התחלה' : 'בחר שעה'}
                       </p>
                       <TimeSlotPicker
@@ -627,11 +627,11 @@ const BookService = () => {
                         data-testid={`platform-${platform.id}`}
                         className={`p-4 rounded-xl border-2 flex items-center gap-3 transition ${
                           selectedPlatform === platform.id
-                            ? 'border-carelink-teal bg-carelink-teal-pale'
-                            : 'border-gray-200 hover:border-carelink-teal-pale'
+                            ? 'border-carefd-teal bg-carefd-teal-pale'
+                            : 'border-gray-200 hover:border-carefd-teal-pale'
                         }`}>
-                        <PlatformIcon className="text-xl text-carelink-teal" />
-                        <span className="font-medium text-carelink-navy text-sm">{platform.label}</span>
+                        <PlatformIcon className="text-xl text-carefd-teal" />
+                        <span className="font-medium text-carefd-navy text-sm">{platform.label}</span>
                       </button>
                     );
                   })}
@@ -642,11 +642,11 @@ const BookService = () => {
               {isHome && (
                 <div>
                   <div className="flex justify-between items-center mb-4">
-                    <p className="text-sm font-medium text-carelink-navy">כתובת הלקוח</p>
+                    <p className="text-sm font-medium text-carefd-navy">כתובת הלקוח</p>
                     {user && (
                       <button type="button"
                         onClick={() => setServiceAddress(prev => ({ ...prev, street: user.address || prev.street, city: user.city || prev.city }))}
-                        className="text-xs text-carelink-teal bg-carelink-teal-pale/40 hover:bg-carelink-teal-pale px-3 py-1.5 rounded-full transition"
+                        className="text-xs text-carefd-teal bg-carefd-teal-pale/40 hover:bg-carefd-teal-pale px-3 py-1.5 rounded-full transition"
                         data-testid="fill-my-address-btn">
                         <FaMapMarkerAlt className="inline text-[10px] ml-1" />הכתובת שלי
                       </button>
@@ -656,28 +656,28 @@ const BookService = () => {
                     <div className="sm:col-span-2">
                       <input type="text" value={serviceAddress.street} placeholder="רחוב ומספר *"
                         onChange={(e) => setServiceAddress({...serviceAddress, street: e.target.value})}
-                        className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                        className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm"
                         data-testid="address-street" />
                     </div>
                     <input type="text" value={serviceAddress.city} placeholder="עיר *"
                       onChange={(e) => setServiceAddress({...serviceAddress, city: e.target.value})}
-                      className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                      className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm"
                       data-testid="address-city" />
                     <div className="grid grid-cols-3 gap-2">
                       <input type="text" value={serviceAddress.apartment} placeholder="דירה"
                         onChange={(e) => setServiceAddress({...serviceAddress, apartment: e.target.value})}
-                        className="w-full px-3 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
+                        className="w-full px-3 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm" />
                       <input type="text" value={serviceAddress.floor} placeholder="קומה"
                         onChange={(e) => setServiceAddress({...serviceAddress, floor: e.target.value})}
-                        className="w-full px-3 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
+                        className="w-full px-3 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm" />
                       <input type="text" value={serviceAddress.entrance} placeholder="כניסה"
                         onChange={(e) => setServiceAddress({...serviceAddress, entrance: e.target.value})}
-                        className="w-full px-3 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
+                        className="w-full px-3 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm" />
                     </div>
                     <div className="sm:col-span-2">
                       <textarea value={serviceAddress.specialInstructions} placeholder="הנחיות הגעה (קוד כניסה, חניה...)"
                         onChange={(e) => setServiceAddress({...serviceAddress, specialInstructions: e.target.value})}
-                        className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none resize-none text-sm" rows="2" />
+                        className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none resize-none text-sm" rows="2" />
                     </div>
                   </div>
                 </div>
@@ -689,43 +689,43 @@ const BookService = () => {
                   <div className="sm:col-span-2">
                     <input type="text" value={shippingAddress.street} placeholder="רחוב ומספר *"
                       onChange={(e) => setShippingAddress({...shippingAddress, street: e.target.value})}
-                      className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                      className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm"
                       data-testid="shipping-street" />
                   </div>
                   <input type="text" value={shippingAddress.city} placeholder="עיר *"
                     onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                    className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm"
                     data-testid="shipping-city" />
                   <input type="text" value={shippingAddress.apartment} placeholder="דירה"
                     onChange={(e) => setShippingAddress({...shippingAddress, apartment: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
+                    className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm" />
                 </div>
               )}
 
               {/* Clinic / Hospital → Address + notes */}
               {(selectedDeliveryType === 'clinic' || selectedDeliveryType === 'hospital') && (
                 <div>
-                  <p className="text-sm font-medium text-carelink-navy mb-3">
+                  <p className="text-sm font-medium text-carefd-navy mb-3">
                     {selectedDeliveryType === 'hospital' ? 'כתובת בית החולים / מוסד' : 'כתובת הקליניקה'}
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="sm:col-span-2">
                       <input type="text" value={serviceAddress.street} placeholder="רחוב ומספר"
                         onChange={(e) => setServiceAddress({...serviceAddress, street: e.target.value})}
-                        className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                        className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm"
                         data-testid="location-street" />
                     </div>
                     <input type="text" value={serviceAddress.city} placeholder="עיר"
                       onChange={(e) => setServiceAddress({...serviceAddress, city: e.target.value})}
-                      className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                      className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm"
                       data-testid="location-city" />
                     <input type="text" value={serviceAddress.floor} placeholder="קומה / מחלקה / חדר"
                       onChange={(e) => setServiceAddress({...serviceAddress, floor: e.target.value})}
-                      className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm" />
+                      className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm" />
                     <div className="sm:col-span-2">
                       <textarea value={serviceAddress.specialInstructions} placeholder="הערות (כניסה, חניה, הנחיות מיוחדות...)"
                         onChange={(e) => setServiceAddress({...serviceAddress, specialInstructions: e.target.value})}
-                        className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none resize-none text-sm" rows="2" />
+                        className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none resize-none text-sm" rows="2" />
                     </div>
                   </div>
                 </div>
@@ -733,7 +733,7 @@ const BookService = () => {
 
               {/* No delivery type selected yet */}
               {!selectedDeliveryType && (
-                <p className="text-sm text-carelink-gray">בחר תחילה היכן ניתן השירות</p>
+                <p className="text-sm text-carefd-gray">בחר תחילה היכן ניתן השירות</p>
               )}
             </FormSection>
 
@@ -743,11 +743,11 @@ const BookService = () => {
             {currentStep === 4 && (<>
             <FormSection icon={FaUserFriends} title="למי - פרטי מזמין ואיש קשר" testId="contact-section">
               <div className="flex justify-between items-center mb-4">
-                <p className="text-sm font-medium text-carelink-navy">פרטי המזמין</p>
+                <p className="text-sm font-medium text-carefd-navy">פרטי המזמין</p>
                 {user && (
                   <button type="button"
                     onClick={() => setContactPerson({ name: user.name || '', phone: user.phone || '', relationship: 'self' })}
-                    className="text-xs text-carelink-teal bg-carelink-teal-pale/40 hover:bg-carelink-teal-pale px-3 py-1.5 rounded-full transition"
+                    className="text-xs text-carefd-teal bg-carefd-teal-pale/40 hover:bg-carefd-teal-pale px-3 py-1.5 rounded-full transition"
                     data-testid="fill-my-details-btn">
                     <FaUser className="inline text-[10px] ml-1" /> הפרטים שלי
                   </button>
@@ -755,24 +755,24 @@ const BookService = () => {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-carelink-navy mb-1">שם מלא *</label>
+                  <label className="block text-xs font-medium text-carefd-navy mb-1">שם מלא *</label>
                   <input type="text" value={contactPerson.name}
                     onChange={(e) => setContactPerson({...contactPerson, name: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                    className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm"
                     placeholder="שם מלא" data-testid="requester-name" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-carelink-navy mb-1">טלפון *</label>
+                  <label className="block text-xs font-medium text-carefd-navy mb-1">טלפון *</label>
                   <input type="tel" value={contactPerson.phone}
                     onChange={(e) => setContactPerson({...contactPerson, phone: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                    className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm"
                     placeholder="050-0000000" data-testid="requester-phone" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-carelink-navy mb-1">קרבה למטופל</label>
+                  <label className="block text-xs font-medium text-carefd-navy mb-1">קרבה למטופל</label>
                   <select value={contactPerson.relationship}
                     onChange={(e) => setContactPerson({...contactPerson, relationship: e.target.value})}
-                    className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none text-sm"
+                    className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none text-sm"
                     data-testid="requester-relationship">
                     <option value="">בחר</option>
                     <option value="self">בעצמי</option>
@@ -788,7 +788,7 @@ const BookService = () => {
             {/* 6. NOTES */}
             <FormSection icon={FaStickyNote} title="הערות" testId="notes-section">
               <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows="3"
-                className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal outline-none resize-none text-sm"
+                className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none resize-none text-sm"
                 placeholder="הערות מיוחדות, בקשות, מידע רפואי רלוונטי..."
                 data-testid="booking-notes" />
             </FormSection>
@@ -798,25 +798,25 @@ const BookService = () => {
             {currentStep === 5 && (<>
             {/* 7. TERMS */}
             <FormSection icon={FaFileContract} title="תנאים ואישורים" testId="terms-section">
-              <label className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl mb-3 cursor-pointer hover:bg-carelink-teal-pale/20 transition">
+              <label className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl mb-3 cursor-pointer hover:bg-carefd-teal-pale/20 transition">
                 <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)}
-                  className="w-5 h-5 mt-0.5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
+                  className="w-5 h-5 mt-0.5 text-carefd-teal rounded border-gray-300 focus:ring-carefd-teal"
                   data-testid="accept-terms" />
                 <span className="text-sm">
-                  <span className="text-carelink-navy">אני מאשר/ת את </span>
-                  <Link to="/terms" target="_blank" className="text-carelink-teal hover:underline">תנאי השימוש</Link>
-                  <span className="text-carelink-navy"> *</span>
+                  <span className="text-carefd-navy">אני מאשר/ת את </span>
+                  <Link to="/terms" target="_blank" className="text-carefd-teal hover:underline">תנאי השימוש</Link>
+                  <span className="text-carefd-navy"> *</span>
                 </span>
               </label>
-              <label className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-carelink-teal-pale/20 transition">
+              <label className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-carefd-teal-pale/20 transition">
                 <input type="checkbox" checked={acceptCancellation} onChange={(e) => setAcceptCancellation(e.target.checked)}
-                  className="w-5 h-5 mt-0.5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
+                  className="w-5 h-5 mt-0.5 text-carefd-teal rounded border-gray-300 focus:ring-carefd-teal"
                   data-testid="accept-cancellation" />
                 <div className="text-sm">
-                  <span className="text-carelink-navy">אני מאשר/ת את </span>
-                  <Link to="/terms#cancellation" target="_blank" className="text-carelink-teal hover:underline">מדיניות הביטולים</Link>
-                  <span className="text-carelink-navy"> *</span>
-                  <p className="text-xs text-carelink-gray mt-1">ביטול עד 24 שעות לפני - ללא עלות. ביטול מאוחר - 50%.</p>
+                  <span className="text-carefd-navy">אני מאשר/ת את </span>
+                  <Link to="/terms#cancellation" target="_blank" className="text-carefd-teal hover:underline">מדיניות הביטולים</Link>
+                  <span className="text-carefd-navy"> *</span>
+                  <p className="text-xs text-carefd-gray mt-1">ביטול עד 24 שעות לפני - ללא עלות. ביטול מאוחר - 50%.</p>
                 </div>
               </label>
             </FormSection>
@@ -827,7 +827,7 @@ const BookService = () => {
               {currentStep > 1 ? (
                 <button
                   onClick={() => setCurrentStep(currentStep - 1)}
-                  className="flex items-center gap-2 px-5 py-3 bg-white border-2 border-gray-200 text-carelink-navy rounded-xl font-medium hover:border-carelink-teal hover:bg-carelink-teal-pale/20 transition"
+                  className="flex items-center gap-2 px-5 py-3 bg-white border-2 border-gray-200 text-carefd-navy rounded-xl font-medium hover:border-carefd-teal hover:bg-carefd-teal-pale/20 transition"
                 >
                   <FaChevronRight size={12} />
                   הקודם
@@ -837,7 +837,7 @@ const BookService = () => {
               {currentStep < 5 ? (
                 <button
                   onClick={() => setCurrentStep(currentStep + 1)}
-                  className="flex items-center gap-2 px-6 py-3 bg-carelink-teal text-white rounded-xl font-bold hover:bg-carelink-teal-medium transition shadow-md"
+                  className="flex items-center gap-2 px-6 py-3 bg-carefd-teal text-white rounded-xl font-bold hover:bg-carefd-teal-medium transition shadow-md"
                 >
                   הבא
                   <FaChevronLeft size={12} />
@@ -848,61 +848,61 @@ const BookService = () => {
 
           {/* ===== RIGHT: Sticky Summary ===== */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border-2 border-carelink-teal sticky top-4" data-testid="order-summary">
-              <h3 className="font-bold text-base sm:text-lg text-carelink-navy mb-4">סיכום הזמנה</h3>
+            <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border-2 border-carefd-teal sticky top-4" data-testid="order-summary">
+              <h3 className="font-bold text-base sm:text-lg text-carefd-navy mb-4">סיכום הזמנה</h3>
               
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-carelink-gray">שירות:</span><span className="font-medium text-carelink-navy">{service.name}</span></div>
-                <div className="flex justify-between"><span className="text-carelink-gray">סוג:</span><span className="font-medium text-carelink-navy">{categoryConfig.label}</span></div>
+                <div className="flex justify-between"><span className="text-carefd-gray">שירות:</span><span className="font-medium text-carefd-navy">{service.name}</span></div>
+                <div className="flex justify-between"><span className="text-carefd-gray">סוג:</span><span className="font-medium text-carefd-navy">{categoryConfig.label}</span></div>
                 
                 {selectedDeliveryType && (
-                  <div className="flex justify-between"><span className="text-carelink-gray">מיקום:</span><span className="font-medium text-carelink-navy">{DELIVERY_TYPES[selectedDeliveryType]?.label}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">מיקום:</span><span className="font-medium text-carefd-navy">{DELIVERY_TYPES[selectedDeliveryType]?.label}</span></div>
                 )}
                 {!skipTimeSelection && selectedDate && (
-                  <div className="flex justify-between"><span className="text-carelink-gray">תאריך:</span><span className="font-medium text-carelink-navy">{format(selectedDate, 'dd/MM/yyyy', { locale: he })}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">תאריך:</span><span className="font-medium text-carefd-navy">{format(selectedDate, 'dd/MM/yyyy', { locale: he })}</span></div>
                 )}
                 {selectedTime && (
-                  <div className="flex justify-between"><span className="text-carelink-gray">שעה:</span><span className="font-medium text-carelink-navy">{selectedTime}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">שעה:</span><span className="font-medium text-carefd-navy">{selectedTime}</span></div>
                 )}
                 {selectedShift && (
-                  <div className="flex justify-between"><span className="text-carelink-gray">משמרת:</span><span className="font-medium text-carelink-navy">{selectedShift.label}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">משמרת:</span><span className="font-medium text-carefd-navy">{selectedShift.label}</span></div>
                 )}
                 {skipTimeSelection && (
-                  <div className="flex justify-between"><span className="text-carelink-gray">תיאום:</span><span className="font-medium text-amber-600">יתואם טלפונית</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">תיאום:</span><span className="font-medium text-amber-600">יתואם טלפונית</span></div>
                 )}
                 {selectedPlatform && (
-                  <div className="flex justify-between"><span className="text-carelink-gray">פלטפורמה:</span><span className="font-medium text-carelink-navy">{TELEMEDICINE_PLATFORMS.find(p => p.id === selectedPlatform)?.label}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">פלטפורמה:</span><span className="font-medium text-carefd-navy">{TELEMEDICINE_PLATFORMS.find(p => p.id === selectedPlatform)?.label}</span></div>
                 )}
                 {isSeries && service.num_sessions && (
-                  <div className="flex justify-between"><span className="text-carelink-gray">מפגשים:</span><span className="font-medium text-carelink-navy">{service.num_sessions}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">מפגשים:</span><span className="font-medium text-carefd-navy">{service.num_sessions}</span></div>
                 )}
 
-                <div className="border-t border-carelink-teal-pale my-3"></div>
+                <div className="border-t border-carefd-teal-pale my-3"></div>
 
                 {isHourly ? (
-                  <div className="flex justify-between"><span className="text-carelink-gray">₪{service.price} x {selectedShift?.duration || customHours} שעות</span><span className="font-medium">₪{service.price * (selectedShift?.duration || customHours)}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">₪{service.price} x {selectedShift?.duration || customHours} שעות</span><span className="font-medium">₪{service.price * (selectedShift?.duration || customHours)}</span></div>
                 ) : isSeries && service.num_sessions ? (
-                  <div className="flex justify-between"><span className="text-carelink-gray">{service.num_sessions} מפגשים</span><span className="font-medium">₪{service.series_price || service.price * service.num_sessions}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">{service.num_sessions} מפגשים</span><span className="font-medium">₪{service.series_price || service.price * service.num_sessions}</span></div>
                 ) : (
-                  <div className="flex justify-between"><span className="text-carelink-gray">מחיר בסיס:</span><span className="font-medium">₪{service.price}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">מחיר בסיס:</span><span className="font-medium">₪{service.price}</span></div>
                 )}
                 
                 {isHome && service.has_travel_cost && service.travel_cost > 0 && (
-                  <div className="flex justify-between text-carelink-gray"><span>נסיעות:</span><span>₪{service.travel_cost}</span></div>
+                  <div className="flex justify-between text-carefd-gray"><span>נסיעות:</span><span>₪{service.travel_cost}</span></div>
                 )}
                 {isDelivery && service.has_shipping && service.shipping_cost > 0 && (
-                  <div className="flex justify-between text-carelink-gray"><span>משלוח:</span><span>₪{service.shipping_cost}</span></div>
+                  <div className="flex justify-between text-carefd-gray"><span>משלוח:</span><span>₪{service.shipping_cost}</span></div>
                 )}
 
-                <div className="border-t border-carelink-teal-pale my-3"></div>
+                <div className="border-t border-carefd-teal-pale my-3"></div>
                 <div className="flex justify-between text-lg">
-                  <span className="font-bold text-carelink-navy">סה"כ:</span>
-                  <span className="font-bold text-carelink-teal">₪{totalPrice}</span>
+                  <span className="font-bold text-carefd-navy">סה"כ:</span>
+                  <span className="font-bold text-carefd-teal">₪{totalPrice}</span>
                 </div>
               </div>
 
               <button onClick={handleSubmit} disabled={booking}
-                className="w-full mt-6 bg-carelink-teal text-white py-4 rounded-xl font-bold text-lg hover:bg-carelink-teal-medium transition disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full mt-6 bg-carefd-teal text-white py-4 rounded-xl font-bold text-lg hover:bg-carefd-teal-medium transition disabled:opacity-50 flex items-center justify-center gap-2"
                 data-testid="booking-submit-btn">
                 {booking ? (
                   <><FaSpinner className="animate-spin" /> מעבד...</>
@@ -922,87 +922,87 @@ const BookService = () => {
       {showConfirmation && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" data-testid="confirmation-overlay">
           <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8">
-            <h2 className="text-xl font-bold text-carelink-navy mb-5 text-center flex items-center justify-center gap-2">
-              <FaCheckCircle className="text-carelink-teal" /> סיכום הזמנה - אישור סופי
+            <h2 className="text-xl font-bold text-carefd-navy mb-5 text-center flex items-center justify-center gap-2">
+              <FaCheckCircle className="text-carefd-teal" /> סיכום הזמנה - אישור סופי
             </h2>
 
             <div className="space-y-3 text-sm text-right">
               {/* Service & Provider */}
-              <div className="bg-carelink-teal-pale/30 rounded-xl p-4 space-y-1.5">
-                <div className="flex justify-between"><span className="text-carelink-gray">שירות:</span><span className="font-semibold text-carelink-navy">{service.name}</span></div>
-                <div className="flex justify-between"><span className="text-carelink-gray">ספק:</span><span className="font-medium text-carelink-navy">{provider.business_name}</span></div>
-                <div className="flex justify-between"><span className="text-carelink-gray">סוג:</span><span className="font-medium text-carelink-navy">{categoryConfig.label}</span></div>
+              <div className="bg-carefd-teal-pale/30 rounded-xl p-4 space-y-1.5">
+                <div className="flex justify-between"><span className="text-carefd-gray">שירות:</span><span className="font-semibold text-carefd-navy">{service.name}</span></div>
+                <div className="flex justify-between"><span className="text-carefd-gray">ספק:</span><span className="font-medium text-carefd-navy">{provider.business_name}</span></div>
+                <div className="flex justify-between"><span className="text-carefd-gray">סוג:</span><span className="font-medium text-carefd-navy">{categoryConfig.label}</span></div>
               </div>
 
               {/* Delivery & Schedule */}
               <div className="bg-gray-50 rounded-xl p-4 space-y-1.5">
                 {selectedDeliveryType && (
-                  <div className="flex justify-between"><span className="text-carelink-gray">מיקום:</span><span className="font-medium text-carelink-navy">{DELIVERY_TYPES[selectedDeliveryType]?.label}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">מיקום:</span><span className="font-medium text-carefd-navy">{DELIVERY_TYPES[selectedDeliveryType]?.label}</span></div>
                 )}
                 {!skipTimeSelection && selectedDate && (
-                  <div className="flex justify-between"><span className="text-carelink-gray">תאריך:</span><span className="font-medium text-carelink-navy">{format(selectedDate, 'dd/MM/yyyy', { locale: he })}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">תאריך:</span><span className="font-medium text-carefd-navy">{format(selectedDate, 'dd/MM/yyyy', { locale: he })}</span></div>
                 )}
                 {selectedTime && (
-                  <div className="flex justify-between"><span className="text-carelink-gray">שעה:</span><span className="font-medium text-carelink-navy">{selectedTime}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">שעה:</span><span className="font-medium text-carefd-navy">{selectedTime}</span></div>
                 )}
                 {selectedShift && (
-                  <div className="flex justify-between"><span className="text-carelink-gray">משמרת:</span><span className="font-medium text-carelink-navy">{selectedShift.label} ({selectedShift.hours})</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">משמרת:</span><span className="font-medium text-carefd-navy">{selectedShift.label} ({selectedShift.hours})</span></div>
                 )}
                 {skipTimeSelection && (
-                  <div className="flex justify-between"><span className="text-carelink-gray">תיאום:</span><span className="font-medium text-amber-600">יתואם טלפונית</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">תיאום:</span><span className="font-medium text-amber-600">יתואם טלפונית</span></div>
                 )}
                 {selectedPlatform && (
-                  <div className="flex justify-between"><span className="text-carelink-gray">פלטפורמה:</span><span className="font-medium text-carelink-navy">{TELEMEDICINE_PLATFORMS.find(p => p.id === selectedPlatform)?.label}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">פלטפורמה:</span><span className="font-medium text-carefd-navy">{TELEMEDICINE_PLATFORMS.find(p => p.id === selectedPlatform)?.label}</span></div>
                 )}
               </div>
 
               {/* Address (if applicable) */}
               {(isHome || selectedDeliveryType === 'clinic' || selectedDeliveryType === 'hospital') && serviceAddress.street && (
                 <div className="bg-gray-50 rounded-xl p-4 space-y-1.5">
-                  <div className="flex justify-between"><span className="text-carelink-gray">כתובת:</span><span className="font-medium text-carelink-navy">{serviceAddress.street}, {serviceAddress.city}</span></div>
-                  {serviceAddress.floor && <div className="flex justify-between"><span className="text-carelink-gray">קומה:</span><span className="font-medium text-carelink-navy">{serviceAddress.floor}</span></div>}
-                  {serviceAddress.apartment && <div className="flex justify-between"><span className="text-carelink-gray">דירה:</span><span className="font-medium text-carelink-navy">{serviceAddress.apartment}</span></div>}
+                  <div className="flex justify-between"><span className="text-carefd-gray">כתובת:</span><span className="font-medium text-carefd-navy">{serviceAddress.street}, {serviceAddress.city}</span></div>
+                  {serviceAddress.floor && <div className="flex justify-between"><span className="text-carefd-gray">קומה:</span><span className="font-medium text-carefd-navy">{serviceAddress.floor}</span></div>}
+                  {serviceAddress.apartment && <div className="flex justify-between"><span className="text-carefd-gray">דירה:</span><span className="font-medium text-carefd-navy">{serviceAddress.apartment}</span></div>}
                 </div>
               )}
               {isDelivery && shippingAddress.street && (
                 <div className="bg-gray-50 rounded-xl p-4 space-y-1.5">
-                  <div className="flex justify-between"><span className="text-carelink-gray">משלוח ל:</span><span className="font-medium text-carelink-navy">{shippingAddress.street}, {shippingAddress.city}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">משלוח ל:</span><span className="font-medium text-carefd-navy">{shippingAddress.street}, {shippingAddress.city}</span></div>
                 </div>
               )}
 
               {/* Contact */}
               <div className="bg-gray-50 rounded-xl p-4 space-y-1.5">
-                <div className="flex justify-between"><span className="text-carelink-gray">שם מזמין:</span><span className="font-medium text-carelink-navy">{contactPerson.name}</span></div>
-                <div className="flex justify-between"><span className="text-carelink-gray">טלפון:</span><span className="font-medium text-carelink-navy">{contactPerson.phone}</span></div>
-                {contactPerson.relationship && <div className="flex justify-between"><span className="text-carelink-gray">קרבה:</span><span className="font-medium text-carelink-navy">{contactPerson.relationship === 'self' ? 'בעצמי' : contactPerson.relationship}</span></div>}
+                <div className="flex justify-between"><span className="text-carefd-gray">שם מזמין:</span><span className="font-medium text-carefd-navy">{contactPerson.name}</span></div>
+                <div className="flex justify-between"><span className="text-carefd-gray">טלפון:</span><span className="font-medium text-carefd-navy">{contactPerson.phone}</span></div>
+                {contactPerson.relationship && <div className="flex justify-between"><span className="text-carefd-gray">קרבה:</span><span className="font-medium text-carefd-navy">{contactPerson.relationship === 'self' ? 'בעצמי' : contactPerson.relationship}</span></div>}
               </div>
 
               {/* Price breakdown */}
-              <div className="bg-carelink-teal-pale/30 rounded-xl p-4 space-y-1.5">
+              <div className="bg-carefd-teal-pale/30 rounded-xl p-4 space-y-1.5">
                 {isHourly ? (
-                  <div className="flex justify-between"><span className="text-carelink-gray">₪{service.price} x {selectedShift?.duration || customHours} שעות</span><span className="font-medium">₪{service.price * (selectedShift?.duration || customHours)}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">₪{service.price} x {selectedShift?.duration || customHours} שעות</span><span className="font-medium">₪{service.price * (selectedShift?.duration || customHours)}</span></div>
                 ) : isSeries && service.num_sessions ? (
-                  <div className="flex justify-between"><span className="text-carelink-gray">{service.num_sessions} מפגשים</span><span className="font-medium">₪{service.series_price || service.price * service.num_sessions}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">{service.num_sessions} מפגשים</span><span className="font-medium">₪{service.series_price || service.price * service.num_sessions}</span></div>
                 ) : (
-                  <div className="flex justify-between"><span className="text-carelink-gray">מחיר בסיס:</span><span className="font-medium">₪{service.price}</span></div>
+                  <div className="flex justify-between"><span className="text-carefd-gray">מחיר בסיס:</span><span className="font-medium">₪{service.price}</span></div>
                 )}
                 {isHome && service.has_travel_cost && service.travel_cost > 0 && (
-                  <div className="flex justify-between text-carelink-gray"><span>נסיעות:</span><span>₪{service.travel_cost}</span></div>
+                  <div className="flex justify-between text-carefd-gray"><span>נסיעות:</span><span>₪{service.travel_cost}</span></div>
                 )}
                 {isDelivery && service.has_shipping && service.shipping_cost > 0 && (
-                  <div className="flex justify-between text-carelink-gray"><span>משלוח:</span><span>₪{service.shipping_cost}</span></div>
+                  <div className="flex justify-between text-carefd-gray"><span>משלוח:</span><span>₪{service.shipping_cost}</span></div>
                 )}
-                <div className="border-t border-carelink-teal-pale my-2"></div>
+                <div className="border-t border-carefd-teal-pale my-2"></div>
                 <div className="flex justify-between text-lg">
-                  <span className="font-bold text-carelink-navy">סה"כ לתשלום:</span>
-                  <span className="font-bold text-carelink-teal">₪{totalPrice}</span>
+                  <span className="font-bold text-carefd-navy">סה"כ לתשלום:</span>
+                  <span className="font-bold text-carefd-teal">₪{totalPrice}</span>
                 </div>
               </div>
 
               {notes && (
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <span className="text-carelink-gray text-xs">הערות:</span>
-                  <p className="text-carelink-navy text-sm mt-1">{notes}</p>
+                  <span className="text-carefd-gray text-xs">הערות:</span>
+                  <p className="text-carefd-navy text-sm mt-1">{notes}</p>
                 </div>
               )}
             </div>
@@ -1010,12 +1010,12 @@ const BookService = () => {
             {/* Action buttons */}
             <div className="flex gap-3 mt-6">
               <button onClick={handleConfirmedSubmit} disabled={booking}
-                className="flex-1 bg-carelink-teal text-white py-3.5 rounded-xl font-bold text-base hover:bg-carelink-teal-medium transition disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 bg-carefd-teal text-white py-3.5 rounded-xl font-bold text-base hover:bg-carefd-teal-medium transition disabled:opacity-50 flex items-center justify-center gap-2"
                 data-testid="confirm-booking-btn">
                 {booking ? <><FaSpinner className="animate-spin" /> מעבד...</> : <><FaCheckCircle /> אשר הזמנה</>}
               </button>
               <button onClick={() => setShowConfirmation(false)}
-                className="flex-1 bg-white border-2 border-gray-300 text-carelink-navy py-3.5 rounded-xl font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-2"
+                className="flex-1 bg-white border-2 border-gray-300 text-carefd-navy py-3.5 rounded-xl font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-2"
                 data-testid="back-to-edit-btn">
                 <FaArrowRight /> חזור לעריכה
               </button>

@@ -186,20 +186,20 @@ const Requests = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale flex flex-col">
       <Navbar />
 
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         {/* CTA Banner for patients */}
         {isPatientRole(user?.role) && !showCreateForm && (
-          <div className="bg-gradient-to-l from-carelink-teal to-carelink-navy p-6 rounded-2xl mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-gradient-to-l from-carefd-teal to-carefd-navy p-6 rounded-2xl mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-white">
               <h2 className="text-xl font-bold mb-1">צריכים שירות? פרסמו בקשה!</h2>
-              <p className="text-carelink-teal-pale text-sm">תארו את הצורך שלכם וקבלו הצעות מספקים מתאימים</p>
+              <p className="text-carefd-teal-pale text-sm">תארו את הצורך שלכם וקבלו הצעות מספקים מתאימים</p>
             </div>
             <button
               onClick={() => setShowCreateForm(true)}
-              className="bg-white text-carelink-teal px-6 py-3 rounded-xl font-bold hover:bg-carelink-teal-pale transition whitespace-nowrap"
+              className="bg-white text-carefd-teal px-6 py-3 rounded-xl font-bold hover:bg-carefd-teal-pale transition whitespace-nowrap"
               data-testid="create-request-btn"
             >
               + {t('createRequest')}
@@ -210,10 +210,10 @@ const Requests = () => {
         {/* Login prompt for non-authenticated users */}
         {!user && (
           <div className="bg-blue-50 border-2 border-blue-200 p-6 rounded-2xl mb-6 text-center">
-            <p className="text-carelink-navy font-medium mb-3">רוצים לפרסם בקשה? התחברו כדי להתחיל</p>
+            <p className="text-carefd-navy font-medium mb-3">רוצים לפרסם בקשה? התחברו כדי להתחיל</p>
             <Link
               to="/login"
-              className="inline-block bg-carelink-teal text-white px-6 py-2 rounded-lg hover:bg-carelink-teal-medium transition font-medium"
+              className="inline-block bg-carefd-teal text-white px-6 py-2 rounded-lg hover:bg-carefd-teal-medium transition font-medium"
             >
               התחברות
             </Link>
@@ -221,13 +221,13 @@ const Requests = () => {
         )}
 
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-carelink-navy font-heading" data-testid="requests-title">
+          <h1 className="text-3xl font-bold text-carefd-navy font-heading" data-testid="requests-title">
             {t('requests')}
           </h1>
           {isPatientRole(user?.role) && (
             <button
               onClick={() => setShowCreateForm(!showCreateForm)}
-              className="bg-carelink-teal text-white px-6 py-2 rounded-lg hover:bg-carelink-teal-medium transition font-medium"
+              className="bg-carefd-teal text-white px-6 py-2 rounded-lg hover:bg-carefd-teal-medium transition font-medium"
               data-testid="create-request-btn-toggle"
             >
               {showCreateForm ? 'סגור' : t('createRequest')}
@@ -242,8 +242,8 @@ const Requests = () => {
               onClick={() => setActiveTab('all')}
               className={`px-4 py-2 rounded-lg font-medium transition ${
                 activeTab === 'all'
-                  ? 'bg-carelink-teal text-white'
-                  : 'bg-white text-carelink-navy border-2 border-carelink-light-gray hover:border-carelink-teal'
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-white text-carefd-navy border-2 border-carefd-light-gray hover:border-carefd-teal'
               }`}
               data-testid="tab-all-requests"
             >
@@ -254,8 +254,8 @@ const Requests = () => {
                 onClick={() => setActiveTab('my')}
                 className={`px-4 py-2 rounded-lg font-medium transition ${
                   activeTab === 'my'
-                    ? 'bg-carelink-teal text-white'
-                    : 'bg-white text-carelink-navy border-2 border-carelink-light-gray hover:border-carelink-teal'
+                    ? 'bg-carefd-teal text-white'
+                    : 'bg-white text-carefd-navy border-2 border-carefd-light-gray hover:border-carefd-teal'
                 }`}
                 data-testid="tab-my-requests"
               >
@@ -267,12 +267,12 @@ const Requests = () => {
 
         {/* Create Request Form */}
         {showCreateForm && (
-          <div className="bg-white p-6 rounded-xl shadow-lg mb-6 border-2 border-carelink-teal" data-testid="create-request-form">
-            <h2 className="text-xl font-semibold mb-4 text-carelink-navy">{t('createRequest')}</h2>
+          <div className="bg-white p-6 rounded-xl shadow-lg mb-6 border-2 border-carefd-teal" data-testid="create-request-form">
+            <h2 className="text-xl font-semibold mb-4 text-carefd-navy">{t('createRequest')}</h2>
             <form onSubmit={handleCreateRequest} className="space-y-4">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-carelink-navy">
+                <label className="block text-sm font-medium text-carefd-navy">
                   כותרת *
                 </label>
                 <input
@@ -280,7 +280,7 @@ const Requests = () => {
                   required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                  className="mt-1 block w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                   placeholder="תארו בקצרה את השירות שאתם מחפשים"
                   data-testid="request-title-input"
                 />
@@ -288,14 +288,14 @@ const Requests = () => {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-carelink-navy">
+                <label className="block text-sm font-medium text-carefd-navy">
                   פרטים נוספים *
                 </label>
                 <textarea
                   required
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                  className="mt-1 block w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                   rows="4"
                   placeholder="פרטו על הצורך, מצב רפואי רלוונטי, דרישות מיוחדות..."
                   data-testid="request-description-input"
@@ -304,7 +304,7 @@ const Requests = () => {
 
               {/* Professions - multi-select chips, up to 3 */}
               <div>
-                <label className="block text-sm font-medium text-carelink-navy mb-2">
+                <label className="block text-sm font-medium text-carefd-navy mb-2">
                   מקצוע (עד 3)
                 </label>
                 <div className="flex flex-wrap gap-2" data-testid="request-professions-select">
@@ -319,8 +319,8 @@ const Requests = () => {
                         onClick={() => handleProfessionToggle(profId)}
                         className={`px-3 py-1.5 rounded-full text-sm font-medium border-2 transition ${
                           isSelected
-                            ? 'bg-carelink-teal text-white border-carelink-teal'
-                            : 'bg-white text-carelink-navy border-carelink-light-gray hover:border-carelink-teal'
+                            ? 'bg-carefd-teal text-white border-carefd-teal'
+                            : 'bg-white text-carefd-navy border-carefd-light-gray hover:border-carefd-teal'
                         }`}
                       >
                         {profName}
@@ -332,7 +332,7 @@ const Requests = () => {
                   )}
                 </div>
                 {formData.professions.length > 0 && (
-                  <p className="text-xs text-carelink-gray mt-1">
+                  <p className="text-xs text-carefd-gray mt-1">
                     נבחרו {formData.professions.length}/3
                   </p>
                 )}
@@ -341,13 +341,13 @@ const Requests = () => {
               <div className="grid md:grid-cols-2 gap-4">
                 {/* Service Type - synced with backend */}
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
+                  <label className="block text-sm font-medium text-carefd-navy">
                     סוג שירות
                   </label>
                   <select
                     value={formData.service_type}
                     onChange={(e) => setFormData({ ...formData, service_type: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    className="mt-1 block w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                     data-testid="request-service-type-select"
                   >
                     <option value="">-- בחר סוג שירות --</option>
@@ -361,13 +361,13 @@ const Requests = () => {
 
                 {/* Delivery Type - synced with backend */}
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
+                  <label className="block text-sm font-medium text-carefd-navy">
                     דרך מתן השירות
                   </label>
                   <select
                     value={formData.delivery_type}
                     onChange={(e) => setFormData({ ...formData, delivery_type: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    className="mt-1 block w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                     data-testid="request-delivery-type-select"
                   >
                     <option value="">-- בחר דרך מתן שירות --</option>
@@ -381,7 +381,7 @@ const Requests = () => {
 
                 {/* Budget + Budget Type */}
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
+                  <label className="block text-sm font-medium text-carefd-navy">
                     תקציב
                   </label>
                   <div className="mt-1 flex gap-2">
@@ -389,14 +389,14 @@ const Requests = () => {
                       type="number"
                       value={formData.budget}
                       onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                      className="block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                      className="block w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                       placeholder="₪"
                       data-testid="request-budget-input"
                     />
                     <select
                       value={formData.budget_type}
                       onChange={(e) => setFormData({ ...formData, budget_type: e.target.value })}
-                      className="block w-32 px-2 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal text-sm"
+                      className="block w-32 px-2 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal text-sm"
                       data-testid="request-budget-type-select"
                     >
                       <option value="">סוג</option>
@@ -410,7 +410,7 @@ const Requests = () => {
                 {/* Hours Needed - shown when budget_type is per_hour */}
                 {formData.budget_type === 'per_hour' && (
                   <div>
-                    <label className="block text-sm font-medium text-carelink-navy">
+                    <label className="block text-sm font-medium text-carefd-navy">
                       מספר שעות דרושות
                     </label>
                     <input
@@ -418,7 +418,7 @@ const Requests = () => {
                       min="1"
                       value={formData.hours_needed}
                       onChange={(e) => setFormData({ ...formData, hours_needed: e.target.value })}
-                      className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                      className="mt-1 block w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                       placeholder="מספר שעות"
                       data-testid="request-hours-input"
                     />
@@ -427,13 +427,13 @@ const Requests = () => {
 
                 {/* Urgency */}
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
+                  <label className="block text-sm font-medium text-carefd-navy">
                     דחיפות
                   </label>
                   <select
                     value={formData.urgency}
                     onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    className="mt-1 block w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                     data-testid="request-urgency-select"
                   >
                     <option value="low">נמוכה</option>
@@ -445,41 +445,41 @@ const Requests = () => {
 
                 {/* Preferred Date */}
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
+                  <label className="block text-sm font-medium text-carefd-navy">
                     תאריך רצוי
                   </label>
                   <input
                     type="date"
                     value={formData.preferred_date}
                     onChange={(e) => setFormData({ ...formData, preferred_date: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    className="mt-1 block w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                     data-testid="request-date-input"
                   />
                 </div>
 
                 {/* Preferred Time */}
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
+                  <label className="block text-sm font-medium text-carefd-navy">
                     שעה רצויה
                   </label>
                   <input
                     type="time"
                     value={formData.preferred_time}
                     onChange={(e) => setFormData({ ...formData, preferred_time: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    className="mt-1 block w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                     data-testid="request-time-input"
                   />
                 </div>
 
                 {/* Gender Preference */}
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
+                  <label className="block text-sm font-medium text-carefd-navy">
                     העדפת מגדר
                   </label>
                   <select
                     value={formData.gender_preference}
                     onChange={(e) => setFormData({ ...formData, gender_preference: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    className="mt-1 block w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                     data-testid="request-gender-select"
                   >
                     <option value="">-- ללא העדפה --</option>
@@ -491,13 +491,13 @@ const Requests = () => {
 
                 {/* Request Type */}
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
+                  <label className="block text-sm font-medium text-carefd-navy">
                     {t('requestType')}
                   </label>
                   <select
                     value={formData.request_type}
                     onChange={(e) => setFormData({ ...formData, request_type: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    className="mt-1 block w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                     data-testid="request-type-select"
                   >
                     <option value="one_time">{t('one_time')}</option>
@@ -511,13 +511,13 @@ const Requests = () => {
               {/* Location - Region, City, Address, Address Notes */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
+                  <label className="block text-sm font-medium text-carefd-navy">
                     אזור
                   </label>
                   <select
                     value={formData.region}
                     onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    className="mt-1 block w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                     data-testid="request-region-select"
                   >
                     <option value="">-- בחר אזור --</option>
@@ -529,7 +529,7 @@ const Requests = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
+                  <label className="block text-sm font-medium text-carefd-navy">
                     עיר
                   </label>
                   <CitySelect
@@ -537,32 +537,32 @@ const Requests = () => {
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     placeholder="בחר עיר..."
-                    inputClassName="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    inputClassName="mt-1 block w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                     data-testid="request-city-input"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
+                  <label className="block text-sm font-medium text-carefd-navy">
                     כתובת
                   </label>
                   <input
                     type="text"
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    className="mt-1 block w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                     placeholder="רחוב, מספר בית"
                     data-testid="request-address-input"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy">
+                  <label className="block text-sm font-medium text-carefd-navy">
                     הערות לכתובת
                   </label>
                   <input
                     type="text"
                     value={formData.address_notes}
                     onChange={(e) => setFormData({ ...formData, address_notes: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                    className="mt-1 block w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                     placeholder="קומה, דירה, קוד כניסה..."
                     data-testid="request-address-notes-input"
                   />
@@ -571,7 +571,7 @@ const Requests = () => {
 
               {/* Language Preferences - multi-select chips */}
               <div>
-                <label className="block text-sm font-medium text-carelink-navy mb-2">
+                <label className="block text-sm font-medium text-carefd-navy mb-2">
                   העדפות שפה
                 </label>
                 <div className="flex flex-wrap gap-2" data-testid="request-languages-select">
@@ -584,8 +584,8 @@ const Requests = () => {
                         onClick={() => handleLanguageToggle(lang.value)}
                         className={`px-3 py-1.5 rounded-full text-sm font-medium border-2 transition ${
                           isSelected
-                            ? 'bg-carelink-teal text-white border-carelink-teal'
-                            : 'bg-white text-carelink-navy border-carelink-light-gray hover:border-carelink-teal'
+                            ? 'bg-carefd-teal text-white border-carefd-teal'
+                            : 'bg-white text-carefd-navy border-carefd-light-gray hover:border-carefd-teal'
                         }`}
                       >
                         {lang.label}
@@ -598,7 +598,7 @@ const Requests = () => {
               <div className="flex gap-4">
                 <button
                   type="submit"
-                  className="bg-carelink-teal text-white px-6 py-2 rounded-lg hover:bg-carelink-teal-medium transition"
+                  className="bg-carefd-teal text-white px-6 py-2 rounded-lg hover:bg-carefd-teal-medium transition"
                   data-testid="submit-request-btn"
                 >
                   {t('submit')}

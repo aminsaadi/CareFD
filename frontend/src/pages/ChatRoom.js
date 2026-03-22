@@ -158,7 +158,7 @@ const ChatRoom = () => {
 
   if (loading) {
     return (
-      <div className="h-screen flex flex-col bg-gradient-to-b from-carelink-navy to-carelink-teal">
+      <div className="h-screen flex flex-col bg-gradient-to-b from-carefd-navy to-carefd-teal">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
           <FaSpinner className="animate-spin text-4xl text-white" />
@@ -168,7 +168,7 @@ const ChatRoom = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-b from-carelink-navy to-carelink-teal" data-testid="chat-room">
+    <div className="h-screen flex flex-col bg-gradient-to-b from-carefd-navy to-carefd-teal" data-testid="chat-room">
       <Navbar />
       
       <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full min-h-0">
@@ -186,7 +186,7 @@ const ChatRoom = () => {
               
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-12 h-12 bg-carelink-teal rounded-full flex items-center justify-center text-white font-bold text-xl border-2 border-white/30">
+                  <div className="w-12 h-12 bg-carefd-teal rounded-full flex items-center justify-center text-white font-bold text-xl border-2 border-white/30">
                     {otherUserInitial}
                   </div>
                   <span className="absolute bottom-0 left-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
@@ -211,13 +211,13 @@ const ChatRoom = () => {
                   <div className="absolute left-0 top-full mt-2 bg-white rounded-xl shadow-xl py-2 min-w-[180px] z-10">
                     <Link 
                       to={`/providers/${roomInfo?.provider_id}`}
-                      className="block px-4 py-2.5 hover:bg-carelink-teal-pale text-carelink-navy text-sm"
+                      className="block px-4 py-2.5 hover:bg-carefd-teal-pale text-carefd-navy text-sm"
                     >
                       צפה בפרופיל
                     </Link>
                     <button
                       onClick={handleArchive}
-                      className="w-full text-right px-4 py-2.5 hover:bg-amber-50 text-carelink-navy text-sm flex items-center gap-3"
+                      className="w-full text-right px-4 py-2.5 hover:bg-amber-50 text-carefd-navy text-sm flex items-center gap-3"
                       data-testid="archive-chat-btn"
                     >
                       <FaArchive className="text-amber-500" />
@@ -275,20 +275,20 @@ const ChatRoom = () => {
                   >
                     <div className={`flex items-end gap-2 max-w-[80%] ${isOwn ? 'flex-row-reverse' : ''}`}>
                       {!isOwn && (
-                        <div className="w-8 h-8 bg-carelink-teal rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 mb-1">
+                        <div className="w-8 h-8 bg-carefd-teal rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0 mb-1">
                           {otherUserInitial}
                         </div>
                       )}
                       <div
                         className={`px-4 py-2.5 rounded-2xl shadow-sm ${
                           isOwn
-                            ? 'bg-carelink-teal text-white rounded-br-md'
-                            : 'bg-white text-carelink-navy rounded-bl-md'
+                            ? 'bg-carefd-teal text-white rounded-br-md'
+                            : 'bg-white text-carefd-navy rounded-bl-md'
                         }`}
                       >
                         <p className="break-words whitespace-pre-wrap text-[15px]">{message.content}</p>
                         <div className={`flex items-center gap-1 mt-1 ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                          <span className={`text-xs ${isOwn ? 'text-white/70' : 'text-carelink-gray'}`}>
+                          <span className={`text-xs ${isOwn ? 'text-white/70' : 'text-carefd-gray'}`}>
                             {formatMessageDate(message.created_at)}
                           </span>
                           {isOwn && (
@@ -331,7 +331,7 @@ const ChatRoom = () => {
             <button
               type="submit"
               disabled={sending || !newMessage.trim()}
-              className="bg-white text-carelink-teal p-3 rounded-full hover:bg-carelink-teal-pale transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+              className="bg-white text-carefd-teal p-3 rounded-full hover:bg-carefd-teal-pale transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
               data-testid="send-message-btn"
             >
               {sending ? (

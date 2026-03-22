@@ -95,13 +95,13 @@ const ProviderTeam = ({ provider }) => {
   return (
     <div className="space-y-4" data-testid="provider-team">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold text-carelink-navy flex items-center gap-2">
-          <FaUsers className="text-carelink-teal" />
+        <h3 className="text-xl font-bold text-carefd-navy flex items-center gap-2">
+          <FaUsers className="text-carefd-teal" />
           ניהול צוות
         </h3>
         <button
           onClick={() => { resetForm(); setShowForm(true); }}
-          className="bg-carelink-teal text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-carelink-teal-medium transition flex items-center gap-2"
+          className="bg-carefd-teal text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-carefd-teal-medium transition flex items-center gap-2"
           data-testid="add-member-btn"
         >
           <FaUserPlus /> הוסף חבר צוות
@@ -110,7 +110,7 @@ const ProviderTeam = ({ provider }) => {
 
       {/* Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl border-2 border-carelink-teal-pale shadow-sm space-y-4">
+        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl border-2 border-carefd-teal-pale shadow-sm space-y-4">
           <h4 className="font-semibold text-gray-900">{editingMember ? 'עריכת חבר צוות' : 'הוספת חבר צוות'}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -135,7 +135,7 @@ const ProviderTeam = ({ provider }) => {
             </div>
           </div>
           <div className="flex gap-3">
-            <button type="submit" className="bg-carelink-teal text-white px-6 py-2.5 rounded-xl font-medium hover:bg-carelink-teal-medium transition flex items-center gap-2" data-testid="save-member-btn">
+            <button type="submit" className="bg-carefd-teal text-white px-6 py-2.5 rounded-xl font-medium hover:bg-carefd-teal-medium transition flex items-center gap-2" data-testid="save-member-btn">
               <FaSave /> {editingMember ? 'עדכן' : 'הוסף'}
             </button>
             <button type="button" onClick={resetForm} className="border border-gray-300 text-gray-600 px-6 py-2.5 rounded-xl font-medium hover:bg-gray-50 transition">
@@ -148,7 +148,7 @@ const ProviderTeam = ({ provider }) => {
       {/* Members List */}
       {members.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-xl">
-          <FaUsers className="text-4xl text-carelink-teal-pale mx-auto mb-3" />
+          <FaUsers className="text-4xl text-carefd-teal-pale mx-auto mb-3" />
           <p className="text-gray-500">אין חברי צוות עדיין</p>
           <p className="text-sm text-gray-400 mt-1">הוסף את חברי הצוות שלך</p>
         </div>
@@ -163,16 +163,16 @@ const ProviderTeam = ({ provider }) => {
                   </div>
                   <div>
                     <h4 className="font-bold text-gray-900">{member.name}</h4>
-                    <p className="text-sm text-carelink-teal font-medium">{member.role}</p>
+                    <p className="text-sm text-carefd-teal font-medium">{member.role}</p>
                     {member.specialization && (
                       <p className="text-xs text-gray-500 mt-0.5">{member.specialization}</p>
                     )}
                     <div className="flex gap-3 mt-2 text-xs text-gray-500">
                       {member.phone && (
-                        <span className="flex items-center gap-1"><FaPhone className="text-carelink-teal" /> {member.phone}</span>
+                        <span className="flex items-center gap-1"><FaPhone className="text-carefd-teal" /> {member.phone}</span>
                       )}
                       {member.email && (
-                        <span className="flex items-center gap-1"><FaEnvelope className="text-carelink-teal" /> {member.email}</span>
+                        <span className="flex items-center gap-1"><FaEnvelope className="text-carefd-teal" /> {member.email}</span>
                       )}
                     </div>
                   </div>

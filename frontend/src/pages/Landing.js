@@ -367,11 +367,11 @@ const Landing = () => {
       <Navbar />
       
       {/* ==================== HERO SECTION ==================== */}
-      <section className="relative bg-gradient-to-br from-carelink-navy via-carelink-slate to-carelink-teal overflow-hidden" data-testid="hero-section">
+      <section className="relative bg-gradient-to-br from-carefd-navy via-carefd-slate to-carefd-teal overflow-hidden" data-testid="hero-section">
         {/* Background Elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-          <div className="absolute bottom-0 right-0 w-72 h-72 bg-carelink-teal rounded-full translate-x-1/3 translate-y-1/3"></div>
+          <div className="absolute bottom-0 right-0 w-72 h-72 bg-carefd-teal rounded-full translate-x-1/3 translate-y-1/3"></div>
           <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-white rounded-full -translate-x-1/2 -translate-y-1/2 opacity-5"></div>
         </div>
         
@@ -380,19 +380,19 @@ const Landing = () => {
             {/* Left Content */}
             <div className="text-white">
               <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-                <span className="w-2 h-2 bg-carelink-teal rounded-full animate-pulse"></span>
-                <span className="text-sm text-carelink-teal-pale">{siteSettings.site_tagline || 'הפלטפורמה המובילה לשירותי בריאות בישראל'}</span>
+                <span className="w-2 h-2 bg-carefd-teal rounded-full animate-pulse"></span>
+                <span className="text-sm text-carefd-teal-pale">{siteSettings.site_tagline || 'הפלטפורמה המובילה לשירותי בריאות בישראל'}</span>
               </div>
               
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 font-heading leading-tight" data-testid="hero-title">
                 מצא את שירותי
                 <br />
-                <span className="text-carelink-teal-light">הבריאות הטובים</span>
+                <span className="text-carefd-teal-light">הבריאות הטובים</span>
                 <br />
                 ביותר בישראל
               </h1>
               
-              <p className="text-lg lg:text-xl mb-8 text-carelink-teal-pale max-w-xl leading-relaxed" data-testid="hero-subtitle">
+              <p className="text-lg lg:text-xl mb-8 text-carefd-teal-pale max-w-xl leading-relaxed" data-testid="hero-subtitle">
                 פלטפורמה משולבת המחברת בין מטופלים לספקי שירותי בריאות איכותיים
               </p>
 
@@ -406,7 +406,7 @@ const Landing = () => {
                       onClick={() => setSearchTab('providers')}
                       className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
                         searchTab === 'providers'
-                          ? 'bg-white text-carelink-teal shadow-soft'
+                          ? 'bg-white text-carefd-teal shadow-soft'
                           : 'text-white hover:bg-white/10'
                       }`}
                       data-testid="search-tab-providers"
@@ -419,7 +419,7 @@ const Landing = () => {
                       onClick={() => setSearchTab('services')}
                       className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
                         searchTab === 'services'
-                          ? 'bg-white text-carelink-teal shadow-soft'
+                          ? 'bg-white text-carefd-teal shadow-soft'
                           : 'text-white hover:bg-white/10'
                       }`}
                       data-testid="search-tab-services"
@@ -433,7 +433,7 @@ const Landing = () => {
                   <div className="grid sm:grid-cols-2 gap-3 mb-3">
                     {/* Search Input with Dropdown */}
                     <div className="relative">
-                      <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray z-10" />
+                      <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-carefd-gray z-10" />
                       <input
                         ref={searchInputRef}
                         type="text"
@@ -441,7 +441,7 @@ const Landing = () => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onFocus={() => setShowSearchDropdown(true)}
                         placeholder={searchTab === 'providers' ? 'מקצוע, התמחות, שם ספק...' : 'סוג שירות, טיפול, התמחות...'}
-                        className="w-full input-soft text-carelink-navy px-5 py-3.5 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-carelink-teal placeholder-carelink-gray transition-all"
+                        className="w-full input-soft text-carefd-navy px-5 py-3.5 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-carefd-teal placeholder-carefd-gray transition-all"
                         data-testid="hero-search-input"
                       />
                       
@@ -453,7 +453,7 @@ const Landing = () => {
                           data-testid="search-dropdown"
                         >
                           <div className="p-3 border-b border-gray-100">
-                            <span className="text-xs font-semibold text-carelink-gray">חיפושים נפוצים</span>
+                            <span className="text-xs font-semibold text-carefd-gray">חיפושים נפוצים</span>
                           </div>
                           <div className="p-2">
                             {filteredSearches.map((search, index) => (
@@ -464,9 +464,9 @@ const Landing = () => {
                                   setSearchQuery(search);
                                   setShowSearchDropdown(false);
                                 }}
-                                className="w-full text-right px-3 py-2.5 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carelink-navy"
+                                className="w-full text-right px-3 py-2.5 hover:bg-carefd-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carefd-navy"
                               >
-                                <FaSearch className="text-carelink-gray text-sm" />
+                                <FaSearch className="text-carefd-gray text-sm" />
                                 <span>{search}</span>
                               </button>
                             ))}
@@ -478,7 +478,7 @@ const Landing = () => {
                     {/* Location Input with Dropdown */}
                     <div className="relative flex gap-2">
                       <div className="flex-1 relative">
-                        <FaMapMarkerAlt className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray z-10" />
+                        <FaMapMarkerAlt className="absolute right-4 top-1/2 -translate-y-1/2 text-carefd-gray z-10" />
                         <input
                           ref={locationInputRef}
                           type="text"
@@ -492,7 +492,7 @@ const Landing = () => {
                           }}
                           onFocus={() => setShowLocationDropdown(true)}
                           placeholder="עיר או אזור"
-                          className="w-full input-soft text-carelink-navy px-5 py-3.5 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-carelink-teal placeholder-carelink-gray transition-all"
+                          className="w-full input-soft text-carefd-navy px-5 py-3.5 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-carefd-teal placeholder-carefd-gray transition-all"
                           data-testid="hero-location-input"
                         />
                         
@@ -509,7 +509,7 @@ const Landing = () => {
                               onClick={() => {
                                 handleGetLocation();
                               }}
-                              className="w-full text-right px-4 py-3 hover:bg-carelink-teal-pale/30 transition-colors flex items-center gap-3 text-carelink-teal border-b border-gray-100"
+                              className="w-full text-right px-4 py-3 hover:bg-carefd-teal-pale/30 transition-colors flex items-center gap-3 text-carefd-teal border-b border-gray-100"
                             >
                               <FaCrosshairs className="text-lg" />
                               <span className="font-medium">השתמש במיקום שלי</span>
@@ -520,7 +520,7 @@ const Landing = () => {
                             {!locationQuery && (
                               <>
                                 <div className="p-3 border-b border-gray-100">
-                                  <span className="text-xs font-semibold text-carelink-gray">אזורים</span>
+                                  <span className="text-xs font-semibold text-carefd-gray">אזורים</span>
                                 </div>
                                 <div className="p-2">
                                   {displayRegions.map((region) => (
@@ -532,9 +532,9 @@ const Landing = () => {
                                         setUserLocation(null);
                                         setShowLocationDropdown(false);
                                       }}
-                                      className="w-full text-right px-3 py-2.5 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carelink-navy"
+                                      className="w-full text-right px-3 py-2.5 hover:bg-carefd-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carefd-navy"
                                     >
-                                      <FaMapMarkerAlt className="text-carelink-gray text-sm" />
+                                      <FaMapMarkerAlt className="text-carefd-gray text-sm" />
                                       <span>{region.name || region.name_he}</span>
                                     </button>
                                   ))}
@@ -546,7 +546,7 @@ const Landing = () => {
                             {locationQuery && filteredCities.length > 0 && (
                               <>
                                 <div className="p-3 border-b border-gray-100">
-                                  <span className="text-xs font-semibold text-carelink-gray">ערים</span>
+                                  <span className="text-xs font-semibold text-carefd-gray">ערים</span>
                                 </div>
                                 <div className="p-2">
                                   {filteredCities.map((city) => (
@@ -558,9 +558,9 @@ const Landing = () => {
                                         setUserLocation(null);
                                         setShowLocationDropdown(false);
                                       }}
-                                      className="w-full text-right px-3 py-2.5 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carelink-navy"
+                                      className="w-full text-right px-3 py-2.5 hover:bg-carefd-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carefd-navy"
                                     >
-                                      <FaMapMarkerAlt className="text-carelink-gray text-sm" />
+                                      <FaMapMarkerAlt className="text-carefd-gray text-sm" />
                                       <span>{city.name || city.name_he}</span>
                                     </button>
                                   ))}
@@ -576,7 +576,7 @@ const Landing = () => {
                         type="button"
                         onClick={handleGetLocation}
                         disabled={isLocating}
-                        className="btn-soft bg-carelink-teal-pale text-carelink-teal px-4 rounded-xl hover:bg-carelink-teal hover:text-white transition-all disabled:opacity-50 flex items-center justify-center btn-press"
+                        className="btn-soft bg-carefd-teal-pale text-carefd-teal px-4 rounded-xl hover:bg-carefd-teal hover:text-white transition-all disabled:opacity-50 flex items-center justify-center btn-press"
                         title="השתמש במיקום שלי"
                         data-testid="gps-btn"
                       >
@@ -588,7 +588,7 @@ const Landing = () => {
                   {/* Radius selector */}
                   {userLocation && (
                     <div className="mb-3 flex items-center gap-3 flex-wrap">
-                      <span className="text-carelink-slate text-sm">רדיוס:</span>
+                      <span className="text-carefd-slate text-sm">רדיוס:</span>
                       <div className="flex gap-2">
                         {radiusOptions.map((option) => (
                           <button
@@ -597,8 +597,8 @@ const Landing = () => {
                             onClick={() => setSelectedRadius(option.value)}
                             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                               selectedRadius === option.value
-                                ? 'bg-carelink-teal text-white'
-                                : 'bg-gray-100 text-carelink-slate hover:bg-gray-200'
+                                ? 'bg-carefd-teal text-white'
+                                : 'bg-gray-100 text-carefd-slate hover:bg-gray-200'
                             }`}
                           >
                             {option.label}
@@ -611,7 +611,7 @@ const Landing = () => {
                   {/* Search Button */}
                   <button
                     type="submit"
-                    className="w-full bg-carelink-teal text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-carelink-teal-medium transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                    className="w-full bg-carefd-teal text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-carefd-teal-medium transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
                     data-testid="hero-search-btn"
                   >
                     <FaSearch />
@@ -621,7 +621,7 @@ const Landing = () => {
                 
                 {/* Quick Region Tags */}
                 <div className="flex flex-wrap gap-2 mt-4">
-                  <span className="text-sm text-carelink-teal-pale">אזורים:</span>
+                  <span className="text-sm text-carefd-teal-pale">אזורים:</span>
                   {displayRegions.map((region) => (
                     <button
                       key={region.id || region.name}
@@ -642,7 +642,7 @@ const Landing = () => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   to="/register"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-carelink-teal px-8 py-4 rounded-xl font-semibold hover:bg-carelink-teal-pale transition-all shadow-lg"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-carefd-teal px-8 py-4 rounded-xl font-semibold hover:bg-carefd-teal-pale transition-all shadow-lg"
                   data-testid="get-started-btn"
                 >
                   התחל עכשיו
@@ -664,25 +664,25 @@ const Landing = () => {
               <AnimatedSection delay={100}>
                 <div className="glass-card-dark p-6 rounded-2xl hover-lift">
                   <div className="text-4xl font-bold text-white mb-2">{statistics.providers}+</div>
-                  <div className="text-carelink-teal-pale">ספקים מאומתים</div>
+                  <div className="text-carefd-teal-pale">ספקים מאומתים</div>
                 </div>
               </AnimatedSection>
               <AnimatedSection delay={200}>
                 <div className="glass-card-dark p-6 rounded-2xl mt-8 hover-lift">
                   <div className="text-4xl font-bold text-white mb-2">{statistics.services}+</div>
-                  <div className="text-carelink-teal-pale">שירותים זמינים</div>
+                  <div className="text-carefd-teal-pale">שירותים זמינים</div>
                 </div>
               </AnimatedSection>
               <AnimatedSection delay={300}>
                 <div className="glass-card-dark p-6 rounded-2xl hover-lift">
                   <div className="text-4xl font-bold text-white mb-2">{statistics.happyClients}+</div>
-                  <div className="text-carelink-teal-pale">לקוחות מרוצים</div>
+                  <div className="text-carefd-teal-pale">לקוחות מרוצים</div>
                 </div>
               </AnimatedSection>
               <AnimatedSection delay={400}>
                 <div className="glass-card-dark p-6 rounded-2xl mt-8 hover-lift">
                   <div className="text-4xl font-bold text-white mb-2">{statistics.cities}+</div>
-                  <div className="text-carelink-teal-pale">ערים בישראל</div>
+                  <div className="text-carefd-teal-pale">ערים בישראל</div>
                 </div>
               </AnimatedSection>
             </div>
@@ -695,8 +695,8 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-carelink-navy">חפש לפי מקצוע</h3>
-              <Link to="/providers" className="text-carelink-teal hover:text-carelink-teal-medium text-sm font-medium">
+              <h3 className="text-lg font-bold text-carefd-navy">חפש לפי מקצוע</h3>
+              <Link to="/providers" className="text-carefd-teal hover:text-carefd-teal-medium text-sm font-medium">
                 כל המקצועות ←
               </Link>
             </div>
@@ -722,10 +722,10 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection>
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-carelink-navy font-heading mb-4">
+              <h2 className="text-3xl font-bold text-carefd-navy font-heading mb-4">
                 קטגוריות שירותים
               </h2>
-              <p className="text-carelink-slate max-w-2xl mx-auto">
+              <p className="text-carefd-slate max-w-2xl mx-auto">
                 מצאו את השירות המתאים לכם מתוך מגוון רחב של קטגוריות
               </p>
             </div>
@@ -744,13 +744,13 @@ const Landing = () => {
                   <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
                   
                   <div className="relative z-10">
-                    <div className="w-14 h-14 mx-auto mb-3 rounded-xl bg-carelink-teal/10 flex items-center justify-center group-hover:bg-white/20 transition-all">
-                      <category.icon className="text-2xl text-carelink-teal group-hover:text-white transition-colors" />
+                    <div className="w-14 h-14 mx-auto mb-3 rounded-xl bg-carefd-teal/10 flex items-center justify-center group-hover:bg-white/20 transition-all">
+                      <category.icon className="text-2xl text-carefd-teal group-hover:text-white transition-colors" />
                     </div>
-                    <h3 className="font-bold text-carelink-navy group-hover:text-white transition-colors mb-1 text-base">
+                    <h3 className="font-bold text-carefd-navy group-hover:text-white transition-colors mb-1 text-base">
                       {category.name}
                     </h3>
-                    <p className="text-xs text-carelink-gray group-hover:text-white/80 transition-colors line-clamp-2">
+                    <p className="text-xs text-carefd-gray group-hover:text-white/80 transition-colors line-clamp-2">
                       {category.description}
                     </p>
                   </div>
@@ -767,14 +767,14 @@ const Landing = () => {
           <AnimatedSection>
             <div className="flex items-center justify-between mb-10">
               <div>
-                <h2 className="text-3xl font-bold text-carelink-navy font-heading mb-2">
+                <h2 className="text-3xl font-bold text-carefd-navy font-heading mb-2">
                   ספקים מומלצים
                 </h2>
-                <p className="text-carelink-slate">הספקים המובילים בפלטפורמה שלנו</p>
+                <p className="text-carefd-slate">הספקים המובילים בפלטפורמה שלנו</p>
               </div>
               <Link
                 to="/providers"
-                className="hidden md:flex items-center gap-2 text-carelink-teal hover:text-carelink-teal-medium font-medium"
+                className="hidden md:flex items-center gap-2 text-carefd-teal hover:text-carefd-teal-medium font-medium"
               >
                 צפה בכל הספקים
                 <FaArrowLeft className="rtl:rotate-180" />
@@ -784,7 +784,7 @@ const Landing = () => {
           
           {loading ? (
             <div className="flex justify-center py-12">
-              <FaSpinner className="animate-spin text-3xl text-carelink-teal" />
+              <FaSpinner className="animate-spin text-3xl text-carefd-teal" />
             </div>
           ) : featuredProviders.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -795,8 +795,8 @@ const Landing = () => {
           ) : (
             <div className="text-center py-12 bg-gray-50 rounded-2xl">
               <FaUsers className="mx-auto text-5xl text-gray-300 mb-4" />
-              <p className="text-carelink-slate text-lg mb-2">בקרוב יתווספו ספקים מומלצים...</p>
-              <Link to="/register/provider" className="text-carelink-teal font-semibold hover:underline">
+              <p className="text-carefd-slate text-lg mb-2">בקרוב יתווספו ספקים מומלצים...</p>
+              <Link to="/register/provider" className="text-carefd-teal font-semibold hover:underline">
                 הצטרפו כספק
               </Link>
             </div>
@@ -805,7 +805,7 @@ const Landing = () => {
           <div className="mt-8 text-center md:hidden">
             <Link
               to="/providers"
-              className="inline-flex items-center gap-2 text-carelink-teal font-semibold"
+              className="inline-flex items-center gap-2 text-carefd-teal font-semibold"
             >
               צפה בכל הספקים
               <FaArrowLeft className="rtl:rotate-180" />
@@ -819,14 +819,14 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-10">
             <div>
-              <h2 className="text-3xl font-bold text-carelink-navy font-heading mb-2">
+              <h2 className="text-3xl font-bold text-carefd-navy font-heading mb-2">
                 שירותים נפוצים
               </h2>
-              <p className="text-carelink-slate">השירותים הפופולריים ביותר בפלטפורמה</p>
+              <p className="text-carefd-slate">השירותים הפופולריים ביותר בפלטפורמה</p>
             </div>
             <Link
               to="/services"
-              className="hidden md:flex items-center gap-2 text-carelink-teal hover:text-carelink-teal-medium font-medium"
+              className="hidden md:flex items-center gap-2 text-carefd-teal hover:text-carefd-teal-medium font-medium"
             >
               צפה בכל השירותים
               <FaArrowLeft className="rtl:rotate-180" />
@@ -835,7 +835,7 @@ const Landing = () => {
           
           {loading ? (
             <div className="flex justify-center py-12">
-              <FaSpinner className="animate-spin text-3xl text-carelink-teal" />
+              <FaSpinner className="animate-spin text-3xl text-carefd-teal" />
             </div>
           ) : popularServices.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -846,14 +846,14 @@ const Landing = () => {
           ) : (
             <div className="text-center py-12 bg-white rounded-2xl">
               <FaHospital className="mx-auto text-5xl text-gray-300 mb-4" />
-              <p className="text-carelink-slate text-lg">בקרוב יתווספו שירותים נפוצים...</p>
+              <p className="text-carefd-slate text-lg">בקרוב יתווספו שירותים נפוצים...</p>
             </div>
           )}
           
           <div className="mt-8 text-center md:hidden">
             <Link
               to="/services"
-              className="inline-flex items-center gap-2 text-carelink-teal font-semibold"
+              className="inline-flex items-center gap-2 text-carefd-teal font-semibold"
             >
               צפה בכל השירותים
               <FaArrowLeft className="rtl:rotate-180" />
@@ -863,20 +863,20 @@ const Landing = () => {
       </section>
 
       {/* ==================== REQUEST BANNER ==================== */}
-      <section className="py-10 bg-gradient-to-l from-carelink-teal via-carelink-teal-medium to-carelink-navy" data-testid="request-banner-section">
+      <section className="py-10 bg-gradient-to-l from-carefd-teal via-carefd-teal-medium to-carefd-navy" data-testid="request-banner-section">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-right">
               <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
                 לא מצאתם מה שחיפשתם?
               </h3>
-              <p className="text-carelink-teal-pale text-lg">
+              <p className="text-carefd-teal-pale text-lg">
                 פרסמו בקשה וקבלו הצעות מספקים מתאימים ישירות אליכם
               </p>
             </div>
             <Link
               to="/requests?create=true"
-              className="inline-flex items-center gap-2 bg-white text-carelink-teal px-8 py-4 rounded-xl font-bold text-lg hover:bg-carelink-teal-pale transition-all shadow-soft-lg btn-press hover-scale whitespace-nowrap"
+              className="inline-flex items-center gap-2 bg-white text-carefd-teal px-8 py-4 rounded-xl font-bold text-lg hover:bg-carefd-teal-pale transition-all shadow-soft-lg btn-press hover-scale whitespace-nowrap"
               data-testid="request-banner-btn"
             >
               <FaSearch />
@@ -891,10 +891,10 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection>
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-carelink-navy font-heading mb-4">
+              <h2 className="text-3xl font-bold text-carefd-navy font-heading mb-4">
                 איך זה עובד?
               </h2>
-              <p className="text-carelink-slate max-w-2xl mx-auto">
+              <p className="text-carefd-slate max-w-2xl mx-auto">
                 שלושה צעדים פשוטים למציאת השירות המושלם
               </p>
             </div>
@@ -908,14 +908,14 @@ const Landing = () => {
             ].map((step, index) => (
               <AnimatedSection key={index} delay={index * 150}>
                 <div className="relative text-center group">
-                  <div className="shadow-soft w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-carelink-teal group-hover:scale-110 transition-all duration-300 bg-carelink-teal-pale/30">
-                    <step.icon className="text-3xl text-carelink-teal group-hover:text-white transition-colors" />
+                  <div className="shadow-soft w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-carefd-teal group-hover:scale-110 transition-all duration-300 bg-carefd-teal-pale/30">
+                    <step.icon className="text-3xl text-carefd-teal group-hover:text-white transition-colors" />
                   </div>
-                  <span className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-2 bg-carelink-navy text-white text-sm font-bold px-3 py-1 rounded-full shadow-soft badge-glow">
+                  <span className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-2 bg-carefd-navy text-white text-sm font-bold px-3 py-1 rounded-full shadow-soft badge-glow">
                     {step.num}
                   </span>
-                  <h3 className="text-xl font-bold text-carelink-navy mb-3">{step.title}</h3>
-                  <p className="text-carelink-slate leading-relaxed">{step.desc}</p>
+                  <h3 className="text-xl font-bold text-carefd-navy mb-3">{step.title}</h3>
+                  <p className="text-carefd-slate leading-relaxed">{step.desc}</p>
                 </div>
               </AnimatedSection>
             ))}
@@ -924,14 +924,14 @@ const Landing = () => {
       </section>
 
       {/* ==================== TESTIMONIALS ==================== */}
-      <section className="py-16 bg-carelink-navy" data-testid="testimonials-section">
+      <section className="py-16 bg-carefd-navy" data-testid="testimonials-section">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection>
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-white font-heading mb-4">
                 מה הלקוחות שלנו אומרים
               </h2>
-              <p className="text-carelink-teal-pale">אלפי לקוחות מרוצים כבר נהנים משירותים איכותיים</p>
+              <p className="text-carefd-teal-pale">אלפי לקוחות מרוצים כבר נהנים משירותים איכותיים</p>
             </div>
           </AnimatedSection>
           
@@ -946,12 +946,12 @@ const Landing = () => {
                   </div>
                   <p className="text-white mb-6 leading-relaxed">"{testimonial.content}"</p>
                   <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-carelink-teal rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  <div className="w-12 h-12 bg-carefd-teal rounded-full flex items-center justify-center text-white font-bold text-lg">
                     {testimonial.avatar}
                   </div>
                   <div>
                     <div className="font-semibold text-white">{testimonial.name}</div>
-                    <div className="text-sm text-carelink-teal-pale">{testimonial.role}</div>
+                    <div className="text-sm text-carefd-teal-pale">{testimonial.role}</div>
                   </div>
                 </div>
               </div>
@@ -967,7 +967,7 @@ const Landing = () => {
           <div className="grid md:grid-cols-2 gap-8">
             {/* For Patients */}
             <AnimatedSection delay={0}>
-              <div className="bg-gradient-to-br from-carelink-teal to-carelink-teal-medium p-8 rounded-2xl text-white shadow-soft-lg hover-lift">
+              <div className="bg-gradient-to-br from-carefd-teal to-carefd-teal-medium p-8 rounded-2xl text-white shadow-soft-lg hover-lift">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                     <FaUsers className="text-xl" />
@@ -982,14 +982,14 @@ const Landing = () => {
                     'נהל את התורים וההזמנות שלך במקום אחד'
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-3">
-                      <FaCheckCircle className="text-carelink-teal-pale mt-1 flex-shrink-0" />
+                      <FaCheckCircle className="text-carefd-teal-pale mt-1 flex-shrink-0" />
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
                 <Link
                   to="/register"
-                  className="inline-flex items-center gap-2 bg-white text-carelink-teal px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-pale transition-all btn-press shadow-soft"
+                  className="inline-flex items-center gap-2 bg-white text-carefd-teal px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-pale transition-all btn-press shadow-soft"
                 >
                   הרשם כמטופל
                   <FaArrowLeft className="rtl:rotate-180" />
@@ -999,7 +999,7 @@ const Landing = () => {
 
             {/* For Providers */}
             <AnimatedSection delay={200}>
-              <div className="bg-gradient-to-br from-carelink-navy to-carelink-slate p-8 rounded-2xl text-white shadow-soft-lg hover-lift">
+              <div className="bg-gradient-to-br from-carefd-navy to-carefd-slate p-8 rounded-2xl text-white shadow-soft-lg hover-lift">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                     <FaUserMd className="text-xl" />
@@ -1014,14 +1014,14 @@ const Landing = () => {
                   'בנה את המוניטין המקצועי שלך דרך ביקורות'
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <FaCheckCircle className="text-carelink-teal-pale mt-1 flex-shrink-0" />
+                    <FaCheckCircle className="text-carefd-teal-pale mt-1 flex-shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
               <Link
                 to="/register"
-                className="inline-flex items-center gap-2 bg-carelink-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition-all btn-press shadow-soft"
+                className="inline-flex items-center gap-2 bg-carefd-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition-all btn-press shadow-soft"
               >
                 הרשם כספק
                 <FaArrowLeft className="rtl:rotate-180" />
@@ -1033,19 +1033,19 @@ const Landing = () => {
       </section>
 
       {/* ==================== CTA SECTION ==================== */}
-      <section className="py-16 bg-gradient-to-br from-carelink-teal via-carelink-teal-medium to-carelink-navy" data-testid="cta-section">
+      <section className="py-16 bg-gradient-to-br from-carefd-teal via-carefd-teal-medium to-carefd-navy" data-testid="cta-section">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <AnimatedSection>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
               מוכנים להתחיל?
             </h2>
-            <p className="text-xl text-carelink-teal-pale mb-10 max-w-2xl mx-auto">
+            <p className="text-xl text-carefd-teal-pale mb-10 max-w-2xl mx-auto">
               הצטרפו לאלפי משתמשים שכבר מצאו את הטיפול המושלם עבורם
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/register"
-                className="inline-flex items-center justify-center gap-2 bg-white text-carelink-teal px-10 py-4 rounded-xl font-bold text-lg hover:bg-carelink-teal-pale transition-all shadow-soft-lg btn-press hover-scale"
+                className="inline-flex items-center justify-center gap-2 bg-white text-carefd-teal px-10 py-4 rounded-xl font-bold text-lg hover:bg-carefd-teal-pale transition-all shadow-soft-lg btn-press hover-scale"
                 data-testid="cta-register-btn"
               >
                 הרשמה

@@ -1,5 +1,5 @@
 """
-Tests for CareLink Enhanced User Dashboard Features:
+Tests for CareFD Enhanced User Dashboard Features:
 - User profile image upload/delete
 - User settings (first_name, last_name, phone, city, address)
 - Password change
@@ -14,9 +14,9 @@ import os
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
 # Test credentials
-USER_EMAIL = "user@carelink.co.il"
+USER_EMAIL = "user@carefd.com"
 USER_PASSWORD = "password"
-ADMIN_EMAIL = "admin@carelink.co.il"
+ADMIN_EMAIL = "admin@carefd.com"
 ADMIN_PASSWORD = "password"
 
 
