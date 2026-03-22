@@ -184,6 +184,15 @@ async def get_file(filename: str):
 
     ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
     media_type = CONTENT_TYPE_MAP.get(ext)
+
+    # For SVG files, add Content-Security-Policy to block inline scripts
+    if ext == 'svg':
+        return FileResponse(
+            str(file_path),
+            media_type=media_type,
+            headers={"Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'"}
+        )
+
     return FileResponse(str(file_path), media_type=media_type)
 
 
