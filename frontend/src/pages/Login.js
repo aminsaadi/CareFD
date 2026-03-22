@@ -122,7 +122,7 @@ const Login = () => {
           {/* Logo */}
           <div className="mb-10">
             <div className="bg-white/10 backdrop-blur-md px-10 py-5 rounded-2xl border border-white/10">
-              <Logo size="large" />
+              <Logo size="large" variant="white" />
             </div>
           </div>
 

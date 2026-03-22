@@ -28,7 +28,9 @@ const AdminLayout = ({ children }) => {
           pendingReviews: reviewsRes.data.reviews?.length || 0,
           pendingVerifications: providersRes.data.total || 0
         });
-      } catch (e) {}
+      } catch (e) {
+        console.warn('Failed to fetch badge counts:', e);
+      }
     };
     fetchBadgeCounts();
     const interval = setInterval(fetchBadgeCounts, 60000);

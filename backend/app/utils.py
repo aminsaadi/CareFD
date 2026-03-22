@@ -27,7 +27,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', '')
 if not SECRET_KEY:
     import secrets
     SECRET_KEY = secrets.token_hex(32)
-    logger.warning("SECRET_KEY not set! Generated a random key. Sessions will NOT survive restarts. Set SECRET_KEY in Railway variables.")
+    if IS_PRODUCTION:
+        logger.error("CRITICAL: SECRET_KEY not set in production! JWT sessions will NOT survive restarts. Set SECRET_KEY in environment variables immediately.")
+    else:
+        logger.warning("SECRET_KEY not set. Generated a random key for development. Sessions will NOT survive restarts.")
 
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'carefd.com@gmail.com')
 SMTP_HOST = os.environ.get('SMTP_HOST', 'smtp.gmail.com')

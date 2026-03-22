@@ -395,7 +395,7 @@ i18n
     lng: 'he', // default language
     fallbackLng: 'he',
     interpolation: {
-      escapeValue: false
+      escapeValue: true
     }
   });
 

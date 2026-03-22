@@ -140,9 +140,9 @@ const ResetPassword = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="w-full px-12 py-3 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal transition-colors"
-                      placeholder="לפחות 6 תווים"
+                      placeholder="לפחות 8 תווים"
                       required
-                      minLength={6}
+                      minLength={8}
                     />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-12 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
                       {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}

@@ -85,7 +85,7 @@ const ServiceCard = ({ service, showProvider = true }) => {
         </div>
 
         {/* Title & Description */}
-        <h3 className="text-lg font-bold text-gray-900 mb-1.5 line-clamp-1">{service.name}</h3>
+        <h3 className="text-lg font-bold text-gray-900 mb-1.5 line-clamp-1">{service.name || 'שירות'}</h3>
         <p className="text-gray-500 text-sm line-clamp-2 mb-4 leading-relaxed">{service.description}</p>
 
         {/* Price + Duration row */}
@@ -105,7 +105,7 @@ const ServiceCard = ({ service, showProvider = true }) => {
             )}
           </div>
           <div className="text-left">
-            <span className="text-2xl font-extrabold text-carefd-navy">₪{service.price}</span>
+            <span className="text-2xl font-extrabold text-carefd-navy">₪{service.price ?? 0}</span>
             {priceUnit && (
               <span className="text-xs text-gray-500 mr-1">/{priceUnit}</span>
             )}

@@ -2839,14 +2839,18 @@ async def admin_get_reports(
     revenue_by_date = {}
     for booking in bookings:
         if booking.get("status") == "completed" and booking.get("final_price"):
-            total_revenue += booking["final_price"]
+            try:
+                price = float(booking["final_price"])
+            except (TypeError, ValueError):
+                continue
+            total_revenue += price
             try:
                 created = booking.get("created_at", "")
                 if isinstance(created, str) and created:
                     date_obj = datetime.fromisoformat(created.replace("Z", "+00:00"))
                     date_key = date_obj.strftime(date_format)
-                    revenue_by_date[date_key] = revenue_by_date.get(date_key, 0) + booking["final_price"]
-            except:
+                    revenue_by_date[date_key] = revenue_by_date.get(date_key, 0) + price
+            except (ValueError, TypeError, AttributeError):
                 pass
     
     # New users in period

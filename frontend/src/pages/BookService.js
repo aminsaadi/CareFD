@@ -171,7 +171,7 @@ const BookService = () => {
     
     if (isHome && service.has_travel_cost && service.travel_cost) total += service.travel_cost;
     if (isDelivery && service.has_shipping && service.shipping_cost) {
-      if (!service.free_shipping_above || total < service.free_shipping_above) total += service.shipping_cost;
+      if (!service.free_shipping_above || total < service.free_shipping_above) total += (parseFloat(service.shipping_cost) || 0);
     }
     if (selectedDate) {
       const day = selectedDate.getDay();
@@ -216,6 +216,11 @@ const BookService = () => {
     }
     if (!acceptTerms) { toast.error('יש לאשר את תנאי השימוש'); return false; }
     if (!acceptCancellation) { toast.error('יש לאשר את מדיניות הביטולים'); return false; }
+    if (!isAuthenticated && guestMode) {
+      if (!guestDetails.name || !guestDetails.email || !guestDetails.phone) {
+        toast.error('אנא מלא את כל פרטי האורח'); return false;
+      }
+    }
     return true;
   };
 

@@ -210,8 +210,11 @@ async def login(credentials: UserLogin, request: Request = None, response: Respo
 
 
 @router.get("/auth/verify-email")
-async def verify_email(token: str):
+async def verify_email(token: str, request: Request = None):
     """Verify email address using the token from the verification link"""
+    # Rate limit: 10 verify attempts per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"verify_email:{get_client_ip(request)}", max_requests=10, window_seconds=900)
     verification = await db.email_verifications.find_one({"token": token}, {"_id": 0})
     if not verification:
         raise HTTPException(status_code=400, detail="invalid_token")
@@ -231,8 +234,11 @@ async def verify_email(token: str):
 
 
 @router.post("/auth/resend-verification")
-async def resend_verification(data: dict):
+async def resend_verification(data: dict, request: Request = None):
     """Resend email verification link"""
+    # Rate limit: 3 resend requests per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"resend_verification:{get_client_ip(request)}", max_requests=3, window_seconds=900)
     email = data.get("email")
     if not email:
         raise HTTPException(status_code=400, detail="Email required")
@@ -445,8 +451,11 @@ async def forgot_password(data: dict, request: Request = None):
     return {"message": "If the email exists, a reset link has been sent"}
 
 @router.get("/auth/reset-password/validate")
-async def validate_reset_token(token: str):
+async def validate_reset_token(token: str, request: Request = None):
     """Validate password reset token"""
+    # Rate limit: 10 validate attempts per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"validate_reset:{get_client_ip(request)}", max_requests=10, window_seconds=900)
     if not token:
         raise HTTPException(status_code=400, detail="Token is required")
     
@@ -464,8 +473,11 @@ async def validate_reset_token(token: str):
     return {"valid": True}
 
 @router.post("/auth/reset-password")
-async def reset_password(data: dict):
+async def reset_password(data: dict, request: Request = None):
     """Reset password with token"""
+    # Rate limit: 5 reset attempts per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"reset_password:{get_client_ip(request)}", max_requests=5, window_seconds=900)
     token = data.get("token")
     new_password = data.get("new_password")
     

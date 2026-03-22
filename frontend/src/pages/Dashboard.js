@@ -345,9 +345,9 @@ const Dashboard = () => {
   };
 
   const getInitials = () => {
-    const first = userForm.first_name || user?.name?.split(' ')[0] || '';
-    const last = userForm.last_name || user?.name?.split(' ')[1] || '';
-    return `${first[0] || ''}${last[0] || ''}`.toUpperCase() || 'U';
+    const first = userForm.first_name || user?.name?.split(' ')?.[0] || '';
+    const last = userForm.last_name || user?.name?.split(' ')?.[1] || '';
+    return `${first?.[0] || ''}${last?.[0] || ''}`.toUpperCase() || 'U';
   };
 
   // === Request CRUD functions ===
@@ -1902,8 +1902,8 @@ const Dashboard = () => {
                     <FaMapMarkerAlt /> כתובת
                   </p>
                   <p className="text-sm text-carefd-navy">
-                    {showBookingDetails.service_location.address}
-                    {showBookingDetails.service_location.city && `, ${showBookingDetails.service_location.city}`}
+                    {showBookingDetails.service_location?.address}
+                    {showBookingDetails.service_location?.city && `, ${showBookingDetails.service_location.city}`}
                   </p>
                 </div>
               )}

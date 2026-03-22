@@ -153,7 +153,7 @@ const Privacy = () => {
             </p>
             <div className="bg-gray-50 p-4 rounded-xl">
               <p className="text-carefd-slate">
-                <strong>אימייל:</strong> {settings.contact_email || 'privacy@example.com'}<br />
+                <strong>אימייל:</strong> {settings.contact_email || 'info@carefd.co.il'}<br />
                 <strong>טלפון:</strong> {settings.contact_phone || '03-1234567'}
               </p>
             </div>

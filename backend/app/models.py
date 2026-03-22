@@ -803,4 +803,4 @@ class Message(BaseModel):
 
 class MessageCreate(BaseModel):
     room_id: str
-    content: str
+    content: str = Field(..., min_length=1, max_length=2000)

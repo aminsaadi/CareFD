@@ -712,7 +712,7 @@ const ProviderProfile = () => {
                           >
                             <div className="flex items-center gap-4">
                               <div className="w-16 h-16 bg-carefd-navy rounded-xl flex items-center justify-center text-white text-xl font-bold">
-                                {member.name[0]}
+                                {(member.name || 'M')[0]}
                               </div>
                               <div>
                                 <h4 className="font-bold text-carefd-navy text-lg">{member.name}</h4>
@@ -736,7 +736,7 @@ const ProviderProfile = () => {
                         <div className="w-20 h-20 bg-carefd-navy rounded-xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
                           {(provider.business_name || 'ס')[0]}
                         </div>
-                        <h4 className="font-bold text-carefd-navy text-lg mb-1">{provider.business_name}</h4>
+                        <h4 className="font-bold text-carefd-navy text-lg mb-1">{provider.business_name || 'ספק שירותים'}</h4>
                         <p className="text-carefd-gray">בעלים</p>
                       </div>
                     )}
@@ -1084,7 +1084,7 @@ const ProviderProfile = () => {
       {showContactModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-carefd-navy mb-4">צור קשר עם {provider.business_name}</h3>
+            <h3 className="text-xl font-bold text-carefd-navy mb-4">צור קשר עם {provider.business_name || 'הספק'}</h3>
             <p className="text-carefd-gray mb-6">
               שלח הודעה ישירה לספק השירות
             </p>

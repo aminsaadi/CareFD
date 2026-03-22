@@ -109,7 +109,7 @@ app.add_middleware(
 if not IS_PRODUCTION:
     @api_router.post("/debug/test-post")
     async def test_post():
-        return {"message": "POST works!", "cors_origins": cors_origins_env[:50] if cors_origins_env else "not set"}
+        return {"message": "POST works!"}
 
 # Serve frontend static files if available
 STATIC_DIR = Path(__file__).parent / "static"

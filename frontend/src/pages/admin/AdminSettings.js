@@ -194,7 +194,9 @@ const AdminSettings = () => {
         smtp_user: d.smtp_user || '',
         smtp_password: ''
       });
-    } catch (e) {}
+    } catch (e) {
+      console.error('Failed to load SMTP settings:', e);
+    }
   };
 
   const saveSmtpSettings = async () => {

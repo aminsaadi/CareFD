@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from datetime import datetime, timezone
 import uuid
+import html as html_module
 
 from app.database import db
 from app.utils import send_email_async, create_notification
@@ -50,12 +51,12 @@ async def submit_contact_form(contact_data: dict):
         f"""
         <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #19B8BA;">תודה שפנית אלינו!</h2>
-            <p>שלום {name},</p>
+            <p>שלום {html_module.escape(name)},</p>
             <p>קיבלנו את הפנייה שלך ונחזור אליך בהקדם האפשרי.</p>
             <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <strong>נושא הפנייה:</strong> {subject}<br>
+                <strong>נושא הפנייה:</strong> {html_module.escape(subject)}<br>
                 <strong>ההודעה שלך:</strong><br>
-                {message}
+                {html_module.escape(message)}
             </div>
             <p>בברכה,<br>צוות CareFD</p>
         </div>

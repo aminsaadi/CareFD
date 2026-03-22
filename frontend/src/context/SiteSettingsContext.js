@@ -3,6 +3,8 @@ import api from '../utils/api';
 
 const SiteSettingsContext = createContext({});
 
+const SETTINGS_CACHE_KEY = 'site_settings_cache';
+
 const DEFAULT_SETTINGS = {
   site_name: '',
   site_tagline: '',
@@ -20,8 +22,20 @@ const DEFAULT_SETTINGS = {
   footer_links: []
 };
 
+const getCachedSettings = () => {
+  try {
+    const cached = localStorage.getItem(SETTINGS_CACHE_KEY);
+    if (cached) {
+      return { ...DEFAULT_SETTINGS, ...JSON.parse(cached) };
+    }
+  } catch {
+    // Ignore invalid cache
+  }
+  return DEFAULT_SETTINGS;
+};
+
 export const SiteSettingsProvider = ({ children }) => {
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState(getCachedSettings);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -31,6 +45,11 @@ export const SiteSettingsProvider = ({ children }) => {
         if (response.data) {
           const newSettings = { ...DEFAULT_SETTINGS, ...response.data };
           setSettings(newSettings);
+          try {
+            localStorage.setItem(SETTINGS_CACHE_KEY, JSON.stringify(response.data));
+          } catch {
+            // Ignore storage errors
+          }
 
           // Update document title and meta from DB settings
           if (newSettings.site_name) {
