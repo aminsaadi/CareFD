@@ -79,7 +79,11 @@ const SplashScreen = ({ onComplete }) => {
           דלג
         </button>
         <div className="flex items-center gap-2">
-          <img src="/logo.svg" alt={siteSettings.site_name || 'CareZone'} className="h-8 w-auto" />
+          {siteSettings.logo_url ? (
+            <img src={siteSettings.logo_url} alt={siteSettings.site_name || 'CareLink'} className="h-8 w-auto" />
+          ) : (
+            <span className="text-xl font-bold text-carelink-navy">{siteSettings.site_name || 'CareLink'}</span>
+          )}
         </div>
         <div className="w-16"></div>
       </div>
