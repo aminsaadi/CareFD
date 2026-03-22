@@ -1299,7 +1299,7 @@ async def get_public_settings():
     settings = await db.site_settings.find_one({}, {"_id": 0})
     if not settings:
         settings = {
-            "site_name": "",
+            "site_name": "CareFD",
             "site_tagline": "Connecting Care Providers",
             "logo_url": "",
             "favicon_url": "",
@@ -1337,7 +1337,7 @@ async def admin_get_settings(
     if not settings:
         # Return default settings
         settings = {
-            "site_name": "",
+            "site_name": "CareFD",
             "site_tagline": "Connecting Care Providers",
             "logo_url": "",
             "favicon_url": "",
