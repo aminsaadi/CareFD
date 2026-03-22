@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import { FaMapMarkerAlt, FaUserMd, FaCalendarCheck, FaArrowLeft, FaChevronLeft } from 'react-icons/fa';
 
-const SPLASH_KEY = 'carezone_onboarding_seen';
+const SPLASH_KEY = 'carefd_onboarding_seen';
 
 const slides = [
   {

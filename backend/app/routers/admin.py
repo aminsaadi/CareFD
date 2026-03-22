@@ -1300,7 +1300,7 @@ async def get_public_settings():
     if not settings:
         settings = {
             "site_name": "CareFD",
-            "site_tagline": "Connecting Care Providers",
+            "site_tagline": "מחברים בין מטופלים לספקי שירותי בריאות",
             "logo_url": "",
             "favicon_url": "",
             "contact_email": "",
@@ -1338,7 +1338,7 @@ async def admin_get_settings(
         # Return default settings
         settings = {
             "site_name": "CareFD",
-            "site_tagline": "Connecting Care Providers",
+            "site_tagline": "מחברים בין מטופלים לספקי שירותי בריאות",
             "logo_url": "",
             "favicon_url": "",
             "contact_email": "",

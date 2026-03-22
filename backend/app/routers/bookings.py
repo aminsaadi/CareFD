@@ -10,7 +10,7 @@ from app.models import Booking, BookingCreate, BookingStatus, ContactPerson, Ser
 from app.utils import get_current_user, send_email_async, create_notification, send_push_to_user
 from app.rate_limiter import rate_limiter, get_client_ip
 
-SITE_URL = os.environ.get('SITE_URL', 'https://carelink.co.il').rstrip('/')
+SITE_URL = os.environ.get('SITE_URL', 'https://carefd.co.il').rstrip('/')
 
 router = APIRouter()
 
