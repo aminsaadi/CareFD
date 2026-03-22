@@ -5,7 +5,7 @@ import {
   FaGripLines, FaUndo, FaKeyboard, FaHighlighter, FaEyeSlash
 } from 'react-icons/fa';
 
-const STORAGE_KEY = 'carelink_a11y';
+const STORAGE_KEY = 'carefd_a11y';
 
 const defaultSettings = {
   fontSize: 0,

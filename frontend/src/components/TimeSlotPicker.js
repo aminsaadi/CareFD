@@ -158,7 +158,7 @@ const TimeSlotPicker = ({ selectedDate, availability = [], onTimeSelect, bookedT
 
   if (!selectedDate) {
     return (
-      <div className="text-center text-carelink-gray py-8">
+      <div className="text-center text-carefd-gray py-8">
         אנא בחר תאריך תחילה
       </div>
     );
@@ -166,7 +166,7 @@ const TimeSlotPicker = ({ selectedDate, availability = [], onTimeSelect, bookedT
 
   if (timeSlots.length === 0) {
     return (
-      <div className="text-center text-carelink-gray py-8">
+      <div className="text-center text-carefd-gray py-8">
         אין שעות פנויות בתאריך זה
       </div>
     );
@@ -174,7 +174,7 @@ const TimeSlotPicker = ({ selectedDate, availability = [], onTimeSelect, bookedT
 
   return (
     <div className="time-slot-picker">
-      <h3 className="text-lg font-semibold mb-4 text-carelink-navy">
+      <h3 className="text-lg font-semibold mb-4 text-carefd-navy">
         בחר שעה ל-{format(selectedDate, 'dd/MM/yyyy')}
       </h3>
       <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
@@ -187,8 +187,8 @@ const TimeSlotPicker = ({ selectedDate, availability = [], onTimeSelect, bookedT
               slot.isBooked
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 : selectedTime === slot.time
-                ? 'bg-carelink-teal text-white shadow-lg'
-                : 'bg-white border-2 border-carelink-teal-pale text-carelink-navy hover:bg-carelink-teal-pale hover:border-carelink-teal'
+                ? 'bg-carefd-teal text-white shadow-lg'
+                : 'bg-white border-2 border-carefd-teal-pale text-carefd-navy hover:bg-carefd-teal-pale hover:border-carefd-teal'
             }`}
             data-testid={`time-slot-${slot.time}`}
           >

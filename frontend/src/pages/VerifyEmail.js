@@ -33,13 +33,13 @@ const VerifyEmail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-carelink-teal-pale to-white flex items-center justify-center p-4" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-carefd-teal-pale to-white flex items-center justify-center p-4" dir="rtl">
       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center" data-testid="verify-email-page">
         {status === 'loading' && (
           <div>
-            <FaSpinner className="text-5xl text-carelink-teal mx-auto mb-4 animate-spin" />
-            <h2 className="text-xl font-bold text-carelink-navy mb-2">מאמת את כתובת הדואר...</h2>
-            <p className="text-carelink-gray">אנא המתן רגע</p>
+            <FaSpinner className="text-5xl text-carefd-teal mx-auto mb-4 animate-spin" />
+            <h2 className="text-xl font-bold text-carefd-navy mb-2">מאמת את כתובת הדואר...</h2>
+            <p className="text-carefd-gray">אנא המתן רגע</p>
           </div>
         )}
 
@@ -48,13 +48,13 @@ const VerifyEmail = () => {
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <FaCheckCircle className="text-4xl text-green-500" />
             </div>
-            <h2 className="text-2xl font-bold text-carelink-navy mb-3">המייל אומת בהצלחה!</h2>
-            <p className="text-carelink-gray mb-6">
-              כתובת הדואר {email && <strong className="text-carelink-navy">{email}</strong>} אומתה. כעת תוכל להתחבר לחשבונך.
+            <h2 className="text-2xl font-bold text-carefd-navy mb-3">המייל אומת בהצלחה!</h2>
+            <p className="text-carefd-gray mb-6">
+              כתובת הדואר {email && <strong className="text-carefd-navy">{email}</strong>} אומתה. כעת תוכל להתחבר לחשבונך.
             </p>
             <Link
               to="/login"
-              className="inline-block bg-carelink-teal text-white px-8 py-3 rounded-xl font-bold hover:bg-carelink-teal/90 transition text-lg"
+              className="inline-block bg-carefd-teal text-white px-8 py-3 rounded-xl font-bold hover:bg-carefd-teal/90 transition text-lg"
               data-testid="go-to-login-btn"
             >
               התחבר לחשבון
@@ -67,13 +67,13 @@ const VerifyEmail = () => {
             <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <FaTimesCircle className="text-4xl text-amber-500" />
             </div>
-            <h2 className="text-2xl font-bold text-carelink-navy mb-3">הלינק פג תוקף</h2>
-            <p className="text-carelink-gray mb-6">
+            <h2 className="text-2xl font-bold text-carefd-navy mb-3">הלינק פג תוקף</h2>
+            <p className="text-carefd-gray mb-6">
               קישור האימות פג תוקפו. אנא בקש קישור אימות חדש מדף ההתחברות.
             </p>
             <Link
               to="/login"
-              className="inline-block bg-carelink-teal text-white px-8 py-3 rounded-xl font-bold hover:bg-carelink-teal/90 transition"
+              className="inline-block bg-carefd-teal text-white px-8 py-3 rounded-xl font-bold hover:bg-carefd-teal/90 transition"
               data-testid="go-to-login-expired-btn"
             >
               חזור להתחברות
@@ -86,13 +86,13 @@ const VerifyEmail = () => {
             <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <FaTimesCircle className="text-4xl text-red-500" />
             </div>
-            <h2 className="text-2xl font-bold text-carelink-navy mb-3">שגיאה באימות</h2>
-            <p className="text-carelink-gray mb-6">
+            <h2 className="text-2xl font-bold text-carefd-navy mb-3">שגיאה באימות</h2>
+            <p className="text-carefd-gray mb-6">
               קישור האימות אינו תקין. ייתכן שכבר השתמשת בו.
             </p>
             <Link
               to="/login"
-              className="inline-block bg-carelink-teal text-white px-8 py-3 rounded-xl font-bold hover:bg-carelink-teal/90 transition"
+              className="inline-block bg-carefd-teal text-white px-8 py-3 rounded-xl font-bold hover:bg-carefd-teal/90 transition"
               data-testid="go-to-login-error-btn"
             >
               חזור להתחברות

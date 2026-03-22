@@ -14,9 +14,9 @@ import io
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://carelink-preview-5.preview.emergentagent.com"
+    BASE_URL = "https://carefd-preview-5.preview.emergentagent.com"
 
-TEST_EMAIL = "enhanced_profile_test@carelink.co.il"
+TEST_EMAIL = "enhanced_profile_test@carefd.com"
 TEST_PASSWORD = "testpass123"
 
 class TestEnhancedProviderProfile:

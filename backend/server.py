@@ -85,9 +85,9 @@ if cors_origins_env:
 elif IS_PRODUCTION:
     # Include Railway URLs alongside the main domain
     cors_origins = [
-        "https://carelink.co.il",
-        "https://www.carelink.co.il",
-        "https://carelinkproduction.up.railway.app",
+        "https://carefd.com",
+        "https://www.carefd.com",
+        "https://carefdproduction.up.railway.app",
     ]
     # Also include RAILWAY_PUBLIC_DOMAIN if set
     railway_domain = os.environ.get('RAILWAY_PUBLIC_DOMAIN')
@@ -131,7 +131,7 @@ if STATIC_DIR.exists():
 @app.on_event("startup")
 async def startup_db_client():
     """Verify database connection and environment on startup."""
-    logger.info(f"Starting Carelink in {ENVIRONMENT} mode")
+    logger.info(f"Starting CareFD in {ENVIRONMENT} mode")
 
     # Log all registered routes for debugging
     logger.info("=== Registered Routes ===")

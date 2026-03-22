@@ -125,7 +125,7 @@ const MyBookings = () => {
   const getStatusColor = (status) => {
     const colors = {
       pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-      confirmed: 'bg-carelink-teal-pale text-carelink-teal border-carelink-teal',
+      confirmed: 'bg-carefd-teal-pale text-carefd-teal border-carefd-teal',
       completed: 'bg-green-100 text-green-800 border-green-300',
       cancelled: 'bg-red-100 text-red-800 border-red-300'
     };
@@ -147,17 +147,17 @@ const MyBookings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale">
+    <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-carelink-navy font-heading" data-testid="my-bookings-title">
+          <h1 className="text-3xl font-bold text-carefd-navy font-heading" data-testid="my-bookings-title">
             {t('myBookings')}
           </h1>
           <Link
             to="/services"
-            className="bg-carelink-teal text-white px-6 py-2 rounded-lg hover:bg-carelink-teal-medium transition-colors"
+            className="bg-carefd-teal text-white px-6 py-2 rounded-lg hover:bg-carefd-teal-medium transition-colors"
           >
             הזמן שירות חדש
           </Link>
@@ -170,8 +170,8 @@ const MyBookings = () => {
               onClick={() => setFilter('all')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filter === 'all'
-                  ? 'bg-carelink-teal text-white'
-                  : 'bg-carelink-light-gray text-carelink-navy hover:bg-carelink-teal-pale'
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-light-gray text-carefd-navy hover:bg-carefd-teal-pale'
               }`}
             >
               הכל ({bookings.length})
@@ -180,8 +180,8 @@ const MyBookings = () => {
               onClick={() => setFilter('pending')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filter === 'pending'
-                  ? 'bg-carelink-teal text-white'
-                  : 'bg-carelink-light-gray text-carelink-navy hover:bg-carelink-teal-pale'
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-light-gray text-carefd-navy hover:bg-carefd-teal-pale'
               }`}
             >
               ממתינות ({bookings.filter(b => b.status === 'pending').length})
@@ -190,8 +190,8 @@ const MyBookings = () => {
               onClick={() => setFilter('confirmed')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filter === 'confirmed'
-                  ? 'bg-carelink-teal text-white'
-                  : 'bg-carelink-light-gray text-carelink-navy hover:bg-carelink-teal-pale'
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-light-gray text-carefd-navy hover:bg-carefd-teal-pale'
               }`}
             >
               מאושרות ({bookings.filter(b => b.status === 'confirmed').length})
@@ -200,8 +200,8 @@ const MyBookings = () => {
               onClick={() => setFilter('completed')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 filter === 'completed'
-                  ? 'bg-carelink-teal text-white'
-                  : 'bg-carelink-light-gray text-carelink-navy hover:bg-carelink-teal-pale'
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-light-gray text-carefd-navy hover:bg-carefd-teal-pale'
               }`}
             >
               הושלמו ({bookings.filter(b => b.status === 'completed').length})
@@ -212,22 +212,22 @@ const MyBookings = () => {
         {/* Bookings List */}
         {filteredBookings.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <p className="text-carelink-gray text-lg">אין הזמנות</p>
+            <p className="text-carefd-gray text-lg">אין הזמנות</p>
           </div>
         ) : (
           <div className="space-y-4">
             {filteredBookings.map((booking) => (
               <div
                 key={booking.booking_id}
-                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border-2 border-carelink-teal-pale"
+                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow border-2 border-carefd-teal-pale"
                 data-testid={`booking-${booking.booking_id}`}
               >
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-xl font-bold text-carelink-navy">
+                    <h3 className="text-xl font-bold text-carefd-navy">
                       {booking.service?.name || 'שירות'}
                     </h3>
-                    <p className="text-carelink-gray">
+                    <p className="text-carefd-gray">
                       {booking.provider?.business_name || 'ספק שירותים'}
                     </p>
                   </div>
@@ -241,15 +241,15 @@ const MyBookings = () => {
 
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <span className="font-semibold text-carelink-navy">תאריך:</span>
-                    <span className="mr-2 text-carelink-slate">
+                    <span className="font-semibold text-carefd-navy">תאריך:</span>
+                    <span className="mr-2 text-carefd-slate">
                       {booking.booking_date ? format(new Date(booking.booking_date), 'dd/MM/yyyy HH:mm') : ''}
                     </span>
                   </div>
                   {booking.service?.price && (
                     <div>
-                      <span className="font-semibold text-carelink-navy">מחיר:</span>
-                      <span className="text-carelink-teal font-bold mr-2">₪{booking.service.price}</span>
+                      <span className="font-semibold text-carefd-navy">מחיר:</span>
+                      <span className="text-carefd-teal font-bold mr-2">₪{booking.service.price}</span>
                     </div>
                   )}
                 </div>
@@ -268,7 +268,7 @@ const MyBookings = () => {
                 
                 {/* Review button for completed bookings */}
                 {booking.status === 'completed' && !reviewedBookings.includes(booking.booking_id) && (
-                  <div className="flex gap-2 mt-4 pt-4 border-t border-carelink-teal-pale">
+                  <div className="flex gap-2 mt-4 pt-4 border-t border-carefd-teal-pale">
                     <button
                       onClick={() => setShowReviewModal(booking)}
                       className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition-colors flex items-center gap-2"
@@ -279,7 +279,7 @@ const MyBookings = () => {
                     </button>
                     <Link
                       to={`/providers/${booking.provider?.provider_id || booking.service?.provider_id}`}
-                      className="bg-carelink-teal text-white px-4 py-2 rounded-lg hover:bg-carelink-teal-medium transition-colors"
+                      className="bg-carefd-teal text-white px-4 py-2 rounded-lg hover:bg-carefd-teal-medium transition-colors"
                     >
                       צפה בפרופיל הספק
                     </Link>
@@ -287,7 +287,7 @@ const MyBookings = () => {
                 )}
                 
                 {booking.status === 'completed' && reviewedBookings.includes(booking.booking_id) && (
-                  <div className="flex items-center gap-2 mt-4 pt-4 border-t border-carelink-teal-pale text-green-600">
+                  <div className="flex items-center gap-2 mt-4 pt-4 border-t border-carefd-teal-pale text-green-600">
                     <FaStar className="text-yellow-500" />
                     <span>ביקורת נשלחה - תודה!</span>
                   </div>
@@ -313,14 +313,14 @@ const MyBookings = () => {
       {showReviewModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowReviewModal(null)}>
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" role="dialog" aria-modal="true" aria-label="כתוב ביקורת" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold text-carelink-navy mb-2">כתוב ביקורת</h3>
-            <p className="text-carelink-gray mb-6">
+            <h3 className="text-xl font-bold text-carefd-navy mb-2">כתוב ביקורת</h3>
+            <p className="text-carefd-gray mb-6">
               ספר לנו על החוויה שלך עם {showReviewModal.provider?.business_name || 'הספק'}
             </p>
             
             {/* Star Rating */}
             <div className="mb-4">
-              <label className="block text-sm font-medium text-carelink-navy mb-2">דירוג</label>
+              <label className="block text-sm font-medium text-carefd-navy mb-2">דירוג</label>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -341,7 +341,7 @@ const MyBookings = () => {
                     />
                   </button>
                 ))}
-                <span className="mr-3 text-sm text-carelink-gray self-center">
+                <span className="mr-3 text-sm text-carefd-gray self-center">
                   {reviewRating > 0 && `${reviewRating} מתוך 5`}
                 </span>
               </div>
@@ -349,17 +349,17 @@ const MyBookings = () => {
 
             {/* Comment */}
             <div className="mb-4">
-              <label className="block text-sm font-medium text-carelink-navy mb-2">הביקורת שלך</label>
+              <label className="block text-sm font-medium text-carefd-navy mb-2">הביקורת שלך</label>
               <textarea
                 value={reviewComment}
                 onChange={(e) => setReviewComment(e.target.value)}
                 placeholder="ספר/י על החוויה שלך עם הספק..."
                 rows={4}
                 maxLength={500}
-                className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal resize-none"
+                className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal resize-none"
                 data-testid="review-modal-comment"
               />
-              <p className="text-xs text-carelink-gray mt-1">{reviewComment.length}/500 תווים</p>
+              <p className="text-xs text-carefd-gray mt-1">{reviewComment.length}/500 תווים</p>
             </div>
 
             <div className="flex gap-3">
@@ -369,14 +369,14 @@ const MyBookings = () => {
                   setReviewRating(0);
                   setReviewComment('');
                 }}
-                className="flex-1 bg-gray-100 text-carelink-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
+                className="flex-1 bg-gray-100 text-carefd-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
               >
                 ביטול
               </button>
               <button
                 onClick={() => handleSubmitReview(showReviewModal)}
                 disabled={isSubmittingReview}
-                className="flex-1 bg-carelink-teal text-white py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 bg-carefd-teal text-white py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition disabled:opacity-50 flex items-center justify-center gap-2"
                 data-testid="submit-review-modal-btn"
               >
                 {isSubmittingReview ? (

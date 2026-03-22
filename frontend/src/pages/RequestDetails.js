@@ -201,22 +201,22 @@ const RequestDetails = () => {
   const isProvider = user?.role === 'provider';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale">
+    <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale">
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold mb-6 text-carelink-navy font-heading" data-testid="request-details-title">
+        <h1 className="text-3xl font-bold mb-6 text-carefd-navy font-heading" data-testid="request-details-title">
           {request.title}
         </h1>
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Request Details */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white p-6 rounded-xl shadow-lg border-2 border-carelink-teal-pale">
+            <div className="bg-white p-6 rounded-xl shadow-lg border-2 border-carefd-teal-pale">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h2 className="text-2xl font-bold text-carelink-navy">{request.title}</h2>
-                  <p className="text-carelink-gray text-sm">
+                  <h2 className="text-2xl font-bold text-carefd-navy">{request.title}</h2>
+                  <p className="text-carefd-gray text-sm">
                     {request.created_at ? format(new Date(request.created_at), 'dd/MM/yyyy HH:mm') : ''}
                   </p>
                 </div>
@@ -238,17 +238,17 @@ const RequestDetails = () => {
 
               <div className="space-y-3">
                 <div>
-                  <h3 className="font-semibold text-carelink-navy mb-2">תיאור:</h3>
-                  <p className="text-carelink-slate">{request.description}</p>
+                  <h3 className="font-semibold text-carefd-navy mb-2">תיאור:</h3>
+                  <p className="text-carefd-slate">{request.description}</p>
                 </div>
 
                 {/* Professions */}
                 {request.professions && request.professions.length > 0 && (
                   <div>
-                    <span className="font-semibold text-carelink-navy">מקצוע:</span>
+                    <span className="font-semibold text-carefd-navy">מקצוע:</span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {request.professions.map((prof, idx) => (
-                        <span key={idx} className="bg-carelink-teal-pale text-carelink-teal text-sm px-3 py-1 rounded-full">
+                        <span key={idx} className="bg-carefd-teal-pale text-carefd-teal text-sm px-3 py-1 rounded-full">
                           {prof}
                         </span>
                       ))}
@@ -259,39 +259,39 @@ const RequestDetails = () => {
                 {/* Legacy specialization fallback */}
                 {(!request.professions || request.professions.length === 0) && request.specialization && (
                   <div>
-                    <span className="font-semibold text-carelink-navy">{t('specialization')}:</span>
-                    <span className="mr-2 text-carelink-slate">{request.specialization}</span>
+                    <span className="font-semibold text-carefd-navy">{t('specialization')}:</span>
+                    <span className="mr-2 text-carefd-slate">{request.specialization}</span>
                   </div>
                 )}
 
                 {request.service_type && (
                   <div>
-                    <span className="font-semibold text-carelink-navy">סוג שירות:</span>
-                    <span className="mr-2 text-carelink-slate">{t(request.service_type)}</span>
+                    <span className="font-semibold text-carefd-navy">סוג שירות:</span>
+                    <span className="mr-2 text-carefd-slate">{t(request.service_type)}</span>
                   </div>
                 )}
 
                 {request.delivery_type && (
                   <div>
-                    <span className="font-semibold text-carelink-navy">דרך מתן השירות:</span>
-                    <span className="mr-2 text-carelink-slate">{t(request.delivery_type)}</span>
+                    <span className="font-semibold text-carefd-navy">דרך מתן השירות:</span>
+                    <span className="mr-2 text-carefd-slate">{t(request.delivery_type)}</span>
                   </div>
                 )}
 
                 {request.request_type && (
                   <div>
-                    <span className="font-semibold text-carelink-navy">{t('requestType')}:</span>
-                    <span className="mr-2 text-carelink-slate">{t(request.request_type)}</span>
+                    <span className="font-semibold text-carefd-navy">{t('requestType')}:</span>
+                    <span className="mr-2 text-carefd-slate">{t(request.request_type)}</span>
                   </div>
                 )}
 
                 {request.budget && (
                   <div>
-                    <span className="font-semibold text-carelink-navy">{t('budget')}:</span>
-                    <span className="text-carelink-teal font-bold text-xl mr-2">
+                    <span className="font-semibold text-carefd-navy">{t('budget')}:</span>
+                    <span className="text-carefd-teal font-bold text-xl mr-2">
                       ₪{request.budget}
                       {request.budget_type && (
-                        <span className="text-sm font-normal text-carelink-gray mr-1">
+                        <span className="text-sm font-normal text-carefd-gray mr-1">
                           {request.budget_type === 'per_hour' ? 'לשעה' :
                            request.budget_type === 'per_treatment' ? 'לטיפול' :
                            request.budget_type === 'per_visit' ? 'לביקור' : request.budget_type}
@@ -303,9 +303,9 @@ const RequestDetails = () => {
 
                 {request.preferred_date && (
                   <div className="flex items-center gap-2">
-                    <FaCalendar className="text-carelink-teal" />
-                    <span className="font-semibold text-carelink-navy">{t('preferredDate')}:</span>
-                    <span className="text-carelink-slate">
+                    <FaCalendar className="text-carefd-teal" />
+                    <span className="font-semibold text-carefd-navy">{t('preferredDate')}:</span>
+                    <span className="text-carefd-slate">
                       {request.preferred_date ? format(new Date(request.preferred_date), 'dd/MM/yyyy') : ''}
                       {request.preferred_time && ` בשעה ${request.preferred_time}`}
                     </span>
@@ -314,8 +314,8 @@ const RequestDetails = () => {
 
                 {request.gender_preference && request.gender_preference !== 'no_preference' && (
                   <div>
-                    <span className="font-semibold text-carelink-navy">העדפת מגדר:</span>
-                    <span className="mr-2 text-carelink-slate">
+                    <span className="font-semibold text-carefd-navy">העדפת מגדר:</span>
+                    <span className="mr-2 text-carefd-slate">
                       {request.gender_preference === 'male' ? 'זכר' :
                        request.gender_preference === 'female' ? 'נקבה' : request.gender_preference}
                     </span>
@@ -324,7 +324,7 @@ const RequestDetails = () => {
 
                 {request.language_preferences && request.language_preferences.length > 0 && (
                   <div>
-                    <span className="font-semibold text-carelink-navy">העדפות שפה:</span>
+                    <span className="font-semibold text-carefd-navy">העדפות שפה:</span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {request.language_preferences.map((lang, idx) => {
                         const labels = {
@@ -343,15 +343,15 @@ const RequestDetails = () => {
 
                 {request.preferences && (
                   <div>
-                    <span className="font-semibold text-carelink-navy">{t('preferences')}:</span>
-                    <p className="text-carelink-slate mt-1">{request.preferences}</p>
+                    <span className="font-semibold text-carefd-navy">{t('preferences')}:</span>
+                    <p className="text-carefd-slate mt-1">{request.preferences}</p>
                   </div>
                 )}
 
                 {request.location && (request.location.city || request.location.address) && (
                   <div>
-                    <span className="font-semibold text-carelink-navy">מיקום:</span>
-                    <span className="mr-2 text-carelink-slate">
+                    <span className="font-semibold text-carefd-navy">מיקום:</span>
+                    <span className="mr-2 text-carefd-slate">
                       {request.location.city}
                       {request.location.city && request.location.address && ', '}
                       {request.location.address}
@@ -365,13 +365,13 @@ const RequestDetails = () => {
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg flex gap-3">
                   <Link
                     to="/dashboard?tab=bookings"
-                    className="flex-1 text-center bg-carelink-teal text-white py-2 rounded-lg hover:bg-carelink-teal-medium transition font-medium"
+                    className="flex-1 text-center bg-carefd-teal text-white py-2 rounded-lg hover:bg-carefd-teal-medium transition font-medium"
                   >
                     {t('viewBooking')}
                   </Link>
                   <Link
                     to="/chats"
-                    className="flex-1 text-center bg-carelink-navy text-white py-2 rounded-lg hover:bg-carelink-slate transition font-medium flex items-center justify-center gap-2"
+                    className="flex-1 text-center bg-carefd-navy text-white py-2 rounded-lg hover:bg-carefd-slate transition font-medium flex items-center justify-center gap-2"
                   >
                     <FaComments /> {t('goToChat')}
                   </Link>
@@ -381,13 +381,13 @@ const RequestDetails = () => {
 
             {/* Offers Section - visible to owner and the provider who made the offer */}
             {(isOwner || (isProvider && offers.some(o => o.provider_id === user?.provider_id || o.provider?.provider_id === user?.provider_id))) && (
-            <div className="bg-white p-6 rounded-xl shadow-lg border-2 border-carelink-teal-pale">
-              <h2 className="text-2xl font-bold mb-4 text-carelink-navy">
+            <div className="bg-white p-6 rounded-xl shadow-lg border-2 border-carefd-teal-pale">
+              <h2 className="text-2xl font-bold mb-4 text-carefd-navy">
                 {isOwner ? `${t('offersReceived')} (${offers.length})` : 'ההצעה שלי'}
               </h2>
 
               {offers.length === 0 ? (
-                <p className="text-carelink-gray text-center py-8">{t('noOffers')}</p>
+                <p className="text-carefd-gray text-center py-8">{t('noOffers')}</p>
               ) : (
                 <div className="space-y-4">
                   {offers.map((offer) => (
@@ -397,7 +397,7 @@ const RequestDetails = () => {
                         offer.status === 'accepted' ? 'border-green-300 bg-green-50' :
                         offer.status === 'rejected' ? 'border-red-200 bg-red-50 opacity-60' :
                         offer.status === 'withdrawn' ? 'border-gray-200 bg-gray-50 opacity-60' :
-                        'border-carelink-light-gray hover:border-carelink-teal'
+                        'border-carefd-light-gray hover:border-carefd-teal'
                       }`}
                     >
                       <div className="flex justify-between items-start mb-3">
@@ -410,15 +410,15 @@ const RequestDetails = () => {
                               className="w-12 h-12 rounded-full object-cover"
                             />
                           ) : (
-                            <div className="w-12 h-12 rounded-full bg-carelink-teal-pale flex items-center justify-center text-carelink-teal font-bold">
+                            <div className="w-12 h-12 rounded-full bg-carefd-teal-pale flex items-center justify-center text-carefd-teal font-bold">
                               {(offer.provider?.business_name || 'ס')[0]}
                             </div>
                           )}
                           <div>
-                            <h3 className="font-bold text-carelink-navy">
+                            <h3 className="font-bold text-carefd-navy">
                               {offer.provider?.business_name || offer.provider_name || 'ספק שירותים'}
                             </h3>
-                            <div className="flex items-center gap-3 text-sm text-carelink-gray">
+                            <div className="flex items-center gap-3 text-sm text-carefd-gray">
                               {offer.provider?.rating != null && offer.provider.rating > 0 && (
                                 <div className="flex items-center">
                                   <FaStar className="text-yellow-500 ml-1" />
@@ -440,16 +440,16 @@ const RequestDetails = () => {
                           </div>
                         </div>
                         <div className="text-left flex flex-col items-end gap-1">
-                          <div className="text-2xl font-bold text-carelink-teal">₪{offer.price}</div>
-                          <div className="text-sm text-carelink-gray">{t(offer.pricing_type)}</div>
+                          <div className="text-2xl font-bold text-carefd-teal">₪{offer.price}</div>
+                          <div className="text-sm text-carefd-gray">{t(offer.pricing_type)}</div>
                           {getOfferStatusBadge(offer.status)}
                         </div>
                       </div>
 
-                      <p className="text-carelink-slate mb-3">{offer.message}</p>
+                      <p className="text-carefd-slate mb-3">{offer.message}</p>
 
                       {offer.duration_days && (
-                        <p className="text-sm text-carelink-gray mb-3">
+                        <p className="text-sm text-carefd-gray mb-3">
                           משך ביצוע: {offer.duration_days} ימים
                         </p>
                       )}
@@ -466,7 +466,7 @@ const RequestDetails = () => {
                           </button>
                           <button
                             onClick={() => handleAcceptOffer(offer.offer_id)}
-                            className="flex-1 bg-carelink-teal text-white py-2 rounded-lg hover:bg-carelink-teal-medium transition flex items-center justify-center gap-2"
+                            className="flex-1 bg-carefd-teal text-white py-2 rounded-lg hover:bg-carefd-teal-medium transition flex items-center justify-center gap-2"
                             data-testid={`accept-offer-${offer.offer_id}`}
                           >
                             <FaCheckCircle /> {t('acceptOffer')}
@@ -498,37 +498,37 @@ const RequestDetails = () => {
           <div className="space-y-4">
             {/* Provider: Make Offer */}
             {isProvider && request.status === 'open' && (
-              <div className="bg-white p-6 rounded-xl shadow-lg border-2 border-carelink-teal">
+              <div className="bg-white p-6 rounded-xl shadow-lg border-2 border-carefd-teal">
                 {!showOfferForm ? (
                   <button
                     onClick={() => setShowOfferForm(true)}
-                    className="w-full bg-carelink-teal text-white py-3 rounded-lg hover:bg-carelink-teal-medium transition font-bold"
+                    className="w-full bg-carefd-teal text-white py-3 rounded-lg hover:bg-carefd-teal-medium transition font-bold"
                     data-testid="make-offer-btn"
                   >
                     {t('makeOffer')}
                   </button>
                 ) : (
                   <form onSubmit={handleSubmitOffer} className="space-y-4">
-                    <h3 className="font-bold text-carelink-navy mb-3">הגש הצעה</h3>
+                    <h3 className="font-bold text-carefd-navy mb-3">הגש הצעה</h3>
 
                     <div>
-                      <label className="block text-sm font-medium text-carelink-navy mb-1">מחיר *</label>
+                      <label className="block text-sm font-medium text-carefd-navy mb-1">מחיר *</label>
                       <input
                         type="number"
                         required
                         value={offerData.price}
                         onChange={(e) => setOfferData({...offerData, price: e.target.value})}
-                        className="w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                        className="w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                         placeholder="₪"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-carelink-navy mb-1">סוג תמחור</label>
+                      <label className="block text-sm font-medium text-carefd-navy mb-1">סוג תמחור</label>
                       <select
                         value={offerData.pricing_type}
                         onChange={(e) => setOfferData({...offerData, pricing_type: e.target.value})}
-                        className="w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                        className="w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                       >
                         <option value="fixed">מחיר קבוע</option>
                         <option value="per_hour">{t('per_hour')}</option>
@@ -538,22 +538,22 @@ const RequestDetails = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-carelink-navy mb-1">משך ביצוע (ימים)</label>
+                      <label className="block text-sm font-medium text-carefd-navy mb-1">משך ביצוע (ימים)</label>
                       <input
                         type="number"
                         value={offerData.duration_days}
                         onChange={(e) => setOfferData({...offerData, duration_days: e.target.value})}
-                        className="w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                        className="w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-carelink-navy mb-1">הודעה *</label>
+                      <label className="block text-sm font-medium text-carefd-navy mb-1">הודעה *</label>
                       <textarea
                         required
                         value={offerData.message}
                         onChange={(e) => setOfferData({...offerData, message: e.target.value})}
-                        className="w-full px-3 py-2 border border-carelink-light-gray rounded-md focus:ring-carelink-teal focus:border-carelink-teal"
+                        className="w-full px-3 py-2 border border-carefd-light-gray rounded-md focus:ring-carefd-teal focus:border-carefd-teal"
                         rows="4"
                         placeholder="פרט על ההצעה שלך..."
                       />
@@ -562,7 +562,7 @@ const RequestDetails = () => {
                     <div className="flex gap-2">
                       <button
                         type="submit"
-                        className="flex-1 bg-carelink-teal text-white py-2 rounded-lg hover:bg-carelink-teal-medium transition"
+                        className="flex-1 bg-carefd-teal text-white py-2 rounded-lg hover:bg-carefd-teal-medium transition"
                       >
                         שלח
                       </button>
@@ -621,9 +621,9 @@ const RequestDetails = () => {
 
             {/* Tips for owner */}
             {isOwner && request.status === 'open' && (
-              <div className="bg-carelink-teal-pale p-4 rounded-lg">
-                <h3 className="font-bold text-carelink-navy mb-2">עצות</h3>
-                <ul className="text-sm text-carelink-slate space-y-2">
+              <div className="bg-carefd-teal-pale p-4 rounded-lg">
+                <h3 className="font-bold text-carefd-navy mb-2">עצות</h3>
+                <ul className="text-sm text-carefd-slate space-y-2">
                   <li>• השווה בין מספר הצעות</li>
                   <li>• בדוק דירוגי ספקים</li>
                   <li>• קרא ביקורות</li>

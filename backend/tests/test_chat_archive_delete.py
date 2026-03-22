@@ -1,6 +1,6 @@
 """
 Test Suite: Chat Room Archive, Unarchive, and Delete Functionality
-Tests the new archive and delete features for chat rooms in CareLink
+Tests the new archive and delete features for chat rooms in CareFD
 """
 
 import pytest
@@ -12,7 +12,7 @@ BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 # Test credentials
 USER_EMAIL = "saadiameen@gmail.com"
 USER_PASSWORD = "password"
-PROVIDER_EMAIL = "provider@carelink.co.il"
+PROVIDER_EMAIL = "provider@carefd.com"
 PROVIDER_PASSWORD = "password"
 
 

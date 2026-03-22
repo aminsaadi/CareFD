@@ -10,11 +10,11 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://carelink-preview-5.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://carefd-preview-5.preview.emergentagent.com')
 
 # Test credentials
-TEST_USER = {"email": "user@carelink.co.il", "password": "password"}
-TEST_PROVIDER = {"email": "provider@carelink.co.il", "password": "password"}
+TEST_USER = {"email": "user@carefd.com", "password": "password"}
+TEST_PROVIDER = {"email": "provider@carefd.com", "password": "password"}
 
 # Tel Aviv coordinates
 TEL_AVIV_LAT = 32.0853

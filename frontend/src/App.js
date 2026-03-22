@@ -86,7 +86,7 @@ const NotFound = () => (
     <div className="text-center">
       <h1 className="text-6xl font-bold text-gray-300 mb-4">404</h1>
       <p className="text-xl text-gray-600 mb-6">הדף לא נמצא</p>
-      <a href="/" className="bg-carelink-teal text-white px-6 py-3 rounded-lg hover:bg-carelink-teal-medium transition">
+      <a href="/" className="bg-carefd-teal text-white px-6 py-3 rounded-lg hover:bg-carefd-teal-medium transition">
         חזרה לדף הבית
       </a>
     </div>

@@ -33,7 +33,7 @@ const Terms = () => {
       <div className="min-h-screen bg-white" dir="rtl">
         <Navbar />
         <div className="flex items-center justify-center h-96">
-          <div className="w-12 h-12 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-12 h-12 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
         </div>
         <Footer />
       </div>
@@ -45,16 +45,16 @@ const Terms = () => {
     return (
       <div className="min-h-screen bg-white" dir="rtl">
         <Navbar />
-        <section className="bg-gradient-to-br from-carelink-navy to-carelink-slate py-16">
+        <section className="bg-gradient-to-br from-carefd-navy to-carefd-slate py-16">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <FaFileContract className="text-5xl text-carelink-teal mx-auto mb-4" />
+            <FaFileContract className="text-5xl text-carefd-teal mx-auto mb-4" />
             <h1 className="text-4xl font-bold text-white mb-4">{dbPage.title}</h1>
           </div>
         </section>
         <section className="py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <div
-              className="prose prose-lg max-w-none text-carelink-slate"
+              className="prose prose-lg max-w-none text-carefd-slate"
               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(dbPage.content) }}
             />
           </div>
@@ -70,11 +70,11 @@ const Terms = () => {
       <Navbar />
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-carelink-navy to-carelink-slate py-16">
+      <section className="bg-gradient-to-br from-carefd-navy to-carefd-slate py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <FaFileContract className="text-5xl text-carelink-teal mx-auto mb-4" />
+          <FaFileContract className="text-5xl text-carefd-teal mx-auto mb-4" />
           <h1 className="text-4xl font-bold text-white mb-4">תנאי שימוש</h1>
-          <p className="text-carelink-teal-pale">עודכן לאחרונה: {lastUpdated}</p>
+          <p className="text-carefd-teal-pale">עודכן לאחרונה: {lastUpdated}</p>
         </div>
       </section>
 
@@ -89,84 +89,84 @@ const Terms = () => {
               </p>
             </div>
 
-            <h2 className="text-2xl font-bold text-carelink-navy mb-4 flex items-center gap-2">
-              <FaUserCheck className="text-carelink-teal" />
+            <h2 className="text-2xl font-bold text-carefd-navy mb-4 flex items-center gap-2">
+              <FaUserCheck className="text-carefd-teal" />
               1. הגדרות ופרשנות
             </h2>
-            <ul className="list-disc list-inside text-carelink-slate mb-8 space-y-2">
+            <ul className="list-disc list-inside text-carefd-slate mb-8 space-y-2">
               <li><strong>"האתר"</strong> - אתר {siteName} ו/או האפליקציה</li>
               <li><strong>"משתמש"</strong> - כל אדם המשתמש באתר</li>
               <li><strong>"ספק"</strong> - נותן שירות הרשום באתר</li>
               <li><strong>"שירותים"</strong> - השירותים המוצעים דרך האתר</li>
             </ul>
 
-            <h2 className="text-2xl font-bold text-carelink-navy mb-4">2. השימוש באתר</h2>
-            <p className="text-carelink-slate mb-4">השימוש באתר מותר למשתמשים מעל גיל 18. המשתמש מתחייב:</p>
-            <ul className="list-disc list-inside text-carelink-slate mb-8 space-y-2">
+            <h2 className="text-2xl font-bold text-carefd-navy mb-4">2. השימוש באתר</h2>
+            <p className="text-carefd-slate mb-4">השימוש באתר מותר למשתמשים מעל גיל 18. המשתמש מתחייב:</p>
+            <ul className="list-disc list-inside text-carefd-slate mb-8 space-y-2">
               <li>לספק מידע נכון ומדויק</li>
               <li>לשמור על סודיות פרטי ההתחברות</li>
               <li>לא להשתמש באתר לפעילות בלתי חוקית</li>
               <li>לא להעתיק או לשכפל תוכן מהאתר</li>
             </ul>
 
-            <h2 className="text-2xl font-bold text-carelink-navy mb-4">3. הזמנת שירותים</h2>
-            <p className="text-carelink-slate mb-8">
+            <h2 className="text-2xl font-bold text-carefd-navy mb-4">3. הזמנת שירותים</h2>
+            <p className="text-carefd-slate mb-8">
               בעת הזמנת שירות דרך האתר, נוצר הסכם ישיר בין המשתמש לספק.
               {siteName} משמשת כפלטפורמה מתווכת בלבד ואינה צד להסכם זה.
               המשתמש אחראי לבדוק את התאמת הספק והשירות לצרכיו.
             </p>
 
-            <h2 className="text-2xl font-bold text-carelink-navy mb-4">4. תשלומים וביטולים</h2>
-            <ul className="list-disc list-inside text-carelink-slate mb-8 space-y-2">
+            <h2 className="text-2xl font-bold text-carefd-navy mb-4">4. תשלומים וביטולים</h2>
+            <ul className="list-disc list-inside text-carefd-slate mb-8 space-y-2">
               <li>המחירים המוצגים באתר הם בשקלים חדשים וכוללים מע"מ</li>
               <li>ביטול הזמנה יתבצע בהתאם למדיניות הביטולים של הספק</li>
               <li>החזר כספי יבוצע באמצעי התשלום המקורי</li>
             </ul>
 
-            <h2 className="text-2xl font-bold text-carelink-navy mb-4 flex items-center gap-2">
-              <FaExclamationTriangle className="text-carelink-teal" />
+            <h2 className="text-2xl font-bold text-carefd-navy mb-4 flex items-center gap-2">
+              <FaExclamationTriangle className="text-carefd-teal" />
               5. הגבלת אחריות
             </h2>
-            <p className="text-carelink-slate mb-8">
+            <p className="text-carefd-slate mb-8">
               {siteName} אינה אחראית לאיכות השירותים הניתנים על ידי הספקים,
               לנזקים ישירים או עקיפים הנובעים משימוש באתר,
               או להפסקות זמניות בפעילות האתר.
             </p>
 
-            <h2 className="text-2xl font-bold text-carelink-navy mb-4 flex items-center gap-2">
-              <FaBan className="text-carelink-teal" />
+            <h2 className="text-2xl font-bold text-carefd-navy mb-4 flex items-center gap-2">
+              <FaBan className="text-carefd-teal" />
               6. שימוש אסור
             </h2>
-            <p className="text-carelink-slate mb-4">אסור במפורש:</p>
-            <ul className="list-disc list-inside text-carelink-slate mb-8 space-y-2">
+            <p className="text-carefd-slate mb-4">אסור במפורש:</p>
+            <ul className="list-disc list-inside text-carefd-slate mb-8 space-y-2">
               <li>להעלות תוכן פוגעני, מטעה או בלתי חוקי</li>
               <li>לפגוע בפעילות האתר או שרתיו</li>
               <li>להתחזות לאדם אחר</li>
               <li>לאסוף מידע על משתמשים אחרים</li>
             </ul>
 
-            <h2 className="text-2xl font-bold text-carelink-navy mb-4">7. קניין רוחני</h2>
-            <p className="text-carelink-slate mb-8">
+            <h2 className="text-2xl font-bold text-carefd-navy mb-4">7. קניין רוחני</h2>
+            <p className="text-carefd-slate mb-8">
               כל הזכויות באתר, לרבות סימני מסחר, לוגואים ותכנים,
               שייכות לבעלי האתר או לבעלי הזכויות בהם.
               אין להעתיק, לשכפל או להפיץ תוכן מהאתר ללא אישור מראש.
             </p>
 
-            <h2 className="text-2xl font-bold text-carelink-navy mb-4 flex items-center gap-2">
-              <FaGavel className="text-carelink-teal" />
+            <h2 className="text-2xl font-bold text-carefd-navy mb-4 flex items-center gap-2">
+              <FaGavel className="text-carefd-teal" />
               8. דין וסמכות שיפוט
             </h2>
-            <p className="text-carelink-slate mb-8">
+            <p className="text-carefd-slate mb-8">
               על תנאי שימוש אלה יחולו דיני מדינת ישראל.
               סמכות השיפוט הבלעדית נתונה לבתי המשפט בתל אביב-יפו.
             </p>
 
-            <h2 className="text-2xl font-bold text-carelink-navy mb-4">9. יצירת קשר</h2>
-            <p className="text-carelink-slate mb-4">
+            <h2 className="text-2xl font-bold text-carefd-navy mb-4">9. יצירת קשר</h2>
+            <p className="text-carefd-slate mb-4">
               לשאלות בנוגע לתנאי השימוש:
             </p>
             <div className="bg-gray-50 p-4 rounded-xl">
-              <p className="text-carelink-slate">
+              <p className="text-carefd-slate">
                 <strong>אימייל:</strong> {settings.contact_email || 'legal@example.com'}<br />
                 <strong>טלפון:</strong> {settings.contact_phone || '03-1234567'}
               </p>

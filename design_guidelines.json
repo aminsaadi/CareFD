@@ -1,5 +1,5 @@
 {
-  "project_name": "CareLink - Premium Luxury Upgrade",
+  "project_name": "CareFD - Premium Luxury Upgrade",
   "theme": "light",
   "emotional_archetype": "The Private Clinic (Jewel & Luxury)",
   "design_philosophy": {
@@ -67,10 +67,10 @@
       "muted": "#94A3B8"
     },
     "semantic_mappings": {
-      "carelink-navy": "#0F172A",
-      "carelink-slate": "#334155",
-      "carelink-teal": "#0D9488",
-      "carelink-gold": "#D4B483"
+      "carefd-navy": "#0F172A",
+      "carefd-slate": "#334155",
+      "carefd-teal": "#0D9488",
+      "carefd-gold": "#D4B483"
     }
   },
   "layout_strategy": {

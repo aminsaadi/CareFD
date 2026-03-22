@@ -14,7 +14,7 @@ import {
   FaAward, FaUserMd, FaGlobe, FaHospital
 } from 'react-icons/fa';
 
-const SESSION_STORAGE_KEY = 'carelink_services_filters';
+const SESSION_STORAGE_KEY = 'carefd_services_filters';
 const PAGE_LIMIT = 12;
 
 const loadFiltersFromSession = (searchParams) => {
@@ -323,16 +323,16 @@ const Services = () => {
   ].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale flex flex-col">
       <Navbar />
 
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-carelink-navy font-heading mb-2" data-testid="services-title">
+          <h1 className="text-3xl font-bold text-carefd-navy font-heading mb-2" data-testid="services-title">
             {t('services')}
           </h1>
-          <p className="text-carelink-gray">מצאו את השירות המושלם עבורכם</p>
+          <p className="text-carefd-gray">מצאו את השירות המושלם עבורכם</p>
         </div>
 
         {/* Search Box */}
@@ -340,7 +340,7 @@ const Services = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             {/* Search Input */}
             <div className="relative">
-              <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray z-10" />
+              <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-carefd-gray z-10" />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -348,7 +348,7 @@ const Services = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setShowSearchDropdown(true)}
                 placeholder="חפש שירות, טיפול..."
-                className="w-full px-5 py-3 pr-12 border border-gray-200 rounded-xl focus:border-carelink-teal focus:ring-2 focus:ring-carelink-teal/20 outline-none transition-all"
+                className="w-full px-5 py-3 pr-12 border border-gray-200 rounded-xl focus:border-carefd-teal focus:ring-2 focus:ring-carefd-teal/20 outline-none transition-all"
                 data-testid="services-search-input"
                 aria-label="חיפוש שירות או טיפול"
               />
@@ -361,7 +361,7 @@ const Services = () => {
                   aria-label="הצעות חיפוש"
                 >
                   <div className="p-3 border-b border-gray-100">
-                    <span className="text-xs font-semibold text-carelink-gray">חיפושים נפוצים</span>
+                    <span className="text-xs font-semibold text-carefd-gray">חיפושים נפוצים</span>
                   </div>
                   <div className="p-2">
                     {filteredSearches.map((search, index) => (
@@ -373,9 +373,9 @@ const Services = () => {
                           setSearchQuery(search);
                           setShowSearchDropdown(false);
                         }}
-                        className="w-full text-right px-3 py-2.5 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carelink-navy"
+                        className="w-full text-right px-3 py-2.5 hover:bg-carefd-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carefd-navy"
                       >
-                        <FaSearch className="text-carelink-gray text-sm" />
+                        <FaSearch className="text-carefd-gray text-sm" />
                         <span>{search}</span>
                       </button>
                     ))}
@@ -386,7 +386,7 @@ const Services = () => {
 
             {/* Profession Input */}
             <div className="relative">
-              <FaBriefcase className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray z-10" />
+              <FaBriefcase className="absolute right-4 top-1/2 -translate-y-1/2 text-carefd-gray z-10" />
               <input
                 ref={professionInputRef}
                 type="text"
@@ -394,7 +394,7 @@ const Services = () => {
                 onChange={(e) => setProfessionQuery(e.target.value)}
                 onFocus={() => setShowProfessionDropdown(true)}
                 placeholder="מקצוע (אחות, רופא...)"
-                className="w-full px-5 py-3 pr-12 border border-gray-200 rounded-xl focus:border-carelink-teal focus:ring-2 focus:ring-carelink-teal/20 outline-none transition-all"
+                className="w-full px-5 py-3 pr-12 border border-gray-200 rounded-xl focus:border-carefd-teal focus:ring-2 focus:ring-carefd-teal/20 outline-none transition-all"
                 data-testid="services-profession-input"
                 aria-label="חיפוש לפי מקצוע"
               />
@@ -407,7 +407,7 @@ const Services = () => {
                   aria-label="רשימת מקצועות"
                 >
                   <div className="p-3 border-b border-gray-100">
-                    <span className="text-xs font-semibold text-carelink-gray">מקצועות</span>
+                    <span className="text-xs font-semibold text-carefd-gray">מקצועות</span>
                   </div>
                   <div className="p-2">
                     {filteredProfessions.slice(0, 10).map((profession) => (
@@ -419,9 +419,9 @@ const Services = () => {
                           setProfessionQuery(profession.name);
                           setShowProfessionDropdown(false);
                         }}
-                        className="w-full text-right px-3 py-2.5 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carelink-navy"
+                        className="w-full text-right px-3 py-2.5 hover:bg-carefd-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carefd-navy"
                       >
-                        <FaBriefcase className="text-carelink-gray text-sm" />
+                        <FaBriefcase className="text-carefd-gray text-sm" />
                         <span>{profession.name}</span>
                       </button>
                     ))}
@@ -433,7 +433,7 @@ const Services = () => {
             {/* Location Input */}
             <div className="relative flex gap-2">
               <div className="flex-1 relative">
-                <FaMapMarkerAlt className="absolute right-4 top-1/2 -translate-y-1/2 text-carelink-gray z-10" />
+                <FaMapMarkerAlt className="absolute right-4 top-1/2 -translate-y-1/2 text-carefd-gray z-10" />
                 <input
                   ref={locationInputRef}
                   type="text"
@@ -441,7 +441,7 @@ const Services = () => {
                   onChange={(e) => setLocationQuery(e.target.value)}
                   onFocus={() => setShowLocationDropdown(true)}
                   placeholder="עיר או אזור"
-                  className="w-full px-5 py-3 pr-12 border border-gray-200 rounded-xl focus:border-carelink-teal focus:ring-2 focus:ring-carelink-teal/20 outline-none transition-all"
+                  className="w-full px-5 py-3 pr-12 border border-gray-200 rounded-xl focus:border-carefd-teal focus:ring-2 focus:ring-carefd-teal/20 outline-none transition-all"
                   data-testid="services-location-input"
                   aria-label="חיפוש לפי עיר או אזור"
                 />
@@ -456,7 +456,7 @@ const Services = () => {
                     <button
                       type="button"
                       onClick={handleGetLocation}
-                      className="w-full text-right px-4 py-3 hover:bg-carelink-teal-pale/30 transition-colors flex items-center gap-3 text-carelink-teal border-b border-gray-100"
+                      className="w-full text-right px-4 py-3 hover:bg-carefd-teal-pale/30 transition-colors flex items-center gap-3 text-carefd-teal border-b border-gray-100"
                     >
                       <FaCrosshairs className="text-lg" />
                       <span className="font-medium">השתמש במיקום שלי</span>
@@ -466,7 +466,7 @@ const Services = () => {
                     {!locationQuery && (
                       <>
                         <div className="p-3 border-b border-gray-100">
-                          <span className="text-xs font-semibold text-carelink-gray">אזורים</span>
+                          <span className="text-xs font-semibold text-carefd-gray">אזורים</span>
                         </div>
                         <div className="p-2">
                           {israeliRegions.map((region) => (
@@ -478,9 +478,9 @@ const Services = () => {
                                 setLocationQuery(region.name);
                                 setShowLocationDropdown(false);
                               }}
-                              className="w-full text-right px-3 py-2.5 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carelink-navy"
+                              className="w-full text-right px-3 py-2.5 hover:bg-carefd-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carefd-navy"
                             >
-                              <FaMapMarkerAlt className="text-carelink-gray text-sm" />
+                              <FaMapMarkerAlt className="text-carefd-gray text-sm" />
                               <span>{region.name}</span>
                             </button>
                           ))}
@@ -491,7 +491,7 @@ const Services = () => {
                     {locationQuery && filteredCities.length > 0 && (
                       <>
                         <div className="p-3 border-b border-gray-100">
-                          <span className="text-xs font-semibold text-carelink-gray">ערים</span>
+                          <span className="text-xs font-semibold text-carefd-gray">ערים</span>
                         </div>
                         <div className="p-2">
                           {filteredCities.map((city) => (
@@ -503,9 +503,9 @@ const Services = () => {
                                 setLocationQuery(city.name);
                                 setShowLocationDropdown(false);
                               }}
-                              className="w-full text-right px-3 py-2.5 hover:bg-carelink-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carelink-navy"
+                              className="w-full text-right px-3 py-2.5 hover:bg-carefd-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carefd-navy"
                             >
-                              <FaMapMarkerAlt className="text-carelink-gray text-sm" />
+                              <FaMapMarkerAlt className="text-carefd-gray text-sm" />
                               <span>{city.name}</span>
                             </button>
                           ))}
@@ -520,7 +520,7 @@ const Services = () => {
                 type="button"
                 onClick={handleGetLocation}
                 disabled={isLocating}
-                className="bg-carelink-teal-pale text-carelink-teal px-4 rounded-xl hover:bg-carelink-teal hover:text-white transition-all disabled:opacity-50 flex items-center justify-center"
+                className="bg-carefd-teal-pale text-carefd-teal px-4 rounded-xl hover:bg-carefd-teal hover:text-white transition-all disabled:opacity-50 flex items-center justify-center"
                 title="השתמש במיקום שלי"
                 aria-label="איתור מיקום נוכחי"
               >
@@ -531,7 +531,7 @@ const Services = () => {
 
           <button
             type="submit"
-            className="w-full bg-carelink-teal text-white px-8 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition-all flex items-center justify-center gap-2"
+            className="w-full bg-carefd-teal text-white px-8 py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition-all flex items-center justify-center gap-2"
             data-testid="services-search-btn"
             aria-label="חפש שירותים"
           >
@@ -566,24 +566,24 @@ const Services = () => {
                 aria-label="פתח סינון מתקדם"
                 aria-expanded={showFilters}
               >
-                <FaFilter className="text-carelink-teal" />
+                <FaFilter className="text-carefd-teal" />
                 סינון מתקדם
                 {activeFiltersCount > 0 && (
-                  <span className="bg-carelink-teal text-white text-xs px-2 py-0.5 rounded-full">
+                  <span className="bg-carefd-teal text-white text-xs px-2 py-0.5 rounded-full">
                     {activeFiltersCount}
                   </span>
                 )}
               </button>
 
-              <p className="text-carelink-gray">
-                נמצאו <span className="font-bold text-carelink-navy">{services.length}</span> שירותים
+              <p className="text-carefd-gray">
+                נמצאו <span className="font-bold text-carefd-navy">{services.length}</span> שירותים
               </p>
 
               <div className="flex items-center gap-3">
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="px-3 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none text-sm"
+                  className="px-3 py-2 border border-gray-200 rounded-lg focus:border-carefd-teal outline-none text-sm"
                   aria-label="מיון תוצאות"
                 >
                   <option value="popular">פופולריים</option>
@@ -600,7 +600,7 @@ const Services = () => {
                     aria-label="תצוגת רשת"
                     aria-pressed={viewMode === 'grid'}
                   >
-                    <FaThLarge className="text-carelink-gray" />
+                    <FaThLarge className="text-carefd-gray" />
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
@@ -608,7 +608,7 @@ const Services = () => {
                     aria-label="תצוגת רשימה"
                     aria-pressed={viewMode === 'list'}
                   >
-                    <FaList className="text-carelink-gray" />
+                    <FaList className="text-carefd-gray" />
                   </button>
                 </div>
               </div>
@@ -618,7 +618,7 @@ const Services = () => {
             {activeFiltersCount > 0 && (
               <div className="flex flex-wrap gap-2 mb-4" role="list" aria-label="מסננים פעילים">
                 {filters.city && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm" role="listitem">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-teal px-3 py-1 rounded-full text-sm" role="listitem">
                     <FaMapMarkerAlt className="text-xs" />
                     {filters.city}
                     <button onClick={() => setFilters({...filters, city: ''})} aria-label={`הסר סינון עיר: ${filters.city}`}>
@@ -627,7 +627,7 @@ const Services = () => {
                   </span>
                 )}
                 {filters.region && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm" role="listitem">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-teal px-3 py-1 rounded-full text-sm" role="listitem">
                     <FaMapMarkerAlt className="text-xs" />
                     {filters.region}
                     <button onClick={() => setFilters({...filters, region: ''})} aria-label={`הסר סינון אזור: ${filters.region}`}>
@@ -636,7 +636,7 @@ const Services = () => {
                   </span>
                 )}
                 {filters.profession && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm" role="listitem">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-teal px-3 py-1 rounded-full text-sm" role="listitem">
                     <FaUserMd className="text-xs" />
                     {filters.profession}
                     <button onClick={() => setFilters({...filters, profession: ''})} aria-label={`הסר סינון מקצוע: ${filters.profession}`}>
@@ -645,7 +645,7 @@ const Services = () => {
                   </span>
                 )}
                 {filters.category && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm" role="listitem">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-teal px-3 py-1 rounded-full text-sm" role="listitem">
                     {serviceCategories.find(c => c.id === filters.category)?.name}
                     <button onClick={() => setFilters({...filters, category: ''})} aria-label="הסר סינון קטגוריה">
                       <FaTimes className="text-xs" />
@@ -653,7 +653,7 @@ const Services = () => {
                   </span>
                 )}
                 {filters.serviceType && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm" role="listitem">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-teal px-3 py-1 rounded-full text-sm" role="listitem">
                     {serviceTypes.find(t => t.id === filters.serviceType)?.name}
                     <button onClick={() => setFilters({...filters, serviceType: ''})} aria-label="הסר סינון סוג שירות">
                       <FaTimes className="text-xs" />
@@ -661,7 +661,7 @@ const Services = () => {
                   </span>
                 )}
                 {filters.gender && filters.gender !== 'any' && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm" role="listitem">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-teal px-3 py-1 rounded-full text-sm" role="listitem">
                     {filters.gender === 'male' ? 'זכר' : 'נקבה'}
                     <button onClick={() => setFilters({...filters, gender: ''})} aria-label="הסר סינון מגדר">
                       <FaTimes className="text-xs" />
@@ -669,7 +669,7 @@ const Services = () => {
                   </span>
                 )}
                 {filters.languages?.length > 0 && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm" role="listitem">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-teal px-3 py-1 rounded-full text-sm" role="listitem">
                     <FaGlobe className="text-xs" />
                     {filters.languages.length} שפות
                     <button onClick={() => setFilters({...filters, languages: []})} aria-label="הסר סינון שפות">
@@ -678,7 +678,7 @@ const Services = () => {
                   </span>
                 )}
                 {filters.healthFunds?.length > 0 && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm" role="listitem">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-teal px-3 py-1 rounded-full text-sm" role="listitem">
                     <FaHospital className="text-xs" />
                     {filters.healthFunds.length} קופות
                     <button onClick={() => setFilters({...filters, healthFunds: []})} aria-label="הסר סינון קופות חולים">
@@ -687,7 +687,7 @@ const Services = () => {
                   </span>
                 )}
                 {filters.minRating && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm" role="listitem">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-teal px-3 py-1 rounded-full text-sm" role="listitem">
                     <FaStar className="text-xs" />
                     {filters.minRating}+ כוכבים
                     <button onClick={() => setFilters({...filters, minRating: null})} aria-label="הסר סינון דירוג">
@@ -696,7 +696,7 @@ const Services = () => {
                   </span>
                 )}
                 {filters.verifiedOnly && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal-pale text-carelink-teal px-3 py-1 rounded-full text-sm" role="listitem">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-teal px-3 py-1 rounded-full text-sm" role="listitem">
                     <FaCheckCircle className="text-xs" />
                     מאומתים
                     <button onClick={() => setFilters({...filters, verifiedOnly: false})} aria-label="הסר סינון מאומתים בלבד">
@@ -729,21 +729,21 @@ const Services = () => {
             ) : services.length === 0 ? (
               <div className="text-center py-12 bg-white rounded-xl shadow-lg">
                 <FaSearch className="mx-auto text-5xl text-gray-300 mb-4" />
-                <p className="text-xl text-carelink-navy mb-2">לא נמצאו שירותים</p>
-                <p className="text-carelink-gray mb-6">נסו את ההצעות הבאות:</p>
-                <ul className="text-carelink-gray text-sm mb-6 space-y-2">
+                <p className="text-xl text-carefd-navy mb-2">לא נמצאו שירותים</p>
+                <p className="text-carefd-gray mb-6">נסו את ההצעות הבאות:</p>
+                <ul className="text-carefd-gray text-sm mb-6 space-y-2">
                   <li>נסו מילות חיפוש אחרות</li>
                   <li>הרחיבו את טווח המיקום</li>
                   <li>הפחיתו את מספר הסינונים הפעילים</li>
                 </ul>
                 <div className="mb-6">
-                  <p className="text-sm font-semibold text-carelink-navy mb-3">קטגוריות פופולריות:</p>
+                  <p className="text-sm font-semibold text-carefd-navy mb-3">קטגוריות פופולריות:</p>
                   <div className="flex flex-wrap justify-center gap-2">
                     {serviceCategories.slice(0, 6).map((cat) => (
                       <button
                         key={cat.id}
                         onClick={() => handleCategoryClick(cat.id)}
-                        className="px-4 py-2 bg-carelink-teal-pale text-carelink-teal rounded-full text-sm hover:bg-carelink-teal hover:text-white transition-all"
+                        className="px-4 py-2 bg-carefd-teal-pale text-carefd-teal rounded-full text-sm hover:bg-carefd-teal hover:text-white transition-all"
                       >
                         {cat.name}
                       </button>
@@ -752,7 +752,7 @@ const Services = () => {
                 </div>
                 <button
                   onClick={resetFilters}
-                  className="px-6 py-2 bg-carelink-teal text-white rounded-lg font-medium hover:bg-carelink-teal-medium transition"
+                  className="px-6 py-2 bg-carefd-teal text-white rounded-lg font-medium hover:bg-carefd-teal-medium transition"
                 >
                   נקה סינון
                 </button>
@@ -771,7 +771,7 @@ const Services = () => {
                     <button
                       onClick={handleLoadMore}
                       disabled={loadingMore}
-                      className="px-8 py-3 bg-white border-2 border-carelink-teal text-carelink-teal rounded-xl font-semibold hover:bg-carelink-teal hover:text-white transition-all disabled:opacity-50 inline-flex items-center gap-2"
+                      className="px-8 py-3 bg-white border-2 border-carefd-teal text-carefd-teal rounded-xl font-semibold hover:bg-carefd-teal hover:text-white transition-all disabled:opacity-50 inline-flex items-center gap-2"
                       aria-label="טען עוד שירותים"
                     >
                       {loadingMore ? (

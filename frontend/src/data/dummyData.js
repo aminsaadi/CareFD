@@ -1,4 +1,4 @@
-// Dummy data for CareLink platform
+// Dummy data for CareFD platform
 // This data is used for demonstration purposes
 
 export const dummyProviders = [

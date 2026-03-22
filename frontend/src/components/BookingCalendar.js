@@ -53,7 +53,7 @@ const BookingCalendar = ({ onDateSelect, availability = [], bookedSlots = [] }) 
         tileDisabled={tileDisabled}
         tileClassName={tileClassName}
         minDate={new Date()}
-        className="carelink-calendar"
+        className="carefd-calendar"
         locale="he-IL"
         formatShortWeekday={(locale, date) => {
           const days = ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ש'];

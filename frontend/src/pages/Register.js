@@ -75,7 +75,7 @@ const Register = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-carelink-teal via-carelink-teal-medium to-carelink-navy flex">
+    <div className="min-h-screen bg-gradient-to-br from-carefd-teal via-carefd-teal-medium to-carefd-navy flex">
       {/* Left Side - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
@@ -88,28 +88,28 @@ const Register = () => {
 
           {verificationSent ? (
             <div className="bg-white rounded-3xl shadow-2xl p-8 text-center" data-testid="verification-sent">
-              <div className="w-20 h-20 bg-carelink-teal/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <FaEnvelope className="text-4xl text-carelink-teal" />
+              <div className="w-20 h-20 bg-carefd-teal/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <FaEnvelope className="text-4xl text-carefd-teal" />
               </div>
-              <h2 className="text-2xl font-bold text-carelink-navy mb-3">בדוק את תיבת הדואר שלך</h2>
-              <p className="text-carelink-gray mb-2">
+              <h2 className="text-2xl font-bold text-carefd-navy mb-3">בדוק את תיבת הדואר שלך</h2>
+              <p className="text-carefd-gray mb-2">
                 שלחנו לינק אימות לכתובת:
               </p>
-              <p className="font-bold text-carelink-navy text-lg mb-6" dir="ltr">{formData.email}</p>
-              <p className="text-sm text-carelink-gray mb-6">
+              <p className="font-bold text-carefd-navy text-lg mb-6" dir="ltr">{formData.email}</p>
+              <p className="text-sm text-carefd-gray mb-6">
                 לחץ על הלינק במייל כדי לאמת את החשבון שלך ולהתחיל להשתמש בפלטפורמה.
                 <br />הלינק תקף ל-24 שעות.
               </p>
               <button
                 onClick={handleResendVerification}
                 disabled={resending}
-                className="text-carelink-teal font-medium hover:underline disabled:opacity-50 text-sm"
+                className="text-carefd-teal font-medium hover:underline disabled:opacity-50 text-sm"
                 data-testid="resend-verification-btn"
               >
                 {resending ? 'שולח...' : 'לא קיבלת? שלח שוב'}
               </button>
               <div className="mt-6 pt-4 border-t border-gray-100">
-                <Link to="/login" className="text-carelink-teal font-medium hover:underline">
+                <Link to="/login" className="text-carefd-teal font-medium hover:underline">
                   חזור להתחברות
                 </Link>
               </div>
@@ -118,10 +118,10 @@ const Register = () => {
 
           <div className="bg-white rounded-3xl shadow-2xl p-8" data-testid="register-form">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-carelink-navy font-heading" data-testid="register-title">
+              <h2 className="text-3xl font-bold text-carefd-navy font-heading" data-testid="register-title">
                 {t('register')}
               </h2>
-              <p className="text-carelink-gray mt-2">צרו חשבון חדש בחינם</p>
+              <p className="text-carefd-gray mt-2">צרו חשבון חדש בחינם</p>
             </div>
 
             {error && (
@@ -133,11 +133,11 @@ const Register = () => {
             {/* Registration Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-carelink-navy mb-2">
+                <label htmlFor="name" className="block text-sm font-semibold text-carefd-navy mb-2">
                   {t('name')}
                 </label>
                 <div className="relative">
-                  <FaUser className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
+                  <FaUser className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
                   <input
                     id="name"
                     name="name"
@@ -145,7 +145,7 @@ const Register = () => {
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 pr-12 rtl:pr-4 rtl:pl-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
+                    className="w-full px-4 py-3 pr-12 rtl:pr-4 rtl:pl-12 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal transition-colors"
                     placeholder="השם המלא שלך"
                     data-testid="name-input"
                   />
@@ -153,11 +153,11 @@ const Register = () => {
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-carelink-navy mb-2">
+                <label htmlFor="email" className="block text-sm font-semibold text-carefd-navy mb-2">
                   {t('email')}
                 </label>
                 <div className="relative">
-                  <FaEnvelope className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
+                  <FaEnvelope className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
                   <input
                     id="email"
                     name="email"
@@ -165,7 +165,7 @@ const Register = () => {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 pr-12 rtl:pr-4 rtl:pl-12 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
+                    className="w-full px-4 py-3 pr-12 rtl:pr-4 rtl:pl-12 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal transition-colors"
                     placeholder="your@email.com"
                     data-testid="email-input"
                   />
@@ -173,11 +173,11 @@ const Register = () => {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-carelink-navy mb-2">
+                <label htmlFor="password" className="block text-sm font-semibold text-carefd-navy mb-2">
                   {t('password')}
                 </label>
                 <div className="relative">
-                  <FaLock className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carelink-gray" />
+                  <FaLock className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
                   <input
                     id="password"
                     name="password"
@@ -186,14 +186,14 @@ const Register = () => {
                     minLength="6"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full px-12 py-3 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
+                    className="w-full px-12 py-3 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal transition-colors"
                     placeholder="לפחות 6 תווים"
                     data-testid="password-input"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-12 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition"
+                    className="absolute right-12 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition"
                     tabIndex={-1}
                     data-testid="toggle-password-visibility"
                   >
@@ -205,7 +205,7 @@ const Register = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-carelink-teal text-white py-4 rounded-xl hover:bg-carelink-teal-medium font-semibold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-carefd-teal text-white py-4 rounded-xl hover:bg-carefd-teal-medium font-semibold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 data-testid="submit-register-btn"
               >
                 {loading ? (
@@ -220,19 +220,19 @@ const Register = () => {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-carelink-gray">
+              <p className="text-carefd-gray">
                 {t('alreadyHaveAccount')}{' '}
-                <Link to="/login" className="text-carelink-teal hover:text-carelink-teal-medium font-semibold" data-testid="login-link">
+                <Link to="/login" className="text-carefd-teal hover:text-carefd-teal-medium font-semibold" data-testid="login-link">
                   {t('loginNow')}
                 </Link>
               </p>
             </div>
 
             {/* Provider Registration Link */}
-            <div className="mt-6 pt-6 border-t-2 border-carelink-teal-pale">
+            <div className="mt-6 pt-6 border-t-2 border-carefd-teal-pale">
               <Link
                 to="/register/provider"
-                className="flex items-center justify-center gap-3 w-full bg-carelink-navy text-white py-3 rounded-xl hover:bg-carelink-slate font-medium transition"
+                className="flex items-center justify-center gap-3 w-full bg-carefd-navy text-white py-3 rounded-xl hover:bg-carefd-slate font-medium transition"
               >
                 <FaUserMd />
                 הרשמה כספק שירותים
@@ -256,7 +256,7 @@ const Register = () => {
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 right-20 w-64 h-64 bg-white rounded-full"></div>
-          <div className="absolute bottom-20 left-20 w-48 h-48 bg-carelink-navy rounded-full"></div>
+          <div className="absolute bottom-20 left-20 w-48 h-48 bg-carefd-navy rounded-full"></div>
         </div>
         
         <div className="relative z-10 text-white max-w-lg">
@@ -271,7 +271,7 @@ const Register = () => {
           <div className="space-y-4">
             {benefits.map((benefit, index) => (
               <div key={index} className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl">
-                <FaCheckCircle className="text-carelink-teal-pale flex-shrink-0" />
+                <FaCheckCircle className="text-carefd-teal-pale flex-shrink-0" />
                 <span>{benefit}</span>
               </div>
             ))}
@@ -282,7 +282,7 @@ const Register = () => {
               {['א', 'ב', 'ג', 'ד'].map((letter, i) => (
                 <div
                   key={i}
-                  className="w-10 h-10 bg-carelink-teal rounded-full border-2 border-white flex items-center justify-center text-white font-bold"
+                  className="w-10 h-10 bg-carefd-teal rounded-full border-2 border-white flex items-center justify-center text-white font-bold"
                 >
                   {letter}
                 </div>

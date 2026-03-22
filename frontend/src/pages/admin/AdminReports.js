@@ -44,7 +44,7 @@ const AdminReports = () => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-100">
-          <p className="text-carelink-navy font-medium">{label}</p>
+          <p className="text-carefd-navy font-medium">{label}</p>
           {payload.map((entry, index) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
               {entry.name}: {entry.value}
@@ -60,7 +60,7 @@ const AdminReports = () => {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center h-96">
-          <div className="w-12 h-12 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-12 h-12 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
         </div>
       </AdminLayout>
     );
@@ -72,8 +72,8 @@ const AdminReports = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-carelink-navy">דוחות וסטטיסטיקות</h1>
-            <p className="text-carelink-slate mt-1">ניתוח נתוני הפלטפורמה</p>
+            <h1 className="text-2xl font-bold text-carefd-navy">דוחות וסטטיסטיקות</h1>
+            <p className="text-carefd-slate mt-1">ניתוח נתוני הפלטפורמה</p>
           </div>
           <div className="flex items-center gap-2">
             {periodOptions.map((opt) => (
@@ -82,8 +82,8 @@ const AdminReports = () => {
                 onClick={() => setPeriod(opt.value)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
                   period === opt.value
-                    ? 'bg-carelink-teal text-white shadow-md'
-                    : 'bg-white text-carelink-slate border border-gray-200 hover:bg-gray-50'
+                    ? 'bg-carefd-teal text-white shadow-md'
+                    : 'bg-white text-carefd-slate border border-gray-200 hover:bg-gray-50'
                 }`}
               >
                 {opt.label}
@@ -96,42 +96,42 @@ const AdminReports = () => {
         {reports?.summary && (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-              <div className="flex items-center gap-2 text-carelink-slate text-sm mb-1">
+              <div className="flex items-center gap-2 text-carefd-slate text-sm mb-1">
                 <FiCalendar size={14} />
                 הזמנות
               </div>
-              <p className="text-2xl font-bold text-carelink-navy">{reports.summary.total_bookings}</p>
+              <p className="text-2xl font-bold text-carefd-navy">{reports.summary.total_bookings}</p>
             </div>
             <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-              <div className="flex items-center gap-2 text-carelink-slate text-sm mb-1">
+              <div className="flex items-center gap-2 text-carefd-slate text-sm mb-1">
                 <FiDollarSign size={14} />
                 הכנסות
               </div>
               <p className="text-2xl font-bold text-emerald-500">₪{reports.summary.total_revenue?.toLocaleString()}</p>
             </div>
             <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-              <div className="flex items-center gap-2 text-carelink-slate text-sm mb-1">
+              <div className="flex items-center gap-2 text-carefd-slate text-sm mb-1">
                 <FiUsers size={14} />
                 משתמשים חדשים
               </div>
-              <p className="text-2xl font-bold text-carelink-navy">{reports.summary.new_users}</p>
+              <p className="text-2xl font-bold text-carefd-navy">{reports.summary.new_users}</p>
             </div>
             <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-              <div className="flex items-center gap-2 text-carelink-slate text-sm mb-1">
+              <div className="flex items-center gap-2 text-carefd-slate text-sm mb-1">
                 <FiBriefcase size={14} />
                 ספקים חדשים
               </div>
-              <p className="text-2xl font-bold text-carelink-navy">{reports.summary.new_providers}</p>
+              <p className="text-2xl font-bold text-carefd-navy">{reports.summary.new_providers}</p>
             </div>
             <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-              <div className="flex items-center gap-2 text-carelink-slate text-sm mb-1">
+              <div className="flex items-center gap-2 text-carefd-slate text-sm mb-1">
                 <FiStar size={14} />
                 ביקורות
               </div>
-              <p className="text-2xl font-bold text-carelink-navy">{reports.summary.new_reviews}</p>
+              <p className="text-2xl font-bold text-carefd-navy">{reports.summary.new_reviews}</p>
             </div>
             <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-              <div className="flex items-center gap-2 text-carelink-slate text-sm mb-1">
+              <div className="flex items-center gap-2 text-carefd-slate text-sm mb-1">
                 <FiStar size={14} />
                 דירוג ממוצע
               </div>
@@ -145,8 +145,8 @@ const AdminReports = () => {
           {/* Bookings Timeline */}
           <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
-              <FiTrendingUp className="text-carelink-teal" size={20} />
-              <h2 className="text-lg font-semibold text-carelink-navy">הזמנות לאורך זמן</h2>
+              <FiTrendingUp className="text-carefd-teal" size={20} />
+              <h2 className="text-lg font-semibold text-carefd-navy">הזמנות לאורך זמן</h2>
             </div>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
@@ -184,8 +184,8 @@ const AdminReports = () => {
           {/* Status Distribution */}
           <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
-              <FiPieChart className="text-carelink-teal" size={20} />
-              <h2 className="text-lg font-semibold text-carelink-navy">התפלגות סטטוס הזמנות</h2>
+              <FiPieChart className="text-carefd-teal" size={20} />
+              <h2 className="text-lg font-semibold text-carefd-navy">התפלגות סטטוס הזמנות</h2>
             </div>
             <div className="h-64 flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
@@ -216,8 +216,8 @@ const AdminReports = () => {
           {/* Top Providers */}
           <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
-              <FiBarChart2 className="text-carelink-teal" size={20} />
-              <h2 className="text-lg font-semibold text-carelink-navy">ספקים מובילים</h2>
+              <FiBarChart2 className="text-carefd-teal" size={20} />
+              <h2 className="text-lg font-semibold text-carefd-navy">ספקים מובילים</h2>
             </div>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
@@ -250,7 +250,7 @@ const AdminReports = () => {
           <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
               <FiDollarSign className="text-emerald-500" size={20} />
-              <h2 className="text-lg font-semibold text-carelink-navy">הכנסות לאורך זמן</h2>
+              <h2 className="text-lg font-semibold text-carefd-navy">הכנסות לאורך זמן</h2>
             </div>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
@@ -287,43 +287,43 @@ const AdminReports = () => {
 
         {/* Quick Stats Table */}
         <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
-          <h2 className="text-lg font-semibold text-carelink-navy mb-4">סיכום מהיר</h2>
+          <h2 className="text-lg font-semibold text-carefd-navy mb-4">סיכום מהיר</h2>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100">
-                  <th className="text-right py-3 px-4 text-carelink-slate font-medium text-sm">מדד</th>
-                  <th className="text-right py-3 px-4 text-carelink-slate font-medium text-sm">תקופה נוכחית</th>
-                  <th className="text-right py-3 px-4 text-carelink-slate font-medium text-sm">שינוי</th>
+                  <th className="text-right py-3 px-4 text-carefd-slate font-medium text-sm">מדד</th>
+                  <th className="text-right py-3 px-4 text-carefd-slate font-medium text-sm">תקופה נוכחית</th>
+                  <th className="text-right py-3 px-4 text-carefd-slate font-medium text-sm">שינוי</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="border-b border-gray-50">
-                  <td className="py-3 px-4 text-carelink-navy">סה"כ הזמנות</td>
-                  <td className="py-3 px-4 font-semibold text-carelink-navy">{reports?.summary?.total_bookings || 0}</td>
+                  <td className="py-3 px-4 text-carefd-navy">סה"כ הזמנות</td>
+                  <td className="py-3 px-4 font-semibold text-carefd-navy">{reports?.summary?.total_bookings || 0}</td>
                   <td className="py-3 px-4">
                     <span className="text-emerald-500 text-sm">+{Math.floor(Math.random() * 20)}%</span>
                   </td>
                 </tr>
                 <tr className="border-b border-gray-50">
-                  <td className="py-3 px-4 text-carelink-navy">הכנסות</td>
+                  <td className="py-3 px-4 text-carefd-navy">הכנסות</td>
                   <td className="py-3 px-4 font-semibold text-emerald-500">₪{reports?.summary?.total_revenue?.toLocaleString() || 0}</td>
                   <td className="py-3 px-4">
                     <span className="text-emerald-500 text-sm">+{Math.floor(Math.random() * 15)}%</span>
                   </td>
                 </tr>
                 <tr className="border-b border-gray-50">
-                  <td className="py-3 px-4 text-carelink-navy">משתמשים חדשים</td>
-                  <td className="py-3 px-4 font-semibold text-carelink-navy">{reports?.summary?.new_users || 0}</td>
+                  <td className="py-3 px-4 text-carefd-navy">משתמשים חדשים</td>
+                  <td className="py-3 px-4 font-semibold text-carefd-navy">{reports?.summary?.new_users || 0}</td>
                   <td className="py-3 px-4">
                     <span className="text-emerald-500 text-sm">+{Math.floor(Math.random() * 25)}%</span>
                   </td>
                 </tr>
                 <tr>
-                  <td className="py-3 px-4 text-carelink-navy">דירוג ממוצע</td>
+                  <td className="py-3 px-4 text-carefd-navy">דירוג ממוצע</td>
                   <td className="py-3 px-4 font-semibold text-amber-500">{reports?.summary?.avg_rating || 0} ⭐</td>
                   <td className="py-3 px-4">
-                    <span className="text-carelink-slate text-sm">יציב</span>
+                    <span className="text-carefd-slate text-sm">יציב</span>
                   </td>
                 </tr>
               </tbody>

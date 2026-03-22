@@ -134,13 +134,13 @@ async def admin_test_email(
 
     result = await send_email_async(
         recipient,
-        "CareLink - בדיקת שליחת מייל",
+        "CareFD - בדיקת שליחת מייל",
         """
         <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #19B8BA;">בדיקת שליחת מייל</h2>
             <p>מייל זה נשלח כבדיקה מהמערכת.</p>
             <p>אם קיבלת את המייל הזה, שליחת המיילים עובדת כראוי.</p>
-            <p>בברכה,<br>צוות CareLink</p>
+            <p>בברכה,<br>צוות CareFD</p>
         </div>
         """
     )
@@ -826,14 +826,14 @@ async def admin_verify_provider(
         if provider_user:
             await send_email_async(
                 provider_user.get("email"),
-                "CareLink - החשבון שלך אומת!",
+                "CareFD - החשבון שלך אומת!",
                 f"""
                 <h1>ברכות! החשבון שלך אומת 🎉</h1>
                 <p>שלום {provider.get('business_name', 'ספק')},</p>
                 <p>אנו שמחים לבשר לך שהפרופיל שלך אומת בהצלחה!</p>
                 <p>כעת לקוחות יכולים לראות את תג האימות שלך ולהזמין את השירותים שלך.</p>
                 <p>בהצלחה!</p>
-                <p>צוות CareLink</p>
+                <p>צוות CareFD</p>
                 """
             )
     

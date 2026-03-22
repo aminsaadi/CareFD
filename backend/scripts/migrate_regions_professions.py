@@ -10,7 +10,7 @@ Usage:
     python -m scripts.migrate_regions_professions
 
 Or with explicit env vars:
-    MONGO_URL=mongodb+srv://... DB_NAME=carelink python -m scripts.migrate_regions_professions
+    MONGO_URL=mongodb+srv://... DB_NAME=carefd python -m scripts.migrate_regions_professions
 
 Options:
     --dry-run    Show what would be done without making changes

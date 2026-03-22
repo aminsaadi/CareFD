@@ -184,12 +184,12 @@ const AdminAds = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-carelink-navy">ניהול פרסומות</h1>
-            <p className="text-carelink-slate mt-1">ניהול באנרים ומודעות באתר</p>
+            <h1 className="text-2xl font-bold text-carefd-navy">ניהול פרסומות</h1>
+            <p className="text-carefd-slate mt-1">ניהול באנרים ומודעות באתר</p>
           </div>
           <button
             onClick={() => openEditor()}
-            className="flex items-center gap-2 px-4 py-2 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition"
+            className="flex items-center gap-2 px-4 py-2 bg-carefd-teal text-carefd-navy rounded-lg hover:bg-carefd-teal/90 transition"
           >
             <FiPlus size={18} />
             פרסומת חדשה
@@ -199,20 +199,20 @@ const AdminAds = () => {
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-carelink-slate text-sm">סה"כ פרסומות</p>
-            <p className="text-2xl font-bold text-carelink-navy mt-1">{ads.length}</p>
+            <p className="text-carefd-slate text-sm">סה"כ פרסומות</p>
+            <p className="text-2xl font-bold text-carefd-navy mt-1">{ads.length}</p>
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-carelink-slate text-sm">פעילות</p>
+            <p className="text-carefd-slate text-sm">פעילות</p>
             <p className="text-2xl font-bold text-emerald-400 mt-1">{ads.filter(a => a.is_active).length}</p>
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-carelink-slate text-sm">סה"כ צפיות</p>
-            <p className="text-2xl font-bold text-carelink-navy mt-1">{ads.reduce((sum, a) => sum + (a.views || 0), 0).toLocaleString()}</p>
+            <p className="text-carefd-slate text-sm">סה"כ צפיות</p>
+            <p className="text-2xl font-bold text-carefd-navy mt-1">{ads.reduce((sum, a) => sum + (a.views || 0), 0).toLocaleString()}</p>
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-carelink-slate text-sm">סה"כ קליקים</p>
-            <p className="text-2xl font-bold text-carelink-navy mt-1">{ads.reduce((sum, a) => sum + (a.clicks || 0), 0).toLocaleString()}</p>
+            <p className="text-carefd-slate text-sm">סה"כ קליקים</p>
+            <p className="text-2xl font-bold text-carefd-navy mt-1">{ads.reduce((sum, a) => sum + (a.clicks || 0), 0).toLocaleString()}</p>
           </div>
         </div>
 
@@ -221,24 +221,24 @@ const AdminAds = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100">
-                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">פרסומת</th>
-                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">מיקום</th>
-                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">צפיות / קליקים</th>
-                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">תקופה</th>
-                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">סטטוס</th>
-                <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">פעולות</th>
+                <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">פרסומת</th>
+                <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">מיקום</th>
+                <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">צפיות / קליקים</th>
+                <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">תקופה</th>
+                <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">סטטוס</th>
+                <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">פעולות</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center">
-                    <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    <div className="w-8 h-8 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
                   </td>
                 </tr>
               ) : ads.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-carelink-slate">
+                  <td colSpan={6} className="py-12 text-center text-carefd-slate">
                     <FiImage className="mx-auto mb-3" size={32} />
                     אין פרסומות. צור פרסומת ראשונה.
                   </td>
@@ -253,14 +253,14 @@ const AdminAds = () => {
                             <img src={ad.image_url} alt={ad.title} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                              <FiImage className="text-carelink-gray" />
+                              <FiImage className="text-carefd-gray" />
                             </div>
                           )}
                         </div>
                         <div>
-                          <p className="text-carelink-navy font-medium">{ad.title}</p>
+                          <p className="text-carefd-navy font-medium">{ad.title}</p>
                           {ad.link_url && (
-                            <a href={ad.link_url} target="_blank" rel="noopener noreferrer" className="text-carelink-slate text-sm flex items-center gap-1 hover:text-carelink-teal">
+                            <a href={ad.link_url} target="_blank" rel="noopener noreferrer" className="text-carefd-slate text-sm flex items-center gap-1 hover:text-carefd-teal">
                               <FiExternalLink size={12} />
                               קישור
                             </a>
@@ -269,11 +269,11 @@ const AdminAds = () => {
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <span className="bg-gray-50 text-carelink-slate px-2 py-1 rounded text-sm">
+                      <span className="bg-gray-50 text-carefd-slate px-2 py-1 rounded text-sm">
                         {getPositionLabel(ad.position)}
                       </span>
                     </td>
-                    <td className="py-4 px-6 text-carelink-slate text-sm">
+                    <td className="py-4 px-6 text-carefd-slate text-sm">
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1">
                           <FiEye size={14} />
@@ -283,12 +283,12 @@ const AdminAds = () => {
                         <span>{(ad.clicks || 0).toLocaleString()}</span>
                       </div>
                       {ad.views > 0 && (
-                        <p className="text-xs text-carelink-gray">
+                        <p className="text-xs text-carefd-gray">
                           CTR: {((ad.clicks / ad.views) * 100).toFixed(2)}%
                         </p>
                       )}
                     </td>
-                    <td className="py-4 px-6 text-carelink-slate text-sm">
+                    <td className="py-4 px-6 text-carefd-slate text-sm">
                       {ad.start_date && ad.end_date ? (
                         <span className="flex items-center gap-1">
                           <FiCalendar size={14} />
@@ -304,7 +304,7 @@ const AdminAds = () => {
                         className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition ${
                           ad.is_active 
                             ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30'
-                            : 'bg-gray-100/50 text-carelink-slate hover:bg-gray-100'
+                            : 'bg-gray-100/50 text-carefd-slate hover:bg-gray-100'
                         }`}
                       >
                         {ad.is_active ? <FiToggleRight size={16} /> : <FiToggleLeft size={16} />}
@@ -315,13 +315,13 @@ const AdminAds = () => {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => openEditor(ad)}
-                          className="p-2 text-carelink-slate hover:text-carelink-teal hover:bg-carelink-teal/10 rounded-lg transition"
+                          className="p-2 text-carefd-slate hover:text-carefd-teal hover:bg-carefd-teal/10 rounded-lg transition"
                         >
                           <FiEdit2 size={16} />
                         </button>
                         <button
                           onClick={() => deleteAd(ad.ad_id)}
-                          className="p-2 text-carelink-slate hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
+                          className="p-2 text-carefd-slate hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
                         >
                           <FiTrash2 size={16} />
                         </button>
@@ -340,12 +340,12 @@ const AdminAds = () => {
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-2xl border border-gray-100">
             <div className="flex items-center justify-between p-4 border-b border-gray-100">
-              <h2 className="text-lg font-bold text-carelink-navy">
+              <h2 className="text-lg font-bold text-carefd-navy">
                 {editingAd ? 'עריכת פרסומת' : 'פרסומת חדשה'}
               </h2>
               <button
                 onClick={() => setShowEditor(false)}
-                className="p-2 text-carelink-slate hover:text-carelink-navy hover:bg-gray-50 rounded-lg transition"
+                className="p-2 text-carefd-slate hover:text-carefd-navy hover:bg-gray-50 rounded-lg transition"
               >
                 ✕
               </button>
@@ -353,46 +353,46 @@ const AdminAds = () => {
 
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm text-carelink-slate mb-2">כותרת (פנימית)</label>
+                <label className="block text-sm text-carefd-slate mb-2">כותרת (פנימית)</label>
                 <input
                   type="text"
                   value={currentAd.title}
                   onChange={(e) => setCurrentAd(prev => ({ ...prev, title: e.target.value }))}
                   placeholder="שם הקמפיין / הפרסומת"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-carelink-slate mb-2">תמונת באנר (URL)</label>
+                <label className="block text-sm text-carefd-slate mb-2">תמונת באנר (URL)</label>
                 <input
                   type="text"
                   value={currentAd.image_url}
                   onChange={(e) => setCurrentAd(prev => ({ ...prev, image_url: e.target.value }))}
                   placeholder="https://example.com/banner.jpg"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal outline-none"
                   dir="ltr"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-carelink-slate mb-2">קישור יעד</label>
+                <label className="block text-sm text-carefd-slate mb-2">קישור יעד</label>
                 <input
                   type="text"
                   value={currentAd.link_url}
                   onChange={(e) => setCurrentAd(prev => ({ ...prev, link_url: e.target.value }))}
                   placeholder="https://example.com"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal outline-none"
                   dir="ltr"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-carelink-slate mb-2">מיקום</label>
+                <label className="block text-sm text-carefd-slate mb-2">מיקום</label>
                 <select
                   value={currentAd.position}
                   onChange={(e) => setCurrentAd(prev => ({ ...prev, position: e.target.value }))}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal outline-none"
                 >
                   {positions.map((pos) => (
                     <option key={pos.value} value={pos.value}>{pos.label}</option>
@@ -402,21 +402,21 @@ const AdminAds = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2">תאריך התחלה</label>
+                  <label className="block text-sm text-carefd-slate mb-2">תאריך התחלה</label>
                   <input
                     type="date"
                     value={currentAd.start_date}
                     onChange={(e) => setCurrentAd(prev => ({ ...prev, start_date: e.target.value }))}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2">תאריך סיום</label>
+                  <label className="block text-sm text-carefd-slate mb-2">תאריך סיום</label>
                   <input
                     type="date"
                     value={currentAd.end_date}
                     onChange={(e) => setCurrentAd(prev => ({ ...prev, end_date: e.target.value }))}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal outline-none"
                   />
                 </div>
               </div>
@@ -429,23 +429,23 @@ const AdminAds = () => {
                     onChange={(e) => setCurrentAd(prev => ({ ...prev, is_active: e.target.checked }))}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-100 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
+                  <div className="w-11 h-6 bg-gray-100 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carefd-teal"></div>
                 </label>
-                <span className="text-carelink-slate">פעיל</span>
+                <span className="text-carefd-slate">פעיל</span>
               </div>
             </div>
 
             <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-100">
               <button
                 onClick={() => setShowEditor(false)}
-                className="px-6 py-2.5 bg-gray-50 text-carelink-navy rounded-lg hover:bg-gray-100 transition"
+                className="px-6 py-2.5 bg-gray-50 text-carefd-navy rounded-lg hover:bg-gray-100 transition"
               >
                 ביטול
               </button>
               <button
                 onClick={saveAd}
                 disabled={!currentAd.title.trim() || !currentAd.image_url.trim()}
-                className="px-6 py-2.5 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition disabled:opacity-50"
+                className="px-6 py-2.5 bg-carefd-teal text-carefd-navy rounded-lg hover:bg-carefd-teal/90 transition disabled:opacity-50"
               >
                 שמור
               </button>

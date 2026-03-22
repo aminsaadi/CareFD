@@ -13,12 +13,12 @@ import requests
 import os
 import io
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://carelink-preview-5.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://carefd-preview-5.preview.emergentagent.com')
 
 # Test credentials
-ADMIN_CREDS = {"email": "admin@carelink.co.il", "password": "password"}
-USER_CREDS = {"email": "user@carelink.co.il", "password": "password"}
-PROVIDER_CREDS = {"email": "provider@carelink.co.il", "password": "password"}
+ADMIN_CREDS = {"email": "admin@carefd.com", "password": "password"}
+USER_CREDS = {"email": "user@carefd.com", "password": "password"}
+PROVIDER_CREDS = {"email": "provider@carefd.com", "password": "password"}
 
 
 class TestAuthHelpers:

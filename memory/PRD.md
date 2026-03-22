@@ -1,4 +1,4 @@
-# CareLink - Service Marketplace Platform
+# CareFD - Service Marketplace Platform
 
 ## Architecture
 Backend: /app/backend/app/ (database.py, models.py, utils.py, localities.py, routers/ with 18 files)
@@ -74,9 +74,9 @@ Frontend: /app/frontend/src/ (context/, components/, pages/, data/)
 ## Mocked: PayPal, Subscription payments
 
 ## Test Credentials
-- Admin: admin@carelink.co.il / password
-- User: user@carelink.co.il / password
-- Provider: provider@carelink.co.il / password
+- Admin: admin@carefd.com / password
+- User: user@carefd.com / password
+- Provider: provider@carefd.com / password
 
 ## Backlog
 - P2: PayPal integration (blocked on API keys)
@@ -85,4 +85,4 @@ Frontend: /app/frontend/src/ (context/, components/, pages/, data/)
 - Low: Refactor show-password into reusable PasswordInput component
 
 ## Known Issues
-- Production (carelink.co.il): Login/Register shows error - needs new deploy + Cloudflare cache clear
+- Production (carefd.com): Login/Register shows error - needs new deploy + Cloudflare cache clear

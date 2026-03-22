@@ -85,9 +85,9 @@ class TestExistingUsersCanLogin:
     """Test existing users (admin, provider) can still login without email verification"""
     
     def test_admin_can_login(self):
-        """Admin user admin@carelink.co.il should be able to login (exempt from verification)"""
+        """Admin user admin@carefd.com should be able to login (exempt from verification)"""
         response = requests.post(f"{BASE_URL}/api/auth/login", json={
-            "email": "admin@carelink.co.il",
+            "email": "admin@carefd.com",
             "password": "password"
         })
         
@@ -95,14 +95,14 @@ class TestExistingUsersCanLogin:
         
         data = response.json()
         assert "session_token" in data, f"Expected session_token in response, got {data}"
-        assert data["user"]["email"] == "admin@carelink.co.il"
+        assert data["user"]["email"] == "admin@carefd.com"
         assert data["user"]["role"] == "admin"
-        print("✓ Admin admin@carelink.co.il can login (exempt from email verification)")
+        print("✓ Admin admin@carefd.com can login (exempt from email verification)")
     
     def test_provider_can_login(self):
-        """Provider user provider@carelink.co.il should be able to login (exempt from verification)"""
+        """Provider user provider@carefd.com should be able to login (exempt from verification)"""
         response = requests.post(f"{BASE_URL}/api/auth/login", json={
-            "email": "provider@carelink.co.il",
+            "email": "provider@carefd.com",
             "password": "password"
         })
         
@@ -110,8 +110,8 @@ class TestExistingUsersCanLogin:
         
         data = response.json()
         assert "session_token" in data, f"Expected session_token in response, got {data}"
-        assert data["user"]["email"] == "provider@carelink.co.il"
-        print("✓ Provider provider@carelink.co.il can login (exempt from email verification)")
+        assert data["user"]["email"] == "provider@carefd.com"
+        print("✓ Provider provider@carefd.com can login (exempt from email verification)")
 
 
 class TestVerifyEmailEndpoint:

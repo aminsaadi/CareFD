@@ -242,12 +242,12 @@ const ProviderProfile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale flex flex-col">
+      <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <div className="w-16 h-16 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-carelink-slate">{t('loading')}</p>
+            <div className="w-16 h-16 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-carefd-slate">{t('loading')}</p>
           </div>
         </div>
         <Footer />
@@ -257,16 +257,16 @@ const ProviderProfile = () => {
 
   if (!provider) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale flex flex-col">
+      <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <FaUserMd className="text-6xl text-carelink-gray mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-carelink-navy mb-2">ספק לא נמצא</h2>
-            <p className="text-carelink-slate mb-4">הספק שחיפשת לא קיים במערכת</p>
+            <FaUserMd className="text-6xl text-carefd-gray mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-carefd-navy mb-2">ספק לא נמצא</h2>
+            <p className="text-carefd-slate mb-4">הספק שחיפשת לא קיים במערכת</p>
             <Link
               to="/providers"
-              className="inline-flex items-center gap-2 bg-carelink-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition"
+              className="inline-flex items-center gap-2 bg-carefd-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition"
             >
               חזור לרשימת הספקים
             </Link>
@@ -278,11 +278,11 @@ const ProviderProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale flex flex-col">
       <Navbar />
       
       {/* Hero Header */}
-      <div className="bg-gradient-to-r from-carelink-navy via-carelink-slate to-carelink-teal text-white">
+      <div className="bg-gradient-to-r from-carefd-navy via-carefd-slate to-carefd-teal text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col lg:flex-row gap-8 items-start">
             {/* Provider Avatar/Logo */}
@@ -295,7 +295,7 @@ const ProviderProfile = () => {
                   data-testid="provider-profile-image"
                 />
               ) : (
-                <span className="text-5xl lg:text-6xl font-bold text-carelink-teal">
+                <span className="text-5xl lg:text-6xl font-bold text-carefd-teal">
                   {(provider.business_name || 'ס')[0]}
                 </span>
               )}
@@ -308,7 +308,7 @@ const ProviderProfile = () => {
                   {provider.business_name || 'ספק שירותים'}
                 </h1>
                 {provider.is_verified && (
-                  <span className="inline-flex items-center gap-1 bg-carelink-teal px-3 py-1 rounded-full text-sm" data-testid="verified-badge">
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal px-3 py-1 rounded-full text-sm" data-testid="verified-badge">
                     <FaCheckCircle /> מאומת
                   </span>
                 )}
@@ -322,7 +322,7 @@ const ProviderProfile = () => {
               {/* Profession & Specialization */}
               {(provider.profession_name || provider.profession_title) && (
                 <div className="mb-3" data-testid="profession-title">
-                  <p className="text-xl text-carelink-teal-pale font-medium mb-1">
+                  <p className="text-xl text-carefd-teal-pale font-medium mb-1">
                     {provider.profession_name || getProfessionLabel(provider.profession_title)}
                   </p>
                   {provider.specialization_name && (
@@ -363,7 +363,7 @@ const ProviderProfile = () => {
                 <div className="inline-flex items-center gap-2 bg-yellow-500/20 px-3 py-1 rounded-full">
                   <FaStar className="text-yellow-400" />
                   <span className="font-bold">{provider.rating?.toFixed(1) || '0.0'}</span>
-                  <span className="text-carelink-teal-pale">({provider.total_reviews || 0} ביקורות)</span>
+                  <span className="text-carefd-teal-pale">({provider.total_reviews || 0} ביקורות)</span>
                 </div>
               </div>
 
@@ -385,7 +385,7 @@ const ProviderProfile = () => {
               )}
               
               {provider.description && (
-                <p className="text-carelink-teal-pale text-lg max-w-2xl leading-relaxed mb-6">
+                <p className="text-carefd-teal-pale text-lg max-w-2xl leading-relaxed mb-6">
                   {provider.description}
                 </p>
               )}
@@ -403,7 +403,7 @@ const ProviderProfile = () => {
 
                 <button
                   onClick={handleCall}
-                  className="inline-flex items-center gap-2 bg-carelink-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition shadow-lg"
+                  className="inline-flex items-center gap-2 bg-carefd-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition shadow-lg"
                   data-testid="call-btn"
                 >
                   <FaPhone />
@@ -412,7 +412,7 @@ const ProviderProfile = () => {
                 
                 <button
                   onClick={() => setActiveTab('services')}
-                  className="inline-flex items-center gap-2 bg-white text-carelink-navy px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-pale transition"
+                  className="inline-flex items-center gap-2 bg-white text-carefd-navy px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-pale transition"
                   data-testid="view-services-btn"
                 >
                   <FaCalendarAlt />
@@ -470,32 +470,32 @@ const ProviderProfile = () => {
       </div>
 
       {/* Stats Bar */}
-      <div className="bg-white border-b border-carelink-teal-pale">
+      <div className="bg-white border-b border-carefd-teal-pale">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-carelink-teal mb-1">
+              <div className="text-3xl font-bold text-carefd-teal mb-1">
                 {provider.services_list?.length || 0}
               </div>
-              <div className="text-sm text-carelink-gray">שירותים</div>
+              <div className="text-sm text-carefd-gray">שירותים</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-carelink-teal mb-1">
+              <div className="text-3xl font-bold text-carefd-teal mb-1">
                 {provider.total_reviews || 0}
               </div>
-              <div className="text-sm text-carelink-gray">ביקורות</div>
+              <div className="text-sm text-carefd-gray">ביקורות</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-carelink-teal mb-1">
+              <div className="text-3xl font-bold text-carefd-teal mb-1">
                 {provider.team_members?.length || 1}
               </div>
-              <div className="text-sm text-carelink-gray">אנשי צוות</div>
+              <div className="text-sm text-carefd-gray">אנשי צוות</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-carelink-teal mb-1">
+              <div className="text-3xl font-bold text-carefd-teal mb-1">
                 {provider.specializations?.length || 0}
               </div>
-              <div className="text-sm text-carelink-gray">התמחויות</div>
+              <div className="text-sm text-carefd-gray">התמחויות</div>
             </div>
           </div>
         </div>
@@ -508,7 +508,7 @@ const ProviderProfile = () => {
           <div className="lg:col-span-2 space-y-8">
             {/* Tabs */}
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <div className="flex border-b border-carelink-teal-pale">
+              <div className="flex border-b border-carefd-teal-pale">
                 {[
                   { id: 'services', label: 'שירותים', icon: FaCalendarAlt },
                   { id: 'reviews', label: 'ביקורות', icon: FaStar },
@@ -519,8 +519,8 @@ const ProviderProfile = () => {
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 font-semibold transition ${
                       activeTab === tab.id
-                        ? 'text-carelink-teal border-b-2 border-carelink-teal bg-carelink-teal-pale/20'
-                        : 'text-carelink-gray hover:text-carelink-navy hover:bg-gray-50'
+                        ? 'text-carefd-teal border-b-2 border-carefd-teal bg-carefd-teal-pale/20'
+                        : 'text-carefd-gray hover:text-carefd-navy hover:bg-gray-50'
                     }`}
                     data-testid={`tab-${tab.id}`}
                   >
@@ -546,7 +546,7 @@ const ProviderProfile = () => {
                         return (
                           <div
                             key={service.service_id}
-                            className="border border-gray-100 rounded-xl p-5 hover:border-carelink-teal hover:shadow-md transition group bg-white"
+                            className="border border-gray-100 rounded-xl p-5 hover:border-carefd-teal hover:shadow-md transition group bg-white"
                             data-testid={`service-${service.service_id}`}
                           >
                             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
@@ -563,12 +563,12 @@ const ProviderProfile = () => {
                                     </span>
                                   )}
                                 </div>
-                                <h3 className="text-xl font-bold text-carelink-navy mb-1.5">{service.name}</h3>
-                                <p className="text-carelink-slate text-sm mb-3 line-clamp-2">{service.description}</p>
-                                <div className="flex flex-wrap items-center gap-3 text-sm text-carelink-gray">
+                                <h3 className="text-xl font-bold text-carefd-navy mb-1.5">{service.name}</h3>
+                                <p className="text-carefd-slate text-sm mb-3 line-clamp-2">{service.description}</p>
+                                <div className="flex flex-wrap items-center gap-3 text-sm text-carefd-gray">
                                   {service.duration_minutes && (
                                     <span className="inline-flex items-center gap-1">
-                                      <FaClock className="text-carelink-teal text-xs" />
+                                      <FaClock className="text-carefd-teal text-xs" />
                                       {service.duration_minutes} דקות
                                     </span>
                                   )}
@@ -576,14 +576,14 @@ const ProviderProfile = () => {
                               </div>
                               <div className="flex flex-col items-end gap-3">
                                 <div className="text-left">
-                                  <span className="text-3xl font-bold text-carelink-teal">₪{service.price}</span>
+                                  <span className="text-3xl font-bold text-carefd-teal">₪{service.price}</span>
                                   {priceUnit && (
-                                    <span className="text-sm text-carelink-gray mr-1">/{priceUnit}</span>
+                                    <span className="text-sm text-carefd-gray mr-1">/{priceUnit}</span>
                                   )}
                                 </div>
                                 <button
                                   onClick={() => handleBookService(service.service_id)}
-                                  className="bg-carelink-teal text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-carelink-teal-medium transition text-sm"
+                                  className="bg-carefd-teal text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-carefd-teal-medium transition text-sm"
                                   data-testid={`book-${service.service_id}`}
                                 >
                                   הזמן עכשיו
@@ -594,8 +594,8 @@ const ProviderProfile = () => {
                         );
                       })
                     ) : (
-                      <div className="text-center py-8 text-carelink-gray">
-                        <FaCalendarAlt className="text-4xl mx-auto mb-3 text-carelink-teal-pale" />
+                      <div className="text-center py-8 text-carefd-gray">
+                        <FaCalendarAlt className="text-4xl mx-auto mb-3 text-carefd-teal-pale" />
                         <p>אין שירותים להצגה כרגע</p>
                       </div>
                     )}
@@ -606,10 +606,10 @@ const ProviderProfile = () => {
                 {activeTab === 'reviews' && (
                   <div className="space-y-6" data-testid="reviews-section">
                     {/* Rating Summary */}
-                    <div className="bg-carelink-teal-pale/20 rounded-xl p-6 mb-6">
+                    <div className="bg-carefd-teal-pale/20 rounded-xl p-6 mb-6">
                       <div className="flex items-center gap-6">
                         <div className="text-center">
-                          <div className="text-5xl font-bold text-carelink-teal mb-1">
+                          <div className="text-5xl font-bold text-carefd-teal mb-1">
                             {provider.rating?.toFixed(1) || '0.0'}
                           </div>
                           <div className="flex justify-center mb-1">
@@ -620,7 +620,7 @@ const ProviderProfile = () => {
                               />
                             ))}
                           </div>
-                          <div className="text-sm text-carelink-gray">
+                          <div className="text-sm text-carefd-gray">
                             {provider.total_reviews || 0} ביקורות
                           </div>
                         </div>
@@ -638,7 +638,7 @@ const ProviderProfile = () => {
                                     style={{ width: `${percentage}%` }}
                                   ></div>
                                 </div>
-                                <span className="text-sm text-carelink-gray w-8">{count}</span>
+                                <span className="text-sm text-carefd-gray w-8">{count}</span>
                               </div>
                             );
                           })}
@@ -648,8 +648,8 @@ const ProviderProfile = () => {
 
                     {/* Add Review Form */}
                     {isAuthenticated && !isOwner && (
-                      <div className="bg-carelink-teal-pale/20 rounded-xl p-6 mb-6">
-                        <h4 className="font-bold text-carelink-navy mb-4">הוסף ביקורת</h4>
+                      <div className="bg-carefd-teal-pale/20 rounded-xl p-6 mb-6">
+                        <h4 className="font-bold text-carefd-navy mb-4">הוסף ביקורת</h4>
                         <AddReviewForm 
                           providerId={providerId} 
                           onReviewAdded={fetchReviews}
@@ -660,14 +660,14 @@ const ProviderProfile = () => {
                     {/* Reviews List */}
                     {reviews.length > 0 ? (
                       reviews.map((review) => (
-                        <div key={review.review_id} className="border-b border-carelink-teal-pale pb-6 last:border-0">
+                        <div key={review.review_id} className="border-b border-carefd-teal-pale pb-6 last:border-0">
                           <div className="flex items-start gap-4">
-                            <div className="w-12 h-12 bg-carelink-teal rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                            <div className="w-12 h-12 bg-carefd-teal rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                               {(review.user?.name || 'מ')[0]}
                             </div>
                             <div className="flex-1">
                               <div className="flex flex-wrap items-center gap-3 mb-2">
-                                <span className="font-bold text-carelink-navy">{review.user?.name || 'משתמש'}</span>
+                                <span className="font-bold text-carefd-navy">{review.user?.name || 'משתמש'}</span>
                                 <div className="flex">
                                   {[...Array(5)].map((_, i) => (
                                     <FaStar
@@ -676,12 +676,12 @@ const ProviderProfile = () => {
                                     />
                                   ))}
                                 </div>
-                                <span className="text-sm text-carelink-gray">
+                                <span className="text-sm text-carefd-gray">
                                   {new Date(review.created_at).toLocaleDateString('he-IL')}
                                 </span>
                               </div>
-                              <p className="text-carelink-slate leading-relaxed">
-                                <FaQuoteRight className="inline text-carelink-teal-pale ml-2" />
+                              <p className="text-carefd-slate leading-relaxed">
+                                <FaQuoteRight className="inline text-carefd-teal-pale ml-2" />
                                 {review.comment}
                               </p>
                             </div>
@@ -689,8 +689,8 @@ const ProviderProfile = () => {
                         </div>
                       ))
                     ) : (
-                      <div className="text-center py-8 text-carelink-gray">
-                        <FaStar className="text-4xl mx-auto mb-3 text-carelink-teal-pale" />
+                      <div className="text-center py-8 text-carefd-gray">
+                        <FaStar className="text-4xl mx-auto mb-3 text-carefd-teal-pale" />
                         <p>עדיין אין ביקורות</p>
                         {isAuthenticated && !isOwner && (
                           <p className="mt-2">היה הראשון לכתוב ביקורת!</p>
@@ -708,21 +708,21 @@ const ProviderProfile = () => {
                         {provider.team_members.map((member) => (
                           <div
                             key={member.member_id}
-                            className="border-2 border-carelink-teal-pale rounded-xl p-5 hover:border-carelink-teal transition"
+                            className="border-2 border-carefd-teal-pale rounded-xl p-5 hover:border-carefd-teal transition"
                           >
                             <div className="flex items-center gap-4">
-                              <div className="w-16 h-16 bg-carelink-navy rounded-xl flex items-center justify-center text-white text-xl font-bold">
+                              <div className="w-16 h-16 bg-carefd-navy rounded-xl flex items-center justify-center text-white text-xl font-bold">
                                 {member.name[0]}
                               </div>
                               <div>
-                                <h4 className="font-bold text-carelink-navy text-lg">{member.name}</h4>
-                                <p className="text-carelink-teal">{member.role}</p>
+                                <h4 className="font-bold text-carefd-navy text-lg">{member.name}</h4>
+                                <p className="text-carefd-teal">{member.role}</p>
                               </div>
                             </div>
                             {member.specializations && member.specializations.length > 0 && (
                               <div className="flex flex-wrap gap-2 mt-4">
                                 {member.specializations.map((spec, idx) => (
-                                  <span key={idx} className="bg-carelink-teal-pale text-carelink-navy text-xs px-3 py-1 rounded-full">
+                                  <span key={idx} className="bg-carefd-teal-pale text-carefd-navy text-xs px-3 py-1 rounded-full">
                                     {spec}
                                   </span>
                                 ))}
@@ -733,11 +733,11 @@ const ProviderProfile = () => {
                       </div>
                     ) : (
                       <div className="text-center py-8">
-                        <div className="w-20 h-20 bg-carelink-navy rounded-xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                        <div className="w-20 h-20 bg-carefd-navy rounded-xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
                           {(provider.business_name || 'ס')[0]}
                         </div>
-                        <h4 className="font-bold text-carelink-navy text-lg mb-1">{provider.business_name}</h4>
-                        <p className="text-carelink-gray">בעלים</p>
+                        <h4 className="font-bold text-carefd-navy text-lg mb-1">{provider.business_name}</h4>
+                        <p className="text-carefd-gray">בעלים</p>
                       </div>
                     )}
                   </div>
@@ -751,11 +751,11 @@ const ProviderProfile = () => {
             {/* About Section */}
             {provider.about && (
               <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="about-section">
-                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
-                  <FaInfoCircle className="text-carelink-teal" />
+                <h3 className="text-lg font-bold text-carefd-navy mb-4 flex items-center gap-2">
+                  <FaInfoCircle className="text-carefd-teal" />
                   אודות
                 </h3>
-                <p className="text-carelink-slate leading-relaxed whitespace-pre-line">
+                <p className="text-carefd-slate leading-relaxed whitespace-pre-line">
                   {provider.about}
                 </p>
               </div>
@@ -764,15 +764,15 @@ const ProviderProfile = () => {
             {/* Specializations */}
             {provider.specializations && provider.specializations.length > 0 && (
               <div className="bg-white rounded-2xl shadow-lg p-6">
-                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
-                  <FaAward className="text-carelink-teal" />
+                <h3 className="text-lg font-bold text-carefd-navy mb-4 flex items-center gap-2">
+                  <FaAward className="text-carefd-teal" />
                   התמחויות
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {provider.specializations.map((spec, idx) => (
                     <span
                       key={idx}
-                      className="bg-carelink-teal text-white px-4 py-2 rounded-full text-sm font-medium"
+                      className="bg-carefd-teal text-white px-4 py-2 rounded-full text-sm font-medium"
                     >
                       {spec}
                     </span>
@@ -784,15 +784,15 @@ const ProviderProfile = () => {
             {/* Expertise */}
             {provider.expertise && provider.expertise.length > 0 && (
               <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="expertise-section">
-                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
-                  <FaBriefcase className="text-carelink-teal" />
+                <h3 className="text-lg font-bold text-carefd-navy mb-4 flex items-center gap-2">
+                  <FaBriefcase className="text-carefd-teal" />
                   מומחיויות
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {provider.expertise.map((exp, idx) => (
                     <span
                       key={idx}
-                      className="bg-carelink-navy/10 text-carelink-navy px-3 py-1.5 rounded-lg text-sm"
+                      className="bg-carefd-navy/10 text-carefd-navy px-3 py-1.5 rounded-lg text-sm"
                     >
                       {exp}
                     </span>
@@ -804,8 +804,8 @@ const ProviderProfile = () => {
             {/* Languages */}
             {provider.languages && provider.languages.length > 0 && (
               <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="languages-section">
-                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
-                  <FaComments className="text-carelink-teal" />
+                <h3 className="text-lg font-bold text-carefd-navy mb-4 flex items-center gap-2">
+                  <FaComments className="text-carefd-teal" />
                   שפות
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -830,8 +830,8 @@ const ProviderProfile = () => {
             {/* Target Audience */}
             {provider.target_audience && provider.target_audience.length > 0 && (
               <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="target-audience-section">
-                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
-                  <FaUsers className="text-carelink-teal" />
+                <h3 className="text-lg font-bold text-carefd-navy mb-4 flex items-center gap-2">
+                  <FaUsers className="text-carefd-teal" />
                   קהל יעד
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -857,24 +857,24 @@ const ProviderProfile = () => {
             {/* Education */}
             {provider.education && provider.education.length > 0 && provider.education.some(e => e.institution || e.degree) && (
               <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="education-section">
-                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
-                  <FaGraduationCap className="text-carelink-teal" />
+                <h3 className="text-lg font-bold text-carefd-navy mb-4 flex items-center gap-2">
+                  <FaGraduationCap className="text-carefd-teal" />
                   השכלה
                 </h3>
                 <div className="space-y-4">
                   {(provider.education || []).filter(e => e.institution || e.degree).map((edu, idx) => (
-                    <div key={idx} className="border-r-4 border-carelink-teal pr-4">
-                      <p className="font-semibold text-carelink-navy">
+                    <div key={idx} className="border-r-4 border-carefd-teal pr-4">
+                      <p className="font-semibold text-carefd-navy">
                         {educationLevelLabels[edu.degree] || edu.degree}
                       </p>
                       {edu.field && (
-                        <p className="text-sm text-carelink-slate">{edu.field}</p>
+                        <p className="text-sm text-carefd-slate">{edu.field}</p>
                       )}
                       {edu.institution && (
-                        <p className="text-sm text-carelink-gray">{edu.institution}</p>
+                        <p className="text-sm text-carefd-gray">{edu.institution}</p>
                       )}
                       {edu.year && (
-                        <p className="text-xs text-carelink-gray mt-1">{edu.year}</p>
+                        <p className="text-xs text-carefd-gray mt-1">{edu.year}</p>
                       )}
                     </div>
                   ))}
@@ -885,25 +885,25 @@ const ProviderProfile = () => {
             {/* Certifications */}
             {provider.certifications && provider.certifications.length > 0 && provider.certifications.some(c => c.name || c.license_number) && (
               <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="certifications-section">
-                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
-                  <FaCertificate className="text-carelink-teal" />
+                <h3 className="text-lg font-bold text-carefd-navy mb-4 flex items-center gap-2">
+                  <FaCertificate className="text-carefd-teal" />
                   תעודות ורישיונות
                 </h3>
                 <div className="space-y-4">
                   {(provider.certifications || []).filter(c => c.name || c.license_number).map((cert, idx) => (
                     <div key={idx} className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200">
-                      <p className="font-semibold text-carelink-navy flex items-center gap-2">
+                      <p className="font-semibold text-carefd-navy flex items-center gap-2">
                         <FaAward className="text-amber-500" />
                         {cert.name}
                       </p>
                       {cert.issuer && (
-                        <p className="text-sm text-carelink-slate mt-1">מנפיק: {cert.issuer}</p>
+                        <p className="text-sm text-carefd-slate mt-1">מנפיק: {cert.issuer}</p>
                       )}
                       {cert.license_number && (
-                        <p className="text-sm text-carelink-gray mt-1">מספר רישיון: {cert.license_number}</p>
+                        <p className="text-sm text-carefd-gray mt-1">מספר רישיון: {cert.license_number}</p>
                       )}
                       {cert.year && (
-                        <p className="text-xs text-carelink-gray mt-1">שנה: {cert.year}</p>
+                        <p className="text-xs text-carefd-gray mt-1">שנה: {cert.year}</p>
                       )}
                     </div>
                   ))}
@@ -914,8 +914,8 @@ const ProviderProfile = () => {
             {/* Health Funds */}
             {provider.health_funds && provider.health_funds.length > 0 && (
               <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="health-funds-section">
-                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
-                  <FaHospital className="text-carelink-teal" />
+                <h3 className="text-lg font-bold text-carefd-navy mb-4 flex items-center gap-2">
+                  <FaHospital className="text-carefd-teal" />
                   קופות חולים
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -934,8 +934,8 @@ const ProviderProfile = () => {
             {/* Payment Methods */}
             {provider.payment_methods && provider.payment_methods.length > 0 && (
               <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="payment-methods-section">
-                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
-                  <FaCreditCard className="text-carelink-teal" />
+                <h3 className="text-lg font-bold text-carefd-navy mb-4 flex items-center gap-2">
+                  <FaCreditCard className="text-carefd-teal" />
                   אמצעי תשלום
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -954,8 +954,8 @@ const ProviderProfile = () => {
             {/* Cancellation Policy */}
             {provider.cancellation_policy && (
               <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="cancellation-policy-section">
-                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
-                  <FaFileContract className="text-carelink-teal" />
+                <h3 className="text-lg font-bold text-carefd-navy mb-4 flex items-center gap-2">
+                  <FaFileContract className="text-carefd-teal" />
                   מדיניות ביטולים
                 </h3>
                 {provider.cancellation_notice_hours && (
@@ -965,7 +965,7 @@ const ProviderProfile = () => {
                     </p>
                   </div>
                 )}
-                <p className="text-carelink-slate whitespace-pre-line text-sm leading-relaxed">
+                <p className="text-carefd-slate whitespace-pre-line text-sm leading-relaxed">
                   {provider.cancellation_policy}
                 </p>
               </div>
@@ -974,21 +974,21 @@ const ProviderProfile = () => {
             {/* Location */}
             {provider.location && (
               <div className="bg-white rounded-2xl shadow-lg p-6">
-                <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
-                  <FaMapMarkerAlt className="text-carelink-teal" />
+                <h3 className="text-lg font-bold text-carefd-navy mb-4 flex items-center gap-2">
+                  <FaMapMarkerAlt className="text-carefd-teal" />
                   מיקום
                 </h3>
-                <p className="text-carelink-slate mb-4">
+                <p className="text-carefd-slate mb-4">
                   {provider.location.address && `${provider.location.address}, `}
                   {provider.location.city}
                 </p>
                 {/* Service Areas */}
                 {provider.service_areas && provider.service_areas.length > 0 && (
                   <div className="mt-3 pt-3 border-t border-gray-100">
-                    <p className="text-sm font-medium text-carelink-navy mb-2">אזורי שירות:</p>
+                    <p className="text-sm font-medium text-carefd-navy mb-2">אזורי שירות:</p>
                     <div className="flex flex-wrap gap-1">
                       {provider.service_areas.map((area, idx) => (
-                        <span key={idx} className="bg-gray-100 text-carelink-gray text-xs px-2 py-1 rounded">
+                        <span key={idx} className="bg-gray-100 text-carefd-gray text-xs px-2 py-1 rounded">
                           {area}
                         </span>
                       ))}
@@ -999,14 +999,14 @@ const ProviderProfile = () => {
             )}
 
             {/* Contact Card */}
-            <div className="bg-gradient-to-br from-carelink-teal to-carelink-teal-medium rounded-2xl shadow-lg p-6 text-white">
+            <div className="bg-gradient-to-br from-carefd-teal to-carefd-teal-medium rounded-2xl shadow-lg p-6 text-white">
               <h3 className="text-lg font-bold mb-4">צור קשר</h3>
               <p className="text-white/80 mb-6">
                 מעוניינים בשירותים? צרו קשר ונשמח לעזור
               </p>
               <button
                 onClick={handleContact}
-                className="w-full bg-white text-carelink-teal py-3 rounded-xl font-semibold hover:bg-carelink-teal-pale transition"
+                className="w-full bg-white text-carefd-teal py-3 rounded-xl font-semibold hover:bg-carefd-teal-pale transition"
               >
                 שלח הודעה
               </button>
@@ -1014,8 +1014,8 @@ const ProviderProfile = () => {
 
             {/* Working Hours - Dynamic Availability */}
             <div className="bg-white rounded-2xl shadow-lg p-6" data-testid="availability-section">
-              <h3 className="text-lg font-bold text-carelink-navy mb-4 flex items-center gap-2">
-                <FaClock className="text-carelink-teal" />
+              <h3 className="text-lg font-bold text-carefd-navy mb-4 flex items-center gap-2">
+                <FaClock className="text-carefd-teal" />
                 זמינות
               </h3>
               {provider.availability && provider.availability.length > 0 ? (
@@ -1038,7 +1038,7 @@ const ProviderProfile = () => {
                     
                     return (
                       <div key={day} className="flex items-center justify-between text-sm">
-                        <span className="text-carelink-gray font-medium w-16">{dayLabels[day]}</span>
+                        <span className="text-carefd-gray font-medium w-16">{dayLabels[day]}</span>
                         <div className="flex gap-1 flex-1 justify-end">
                           {daySlots.length > 0 ? (
                             daySlots.map((slot, idx) => (
@@ -1061,16 +1061,16 @@ const ProviderProfile = () => {
                 <div className="space-y-2 text-sm">
                   {['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי'].map((day) => (
                     <div key={day} className="flex justify-between">
-                      <span className="text-carelink-gray">{day}</span>
-                      <span className="text-carelink-navy font-medium">09:00 - 18:00</span>
+                      <span className="text-carefd-gray">{day}</span>
+                      <span className="text-carefd-navy font-medium">09:00 - 18:00</span>
                     </div>
                   ))}
                   <div className="flex justify-between">
-                    <span className="text-carelink-gray">שישי</span>
-                    <span className="text-carelink-navy font-medium">09:00 - 13:00</span>
+                    <span className="text-carefd-gray">שישי</span>
+                    <span className="text-carefd-navy font-medium">09:00 - 13:00</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-carelink-gray">שבת</span>
+                    <span className="text-carefd-gray">שבת</span>
                     <span className="text-red-500 font-medium">סגור</span>
                   </div>
                 </div>
@@ -1084,18 +1084,18 @@ const ProviderProfile = () => {
       {showContactModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-carelink-navy mb-4">צור קשר עם {provider.business_name}</h3>
-            <p className="text-carelink-gray mb-6">
+            <h3 className="text-xl font-bold text-carefd-navy mb-4">צור קשר עם {provider.business_name}</h3>
+            <p className="text-carefd-gray mb-6">
               שלח הודעה ישירה לספק השירות
             </p>
             <textarea
-              className="w-full border-2 border-carelink-teal-pale rounded-xl p-4 h-32 focus:border-carelink-teal focus:outline-none resize-none"
+              className="w-full border-2 border-carefd-teal-pale rounded-xl p-4 h-32 focus:border-carefd-teal focus:outline-none resize-none"
               placeholder="כתוב את ההודעה שלך..."
             ></textarea>
             <div className="flex gap-3 mt-4">
               <button
                 onClick={() => setShowContactModal(false)}
-                className="flex-1 bg-gray-100 text-carelink-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
+                className="flex-1 bg-gray-100 text-carefd-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
               >
                 ביטול
               </button>
@@ -1104,7 +1104,7 @@ const ProviderProfile = () => {
                   setShowContactModal(false);
                   navigate('/chats');
                 }}
-                className="flex-1 bg-carelink-teal text-white py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition"
+                className="flex-1 bg-carefd-teal text-white py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition"
               >
                 שלח הודעה
               </button>
@@ -1117,14 +1117,14 @@ const ProviderProfile = () => {
       {showShareModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowShareModal(false)}>
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-xl font-bold text-carelink-navy mb-4">שתף את הפרופיל</h3>
-            <p className="text-carelink-gray mb-6">
+            <h3 className="text-xl font-bold text-carefd-navy mb-4">שתף את הפרופיל</h3>
+            <p className="text-carefd-gray mb-6">
               שתף את {provider?.business_name || 'הספק'} עם חברים ומשפחה
             </p>
             
             {/* Copy Link */}
             <div className="flex items-center gap-2 mb-4">
-              <div className="flex-1 bg-carelink-teal-pale/30 px-4 py-3 rounded-xl text-sm text-carelink-navy truncate">
+              <div className="flex-1 bg-carefd-teal-pale/30 px-4 py-3 rounded-xl text-sm text-carefd-navy truncate">
                 {window.location.href}
               </div>
               <button
@@ -1132,7 +1132,7 @@ const ProviderProfile = () => {
                 className={`px-4 py-3 rounded-xl font-semibold transition flex items-center gap-2 ${
                   copied 
                     ? 'bg-green-500 text-white' 
-                    : 'bg-carelink-teal text-white hover:bg-carelink-teal-medium'
+                    : 'bg-carefd-teal text-white hover:bg-carefd-teal-medium'
                 }`}
               >
                 {copied ? <FaCheck /> : <FaCopy />}
@@ -1168,7 +1168,7 @@ const ProviderProfile = () => {
 
             <button
               onClick={() => setShowShareModal(false)}
-              className="w-full mt-4 bg-gray-100 text-carelink-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
+              className="w-full mt-4 bg-gray-100 text-carefd-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
             >
               סגור
             </button>
@@ -1180,14 +1180,14 @@ const ProviderProfile = () => {
       {showPhoneModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowPhoneModal(false)}>
           <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center" onClick={(e) => e.stopPropagation()}>
-            <div className="w-16 h-16 bg-carelink-teal rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-carefd-teal rounded-full flex items-center justify-center mx-auto mb-4">
               <FaPhone className="text-2xl text-white" />
             </div>
-            <h3 className="text-xl font-bold text-carelink-navy mb-2">מספר טלפון</h3>
-            <p className="text-carelink-gray mb-4">{provider?.business_name || 'ספק שירותים'}</p>
+            <h3 className="text-xl font-bold text-carefd-navy mb-2">מספר טלפון</h3>
+            <p className="text-carefd-gray mb-4">{provider?.business_name || 'ספק שירותים'}</p>
             
-            <div className="bg-carelink-teal-pale/30 px-6 py-4 rounded-xl mb-4">
-              <p className="text-2xl font-bold text-carelink-navy direction-ltr">
+            <div className="bg-carefd-teal-pale/30 px-6 py-4 rounded-xl mb-4">
+              <p className="text-2xl font-bold text-carefd-navy direction-ltr">
                 {provider?.phone || '050-0000000'}
               </p>
             </div>
@@ -1198,14 +1198,14 @@ const ProviderProfile = () => {
                   navigator.clipboard.writeText(provider?.phone || '050-0000000');
                   setShowPhoneModal(false);
                 }}
-                className="flex-1 flex items-center justify-center gap-2 bg-carelink-teal text-white py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition"
+                className="flex-1 flex items-center justify-center gap-2 bg-carefd-teal text-white py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition"
               >
                 <FaCopy />
                 העתק
               </button>
               <button
                 onClick={() => setShowPhoneModal(false)}
-                className="flex-1 bg-gray-100 text-carelink-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
+                className="flex-1 bg-gray-100 text-carefd-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
               >
                 סגור
               </button>

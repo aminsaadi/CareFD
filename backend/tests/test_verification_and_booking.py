@@ -1,5 +1,5 @@
 """
-Backend API Tests for CareLink Provider Verification and Enhanced Booking Flow
+Backend API Tests for CareFD Provider Verification and Enhanced Booking Flow
 - Provider verification: document upload, admin approve/reject
 - Enhanced booking flow: create with full details, provider complete, client confirm
 """
@@ -12,11 +12,11 @@ from datetime import datetime, timedelta
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
 # Test credentials
-ADMIN_EMAIL = "admin@carelink.co.il"
+ADMIN_EMAIL = "admin@carefd.com"
 ADMIN_PASSWORD = "Admin123!"
-PROVIDER_EMAIL = "provider@carelink.co.il"
+PROVIDER_EMAIL = "provider@carefd.com"
 PROVIDER_PASSWORD = "Provider123!"
-USER_EMAIL = "user@carelink.co.il"
+USER_EMAIL = "user@carefd.com"
 USER_PASSWORD = "User123!"
 
 

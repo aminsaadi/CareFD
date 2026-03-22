@@ -29,7 +29,7 @@ if not SECRET_KEY:
     SECRET_KEY = secrets.token_hex(32)
     logger.warning("SECRET_KEY not set! Generated a random key. Sessions will NOT survive restarts. Set SECRET_KEY in Railway variables.")
 
-SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'carelink.co.il@gmail.com')
+SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'carefd.com@gmail.com')
 SMTP_HOST = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
 try:
     SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
@@ -40,14 +40,14 @@ SMTP_USER = os.environ.get('SMTP_USER', '')
 SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
 VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', '')
 VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY', '')
-VAPID_CLAIMS_EMAIL = os.environ.get('VAPID_CLAIMS_EMAIL', 'admin@carelink.co.il')
+VAPID_CLAIMS_EMAIL = os.environ.get('VAPID_CLAIMS_EMAIL', 'admin@carefd.com')
 
 # Resend API (preferred over SMTP on Railway where SMTP ports are blocked)
 RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
 if RESEND_API_KEY:
     resend.api_key = RESEND_API_KEY
 
-SITE_URL = os.environ.get('SITE_URL', 'https://carelink.co.il')
+SITE_URL = os.environ.get('SITE_URL', 'https://carefd.com')
 
 
 async def get_site_url():
@@ -217,7 +217,7 @@ async def send_email_async(recipient: str, subject: str, html_content: str):
     try:
         # Prefer Resend API (works on Railway where SMTP ports are blocked)
         if RESEND_API_KEY:
-            sender = f"CareLink <{SENDER_EMAIL}>"
+            sender = f"CareFD <{SENDER_EMAIL}>"
             result = await asyncio.to_thread(_send_email_resend, recipient, subject, html_content, sender)
             if result:
                 return result

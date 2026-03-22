@@ -16,9 +16,9 @@ BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
 class TestConfig:
     """Test configuration"""
-    admin_email = "admin@carelink.co.il"
+    admin_email = "admin@carefd.com"
     admin_password = "password"
-    test_provider_email = f"test_provider_{uuid.uuid4().hex[:8]}@carelink.co.il"
+    test_provider_email = f"test_provider_{uuid.uuid4().hex[:8]}@carefd.com"
     test_provider_password = "testpass123"
     test_provider_name = "ספק בדיקה חדש"
     
@@ -297,7 +297,7 @@ class TestRegistrationReturnsProviderId:
     
     def test_registration_response_structure_for_provider(self, api_client):
         """Verify registration response includes provider_id for provider role"""
-        unique_email = f"test_verify_{uuid.uuid4().hex[:8]}@carelink.co.il"
+        unique_email = f"test_verify_{uuid.uuid4().hex[:8]}@carefd.com"
         
         response = api_client.post(f"{BASE_URL}/api/auth/register", json={
             "email": unique_email,
@@ -328,7 +328,7 @@ class TestRegistrationReturnsProviderId:
     
     def test_registration_response_structure_for_patient(self, api_client):
         """Verify registration response for patient role (no provider_id expected)"""
-        unique_email = f"test_patient_{uuid.uuid4().hex[:8]}@carelink.co.il"
+        unique_email = f"test_patient_{uuid.uuid4().hex[:8]}@carefd.com"
         
         response = api_client.post(f"{BASE_URL}/api/auth/register", json={
             "email": unique_email,

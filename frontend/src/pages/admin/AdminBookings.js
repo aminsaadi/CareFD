@@ -57,7 +57,7 @@ const AdminBookings = () => {
       case 'completed':
         return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
       default:
-        return 'bg-slate-500/20 text-carelink-slate border-slate-500/30';
+        return 'bg-slate-500/20 text-carefd-slate border-slate-500/30';
     }
   };
 
@@ -77,31 +77,31 @@ const AdminBookings = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-carelink-navy">ניהול הזמנות</h1>
-            <p className="text-carelink-slate mt-1">{pagination.total} הזמנות במערכת</p>
+            <h1 className="text-2xl font-bold text-carefd-navy">ניהול הזמנות</h1>
+            <p className="text-carefd-slate mt-1">{pagination.total} הזמנות במערכת</p>
           </div>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-carelink-slate text-sm">סה"כ</p>
-            <p className="text-2xl font-bold text-carelink-navy mt-1">{bookings.length}</p>
+            <p className="text-carefd-slate text-sm">סה"כ</p>
+            <p className="text-2xl font-bold text-carefd-navy mt-1">{bookings.length}</p>
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-carelink-slate text-sm">ממתינות</p>
+            <p className="text-carefd-slate text-sm">ממתינות</p>
             <p className="text-2xl font-bold text-amber-400 mt-1">{bookings.filter(b => b.status === 'pending').length}</p>
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-carelink-slate text-sm">מאושרות</p>
+            <p className="text-carefd-slate text-sm">מאושרות</p>
             <p className="text-2xl font-bold text-emerald-400 mt-1">{bookings.filter(b => b.status === 'confirmed').length}</p>
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-carelink-slate text-sm">הושלמו</p>
+            <p className="text-carefd-slate text-sm">הושלמו</p>
             <p className="text-2xl font-bold text-blue-400 mt-1">{bookings.filter(b => b.status === 'completed').length}</p>
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-carelink-slate text-sm">בוטלו</p>
+            <p className="text-carefd-slate text-sm">בוטלו</p>
             <p className="text-2xl font-bold text-red-400 mt-1">{bookings.filter(b => b.status === 'cancelled').length}</p>
           </div>
         </div>
@@ -110,19 +110,19 @@ const AdminBookings = () => {
         <div className="bg-white rounded-xl p-4 border border-gray-100">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carelink-slate" size={18} />
+              <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carefd-slate" size={18} />
               <input
                 type="text"
                 placeholder="חפש לפי שם לקוח, ספק..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg pr-10 pl-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal outline-none"
+                className="w-full bg-gray-50 border border-gray-200 rounded-lg pr-10 pl-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal outline-none"
               />
             </div>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal outline-none min-w-[150px]"
+              className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal outline-none min-w-[150px]"
             >
               <option value="">כל הסטטוסים</option>
               <option value="pending">ממתינות</option>
@@ -139,24 +139,24 @@ const AdminBookings = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100">
-                  <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">מזהה</th>
-                  <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">לקוח</th>
-                  <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">שירות</th>
-                  <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">תאריך</th>
-                  <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">סטטוס</th>
-                  <th className="text-right py-4 px-6 text-carelink-slate font-medium text-sm">פעולות</th>
+                  <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">מזהה</th>
+                  <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">לקוח</th>
+                  <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">שירות</th>
+                  <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">תאריך</th>
+                  <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">סטטוס</th>
+                  <th className="text-right py-4 px-6 text-carefd-slate font-medium text-sm">פעולות</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
                     <td colSpan={6} className="py-12 text-center">
-                      <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
+                      <div className="w-8 h-8 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
                     </td>
                   </tr>
                 ) : bookings.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-12 text-center text-carelink-slate">
+                    <td colSpan={6} className="py-12 text-center text-carefd-slate">
                       <FiCalendar className="mx-auto mb-3" size={32} />
                       לא נמצאו הזמנות
                     </td>
@@ -165,15 +165,15 @@ const AdminBookings = () => {
                   bookings.map((booking) => (
                     <tr key={booking.booking_id} className="border-b border-gray-100/50 hover:bg-gray-50/30 transition">
                       <td className="py-4 px-6">
-                        <span className="text-carelink-slate text-sm font-mono">{booking.booking_id?.slice(-8)}</span>
+                        <span className="text-carefd-slate text-sm font-mono">{booking.booking_id?.slice(-8)}</span>
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-carelink-navy text-sm">
+                          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-carefd-navy text-sm">
                             {booking.client_name?.[0] || booking.user_name?.[0] || 'U'}
                           </div>
                           <div>
-                            <p className="text-carelink-navy text-sm">{booking.client_name || booking.user_name || 'לקוח'}</p>
+                            <p className="text-carefd-navy text-sm">{booking.client_name || booking.user_name || 'לקוח'}</p>
                             {booking.is_guest_booking && (
                               <span className="text-xs text-amber-400">אורח</span>
                             )}
@@ -181,16 +181,16 @@ const AdminBookings = () => {
                         </div>
                       </td>
                       <td className="py-4 px-6">
-                        <p className="text-carelink-navy text-sm">{booking.service_name || '-'}</p>
-                        <p className="text-carelink-gray text-xs">{booking.provider_name || '-'}</p>
+                        <p className="text-carefd-navy text-sm">{booking.service_name || '-'}</p>
+                        <p className="text-carefd-gray text-xs">{booking.provider_name || '-'}</p>
                       </td>
                       <td className="py-4 px-6">
-                        <div className="flex items-center gap-2 text-carelink-slate text-sm">
+                        <div className="flex items-center gap-2 text-carefd-slate text-sm">
                           <FiCalendar size={14} />
                           {booking.booking_date ? new Date(booking.booking_date).toLocaleDateString('he-IL') : '-'}
                         </div>
                         {booking.booking_time && (
-                          <div className="flex items-center gap-2 text-carelink-gray text-xs mt-1">
+                          <div className="flex items-center gap-2 text-carefd-gray text-xs mt-1">
                             <FiClock size={12} />
                             {booking.booking_time}
                           </div>
@@ -210,21 +210,21 @@ const AdminBookings = () => {
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-2">
-                          <button className="p-2 text-carelink-slate hover:text-carelink-navy hover:bg-gray-50 rounded-lg transition">
+                          <button className="p-2 text-carefd-slate hover:text-carefd-navy hover:bg-gray-50 rounded-lg transition">
                             <FiEye size={16} />
                           </button>
                           {booking.status === 'pending' && (
                             <>
                               <button
                                 onClick={() => updateBookingStatus(booking.booking_id, 'confirmed')}
-                                className="p-2 text-carelink-slate hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition"
+                                className="p-2 text-carefd-slate hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition"
                                 title="אשר"
                               >
                                 <FiCheck size={16} />
                               </button>
                               <button
                                 onClick={() => updateBookingStatus(booking.booking_id, 'cancelled')}
-                                className="p-2 text-carelink-slate hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
+                                className="p-2 text-carefd-slate hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
                                 title="בטל"
                               >
                                 <FiX size={16} />

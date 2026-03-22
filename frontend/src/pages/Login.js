@@ -104,11 +104,11 @@ const Login = () => {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left Side - Visual Branding Panel */}
-      <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-gradient-to-br from-carelink-navy via-[#1a3a4f] to-carelink-teal">
+      <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-gradient-to-br from-carefd-navy via-[#1a3a4f] to-carefd-teal">
         {/* Animated background shapes */}
         <div className="absolute inset-0">
-          <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-carelink-teal/20 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-carelink-teal/15 rounded-full blur-3xl"></div>
+          <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-carefd-teal/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-carefd-teal/15 rounded-full blur-3xl"></div>
           <div className="absolute top-[40%] left-[30%] w-[200px] h-[200px] bg-white/5 rounded-full blur-2xl"></div>
         </div>
 
@@ -130,27 +130,27 @@ const Login = () => {
           <h1 className="text-4xl xl:text-5xl font-bold text-white text-center mb-4 font-heading leading-tight">
             {siteSettings.site_tagline || 'HealthCare Providers Zone'}
           </h1>
-          <p className="text-lg text-carelink-teal-pale text-center max-w-md mb-12">
+          <p className="text-lg text-carefd-teal-pale text-center max-w-md mb-12">
             התחברו לחשבון שלכם וגשו לכל השירותים והספקים המובילים
           </p>
 
           {/* Feature Cards */}
           <div className="grid grid-cols-3 gap-4 max-w-lg w-full">
             <div className="bg-white/10 backdrop-blur-sm p-5 rounded-2xl border border-white/10 text-center group hover:bg-white/15 transition-all">
-              <div className="w-12 h-12 mx-auto mb-3 bg-carelink-teal/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <FaMapMarkerAlt className="text-xl text-carelink-teal-light" />
+              <div className="w-12 h-12 mx-auto mb-3 bg-carefd-teal/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <FaMapMarkerAlt className="text-xl text-carefd-teal-light" />
               </div>
               <div className="text-sm font-semibold text-white">חיפוש לפי אזור</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm p-5 rounded-2xl border border-white/10 text-center group hover:bg-white/15 transition-all">
-              <div className="w-12 h-12 mx-auto mb-3 bg-carelink-teal/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <FaHeartbeat className="text-xl text-carelink-teal-light" />
+              <div className="w-12 h-12 mx-auto mb-3 bg-carefd-teal/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <FaHeartbeat className="text-xl text-carefd-teal-light" />
               </div>
               <div className="text-sm font-semibold text-white">ספקים מאומתים</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm p-5 rounded-2xl border border-white/10 text-center group hover:bg-white/15 transition-all">
-              <div className="w-12 h-12 mx-auto mb-3 bg-carelink-teal/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                <FaShieldAlt className="text-xl text-carelink-teal-light" />
+              <div className="w-12 h-12 mx-auto mb-3 bg-carefd-teal/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <FaShieldAlt className="text-xl text-carefd-teal-light" />
               </div>
               <div className="text-sm font-semibold text-white">מאובטח ובטוח</div>
             </div>
@@ -166,7 +166,7 @@ const Login = () => {
             <Link to="/" className="inline-block">
               <Logo />
             </Link>
-            <p className="text-carelink-gray mt-2 text-sm">
+            <p className="text-carefd-gray mt-2 text-sm">
               {siteSettings.site_tagline || 'HealthCare Providers Zone'}
             </p>
           </div>
@@ -175,10 +175,10 @@ const Login = () => {
           <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 lg:p-10" data-testid="login-form">
             {/* Header */}
             <div className="mb-8">
-              <h2 className="text-3xl font-bold text-carelink-navy font-heading" data-testid="login-title">
+              <h2 className="text-3xl font-bold text-carefd-navy font-heading" data-testid="login-title">
                 {t('login')}
               </h2>
-              <p className="text-carelink-gray mt-2">
+              <p className="text-carefd-gray mt-2">
                 התחברו לחשבון שלכם ב-{siteName}
               </p>
             </div>
@@ -198,7 +198,7 @@ const Login = () => {
                   type="button"
                   onClick={handleResendVerification}
                   disabled={resendingVerification}
-                  className="text-carelink-teal font-medium hover:underline text-sm disabled:opacity-50"
+                  className="text-carefd-teal font-medium hover:underline text-sm disabled:opacity-50"
                   data-testid="resend-verification-login-btn"
                 >
                   {resendingVerification ? 'שולח...' : 'שלח קישור אימות מחדש'}
@@ -209,11 +209,11 @@ const Login = () => {
             {/* Login Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-carelink-navy mb-2">
+                <label htmlFor="email" className="block text-sm font-semibold text-carefd-navy mb-2">
                   {t('email')}
                 </label>
                 <div className="relative">
-                  <FaEnvelope className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carelink-gray/50" />
+                  <FaEnvelope className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray/50" />
                   <input
                     id="email"
                     name="email"
@@ -221,7 +221,7 @@ const Login = () => {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-3.5 pr-12 rtl:pr-4 rtl:pl-12 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-carelink-teal focus:bg-white focus:ring-2 focus:ring-carelink-teal/10 transition-all"
+                    className="w-full px-4 py-3.5 pr-12 rtl:pr-4 rtl:pl-12 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-carefd-teal focus:bg-white focus:ring-2 focus:ring-carefd-teal/10 transition-all"
                     placeholder="your@email.com"
                     data-testid="email-input"
                   />
@@ -229,11 +229,11 @@ const Login = () => {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-semibold text-carelink-navy mb-2">
+                <label htmlFor="password" className="block text-sm font-semibold text-carefd-navy mb-2">
                   {t('password')}
                 </label>
                 <div className="relative">
-                  <FaLock className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carelink-gray/50" />
+                  <FaLock className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray/50" />
                   <input
                     id="password"
                     name="password"
@@ -241,14 +241,14 @@ const Login = () => {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full px-12 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-carelink-teal focus:bg-white focus:ring-2 focus:ring-carelink-teal/10 transition-all"
+                    className="w-full px-12 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-carefd-teal focus:bg-white focus:ring-2 focus:ring-carefd-teal/10 transition-all"
                     placeholder="••••••••"
                     data-testid="password-input"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-12 top-1/2 -translate-y-1/2 text-carelink-gray/50 hover:text-carelink-teal transition"
+                    className="absolute right-12 top-1/2 -translate-y-1/2 text-carefd-gray/50 hover:text-carefd-teal transition"
                     tabIndex={-1}
                     data-testid="toggle-password-visibility"
                   >
@@ -259,8 +259,8 @@ const Login = () => {
 
               <div className="flex items-center justify-between text-sm">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="w-4 h-4 text-carelink-teal rounded border-gray-300" />
-                  <span className="text-carelink-gray">זכור אותי</span>
+                  <input type="checkbox" className="w-4 h-4 text-carefd-teal rounded border-gray-300" />
+                  <span className="text-carefd-gray">זכור אותי</span>
                 </label>
                 <button
                   type="button"
@@ -269,7 +269,7 @@ const Login = () => {
                     setForgotEmail('');
                     setResetSent(false);
                   }}
-                  className="text-carelink-teal hover:text-carelink-teal-medium font-medium"
+                  className="text-carefd-teal hover:text-carefd-teal-medium font-medium"
                 >
                   שכחת סיסמה?
                 </button>
@@ -278,7 +278,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-l from-carelink-teal to-carelink-teal-medium text-white py-4 rounded-xl hover:shadow-lg hover:shadow-carelink-teal/25 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-l from-carefd-teal to-carefd-teal-medium text-white py-4 rounded-xl hover:shadow-lg hover:shadow-carefd-teal/25 font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 data-testid="submit-login-btn"
               >
                 {loading ? (
@@ -294,9 +294,9 @@ const Login = () => {
 
             {/* Register Link */}
             <div className="mt-8 text-center">
-              <p className="text-carelink-gray text-sm">
+              <p className="text-carefd-gray text-sm">
                 {t('dontHaveAccount')}{' '}
-                <Link to="/register" className="text-carelink-teal hover:text-carelink-teal-medium font-semibold" data-testid="register-link">
+                <Link to="/register" className="text-carefd-teal hover:text-carefd-teal-medium font-semibold" data-testid="register-link">
                   {t('registerNow')}
                 </Link>
               </p>
@@ -306,9 +306,9 @@ const Login = () => {
             <div className="mt-6 pt-6 border-t border-gray-100">
               <Link
                 to="/register/provider"
-                className="flex items-center justify-center gap-3 w-full bg-carelink-navy/5 text-carelink-navy py-3.5 rounded-xl hover:bg-carelink-navy/10 font-medium transition group"
+                className="flex items-center justify-center gap-3 w-full bg-carefd-navy/5 text-carefd-navy py-3.5 rounded-xl hover:bg-carefd-navy/10 font-medium transition group"
               >
-                <FaUserMd className="text-carelink-teal group-hover:scale-110 transition-transform" />
+                <FaUserMd className="text-carefd-teal group-hover:scale-110 transition-transform" />
                 הרשמה כספק שירותים
               </Link>
             </div>
@@ -316,7 +316,7 @@ const Login = () => {
 
           {/* Back to Home */}
           <div className="text-center mt-6">
-            <Link to="/" className="text-carelink-gray hover:text-carelink-teal transition flex items-center justify-center gap-2 text-sm">
+            <Link to="/" className="text-carefd-gray hover:text-carefd-teal transition flex items-center justify-center gap-2 text-sm">
               <FaArrowLeft className="rtl:rotate-180" />
               חזרה לדף הבית
             </Link>
@@ -330,29 +330,29 @@ const Login = () => {
           <div className="bg-white rounded-2xl w-full max-w-md p-6 relative shadow-2xl">
             <button
               onClick={() => setShowForgotPassword(false)}
-              className="absolute top-4 left-4 text-carelink-gray hover:text-carelink-navy transition"
+              className="absolute top-4 left-4 text-carefd-gray hover:text-carefd-navy transition"
             >
               <FaTimes size={20} />
             </button>
 
-            <h2 className="text-xl font-bold text-carelink-navy mb-2">איפוס סיסמה</h2>
+            <h2 className="text-xl font-bold text-carefd-navy mb-2">איפוס סיסמה</h2>
 
             {!resetSent ? (
               <>
-                <p className="text-carelink-gray mb-6 text-sm">
+                <p className="text-carefd-gray mb-6 text-sm">
                   הזן את כתובת האימייל שלך ונשלח לך קישור לאיפוס הסיסמה
                 </p>
 
                 <form onSubmit={handleForgotPassword}>
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">אימייל</label>
+                    <label className="block text-sm font-medium text-carefd-navy mb-2">אימייל</label>
                     <div className="relative">
-                      <FaEnvelope className="absolute top-1/2 -translate-y-1/2 right-4 text-carelink-gray/50" />
+                      <FaEnvelope className="absolute top-1/2 -translate-y-1/2 right-4 text-carefd-gray/50" />
                       <input
                         type="email"
                         value={forgotEmail}
                         onChange={(e) => setForgotEmail(e.target.value)}
-                        className="w-full px-4 py-3 pr-12 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-carelink-teal focus:bg-white transition-all"
+                        className="w-full px-4 py-3 pr-12 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-carefd-teal focus:bg-white transition-all"
                         placeholder="your@email.com"
                         required
                       />
@@ -362,7 +362,7 @@ const Login = () => {
                   <button
                     type="submit"
                     disabled={sendingReset}
-                    className="w-full bg-carelink-teal text-white py-3 rounded-xl hover:bg-carelink-teal-medium font-semibold transition disabled:opacity-50"
+                    className="w-full bg-carefd-teal text-white py-3 rounded-xl hover:bg-carefd-teal-medium font-semibold transition disabled:opacity-50"
                   >
                     {sendingReset ? (
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />
@@ -377,15 +377,15 @@ const Login = () => {
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <FaEnvelope className="text-green-600 text-2xl" />
                 </div>
-                <h3 className="text-lg font-bold text-carelink-navy mb-2">בדוק את האימייל שלך</h3>
-                <p className="text-carelink-gray mb-6 text-sm">
+                <h3 className="text-lg font-bold text-carefd-navy mb-2">בדוק את האימייל שלך</h3>
+                <p className="text-carefd-gray mb-6 text-sm">
                   אם האימייל קיים במערכת, שלחנו לך קישור לאיפוס הסיסמה.
                   <br />
                   <span className="text-xs">הקישור תקף ל-1 שעה</span>
                 </p>
                 <button
                   onClick={() => setShowForgotPassword(false)}
-                  className="text-carelink-teal font-medium hover:underline"
+                  className="text-carefd-teal font-medium hover:underline"
                 >
                   חזור להתחברות
                 </button>
