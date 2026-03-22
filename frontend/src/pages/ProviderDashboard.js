@@ -257,7 +257,7 @@ const ProviderDashboard = () => {
         totalBookings: providerBookings.length,
         pendingBookings: providerBookings.filter(b => b.status === 'pending').length,
         completedBookings: completed.length,
-        totalEarnings: completed.reduce((acc, b) => acc + (b.price || 0), 0),
+        totalEarnings: completed.reduce((acc, b) => acc + (parseFloat(b.price) || 0), 0),
         averageRating: providerRes.data?.rating || 0,
         totalReviews: providerRes.data?.total_reviews || 0,
         profileViews: providerRes.data?.views_count || 0

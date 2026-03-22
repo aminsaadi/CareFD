@@ -185,11 +185,11 @@ const Register = () => {
                     name="password"
                     type={showPassword ? 'text' : 'password'}
                     required
-                    minLength="6"
+                    minLength="8"
                     value={formData.password}
                     onChange={handleChange}
                     className="w-full px-12 py-3 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
-                    placeholder="לפחות 6 תווים"
+                    placeholder="לפחות 8 תווים"
                     data-testid="password-input"
                   />
                   <button

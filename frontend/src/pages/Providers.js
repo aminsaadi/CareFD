@@ -852,14 +852,14 @@ const Providers = () => {
                             className="flex items-center gap-3 p-3 hover:bg-carelink-teal/5 transition group"
                           >
                             {provider.profile_image ? (
-                              <img src={provider.profile_image} alt={provider.name} className="w-11 h-11 rounded-full object-cover flex-shrink-0 ring-2 ring-gray-100 group-hover:ring-carelink-teal/30" />
+                              <img src={provider.profile_image} alt={provider.business_name || ''} className="w-11 h-11 rounded-full object-cover flex-shrink-0 ring-2 ring-gray-100 group-hover:ring-carelink-teal/30" />
                             ) : (
                               <div className="w-11 h-11 rounded-full bg-gradient-to-br from-carelink-teal/20 to-carelink-navy/10 flex items-center justify-center text-carelink-teal font-bold flex-shrink-0">
-                                {provider.name?.charAt(0)}
+                                {(provider.business_name || '?').charAt(0)}
                               </div>
                             )}
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-carelink-navy text-sm truncate group-hover:text-carelink-teal transition">{provider.name}</p>
+                              <p className="font-medium text-carelink-navy text-sm truncate group-hover:text-carelink-teal transition">{provider.business_name}</p>
                               <p className="text-xs text-carelink-gray truncate">{provider.profession_name || provider.profession} • {provider.location?.city}</p>
                               <div className="flex items-center gap-3 mt-0.5">
                                 {provider.rating != null && provider.rating > 0 && (
