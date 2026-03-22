@@ -342,9 +342,7 @@ async def delete_chat_room(
     
     # If both participants deleted, remove messages too
     all_participants = [room["user_id"]]
-    if provider:
-        all_participants.append(provider.get("user_id", ""))
-    prov_doc = await db.providers.find_one({"provider_id": room["provider_id"]}, {"_id": 0})
+    prov_doc = provider or await db.providers.find_one({"provider_id": room["provider_id"]}, {"_id": 0})
     if prov_doc:
         all_participants.append(prov_doc.get("user_id", ""))
     all_participants = list(set(all_participants))

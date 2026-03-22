@@ -63,7 +63,9 @@ const Register = () => {
     try {
       await api.post('/auth/resend-verification', { email: formData.email });
       setError('');
-    } catch (e) {}
+    } catch (e) {
+      console.error('Failed to resend verification:', e);
+    }
     setResending(false);
   };
 

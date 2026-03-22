@@ -9,7 +9,7 @@ from app.database import db
 from app.models import Booking, BookingCreate, BookingStatus, ContactPerson, ServiceLocation, NotificationType
 from app.utils import get_current_user, send_email_async, create_notification, send_push_to_user
 
-SITE_URL = os.environ.get('SITE_URL', 'https://example.com').rstrip('/')
+SITE_URL = os.environ.get('SITE_URL', 'https://carelink.co.il').rstrip('/')
 
 router = APIRouter()
 

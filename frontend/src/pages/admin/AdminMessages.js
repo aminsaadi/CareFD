@@ -41,12 +41,16 @@ const AdminMessages = () => {
         try {
           const providerRes = await api.get(`/providers/${room.provider_id}`);
           providerName = providerRes.data.business_name || 'ספק';
-        } catch (e) {}
-        
+        } catch (e) {
+          console.warn('Failed to fetch provider info:', e);
+        }
+
         try {
           const userRes = await api.get(`/users/${room.user_id}`);
           userName = userRes.data.name || 'משתמש';
-        } catch (e) {}
+        } catch (e) {
+          console.warn('Failed to fetch user info:', e);
+        }
         
         return {
           ...room,

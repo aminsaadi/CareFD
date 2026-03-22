@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import api from '../utils/api';
 import { toast } from 'sonner';
@@ -39,6 +40,7 @@ const notificationTypeStyles = {
 
 export const NotificationProvider = ({ children }) => {
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const seenIdsRef = useRef(new Set());
@@ -78,7 +80,7 @@ export const NotificationProvider = ({ children }) => {
           action: n.data?.booking_id ? {
             label: 'צפה',
             onClick: () => {
-              window.location.href = '/dashboard';
+              navigate('/dashboard');
             }
           } : undefined
         });
