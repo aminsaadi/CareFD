@@ -568,7 +568,7 @@ async def accept_offer(
     # Atomically claim the request
     req_claim = await db.requests.update_one(
         {"request_id": offer["request_id"], "status": RequestStatus.OPEN},
-        {"$set": {"status": RequestStatus.BOOKED}}
+        {"$set": {"status": RequestStatus.IN_PROGRESS}}
     )
     if req_claim.matched_count == 0:
         await db.offers.update_one({"offer_id": offer_id}, {"$set": {"status": OfferStatus.PENDING}})

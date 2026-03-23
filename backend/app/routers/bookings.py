@@ -672,80 +672,46 @@ async def cancel_booking(
     authorization: Optional[str] = Header(None),
     request: Request = None
 ):
-    """Cancel a booking"""
+    """Cancel a booking. Provider can cancel directly. Client must request cancellation (provider approves)."""
     user = await get_current_user(authorization, request)
-    
+
     booking = await db.bookings.find_one({"booking_id": booking_id}, {"_id": 0})
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
-    
+
     # Check authorization
     provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
     is_owner = booking["user_id"] == user["user_id"]
     is_provider = provider and booking["provider_id"] == provider["provider_id"]
-    
+
     if not (is_owner or is_provider):
         raise HTTPException(status_code=403, detail="Not authorized")
-    
-    await db.bookings.update_one(
-        {"booking_id": booking_id},
-        {"$set": {
-            "status": BookingStatus.CANCELLED,
-            "cancelled_at": datetime.now(timezone.utc).isoformat()
-        }}
-    )
-    
-    # Notify the other party
-    if is_owner:
-        # Client cancelled - notify provider
-        target_provider = await db.providers.find_one({"provider_id": booking["provider_id"]}, {"_id": 0})
-        if target_provider:
-            await create_notification(
-                target_provider["user_id"],
-                NotificationType.BOOKING_CANCELLED,
-                "הזמנה בוטלה",
-                f"הלקוח ביטל את ההזמנה ל-{booking.get('service_name', 'שירות')}",
-                {"booking_id": booking_id}
-            )
-            await send_push_to_user(
-                target_provider["user_id"],
-                "הזמנה בוטלה",
-                f"הלקוח ביטל את ההזמנה ל-{booking.get('service_name', 'שירות')}",
-                {"booking_id": booking_id, "type": "booking_cancelled"}
-            )
-            # Send email to provider
-            provider_user = await db.users.find_one({"user_id": target_provider["user_id"]}, {"_id": 0})
-            if provider_user and provider_user.get("email"):
-                client_user = await db.users.find_one({"user_id": booking["user_id"]}, {"_id": 0})
-                await send_email_async(
-                    provider_user["email"],
-                    "הזמנה -הזמנה בוטלה ❌",
-                    f"""
-                    <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                        <h2 style="color: #e74c3c;">הזמנה בוטלה</h2>
-                        <p>שלום {provider_user.get('name', 'ספק')},</p>
-                        <p>הלקוח {client_user.get('name', 'לקוח') if client_user else 'לקוח'} ביטל את ההזמנה:</p>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
-                            <p><strong>שירות:</strong> {booking.get('service_name', 'שירות')}</p>
-                            <p><strong>תאריך:</strong> {booking.get('booking_date', '')[:10]}</p>
-                        </div>
-                        <p>בברכה</p>
-                    </div>
-                    """
-                )
-    else:
-        # Provider cancelled - notify client
+
+    now = datetime.now(timezone.utc)
+    service_name = booking.get('service_name', 'שירות')
+
+    if is_provider:
+        # Provider can cancel directly
+        await db.bookings.update_one(
+            {"booking_id": booking_id},
+            {"$set": {
+                "status": BookingStatus.CANCELLED,
+                "cancelled_at": now.isoformat(),
+                "cancelled_by": "provider"
+            }}
+        )
+        # Notify client
         await create_notification(
             booking["user_id"],
             NotificationType.BOOKING_CANCELLED,
             "הזמנה בוטלה",
-            f"הספק ביטל את ההזמנה ל-{booking.get('service_name', 'שירות')}",
+            f"הספק ביטל את ההזמנה ל-{service_name}",
             {"booking_id": booking_id}
         )
         await send_push_to_user(
             booking["user_id"],
             "הזמנה בוטלה",
-            f"הספק ביטל את ההזמנה ל-{booking.get('service_name', 'שירות')}",
+            f"הספק ביטל את ההזמנה ל-{service_name}",
             {"booking_id": booking_id, "type": "booking_cancelled"}
         )
         # Send email to client
@@ -754,23 +720,196 @@ async def cancel_booking(
             provider_info = await db.providers.find_one({"provider_id": booking["provider_id"]}, {"_id": 0})
             await send_email_async(
                 client_user["email"],
-                "הזמנה -הזמנה בוטלה ❌",
+                "הזמנה בוטלה",
                 f"""
                 <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                     <h2 style="color: #e74c3c;">הזמנה בוטלה</h2>
                     <p>שלום {client_user.get('name', 'לקוח')},</p>
                     <p>הספק {provider_info.get('business_name', 'ספק') if provider_info else 'ספק'} ביטל את ההזמנה:</p>
                     <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
-                        <p><strong>שירות:</strong> {booking.get('service_name', 'שירות')}</p>
-                        <p><strong>תאריך:</strong> {booking.get('booking_date', '')[:10]}</p>
+                        <p><strong>שירות:</strong> {service_name}</p>
+                        <p><strong>תאריך:</strong> {booking.get('booking_date', '')[:10] if booking.get('booking_date') else ''}</p>
                     </div>
                     <p>מומלץ לחפש ספק חלופי.</p>
                     <p>בברכה</p>
                 </div>
                 """
             )
-    
-    return {"message": "Booking cancelled successfully"}
+        return {"message": "Booking cancelled successfully"}
+    else:
+        # Client requests cancellation - needs provider approval
+        if booking.get("status") == BookingStatus.CANCELLATION_REQUESTED:
+            raise HTTPException(status_code=400, detail="בקשת ביטול כבר נשלחה, ממתין לאישור הספק")
+
+        await db.bookings.update_one(
+            {"booking_id": booking_id},
+            {"$set": {
+                "status": BookingStatus.CANCELLATION_REQUESTED,
+                "status_before_cancellation": booking["status"],
+                "cancellation_requested_at": now.isoformat(),
+                "cancellation_requested_by": user["user_id"]
+            }}
+        )
+        # Notify provider about cancellation request
+        target_provider = await db.providers.find_one({"provider_id": booking["provider_id"]}, {"_id": 0})
+        if target_provider:
+            await create_notification(
+                target_provider["user_id"],
+                NotificationType.BOOKING_CANCELLATION_REQUESTED,
+                "בקשת ביטול הזמנה",
+                f"הלקוח מבקש לבטל את ההזמנה ל-{service_name}",
+                {"booking_id": booking_id}
+            )
+            await send_push_to_user(
+                target_provider["user_id"],
+                "בקשת ביטול הזמנה",
+                f"הלקוח מבקש לבטל את ההזמנה ל-{service_name}",
+                {"booking_id": booking_id, "type": "booking_cancellation_requested"}
+            )
+            # Send email to provider
+            provider_user = await db.users.find_one({"user_id": target_provider["user_id"]}, {"_id": 0})
+            if provider_user and provider_user.get("email"):
+                client_user = await db.users.find_one({"user_id": booking["user_id"]}, {"_id": 0})
+                await send_email_async(
+                    provider_user["email"],
+                    "בקשת ביטול הזמנה",
+                    f"""
+                    <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                        <h2 style="color: #f39c12;">בקשת ביטול הזמנה</h2>
+                        <p>שלום {provider_user.get('name', 'ספק')},</p>
+                        <p>הלקוח {client_user.get('name', 'לקוח') if client_user else 'לקוח'} מבקש לבטל את ההזמנה:</p>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                            <p><strong>שירות:</strong> {service_name}</p>
+                            <p><strong>תאריך:</strong> {booking.get('booking_date', '')[:10] if booking.get('booking_date') else ''}</p>
+                        </div>
+                        <p>נא להיכנס לאפליקציה כדי לאשר או לדחות את בקשת הביטול.</p>
+                        <p>בברכה</p>
+                    </div>
+                    """
+                )
+        return {"message": "בקשת ביטול נשלחה לספק לאישור"}
+
+
+@router.put("/bookings/{booking_id}/approve-cancellation")
+async def approve_cancellation(
+    booking_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Provider approves client's cancellation request"""
+    user = await get_current_user(authorization, request)
+
+    booking = await db.bookings.find_one({"booking_id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+
+    # Only the provider can approve cancellation
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider or booking["provider_id"] != provider["provider_id"]:
+        raise HTTPException(status_code=403, detail="Only the provider can approve cancellation")
+
+    if booking.get("status") != BookingStatus.CANCELLATION_REQUESTED:
+        raise HTTPException(status_code=400, detail="No pending cancellation request")
+
+    now = datetime.now(timezone.utc)
+    service_name = booking.get('service_name', 'שירות')
+
+    await db.bookings.update_one(
+        {"booking_id": booking_id},
+        {"$set": {
+            "status": BookingStatus.CANCELLED,
+            "cancelled_at": now.isoformat(),
+            "cancelled_by": "client_approved_by_provider"
+        }}
+    )
+
+    # Notify client that cancellation was approved
+    await create_notification(
+        booking["user_id"],
+        NotificationType.BOOKING_CANCELLATION_APPROVED,
+        "בקשת ביטול אושרה",
+        f"הספק אישר את ביטול ההזמנה ל-{service_name}",
+        {"booking_id": booking_id}
+    )
+    await send_push_to_user(
+        booking["user_id"],
+        "בקשת ביטול אושרה",
+        f"הספק אישר את ביטול ההזמנה ל-{service_name}",
+        {"booking_id": booking_id, "type": "booking_cancellation_approved"}
+    )
+
+    # Send email to client
+    client_user = await db.users.find_one({"user_id": booking["user_id"]}, {"_id": 0})
+    if client_user and client_user.get("email"):
+        await send_email_async(
+            client_user["email"],
+            "ביטול הזמנה אושר",
+            f"""
+            <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #27ae60;">ביטול ההזמנה אושר</h2>
+                <p>שלום {client_user.get('name', 'לקוח')},</p>
+                <p>הספק אישר את בקשת הביטול שלך:</p>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                    <p><strong>שירות:</strong> {service_name}</p>
+                </div>
+                <p>ההזמנה בוטלה בהצלחה.</p>
+                <p>בברכה</p>
+            </div>
+            """
+        )
+
+    return {"message": "Cancellation approved"}
+
+
+@router.put("/bookings/{booking_id}/reject-cancellation")
+async def reject_cancellation(
+    booking_id: str,
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Provider rejects client's cancellation request"""
+    user = await get_current_user(authorization, request)
+
+    booking = await db.bookings.find_one({"booking_id": booking_id}, {"_id": 0})
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+
+    # Only the provider can reject cancellation
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider or booking["provider_id"] != provider["provider_id"]:
+        raise HTTPException(status_code=403, detail="Only the provider can reject cancellation")
+
+    if booking.get("status") != BookingStatus.CANCELLATION_REQUESTED:
+        raise HTTPException(status_code=400, detail="No pending cancellation request")
+
+    service_name = booking.get('service_name', 'שירות')
+
+    # Restore the previous status (confirmed or pending)
+    previous_status = booking.get("status_before_cancellation", BookingStatus.CONFIRMED)
+    await db.bookings.update_one(
+        {"booking_id": booking_id},
+        {
+            "$set": {"status": previous_status},
+            "$unset": {"cancellation_requested_at": "", "cancellation_requested_by": ""}
+        }
+    )
+
+    # Notify client that cancellation was rejected
+    await create_notification(
+        booking["user_id"],
+        NotificationType.BOOKING_CANCELLATION_REJECTED,
+        "בקשת ביטול נדחתה",
+        f"הספק דחה את בקשת הביטול ל-{service_name}",
+        {"booking_id": booking_id}
+    )
+    await send_push_to_user(
+        booking["user_id"],
+        "בקשת ביטול נדחתה",
+        f"הספק דחה את בקשת הביטול ל-{service_name}",
+        {"booking_id": booking_id, "type": "booking_cancellation_rejected"}
+    )
+
+    return {"message": "Cancellation rejected"}
 
 @router.put("/bookings/{booking_id}/confirm")
 async def confirm_booking(

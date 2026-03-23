@@ -607,6 +607,7 @@ class BookingStatus:
     PROVIDER_COMPLETED = "provider_completed"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
+    CANCELLATION_REQUESTED = "cancellation_requested"
     REJECTED = "rejected"
     ON_HOLD = "on_hold"
 
@@ -763,6 +764,9 @@ class NotificationType:
     OFFER_WITHDRAWN = "offer_withdrawn"
     REQUEST_NEW = "request_new"
     REQUEST_CANCELLED = "request_cancelled"
+    BOOKING_CANCELLATION_REQUESTED = "booking_cancellation_requested"
+    BOOKING_CANCELLATION_APPROVED = "booking_cancellation_approved"
+    BOOKING_CANCELLATION_REJECTED = "booking_cancellation_rejected"
     REVIEW_NEW = "review_new"
     BOOKING_CHANGE_REQUESTED = "booking_change_requested"
     SYSTEM = "system"

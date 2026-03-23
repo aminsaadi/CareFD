@@ -69,10 +69,10 @@ const MyBookings = () => {
   const handleCancelBooking = async (bookingId) => {
     try {
       await confirm({
-        title: 'ביטול הזמנה',
-        message: 'האם אתה בטוח שברצונך לבטל הזמנה זו?',
-        type: 'danger',
-        confirmText: 'בטל הזמנה',
+        title: 'בקשת ביטול הזמנה',
+        message: 'בקשת הביטול תישלח לספק לאישור. האם להמשיך?',
+        type: 'warning',
+        confirmText: 'שלח בקשת ביטול',
         cancelText: 'השאר'
       });
     } catch {
@@ -127,7 +127,8 @@ const MyBookings = () => {
       pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
       confirmed: 'bg-carefd-teal-pale text-carefd-teal border-carefd-teal',
       completed: 'bg-green-100 text-green-800 border-green-300',
-      cancelled: 'bg-red-100 text-red-800 border-red-300'
+      cancelled: 'bg-red-100 text-red-800 border-red-300',
+      cancellation_requested: 'bg-orange-100 text-orange-800 border-orange-300'
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
   };
@@ -236,6 +237,7 @@ const MyBookings = () => {
                     {booking.status === 'confirmed' && 'מאושר'}
                     {booking.status === 'completed' && 'הושלם'}
                     {booking.status === 'cancelled' && 'בוטל'}
+                    {booking.status === 'cancellation_requested' && 'ממתין לאישור ביטול'}
                   </span>
                 </div>
 
@@ -254,15 +256,21 @@ const MyBookings = () => {
                   )}
                 </div>
 
-                {booking.status !== 'cancelled' && booking.status !== 'completed' && (
+                {booking.status !== 'cancelled' && booking.status !== 'completed' && booking.status !== 'cancellation_requested' && (
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleCancelBooking(booking.booking_id)}
                       className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
                       data-testid={`cancel-booking-${booking.booking_id}`}
                     >
-                      בטל הזמנה
+                      בקש ביטול הזמנה
                     </button>
+                  </div>
+                )}
+                {booking.status === 'cancellation_requested' && (
+                  <div className="flex items-center gap-2 text-orange-600 text-sm mt-2">
+                    <FaSpinner className="animate-spin" />
+                    <span>בקשת ביטול נשלחה לספק - ממתין לאישור</span>
                   </div>
                 )}
                 
