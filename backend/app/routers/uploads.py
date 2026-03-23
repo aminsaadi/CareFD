@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import uuid
 import re
 import os
+import base64
 from pathlib import Path
 
 from app.database import db, UPLOAD_DIR
@@ -82,9 +83,24 @@ async def upload_file(
     unique_filename = f"{uuid.uuid4().hex}.{ext}"
     file_path = UPLOAD_DIR / unique_filename
 
-    # Save file
+    # Save file to disk (cache)
     with open(file_path, "wb") as f:
         f.write(content)
+
+    # Also save to MongoDB for persistence across deploys
+    await db.uploaded_files.update_one(
+        {"filename": unique_filename},
+        {"$set": {
+            "filename": unique_filename,
+            "content_base64": base64.b64encode(content).decode('utf-8'),
+            "content_type": content_type,
+            "original_name": file.filename,
+            "size": len(content),
+            "uploaded_by": user["user_id"],
+            "uploaded_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
 
     # Generate URL
     base_url = await get_site_url()
@@ -148,9 +164,24 @@ async def upload_image(
     unique_filename = f"img_{uuid.uuid4().hex}.{ext}"
     file_path = UPLOAD_DIR / unique_filename
 
-    # Save file
+    # Save file to disk (cache)
     with open(file_path, "wb") as f:
         f.write(content)
+
+    # Also save to MongoDB for persistence across deploys
+    await db.uploaded_files.update_one(
+        {"filename": unique_filename},
+        {"$set": {
+            "filename": unique_filename,
+            "content_base64": base64.b64encode(content).decode('utf-8'),
+            "content_type": content_type,
+            "original_name": file.filename,
+            "size": len(content),
+            "uploaded_by": user["user_id"],
+            "uploaded_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
 
     # Generate URL
     base_url = await get_site_url()
@@ -176,7 +207,7 @@ CONTENT_TYPE_MAP = {
 
 @router.get("/files/{filename}")
 async def get_file(filename: str):
-    """Serve uploaded files"""
+    """Serve uploaded files - from disk cache or MongoDB fallback"""
     # Prevent path traversal - only allow alphanumeric filenames with dots
     if not re.match(r'^[a-zA-Z0-9_]+\.[a-z]+$', filename):
         raise HTTPException(status_code=400, detail="Invalid filename")
@@ -187,11 +218,19 @@ async def get_file(filename: str):
     if not str(file_path).startswith(str(UPLOAD_DIR.resolve())):
         raise HTTPException(status_code=403, detail="Access denied")
 
-    if not file_path.exists():
-        raise HTTPException(status_code=404, detail="File not found")
-
     ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
     media_type = CONTENT_TYPE_MAP.get(ext)
+
+    # If file doesn't exist on disk, try to restore from MongoDB
+    if not file_path.exists():
+        stored_file = await db.uploaded_files.find_one({"filename": filename}, {"_id": 0})
+        if not stored_file:
+            raise HTTPException(status_code=404, detail="File not found")
+
+        # Restore file to disk for future requests
+        content = base64.b64decode(stored_file["content_base64"])
+        with open(file_path, "wb") as f:
+            f.write(content)
 
     # For SVG files, add Content-Security-Policy to block inline scripts
     if ext == 'svg':
