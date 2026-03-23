@@ -663,6 +663,10 @@ class Booking(BaseModel):
     provider_completed_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     cancelled_at: Optional[datetime] = None
+    cancelled_by: Optional[str] = None
+    status_before_cancellation: Optional[str] = None
+    cancellation_requested_at: Optional[str] = None
+    cancellation_requested_by: Optional[str] = None
     provider_name: Optional[str] = None
     user_name: Optional[str] = None
     is_guest_booking: bool = False

@@ -687,6 +687,11 @@ async def cancel_booking(
     if not (is_owner or is_provider):
         raise HTTPException(status_code=403, detail="Not authorized")
 
+    # Prevent cancellation of bookings in terminal statuses
+    non_cancellable = {BookingStatus.CANCELLED, BookingStatus.COMPLETED, BookingStatus.REJECTED}
+    if booking.get("status") in non_cancellable:
+        raise HTTPException(status_code=400, detail="לא ניתן לבטל הזמנה בסטטוס זה")
+
     now = datetime.now(timezone.utc)
     service_name = booking.get('service_name', 'שירות')
 
@@ -808,20 +813,20 @@ async def approve_cancellation(
     if not provider or booking["provider_id"] != provider["provider_id"]:
         raise HTTPException(status_code=403, detail="Only the provider can approve cancellation")
 
-    if booking.get("status") != BookingStatus.CANCELLATION_REQUESTED:
-        raise HTTPException(status_code=400, detail="No pending cancellation request")
-
     now = datetime.now(timezone.utc)
     service_name = booking.get('service_name', 'שירות')
 
-    await db.bookings.update_one(
-        {"booking_id": booking_id},
+    # Atomic update - only approve if still in CANCELLATION_REQUESTED status
+    result = await db.bookings.update_one(
+        {"booking_id": booking_id, "status": BookingStatus.CANCELLATION_REQUESTED},
         {"$set": {
             "status": BookingStatus.CANCELLED,
             "cancelled_at": now.isoformat(),
             "cancelled_by": "client_approved_by_provider"
         }}
     )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=400, detail="No pending cancellation request")
 
     # Notify client that cancellation was approved
     await create_notification(
@@ -879,20 +884,19 @@ async def reject_cancellation(
     if not provider or booking["provider_id"] != provider["provider_id"]:
         raise HTTPException(status_code=403, detail="Only the provider can reject cancellation")
 
-    if booking.get("status") != BookingStatus.CANCELLATION_REQUESTED:
-        raise HTTPException(status_code=400, detail="No pending cancellation request")
-
     service_name = booking.get('service_name', 'שירות')
 
-    # Restore the previous status (confirmed or pending)
+    # Atomic update - restore previous status only if still in CANCELLATION_REQUESTED
     previous_status = booking.get("status_before_cancellation", BookingStatus.CONFIRMED)
-    await db.bookings.update_one(
-        {"booking_id": booking_id},
+    result = await db.bookings.update_one(
+        {"booking_id": booking_id, "status": BookingStatus.CANCELLATION_REQUESTED},
         {
             "$set": {"status": previous_status},
             "$unset": {"cancellation_requested_at": "", "cancellation_requested_by": ""}
         }
     )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=400, detail="No pending cancellation request")
 
     # Notify client that cancellation was rejected
     await create_notification(
