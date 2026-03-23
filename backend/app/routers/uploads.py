@@ -9,6 +9,7 @@ from pathlib import Path
 
 from app.database import db, UPLOAD_DIR
 from app.utils import get_current_user, get_site_url
+from app.rate_limiter import rate_limiter, get_client_ip
 
 router = APIRouter()
 
@@ -54,6 +55,9 @@ async def upload_file(
     request: Request = None
 ):
     """Upload a file and return its URL"""
+    # Rate limit: 20 uploads per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"upload:{get_client_ip(request)}", max_requests=20, window_seconds=900)
     user = await get_current_user(authorization, request)
     
     # Validate file type
@@ -100,6 +104,9 @@ async def upload_image(
     request: Request = None
 ):
     """Upload an image file (for profile pictures)"""
+    # Rate limit: 20 uploads per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"upload_img:{get_client_ip(request)}", max_requests=20, window_seconds=900)
     user = await get_current_user(authorization, request)
 
     # Validate file type - images only

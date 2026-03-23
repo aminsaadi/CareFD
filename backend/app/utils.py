@@ -114,6 +114,18 @@ async def _get_smtp_settings():
         return _smtp_cache["settings"]
 
     db_settings = await db.smtp_settings.find_one({"_id": "smtp_config"})
+    # Decrypt SMTP password if stored encrypted
+    if db_settings and db_settings.get("smtp_password_encrypted"):
+        try:
+            import base64
+            import hashlib
+            from cryptography.fernet import Fernet
+            fernet_key = base64.urlsafe_b64encode(hashlib.sha256(SECRET_KEY.encode()).digest())
+            fernet = Fernet(fernet_key)
+            db_settings["smtp_password"] = fernet.decrypt(db_settings["smtp_password_encrypted"].encode()).decode()
+        except Exception:
+            logger.error("Failed to decrypt SMTP password from database")
+            db_settings["smtp_password"] = ""
     if db_settings and db_settings.get("smtp_user") and db_settings.get("smtp_password"):
         try:
             port = int(db_settings.get("smtp_port", SMTP_PORT))
@@ -126,7 +138,7 @@ async def _get_smtp_settings():
             "smtp_user": db_settings.get("smtp_user", SMTP_USER),
             "smtp_password": db_settings.get("smtp_password", SMTP_PASSWORD),
         }
-        logger.info(f"SMTP: Using DB settings (host={settings['smtp_host']}, port={settings['smtp_port']}, user={settings['smtp_user'][:3]}***)")
+        logger.info(f"SMTP: Using DB settings (host={settings['smtp_host']}, port={settings['smtp_port']})")
     else:
         settings = {
             "sender_email": SENDER_EMAIL,
@@ -138,7 +150,7 @@ async def _get_smtp_settings():
         if not SMTP_USER or not SMTP_PASSWORD:
             logger.warning("SMTP: No credentials configured in DB or env vars - emails will NOT be sent!")
         else:
-            logger.info(f"SMTP: Using env var settings (host={SMTP_HOST}, port={SMTP_PORT}, user={SMTP_USER[:3]}***)")
+            logger.info(f"SMTP: Using env var settings (host={SMTP_HOST}, port={SMTP_PORT})")
     _smtp_cache["settings"] = settings
     _smtp_cache["fetched_at"] = now
     return settings
