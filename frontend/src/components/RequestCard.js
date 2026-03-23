@@ -26,7 +26,7 @@ const LANGUAGE_LABELS = {
   amharic: 'אמהרית',
 };
 
-const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
+const RequestCard = ({ request, showActions = false, onMakeOffer, professionMap = {} }) => {
   const { t } = useTranslation();
 
   const getStatusColor = (status) => {
@@ -94,7 +94,7 @@ const RequestCard = ({ request, showActions = false, onMakeOffer }) => {
             <span className="text-sm font-medium text-carefd-navy">מקצוע:</span>
             {request.professions.map((prof, idx) => (
               <span key={idx} className="bg-carefd-teal-pale text-carefd-teal text-xs px-2 py-0.5 rounded-full">
-                {prof}
+                {professionMap[prof] || prof}
               </span>
             ))}
           </div>

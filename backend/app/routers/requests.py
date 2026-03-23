@@ -3,6 +3,7 @@ from typing import Optional, List
 from datetime import datetime, timezone, timedelta
 import uuid
 import asyncio
+import re
 import logging
 
 from app.database import db
@@ -96,16 +97,18 @@ async def _notify_matching_providers(service_request: ServiceRequest, requester_
             fallback_or = []
             if professions and len(professions) > 0:
                 for prof in professions:
+                    escaped_prof = re.escape(prof)
                     fallback_or.extend([
-                        {"profession_name": {"$regex": prof, "$options": "i"}},
-                        {"specialization_name": {"$regex": prof, "$options": "i"}},
-                        {"specializations": {"$regex": prof, "$options": "i"}},
+                        {"profession_name": {"$regex": escaped_prof, "$options": "i"}},
+                        {"specialization_name": {"$regex": escaped_prof, "$options": "i"}},
+                        {"specializations": {"$regex": escaped_prof, "$options": "i"}},
                     ])
             elif spec:
+                escaped_spec = re.escape(spec)
                 fallback_or = [
-                    {"specializations": {"$regex": spec, "$options": "i"}},
-                    {"specialization_name": {"$regex": spec, "$options": "i"}},
-                    {"profession_name": {"$regex": spec, "$options": "i"}},
+                    {"specializations": {"$regex": escaped_spec, "$options": "i"}},
+                    {"specialization_name": {"$regex": escaped_spec, "$options": "i"}},
+                    {"profession_name": {"$regex": escaped_spec, "$options": "i"}},
                 ]
 
             if fallback_or:
@@ -173,6 +176,13 @@ async def get_request(
     request_doc = await db.requests.find_one({"request_id": request_id}, {"_id": 0})
     if not request_doc:
         raise HTTPException(status_code=404, detail="Request not found")
+
+    # Authorization: allow owner, providers, and admins
+    is_owner = request_doc["user_id"] == user["user_id"]
+    is_provider = user.get("role") == "provider"
+    is_admin = user.get("role") == "admin"
+    if not (is_owner or is_provider or is_admin):
+        raise HTTPException(status_code=403, detail="Not authorized to view this request")
 
     # Enrich with user info (exclude sensitive fields like email)
     req_user = await db.users.find_one({"user_id": request_doc["user_id"]}, {"_id": 0, "name": 1, "picture": 1})
@@ -531,23 +541,37 @@ async def accept_offer(
     """Accept an offer - creates Booking, ChatRoom, rejects other offers, sends notifications"""
     user = await get_current_user(authorization, request)
 
-    # Fetch offer
-    offer = await db.offers.find_one({"offer_id": offer_id}, {"_id": 0})
-    if not offer:
-        raise HTTPException(status_code=404, detail="Offer not found")
-
-    if offer["status"] != OfferStatus.PENDING:
+    # Atomically claim the offer to prevent race conditions
+    claim_result = await db.offers.update_one(
+        {"offer_id": offer_id, "status": OfferStatus.PENDING},
+        {"$set": {"status": OfferStatus.ACCEPTED}}
+    )
+    if claim_result.matched_count == 0:
+        offer_check = await db.offers.find_one({"offer_id": offer_id}, {"_id": 0})
+        if not offer_check:
+            raise HTTPException(status_code=404, detail="Offer not found")
         raise HTTPException(status_code=400, detail="Offer is no longer pending")
+
+    offer = await db.offers.find_one({"offer_id": offer_id}, {"_id": 0})
 
     # Verify user owns the request
     service_request = await db.requests.find_one({"request_id": offer["request_id"]}, {"_id": 0})
     if not service_request:
+        # Revert offer status
+        await db.offers.update_one({"offer_id": offer_id}, {"$set": {"status": OfferStatus.PENDING}})
         raise HTTPException(status_code=404, detail="Request not found")
 
     if service_request["user_id"] != user["user_id"]:
+        await db.offers.update_one({"offer_id": offer_id}, {"$set": {"status": OfferStatus.PENDING}})
         raise HTTPException(status_code=403, detail="Not authorized")
 
-    if service_request["status"] != RequestStatus.OPEN:
+    # Atomically claim the request
+    req_claim = await db.requests.update_one(
+        {"request_id": offer["request_id"], "status": RequestStatus.OPEN},
+        {"$set": {"status": RequestStatus.BOOKED}}
+    )
+    if req_claim.matched_count == 0:
+        await db.offers.update_one({"offer_id": offer_id}, {"$set": {"status": OfferStatus.PENDING}})
         raise HTTPException(status_code=400, detail="Request is no longer open")
 
     now = datetime.now(timezone.utc)

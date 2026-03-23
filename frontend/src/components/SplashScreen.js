@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import { FaMapMarkerAlt, FaUserMd, FaCalendarCheck, FaArrowLeft, FaChevronLeft } from 'react-icons/fa';
 
-const SPLASH_KEY = 'carezone_onboarding_seen';
+const SPLASH_KEY = 'carefd_onboarding_seen';
 
 const slides = [
   {
@@ -80,7 +80,7 @@ const SplashScreen = ({ onComplete }) => {
         </button>
         <div className="flex items-center gap-2">
           {siteSettings.logo_url ? (
-            <img src={siteSettings.logo_url} alt={siteSettings.site_name || 'CareLink'} className="h-8 w-auto" />
+            <img src={siteSettings.logo_url} alt={siteSettings.site_name || 'CareFD'} className="h-8 w-auto" />
           ) : (
             <span className="text-xl font-bold text-carefd-navy">{siteSettings.site_name || 'CareFD'}</span>
           )}

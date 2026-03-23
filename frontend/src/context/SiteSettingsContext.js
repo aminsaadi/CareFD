@@ -6,7 +6,7 @@ const SiteSettingsContext = createContext({});
 const SETTINGS_CACHE_KEY = 'site_settings_cache';
 
 const DEFAULT_SETTINGS = {
-  site_name: '',
+  site_name: 'CareFD',
   site_tagline: '',
   logo_url: '',
   favicon_url: '',

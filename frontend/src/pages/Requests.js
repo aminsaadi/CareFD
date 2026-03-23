@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -48,6 +48,14 @@ const Requests = () => {
   const [deliveryTypeOptions, setDeliveryTypeOptions] = useState([]);
 
   const [regionOptions, setRegionOptions] = useState([]);
+
+  const professionMap = useMemo(() => {
+    const map = {};
+    professionOptions.forEach(p => {
+      map[p.profession_id] = p.name;
+    });
+    return map;
+  }, [professionOptions]);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -632,6 +640,7 @@ const Requests = () => {
                 key={request.request_id}
                 request={request}
                 showActions={user?.role === 'provider'}
+                professionMap={professionMap}
               />
             ))}
           </div>

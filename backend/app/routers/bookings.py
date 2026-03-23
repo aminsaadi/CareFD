@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Header, Request
 from typing import Optional, List
 from datetime import datetime, timezone, timedelta
 import uuid
-
+import html as html_module
 import os
 
 from app.database import db
@@ -10,7 +10,7 @@ from app.models import Booking, BookingCreate, BookingStatus, ContactPerson, Ser
 from app.utils import get_current_user, send_email_async, create_notification, send_push_to_user
 from app.rate_limiter import rate_limiter, get_client_ip
 
-SITE_URL = os.environ.get('SITE_URL', 'https://carelink.co.il').rstrip('/')
+SITE_URL = os.environ.get('SITE_URL', 'https://carefd.co.il').rstrip('/')
 
 router = APIRouter()
 
@@ -62,18 +62,34 @@ async def create_booking(
     if provider.get("verification_status") not in ["verified", None] and not provider.get("is_verified"):
         raise HTTPException(status_code=400, detail="Provider is not verified yet")
     
-    # Check for conflicts (only when date is provided)
+    # Check for conflicts (only when date is provided) - use atomic operation to prevent race conditions
     if booking_data.booking_date:
         booking_date_str = booking_data.booking_date.isoformat()
-        existing = await db.bookings.find_one({
-            "provider_id": service["provider_id"],
-            "booking_date": booking_date_str,
-            "booking_time": booking_data.booking_time,
-            "status": {"$in": ["pending", "confirmed", "in_progress"]}
-        })
-        
-        if existing:
-            raise HTTPException(status_code=400, detail="Time slot already booked")
+        conflict_lock = await db.booking_locks.find_one_and_update(
+            {
+                "provider_id": service["provider_id"],
+                "booking_date": booking_date_str,
+                "booking_time": booking_data.booking_time,
+            },
+            {"$setOnInsert": {
+                "provider_id": service["provider_id"],
+                "booking_date": booking_date_str,
+                "booking_time": booking_data.booking_time,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }},
+            upsert=True,
+            return_document=False
+        )
+        if conflict_lock is not None:
+            # Lock already existed - check if there's an active booking
+            existing = await db.bookings.find_one({
+                "provider_id": service["provider_id"],
+                "booking_date": booking_date_str,
+                "booking_time": booking_data.booking_time,
+                "status": {"$in": ["pending", "confirmed", "in_progress"]}
+            })
+            if existing:
+                raise HTTPException(status_code=400, detail="Time slot already booked")
     
     # Build contact person
     contact_person = None
@@ -239,9 +255,9 @@ async def create_booking(
                     <h2 style="color: #0d5c63; border-bottom: 2px solid #00a99d; padding-bottom: 10px;">פרטי ההזמנה</h2>
                     
                     <table style="width: 100%; border-collapse: collapse;">
-                        <tr><td style="padding: 10px 0; color: #666;">לקוח:</td><td style="padding: 10px 0; font-weight: bold;">{client_name}</td></tr>
-                        <tr><td style="padding: 10px 0; color: #666;">טלפון:</td><td style="padding: 10px 0;">{client_phone or 'לא צוין'}</td></tr>
-                        <tr><td style="padding: 10px 0; color: #666;">שירות:</td><td style="padding: 10px 0; font-weight: bold;">{service.get('name', 'שירות')}</td></tr>
+                        <tr><td style="padding: 10px 0; color: #666;">לקוח:</td><td style="padding: 10px 0; font-weight: bold;">{html_module.escape(client_name or '')}</td></tr>
+                        <tr><td style="padding: 10px 0; color: #666;">טלפון:</td><td style="padding: 10px 0;">{html_module.escape(client_phone or 'לא צוין')}</td></tr>
+                        <tr><td style="padding: 10px 0; color: #666;">שירות:</td><td style="padding: 10px 0; font-weight: bold;">{html_module.escape(service.get('name', 'שירות'))}</td></tr>
                         <tr><td style="padding: 10px 0; color: #666;">תאריך:</td><td style="padding: 10px 0;">{booking_date_formatted}</td></tr>
                         <tr><td style="padding: 10px 0; color: #666;">שעה:</td><td style="padding: 10px 0;">{booking_time_str}</td></tr>
                         <tr><td style="padding: 10px 0; color: #666;">כתובת:</td><td style="padding: 10px 0;">{booking_data.service_address or booking_data.guest_address or 'לא צוין'}, {booking_data.service_city or ''}</td></tr>

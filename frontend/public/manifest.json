@@ -1,7 +1,7 @@
 {
-  "short_name": "CareZone",
-  "name": "CareZone - HealthCare Providers Zone",
-  "description": "CareZone - HealthCare Providers Zone",
+  "short_name": "CareFD",
+  "name": "CareFD - HealthCare Providers Zone",
+  "description": "CareFD - HealthCare Providers Zone",
   "icons": [
     {
       "src": "logo192.png",

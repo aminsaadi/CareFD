@@ -99,7 +99,7 @@ const Login = () => {
     }
   };
 
-  const siteName = siteSettings.site_name || 'CareZone';
+  const siteName = siteSettings.site_name || 'CareFD';
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
@@ -128,7 +128,7 @@ const Login = () => {
 
           {/* Hero Text */}
           <h1 className="text-4xl xl:text-5xl font-bold text-white text-center mb-4 font-heading leading-tight">
-            {siteSettings.site_tagline || 'HealthCare Providers Zone'}
+            {siteSettings.site_tagline || 'מחברים בין מטופלים לספקי שירותי בריאות'}
           </h1>
           <p className="text-lg text-carefd-teal-pale text-center max-w-md mb-12">
             התחברו לחשבון שלכם וגשו לכל השירותים והספקים המובילים
@@ -167,7 +167,7 @@ const Login = () => {
               <Logo />
             </Link>
             <p className="text-carefd-gray mt-2 text-sm">
-              {siteSettings.site_tagline || 'HealthCare Providers Zone'}
+              {siteSettings.site_tagline || 'מחברים בין מטופלים לספקי שירותי בריאות'}
             </p>
           </div>
 
