@@ -7,7 +7,7 @@ const Logo = ({ size = 'default', variant, className = '' }) => {
 
   const sizeClasses = {
     small: 'h-6',
-    default: 'h-[4rem]',
+    default: 'h-[6rem]',
     large: 'h-12'
   };
 
