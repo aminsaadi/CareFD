@@ -323,8 +323,8 @@ async def admin_reset_user_password(
         raise HTTPException(status_code=403, detail="Admin access required")
     
     new_password = password_data.get("new_password")
-    if not new_password or len(new_password) < 6:
-        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+    if not new_password or len(new_password) < 8 or not any(c.isdigit() for c in new_password) or not any(c.isalpha() for c in new_password):
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters with at least one letter and one digit")
     
     # Hash the new password
     password_hash = hash_password(new_password)
@@ -513,11 +513,12 @@ async def admin_get_services(
     if category:
         query["category"] = category
     if search:
+        escaped_search = re.escape(search)
         query["$or"] = [
-            {"name": {"$regex": search, "$options": "i"}},
-            {"description": {"$regex": search, "$options": "i"}}
+            {"name": {"$regex": escaped_search, "$options": "i"}},
+            {"description": {"$regex": escaped_search, "$options": "i"}}
         ]
-    
+
     services = await db.services.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
     total = await db.services.count_documents(query)
     
@@ -621,10 +622,11 @@ async def admin_get_all_providers(
     query = {}
     
     if search:
+        escaped_search = re.escape(search)
         query["$or"] = [
-            {"business_name": {"$regex": search, "$options": "i"}},
-            {"email": {"$regex": search, "$options": "i"}},
-            {"phone": {"$regex": search, "$options": "i"}}
+            {"business_name": {"$regex": escaped_search, "$options": "i"}},
+            {"email": {"$regex": escaped_search, "$options": "i"}},
+            {"phone": {"$regex": escaped_search, "$options": "i"}}
         ]
     
     if status:
@@ -1376,14 +1378,23 @@ async def admin_update_settings(
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    settings_data["updated_at"] = datetime.now(timezone.utc).isoformat()
-    
+    ALLOWED_SETTINGS_FIELDS = {
+        "site_name", "site_description", "logo_url", "favicon_url",
+        "primary_color", "secondary_color", "contact_email", "contact_phone",
+        "address", "footer_text", "social_links", "hero_title", "hero_subtitle",
+        "hero_image", "allow_registrations", "require_email_verification",
+        "google_analytics_id", "meta_description", "meta_keywords",
+        "maintenance_mode", "maintenance_message"
+    }
+    filtered_data = {k: v for k, v in settings_data.items() if k in ALLOWED_SETTINGS_FIELDS}
+    filtered_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+
     await db.site_settings.update_one(
         {},
-        {"$set": settings_data},
+        {"$set": filtered_data},
         upsert=True
     )
-    
+
     return {"message": "Settings updated successfully"}
 
 # ==================== SERVICE TYPES MANAGEMENT ====================
@@ -2394,11 +2405,13 @@ async def admin_update_ad(
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    ad_data["updated_at"] = datetime.now(timezone.utc).isoformat()
-    
+    ALLOWED_AD_FIELDS = {"title", "description", "image_url", "link_url", "is_active", "position", "priority", "start_date", "end_date"}
+    filtered_ad = {k: v for k, v in ad_data.items() if k in ALLOWED_AD_FIELDS}
+    filtered_ad["updated_at"] = datetime.now(timezone.utc).isoformat()
+
     result = await db.ads.update_one(
         {"ad_id": ad_id},
-        {"$set": ad_data}
+        {"$set": filtered_ad}
     )
     
     if result.matched_count == 0:
@@ -2480,11 +2493,13 @@ async def admin_update_blog_post(
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    post_data["updated_at"] = datetime.now(timezone.utc).isoformat()
-    
+    ALLOWED_BLOG_FIELDS = {"title", "slug", "excerpt", "content", "featured_image", "tags", "is_published"}
+    filtered_post = {k: v for k, v in post_data.items() if k in ALLOWED_BLOG_FIELDS}
+    filtered_post["updated_at"] = datetime.now(timezone.utc).isoformat()
+
     result = await db.blog_posts.update_one(
         {"post_id": post_id},
-        {"$set": post_data}
+        {"$set": filtered_post}
     )
     
     if result.matched_count == 0:

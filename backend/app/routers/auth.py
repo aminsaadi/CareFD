@@ -5,6 +5,7 @@ import uuid
 import secrets
 import os
 import logging
+import html as html_module
 
 from app.database import db
 from app.models import User, UserRegister, UserLogin, UserSession, UserRole, Provider, ProviderRegister, NotificationType, VerificationStatus
@@ -82,8 +83,8 @@ async def register(user_data: UserRegister, request: Request = None):
                     </div>
                     <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
                         <h3 style="color: #19B8BA; margin-top: 0;">פרטי הספק:</h3>
-                        <p><strong>שם:</strong> {user.name}</p>
-                        <p><strong>אימייל:</strong> {user.email}</p>
+                        <p><strong>שם:</strong> {html_module.escape(user.name)}</p>
+                        <p><strong>אימייל:</strong> {html_module.escape(user.email)}</p>
                         <p><strong>מספר ספק:</strong> {provider.provider_number}</p>
                     </div>
                     <div style="text-align: center; margin: 30px 0;">
@@ -117,7 +118,7 @@ async def register(user_data: UserRegister, request: Request = None):
                 <h1 style="color: #19B8BA;">אימות כתובת דואר אלקטרוני</h1>
             </div>
             
-            <p style="font-size: 16px; color: #1E4D5F;">שלום {user.name},</p>
+            <p style="font-size: 16px; color: #1E4D5F;">שלום {html_module.escape(user.name)},</p>
             
             <p style="font-size: 16px; color: #4C6D7F;">
                 תודה שנרשמת ל-CareFD!
@@ -166,8 +167,8 @@ async def login(credentials: UserLogin, request: Request = None, response: Respo
     if not user_doc.get("password_hash") or not verify_password(credentials.password, user_doc["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    # Check email verification (admins and existing users without the field are exempt)
-    if user_doc.get("role") != "admin" and user_doc.get("email_verified") == False and "email_verified" in user_doc:
+    # Check email verification (admins are exempt, unverified users are blocked)
+    if user_doc.get("role") != "admin" and not user_doc.get("email_verified", True):
         raise HTTPException(
             status_code=403, 
             detail="email_not_verified"
@@ -272,7 +273,7 @@ async def resend_verification(data: dict, request: Request = None):
             <div style="text-align: center; margin-bottom: 30px;">
                 <h1 style="color: #19B8BA;">אימות כתובת דואר אלקטרוני</h1>
             </div>
-            <p style="font-size: 16px; color: #1E4D5F;">שלום {user_doc.get('name', '')},</p>
+            <p style="font-size: 16px; color: #1E4D5F;">שלום {html_module.escape(user_doc.get('name', ''))},</p>
             <p style="font-size: 16px; color: #4C6D7F;">לחץ על הכפתור למטה כדי לאמת את כתובת הדואר האלקטרוני שלך.</p>
             <div style="text-align: center; margin: 30px 0;">
                 <a href="{verify_link}" style="background-color: #19B8BA; color: white; padding: 15px 40px; text-decoration: none; border-radius: 30px; font-size: 18px; font-weight: bold; display: inline-block;">
@@ -350,7 +351,9 @@ async def setup_admin(body: dict, request: Request = None):
 async def get_me(authorization: Optional[str] = Header(None), request: Request = None):
     """Get current authenticated user"""
     user = await get_current_user(authorization, request)
-    return user
+    # Remove sensitive internal fields
+    sensitive_fields = {"verification_documents", "suspension_reason", "suspended_at", "is_suspended", "admin_notes"}
+    return {k: v for k, v in user.items() if k not in sensitive_fields}
 
 @router.post("/auth/logout")
 async def logout(authorization: Optional[str] = Header(None), request: Request = None, response: Response = None):
@@ -424,7 +427,7 @@ async def forgot_password(data: dict, request: Request = None):
                 <h1 style="color: #19B8BA;">איפוס סיסמה</h1>
             </div>
             
-            <p style="font-size: 16px; color: #1E4D5F;">שלום {user.get('name', 'משתמש')},</p>
+            <p style="font-size: 16px; color: #1E4D5F;">שלום {html_module.escape(user.get('name', 'משתמש'))},</p>
             
             <p style="font-size: 16px; color: #4C6D7F;">
                 קיבלנו בקשה לאיפוס הסיסמה שלך. לחץ על הכפתור למטה כדי לבחור סיסמה חדשה:
