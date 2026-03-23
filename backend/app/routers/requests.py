@@ -538,7 +538,7 @@ async def accept_offer(
     authorization: Optional[str] = Header(None),
     request: Request = None
 ):
-    """Accept an offer - creates Booking, ChatRoom, rejects other offers, sends notifications"""
+    """Accept an offer - creates Booking, ChatRoom, sends notifications. Request stays open for other offers."""
     user = await get_current_user(authorization, request)
 
     # Atomically claim the offer to prevent race conditions
@@ -565,27 +565,16 @@ async def accept_offer(
         await db.offers.update_one({"offer_id": offer_id}, {"$set": {"status": OfferStatus.PENDING}})
         raise HTTPException(status_code=403, detail="Not authorized")
 
-    # Atomically claim the request
-    req_claim = await db.requests.update_one(
-        {"request_id": offer["request_id"], "status": RequestStatus.OPEN},
-        {"$set": {"status": RequestStatus.IN_PROGRESS}}
-    )
-    if req_claim.matched_count == 0:
-        await db.offers.update_one({"offer_id": offer_id}, {"$set": {"status": OfferStatus.PENDING}})
-        raise HTTPException(status_code=400, detail="Request is no longer open")
-
     now = datetime.now(timezone.utc)
 
     # Get provider info and verify they're still verified
     provider = await db.providers.find_one({"provider_id": offer["provider_id"]}, {"_id": 0})
     if not provider:
         await db.offers.update_one({"offer_id": offer_id}, {"$set": {"status": OfferStatus.PENDING}})
-        await db.requests.update_one({"request_id": offer["request_id"]}, {"$set": {"status": RequestStatus.OPEN}})
         raise HTTPException(status_code=404, detail="Provider not found")
 
     if not provider.get("is_verified") and provider.get("verification_status") != "verified":
         await db.offers.update_one({"offer_id": offer_id}, {"$set": {"status": OfferStatus.PENDING}})
-        await db.requests.update_one({"request_id": offer["request_id"]}, {"$set": {"status": RequestStatus.OPEN}})
         raise HTTPException(status_code=400, detail="הספק אינו מאומת יותר")
 
     # Resolve service info if suggested_service_id exists
@@ -657,30 +646,16 @@ async def accept_offer(
         {"$set": {"status": OfferStatus.ACCEPTED, "accepted_at": now.isoformat()}}
     )
 
-    # 4. Update request with booking details
+    # 4. Update request - add booking to list, keep request OPEN for more offers
     await db.requests.update_one(
         {"request_id": offer["request_id"]},
-        {"$set": {
-            "accepted_offer_id": offer_id,
-            "accepted_at": now.isoformat(),
-            "booking_id": booking.booking_id,
-            "updated_at": now.isoformat()
-        }}
+        {
+            "$push": {"booking_ids": booking.booking_id, "accepted_offer_ids": offer_id},
+            "$set": {"updated_at": now.isoformat()}
+        }
     )
 
-    # 5. Reject all other pending offers
-    other_offers = await db.offers.find({
-        "request_id": offer["request_id"],
-        "offer_id": {"$ne": offer_id},
-        "status": OfferStatus.PENDING
-    }, {"_id": 0}).to_list(100)
-
-    await db.offers.update_many(
-        {"request_id": offer["request_id"], "offer_id": {"$ne": offer_id}, "status": OfferStatus.PENDING},
-        {"$set": {"status": OfferStatus.REJECTED, "rejected_at": now.isoformat()}}
-    )
-
-    # 6. Notify accepted provider
+    # 5. Notify accepted provider
     await create_notification(
         provider["user_id"],
         NotificationType.OFFER_ACCEPTED,
@@ -699,20 +674,6 @@ async def accept_offer(
         f"ההצעה שלך על \"{service_request['title']}\" התקבלה!",
         {"booking_id": booking.booking_id, "type": "offer_accepted"}
     )
-
-    # 7. Notify rejected providers
-    for rejected_offer in other_offers:
-        rejected_provider = await db.providers.find_one(
-            {"provider_id": rejected_offer["provider_id"]}, {"_id": 0}
-        )
-        if rejected_provider:
-            await create_notification(
-                rejected_provider["user_id"],
-                NotificationType.OFFER_REJECTED,
-                "ההצעה לא נבחרה",
-                f"ההצעה שלך על \"{service_request['title']}\" לא נבחרה. הבקשה נסגרה.",
-                {"request_id": service_request["request_id"], "offer_id": rejected_offer["offer_id"]}
-            )
 
     return {
         "message": "Offer accepted",
