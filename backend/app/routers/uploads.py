@@ -121,7 +121,7 @@ async def upload_image(
     if ext == 'svg':
         try:
             svg_text = content.decode('utf-8', errors='ignore').lower()
-            dangerous_patterns = ['<script', 'javascript:', 'onerror=', 'onload=', 'onclick=', 'onmouseover=', 'onfocus=', 'eval(', 'expression(']
+            dangerous_patterns = ['<script', 'javascript:', 'onerror=', 'onload=', 'onclick=', 'onmouseover=', 'onfocus=', 'eval(', 'expression(', 'onmouseenter=', 'onfocusin=', 'onanimationstart=', 'data:', 'xlink:href']
             for pattern in dangerous_patterns:
                 if pattern in svg_text:
                     raise HTTPException(status_code=400, detail="SVG file contains potentially dangerous content")
@@ -130,8 +130,9 @@ async def upload_image(
         except Exception:
             raise HTTPException(status_code=400, detail="Invalid SVG file")
     elif ext == 'ico':
-        # ICO files skip magic byte verification
-        pass
+        # ICO files: verify basic structure (must start with reserved=0, type=1 for ICO)
+        if len(content) < 6 or content[0:4] != b'\x00\x00\x01\x00':
+            raise HTTPException(status_code=400, detail="Invalid ICO file format")
     else:
         # Verify file content matches claimed type
         if not _verify_file_magic(content, ext):

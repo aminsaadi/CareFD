@@ -192,7 +192,7 @@ async def login(credentials: UserLogin, request: Request = None, response: Respo
         value=session_token,
         httponly=True,
         secure=True,
-        samesite="none",
+        samesite="lax",
         max_age=7*24*60*60,
         path="/"
     )

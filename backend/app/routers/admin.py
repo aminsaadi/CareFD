@@ -176,7 +176,11 @@ async def admin_get_users(
     user = await get_current_user(authorization, request)
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
-    
+
+    # Enforce pagination bounds
+    limit = max(1, min(limit, 100))
+    skip = max(0, skip)
+
     query = {}
     if role:
         query["role"] = role
@@ -186,7 +190,7 @@ async def admin_get_users(
             {"name": {"$regex": safe_search, "$options": "i"}},
             {"email": {"$regex": safe_search, "$options": "i"}}
         ]
-    
+
     users = await db.users.find(
         query,
         {"_id": 0, "password_hash": 0}

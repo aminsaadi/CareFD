@@ -34,7 +34,9 @@ async def create_booking(
     user_email = None
     
     if is_guest_booking:
-        # Guest booking - no authentication required
+        # Stricter rate limit for guest bookings to prevent spam
+        if request:
+            rate_limiter.check(f"guest_booking:{get_client_ip(request)}", max_requests=3, window_seconds=900)
         user_id = f"guest_{uuid.uuid4().hex[:12]}"
         user_name = booking_data.guest_name
         user_email = booking_data.guest_email
@@ -59,7 +61,7 @@ async def create_booking(
         raise HTTPException(status_code=404, detail="Provider not found")
     
     # Check if provider is verified
-    if provider.get("verification_status") not in ["verified", None] and not provider.get("is_verified"):
+    if not provider.get("is_verified") and provider.get("verification_status") != "verified":
         raise HTTPException(status_code=400, detail="Provider is not verified yet")
     
     # Check for conflicts (only when date is provided) - use atomic operation to prevent race conditions

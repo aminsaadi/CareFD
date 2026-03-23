@@ -25,11 +25,11 @@ IS_PRODUCTION = ENVIRONMENT == 'production'
 # SECRET_KEY for JWT signing
 SECRET_KEY = os.environ.get('SECRET_KEY', '')
 if not SECRET_KEY:
-    import secrets
-    SECRET_KEY = secrets.token_hex(32)
     if IS_PRODUCTION:
-        logger.error("CRITICAL: SECRET_KEY not set in production! JWT sessions will NOT survive restarts. Set SECRET_KEY in environment variables immediately.")
+        raise RuntimeError("CRITICAL: SECRET_KEY environment variable must be set in production. Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\"")
     else:
+        import secrets
+        SECRET_KEY = secrets.token_hex(32)
         logger.warning("SECRET_KEY not set. Generated a random key for development. Sessions will NOT survive restarts.")
 
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'carefd.com@gmail.com')

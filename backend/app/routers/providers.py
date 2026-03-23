@@ -326,7 +326,7 @@ async def search_providers(
         query["$and"].append({"created_at": {"$lte": cutoff_date.isoformat()}})
     
     # Execute query
-    providers = await db.providers.find(query, {"_id": 0}).to_list(1000)
+    providers = await db.providers.find(query, {"_id": 0}).to_list(500)
     
     # Filter by distance if location provided
     if latitude is not None and longitude is not None:
