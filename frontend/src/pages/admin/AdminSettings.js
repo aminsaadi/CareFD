@@ -12,14 +12,14 @@ import {
 
 const AdminSettings = () => {
   const [settings, setSettings] = useState({
-    site_name: 'CareLink',
-    site_tagline: 'Connecting Care Providers',
+    site_name: '',
+    site_tagline: '',
     logo_url: '',
     favicon_url: '',
-    contact_email: 'info@carelink.co.il',
-    contact_phone: '03-1234567',
-    contact_address: 'תל אביב, ישראל',
-    footer_text: '© 2024 CareLink. כל הזכויות שמורות.',
+    contact_email: '',
+    contact_phone: '',
+    contact_address: '',
+    footer_text: '',
     social_facebook: '',
     social_instagram: '',
     social_twitter: '',
@@ -49,7 +49,42 @@ const AdminSettings = () => {
   });
   const [smtpLoading, setSmtpLoading] = useState(false);
   const [smtpStatus, setSmtpStatus] = useState(null);
+  const logoInputRef = React.useRef(null);
+  const faviconInputRef = React.useRef(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingFavicon, setUploadingFavicon] = useState(false);
   const { confirmState, confirm, closeConfirm } = useConfirm();
+
+  const handleFileUpload = async (file, type) => {
+    const setUploading = type === 'logo' ? setUploadingLogo : setUploadingFavicon;
+    const settingKey = type === 'logo' ? 'logo_url' : 'favicon_url';
+
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon'];
+    if (!allowed.includes(file.type)) {
+      toast.error('סוג קובץ לא נתמך. השתמש ב-PNG, JPG, WebP, GIF, SVG או ICO');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('הקובץ גדול מדי (מקסימום 5MB)');
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await api.post('/upload/image', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      updateSetting(settingKey, res.data.url);
+      toast.success(type === 'logo' ? 'הלוגו הועלה בהצלחה!' : 'הפאביקון הועלה בהצלחה!');
+    } catch (error) {
+      console.error(`Failed to upload ${type}:`, error);
+      toast.error(`שגיאה בהעלאת ${type === 'logo' ? 'הלוגו' : 'הפאביקון'}`);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   useEffect(() => {
     fetchSettings();
@@ -159,7 +194,9 @@ const AdminSettings = () => {
         smtp_user: d.smtp_user || '',
         smtp_password: ''
       });
-    } catch (e) {}
+    } catch (e) {
+      console.error('Failed to load SMTP settings:', e);
+    }
   };
 
   const saveSmtpSettings = async () => {
@@ -217,7 +254,7 @@ const AdminSettings = () => {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center h-96">
-          <div className="w-12 h-12 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-12 h-12 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
         </div>
       </AdminLayout>
     );
@@ -229,13 +266,13 @@ const AdminSettings = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-carelink-navy">הגדרות האתר</h1>
-            <p className="text-carelink-slate mt-1">הגדרות כלליות ועיצוב האתר</p>
+            <h1 className="text-2xl font-bold text-carefd-navy">הגדרות האתר</h1>
+            <p className="text-carefd-slate mt-1">הגדרות כלליות ועיצוב האתר</p>
           </div>
           <button
             onClick={saveSettings}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-2.5 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal/90 transition shadow-md disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-2.5 bg-carefd-teal text-white rounded-lg hover:bg-carefd-teal/90 transition shadow-md disabled:opacity-50"
           >
             <FiSave size={18} />
             {saving ? 'שומר...' : 'שמור הגדרות'}
@@ -252,8 +289,8 @@ const AdminSettings = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition ${
                     activeTab === tab.id
-                      ? 'bg-carelink-teal text-white shadow-md'
-                      : 'text-carelink-slate hover:text-carelink-navy hover:bg-gray-50'
+                      ? 'bg-carefd-teal text-white shadow-md'
+                      : 'text-carefd-slate hover:text-carefd-navy hover:bg-gray-50'
                   }`}
                 >
                   <tab.icon size={18} />
@@ -268,32 +305,32 @@ const AdminSettings = () => {
             {/* General Tab */}
             {activeTab === 'general' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-carelink-navy mb-4">הגדרות כלליות</h2>
+                <h2 className="text-lg font-semibold text-carefd-navy mb-4">הגדרות כלליות</h2>
                 
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2">שם האתר</label>
+                  <label className="block text-sm text-carefd-slate mb-2">שם האתר</label>
                   <input
                     type="text"
                     value={settings.site_name}
                     onChange={(e) => updateSetting('site_name', e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2">סלוגן</label>
+                  <label className="block text-sm text-carefd-slate mb-2">סלוגן</label>
                   <input
                     type="text"
                     value={settings.site_tagline}
                     onChange={(e) => updateSetting('site_tagline', e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                   />
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-carelink-teal-pale/20 rounded-lg border border-carelink-teal-pale">
+                <div className="flex items-center justify-between p-4 bg-carefd-teal-pale/20 rounded-lg border border-carefd-teal-pale">
                   <div>
-                    <p className="text-carelink-navy font-medium">אפשר הרשמה</p>
-                    <p className="text-carelink-slate text-sm">אפשר למשתמשים חדשים להירשם</p>
+                    <p className="text-carefd-navy font-medium">אפשר הרשמה</p>
+                    <p className="text-carefd-slate text-sm">אפשר למשתמשים חדשים להירשם</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -302,14 +339,14 @@ const AdminSettings = () => {
                       onChange={(e) => updateSetting('allow_registrations', e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
+                    <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carefd-teal"></div>
                   </label>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-carelink-teal-pale/20 rounded-lg border border-carelink-teal-pale">
+                <div className="flex items-center justify-between p-4 bg-carefd-teal-pale/20 rounded-lg border border-carefd-teal-pale">
                   <div>
-                    <p className="text-carelink-navy font-medium">אימות אימייל</p>
-                    <p className="text-carelink-slate text-sm">דרוש אימות אימייל בהרשמה</p>
+                    <p className="text-carefd-navy font-medium">אימות אימייל</p>
+                    <p className="text-carefd-slate text-sm">דרוש אימות אימייל בהרשמה</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -318,7 +355,7 @@ const AdminSettings = () => {
                       onChange={(e) => updateSetting('require_email_verification', e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carelink-teal"></div>
+                    <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carefd-teal"></div>
                   </label>
                 </div>
               </div>
@@ -327,41 +364,103 @@ const AdminSettings = () => {
             {/* Appearance Tab */}
             {activeTab === 'appearance' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-carelink-navy mb-4">עיצוב</h2>
-                
+                <h2 className="text-lg font-semibold text-carefd-navy mb-4">עיצוב</h2>
+
+                {/* Logo Upload */}
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2">לוגו (URL)</label>
+                  <label className="block text-sm text-carefd-slate mb-2">לוגו</label>
                   <div className="flex gap-3">
                     <input
                       type="text"
                       value={settings.logo_url}
                       onChange={(e) => updateSetting('logo_url', e.target.value)}
                       placeholder="https://example.com/logo.png"
-                      className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                      className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                       dir="ltr"
                     />
-                    <button className="px-4 py-2.5 bg-white border border-gray-200 text-carelink-slate rounded-lg hover:bg-gray-50 transition flex items-center gap-2">
+                    <input
+                      ref={logoInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files[0]) handleFileUpload(e.target.files[0], 'logo');
+                        e.target.value = '';
+                      }}
+                    />
+                    <button
+                      onClick={() => logoInputRef.current?.click()}
+                      disabled={uploadingLogo}
+                      className="px-4 py-2.5 bg-white border border-gray-200 text-carefd-slate rounded-lg hover:bg-gray-50 transition flex items-center gap-2 disabled:opacity-50"
+                    >
                       <FiUpload size={18} />
-                      העלה
+                      {uploadingLogo ? 'מעלה...' : 'העלה'}
                     </button>
+                    {settings.logo_url && (
+                      <button
+                        onClick={() => updateSetting('logo_url', '')}
+                        className="px-3 py-2.5 bg-white border border-red-200 text-red-500 rounded-lg hover:bg-red-50 transition"
+                        title="הסר לוגו"
+                      >
+                        <FiTrash2 size={18} />
+                      </button>
+                    )}
                   </div>
                   {settings.logo_url && (
                     <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <p className="text-xs text-carefd-slate mb-2">תצוגה מקדימה:</p>
                       <img src={settings.logo_url} alt="Logo preview" className="h-12 object-contain" />
                     </div>
                   )}
                 </div>
 
+                {/* Favicon Upload */}
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2">Favicon (URL)</label>
-                  <input
-                    type="text"
-                    value={settings.favicon_url}
-                    onChange={(e) => updateSetting('favicon_url', e.target.value)}
-                    placeholder="https://example.com/favicon.ico"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
-                    dir="ltr"
-                  />
+                  <label className="block text-sm text-carefd-slate mb-2">Favicon (אייקון הדפדפן)</label>
+                  <div className="flex gap-3">
+                    <input
+                      type="text"
+                      value={settings.favicon_url}
+                      onChange={(e) => updateSetting('favicon_url', e.target.value)}
+                      placeholder="https://example.com/favicon.ico"
+                      className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
+                      dir="ltr"
+                    />
+                    <input
+                      ref={faviconInputRef}
+                      type="file"
+                      accept="image/*,.ico"
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files[0]) handleFileUpload(e.target.files[0], 'favicon');
+                        e.target.value = '';
+                      }}
+                    />
+                    <button
+                      onClick={() => faviconInputRef.current?.click()}
+                      disabled={uploadingFavicon}
+                      className="px-4 py-2.5 bg-white border border-gray-200 text-carefd-slate rounded-lg hover:bg-gray-50 transition flex items-center gap-2 disabled:opacity-50"
+                    >
+                      <FiUpload size={18} />
+                      {uploadingFavicon ? 'מעלה...' : 'העלה'}
+                    </button>
+                    {settings.favicon_url && (
+                      <button
+                        onClick={() => updateSetting('favicon_url', '')}
+                        className="px-3 py-2.5 bg-white border border-red-200 text-red-500 rounded-lg hover:bg-red-50 transition"
+                        title="הסר favicon"
+                      >
+                        <FiTrash2 size={18} />
+                      </button>
+                    )}
+                  </div>
+                  {settings.favicon_url && (
+                    <div className="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200 flex items-center gap-3">
+                      <p className="text-xs text-carefd-slate">תצוגה מקדימה:</p>
+                      <img src={settings.favicon_url} alt="Favicon preview" className="h-8 w-8 object-contain" />
+                    </div>
+                  )}
+                  <p className="text-xs text-carefd-gray mt-1">מומלץ: תמונה מרובעת בגודל 32x32 או 64x64 פיקסלים (ICO, PNG, SVG)</p>
                 </div>
               </div>
             )}
@@ -369,46 +468,46 @@ const AdminSettings = () => {
             {/* Contact Tab */}
             {activeTab === 'contact' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-carelink-navy mb-4">פרטי התקשרות</h2>
+                <h2 className="text-lg font-semibold text-carefd-navy mb-4">פרטי התקשרות</h2>
                 
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2 flex items-center gap-2">
-                    <FiMail size={14} className="text-carelink-teal" />
+                  <label className="block text-sm text-carefd-slate mb-2 flex items-center gap-2">
+                    <FiMail size={14} className="text-carefd-teal" />
                     אימייל
                   </label>
                   <input
                     type="email"
                     value={settings.contact_email}
                     onChange={(e) => updateSetting('contact_email', e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                     dir="ltr"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2 flex items-center gap-2">
-                    <FiPhone size={14} className="text-carelink-teal" />
+                  <label className="block text-sm text-carefd-slate mb-2 flex items-center gap-2">
+                    <FiPhone size={14} className="text-carefd-teal" />
                     טלפון
                   </label>
                   <input
                     type="tel"
                     value={settings.contact_phone}
                     onChange={(e) => updateSetting('contact_phone', e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                     dir="ltr"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2 flex items-center gap-2">
-                    <FiMapPin size={14} className="text-carelink-teal" />
+                  <label className="block text-sm text-carefd-slate mb-2 flex items-center gap-2">
+                    <FiMapPin size={14} className="text-carefd-teal" />
                     כתובת
                   </label>
                   <input
                     type="text"
                     value={settings.contact_address}
                     onChange={(e) => updateSetting('contact_address', e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                   />
                 </div>
               </div>
@@ -417,7 +516,7 @@ const AdminSettings = () => {
             {/* Social Tab */}
             {activeTab === 'social' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-carelink-navy mb-4">רשתות חברתיות</h2>
+                <h2 className="text-lg font-semibold text-carefd-navy mb-4">רשתות חברתיות</h2>
                 
                 {[
                   { key: 'social_facebook', label: 'Facebook', icon: FiFacebook, placeholder: 'https://facebook.com/...' },
@@ -427,8 +526,8 @@ const AdminSettings = () => {
                   { key: 'social_youtube', label: 'YouTube', icon: FiYoutube, placeholder: 'https://youtube.com/...' },
                 ].map(({ key, label, icon: Icon, placeholder }) => (
                   <div key={key}>
-                    <label className="block text-sm text-carelink-slate mb-2 flex items-center gap-2">
-                      <Icon size={14} className="text-carelink-teal" />
+                    <label className="block text-sm text-carefd-slate mb-2 flex items-center gap-2">
+                      <Icon size={14} className="text-carefd-teal" />
                       {label}
                     </label>
                     <input
@@ -436,7 +535,7 @@ const AdminSettings = () => {
                       value={settings[key]}
                       onChange={(e) => updateSetting(key, e.target.value)}
                       placeholder={placeholder}
-                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                       dir="ltr"
                     />
                   </div>
@@ -447,29 +546,29 @@ const AdminSettings = () => {
             {/* Footer Tab */}
             {activeTab === 'footer' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-carelink-navy mb-4">הגדרות פוטר</h2>
+                <h2 className="text-lg font-semibold text-carefd-navy mb-4">הגדרות פוטר</h2>
                 
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2">טקסט זכויות יוצרים</label>
+                  <label className="block text-sm text-carefd-slate mb-2">טקסט זכויות יוצרים</label>
                   <input
                     type="text"
                     value={settings.footer_text}
                     onChange={(e) => updateSetting('footer_text', e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-3">קישורי פוטר</label>
+                  <label className="block text-sm text-carefd-slate mb-3">קישורי פוטר</label>
                   <div className="space-y-2 mb-4">
                     {settings.footer_links?.map((link, index) => (
                       <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                        <span className="text-carelink-navy">{link.label}</span>
-                        <span className="text-carelink-gray">→</span>
-                        <span className="text-carelink-slate text-sm" dir="ltr">{link.url}</span>
+                        <span className="text-carefd-navy">{link.label}</span>
+                        <span className="text-carefd-gray">→</span>
+                        <span className="text-carefd-slate text-sm" dir="ltr">{link.url}</span>
                         <button
                           onClick={() => removeFooterLink(index)}
-                          className="mr-auto text-carelink-gray hover:text-red-500"
+                          className="mr-auto text-carefd-gray hover:text-red-500"
                         >
                           ✕
                         </button>
@@ -483,19 +582,19 @@ const AdminSettings = () => {
                       value={newFooterLink.label}
                       onChange={(e) => setNewFooterLink(prev => ({ ...prev, label: e.target.value }))}
                       placeholder="תווית"
-                      className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-carelink-navy focus:border-carelink-teal outline-none"
+                      className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-carefd-navy focus:border-carefd-teal outline-none"
                     />
                     <input
                       type="text"
                       value={newFooterLink.url}
                       onChange={(e) => setNewFooterLink(prev => ({ ...prev, url: e.target.value }))}
                       placeholder="/page-url"
-                      className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-carelink-navy focus:border-carelink-teal outline-none"
+                      className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-carefd-navy focus:border-carefd-teal outline-none"
                       dir="ltr"
                     />
                     <button
                       onClick={addFooterLink}
-                      className="px-4 py-2 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal/90 transition"
+                      className="px-4 py-2 bg-carefd-teal text-white rounded-lg hover:bg-carefd-teal/90 transition"
                     >
                       הוסף
                     </button>
@@ -507,38 +606,38 @@ const AdminSettings = () => {
             {/* SEO Tab */}
             {activeTab === 'seo' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-carelink-navy mb-4">אופטימיזציה למנועי חיפוש</h2>
+                <h2 className="text-lg font-semibold text-carefd-navy mb-4">אופטימיזציה למנועי חיפוש</h2>
                 
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2">תיאור מטא</label>
+                  <label className="block text-sm text-carefd-slate mb-2">תיאור מטא</label>
                   <textarea
                     value={settings.meta_description}
                     onChange={(e) => updateSetting('meta_description', e.target.value)}
                     placeholder="תיאור האתר לתוצאות חיפוש..."
                     rows={3}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none resize-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none resize-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2">מילות מפתח</label>
+                  <label className="block text-sm text-carefd-slate mb-2">מילות מפתח</label>
                   <input
                     type="text"
                     value={settings.meta_keywords}
                     onChange={(e) => updateSetting('meta_keywords', e.target.value)}
                     placeholder="מילה1, מילה2, מילה3..."
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-2">Google Analytics ID</label>
+                  <label className="block text-sm text-carefd-slate mb-2">Google Analytics ID</label>
                   <input
                     type="text"
                     value={settings.google_analytics_id}
                     onChange={(e) => updateSetting('google_analytics_id', e.target.value)}
                     placeholder="G-XXXXXXXXXX"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                     dir="ltr"
                   />
                 </div>
@@ -548,12 +647,12 @@ const AdminSettings = () => {
             {/* Advanced Tab */}
             {activeTab === 'advanced' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-carelink-navy mb-4">הגדרות מתקדמות</h2>
+                <h2 className="text-lg font-semibold text-carefd-navy mb-4">הגדרות מתקדמות</h2>
                 
                 {/* SMTP Configuration */}
                 <div className="p-5 bg-white border-2 border-blue-100 rounded-xl">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-carelink-navy font-bold text-base">הגדרות שליחת מיילים (SMTP)</h3>
+                    <h3 className="text-carefd-navy font-bold text-base">הגדרות שליחת מיילים (SMTP)</h3>
                     {smtpStatus && (
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${smtpStatus.smtp_login_ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                         {smtpStatus.smtp_login_ok ? 'מחובר' : 'לא מחובר'}
@@ -562,53 +661,53 @@ const AdminSettings = () => {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                      <label className="block text-sm text-carelink-slate mb-1">אימייל שולח</label>
+                      <label className="block text-sm text-carefd-slate mb-1">אימייל שולח</label>
                       <input type="email" value={smtpSettings.sender_email}
                         onChange={(e) => setSmtpSettings(p => ({...p, sender_email: e.target.value}))}
-                        placeholder="carelink.co.il@gmail.com" dir="ltr"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carelink-teal outline-none"
+                        placeholder="your-email@gmail.com" dir="ltr"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
                         data-testid="smtp-sender-email" />
                     </div>
                     <div>
-                      <label className="block text-sm text-carelink-slate mb-1">שרת SMTP</label>
+                      <label className="block text-sm text-carefd-slate mb-1">שרת SMTP</label>
                       <input type="text" value={smtpSettings.smtp_host}
                         onChange={(e) => setSmtpSettings(p => ({...p, smtp_host: e.target.value}))}
                         placeholder="smtp.gmail.com" dir="ltr"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carelink-teal outline-none"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
                         data-testid="smtp-host" />
                     </div>
                     <div>
-                      <label className="block text-sm text-carelink-slate mb-1">שם משתמש SMTP</label>
+                      <label className="block text-sm text-carefd-slate mb-1">שם משתמש SMTP</label>
                       <input type="text" value={smtpSettings.smtp_user}
                         onChange={(e) => setSmtpSettings(p => ({...p, smtp_user: e.target.value}))}
-                        placeholder="carelink.co.il@gmail.com" dir="ltr"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carelink-teal outline-none"
+                        placeholder="your-email@gmail.com" dir="ltr"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
                         data-testid="smtp-user" />
                     </div>
                     <div>
-                      <label className="block text-sm text-carelink-slate mb-1">פורט</label>
+                      <label className="block text-sm text-carefd-slate mb-1">פורט</label>
                       <input type="number" value={smtpSettings.smtp_port}
                         onChange={(e) => setSmtpSettings(p => ({...p, smtp_port: parseInt(e.target.value) || 587}))}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carelink-teal outline-none"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
                         data-testid="smtp-port" />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm text-carelink-slate mb-1">סיסמת SMTP (App Password)</label>
+                      <label className="block text-sm text-carefd-slate mb-1">סיסמת SMTP (App Password)</label>
                       <input type="password" value={smtpSettings.smtp_password}
                         onChange={(e) => setSmtpSettings(p => ({...p, smtp_password: e.target.value}))}
                         placeholder="השאר ריק אם לא רוצה לשנות"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carelink-teal outline-none"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
                         data-testid="smtp-password" />
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <button onClick={saveSmtpSettings} disabled={smtpLoading}
-                      className="px-4 py-2 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal/90 transition text-sm font-medium disabled:opacity-50"
+                      className="px-4 py-2 bg-carefd-teal text-white rounded-lg hover:bg-carefd-teal/90 transition text-sm font-medium disabled:opacity-50"
                       data-testid="save-smtp-btn">
                       {smtpLoading ? 'שומר...' : 'שמור הגדרות SMTP'}
                     </button>
                     <button onClick={checkSmtpConnection}
-                      className="px-4 py-2 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition text-sm font-medium"
+                      className="px-4 py-2 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition text-sm font-medium"
                       data-testid="check-smtp-btn">
                       בדוק חיבור
                     </button>
@@ -620,15 +719,15 @@ const AdminSettings = () => {
 
                 {/* Test Email */}
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h3 className="text-carelink-navy font-medium mb-2">בדיקת שליחת מיילים</h3>
-                  <p className="text-carelink-slate text-sm mb-3">שלח מייל בדיקה כדי לוודא שהגדרות ה-SMTP עובדות</p>
+                  <h3 className="text-carefd-navy font-medium mb-2">בדיקת שליחת מיילים</h3>
+                  <p className="text-carefd-slate text-sm mb-3">שלח מייל בדיקה כדי לוודא שהגדרות ה-SMTP עובדות</p>
                   <div className="flex gap-2">
                     <input
                       type="email"
                       value={testEmail}
                       onChange={(e) => setTestEmail(e.target.value)}
                       placeholder="כתובת מייל לבדיקה..."
-                      className="flex-1 bg-white border border-gray-200 rounded-lg px-4 py-2 text-carelink-navy focus:border-carelink-teal outline-none text-sm"
+                      className="flex-1 bg-white border border-gray-200 rounded-lg px-4 py-2 text-carefd-navy focus:border-carefd-teal outline-none text-sm"
                       dir="ltr"
                       data-testid="test-email-input"
                     />
@@ -677,19 +776,19 @@ const AdminSettings = () => {
                 </div>
 
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h3 className="text-carelink-navy font-medium mb-2">גיבוי נתונים</h3>
-                  <p className="text-carelink-slate text-sm mb-3">הורד גיבוי מלא של כל הנתונים</p>
-                  <button className="px-4 py-2 bg-white border border-gray-200 text-carelink-navy rounded-lg hover:bg-gray-100 transition">
+                  <h3 className="text-carefd-navy font-medium mb-2">גיבוי נתונים</h3>
+                  <p className="text-carefd-slate text-sm mb-3">הורד גיבוי מלא של כל הנתונים</p>
+                  <button className="px-4 py-2 bg-white border border-gray-200 text-carefd-navy rounded-lg hover:bg-gray-100 transition">
                     הורד גיבוי
                   </button>
                 </div>
 
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <h3 className="text-carelink-navy font-medium mb-2">נקה מטמון</h3>
-                  <p className="text-carelink-slate text-sm mb-3">נקה את כל הנתונים השמורים במטמון</p>
+                  <h3 className="text-carefd-navy font-medium mb-2">נקה מטמון</h3>
+                  <p className="text-carefd-slate text-sm mb-3">נקה את כל הנתונים השמורים במטמון</p>
                   <button 
                     onClick={clearCache}
-                    className="px-4 py-2 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal-medium transition"
+                    className="px-4 py-2 bg-carefd-teal text-white rounded-lg hover:bg-carefd-teal-medium transition"
                   >
                     נקה מטמון
                   </button>

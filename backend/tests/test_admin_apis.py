@@ -1,5 +1,5 @@
 """
-Test Admin APIs for CareLink Healthcare Platform
+Test Admin APIs for CareFD Healthcare Platform
 Tests: /api/admin/stats, settings, professions, users, bookings, ads, blog, pages, featured
 """
 import pytest
@@ -10,7 +10,7 @@ import uuid
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
 # Test credentials
-ADMIN_EMAIL = "admin_test@carelink.co.il"
+ADMIN_EMAIL = "admin_test@carefd.com"
 ADMIN_PASSWORD = "test123456"
 
 class TestAdminAPIs:

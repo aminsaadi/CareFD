@@ -178,8 +178,8 @@ const AdminServiceTypes = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-carelink-navy">סוגי שירותים</h1>
-            <p className="text-carelink-slate mt-1">ניהול סוגי שירות ואופני מתן שירות</p>
+            <h1 className="text-2xl font-bold text-carefd-navy">סוגי שירותים</h1>
+            <p className="text-carefd-slate mt-1">ניהול סוגי שירות ואופני מתן שירות</p>
           </div>
         </div>
 
@@ -189,8 +189,8 @@ const AdminServiceTypes = () => {
             onClick={() => setActiveTab('service')}
             className={`px-4 py-3 font-medium border-b-2 transition ${
               activeTab === 'service'
-                ? 'text-carelink-teal border-carelink-teal'
-                : 'text-carelink-slate border-transparent hover:text-carelink-navy'
+                ? 'text-carefd-teal border-carefd-teal'
+                : 'text-carefd-slate border-transparent hover:text-carefd-navy'
             }`}
           >
             <FiPackage className="inline-block ml-2" />
@@ -200,8 +200,8 @@ const AdminServiceTypes = () => {
             onClick={() => setActiveTab('delivery')}
             className={`px-4 py-3 font-medium border-b-2 transition ${
               activeTab === 'delivery'
-                ? 'text-carelink-teal border-carelink-teal'
-                : 'text-carelink-slate border-transparent hover:text-carelink-navy'
+                ? 'text-carefd-teal border-carefd-teal'
+                : 'text-carefd-slate border-transparent hover:text-carefd-navy'
             }`}
           >
             <FiMapPin className="inline-block ml-2" />
@@ -212,14 +212,14 @@ const AdminServiceTypes = () => {
         {/* Content */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="w-10 h-10 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : (
           <>
             {/* Add Button */}
             <button
               onClick={() => openAddModal(activeTab)}
-              className="flex items-center gap-2 px-4 py-2 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition"
+              className="flex items-center gap-2 px-4 py-2 bg-carefd-teal text-carefd-navy rounded-lg hover:bg-carefd-teal/90 transition"
               data-testid="add-type-btn"
             >
               <FiPlus size={18} />
@@ -239,13 +239,13 @@ const AdminServiceTypes = () => {
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
                       <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                        item.is_active ? 'bg-carelink-teal/20 text-carelink-teal' : 'bg-gray-200 text-gray-500'
+                        item.is_active ? 'bg-carefd-teal/20 text-carefd-teal' : 'bg-gray-200 text-gray-500'
                       }`}>
                         {getIcon(item.icon)}
                       </div>
                       <div>
-                        <h3 className="font-bold text-carelink-navy">{item.name}</h3>
-                        <p className="text-carelink-slate text-sm">{item.name_en}</p>
+                        <h3 className="font-bold text-carefd-navy">{item.name}</h3>
+                        <p className="text-carefd-slate text-sm">{item.name_en}</p>
                       </div>
                     </div>
                     <button
@@ -259,7 +259,7 @@ const AdminServiceTypes = () => {
                     </button>
                   </div>
                   
-                  <p className="text-carelink-gray text-sm mb-4">{item.description}</p>
+                  <p className="text-carefd-gray text-sm mb-4">{item.description}</p>
                   
                   <div className="flex flex-wrap gap-2 mb-4">
                     {activeTab === 'service' && (
@@ -292,14 +292,14 @@ const AdminServiceTypes = () => {
                   <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
                     <button
                       onClick={() => openEditModal(activeTab, item)}
-                      className="flex-1 flex items-center justify-center gap-1 py-2 text-carelink-slate hover:text-carelink-teal hover:bg-carelink-teal/10 rounded-lg transition"
+                      className="flex-1 flex items-center justify-center gap-1 py-2 text-carefd-slate hover:text-carefd-teal hover:bg-carefd-teal/10 rounded-lg transition"
                     >
                       <FiEdit2 size={16} />
                       ערוך
                     </button>
                     <button
                       onClick={() => handleDelete(activeTab, item)}
-                      className="flex-1 flex items-center justify-center gap-1 py-2 text-carelink-slate hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                      className="flex-1 flex items-center justify-center gap-1 py-2 text-carefd-slate hover:text-red-500 hover:bg-red-50 rounded-lg transition"
                     >
                       <FiTrash2 size={16} />
                       מחק
@@ -317,12 +317,12 @@ const AdminServiceTypes = () => {
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-lg p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-carelink-navy">
+              <h3 className="text-lg font-bold text-carefd-navy">
                 {showModal.includes('edit') ? 'עריכה' : 'הוספה'} - {showModal.includes('service') ? 'סוג שירות' : 'אופן מתן שירות'}
               </h3>
               <button
                 onClick={() => { setShowModal(null); resetForm(); }}
-                className="p-2 text-carelink-slate hover:text-carelink-navy rounded-lg transition"
+                className="p-2 text-carefd-slate hover:text-carefd-navy rounded-lg transition"
               >
                 <FiX size={20} />
               </button>
@@ -331,46 +331,46 @@ const AdminServiceTypes = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-1">שם בעברית *</label>
+                  <label className="block text-sm text-carefd-slate mb-1">שם בעברית *</label>
                   <input
                     type="text"
                     value={form.name}
                     onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
                     placeholder="לדוגמה: שירות ביקור"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                     data-testid="type-name-input"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-1">שם באנגלית</label>
+                  <label className="block text-sm text-carefd-slate mb-1">שם באנגלית</label>
                   <input
                     type="text"
                     value={form.name_en}
                     onChange={(e) => setForm(prev => ({ ...prev, name_en: e.target.value }))}
                     placeholder="e.g. Visit Service"
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                     dir="ltr"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-carelink-slate mb-1">תיאור</label>
+                <label className="block text-sm text-carefd-slate mb-1">תיאור</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="תיאור קצר..."
                   rows={2}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none resize-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none resize-none"
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-carelink-slate mb-1">אייקון</label>
+                <label className="block text-sm text-carefd-slate mb-1">אייקון</label>
                 <select
                   value={form.icon}
                   onChange={(e) => setForm(prev => ({ ...prev, icon: e.target.value }))}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                 >
                   <option value="home">🏠 בית</option>
                   <option value="clock">⏰ שעון</option>
@@ -388,52 +388,52 @@ const AdminServiceTypes = () => {
                 {showModal.includes('service') ? (
                   <>
                     <label className="flex items-center justify-between cursor-pointer">
-                      <span className="text-carelink-navy">דורש מיקום</span>
+                      <span className="text-carefd-navy">דורש מיקום</span>
                       <input
                         type="checkbox"
                         checked={form.requires_location}
                         onChange={(e) => setForm(prev => ({ ...prev, requires_location: e.target.checked }))}
-                        className="w-5 h-5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
+                        className="w-5 h-5 text-carefd-teal rounded border-gray-300 focus:ring-carefd-teal"
                       />
                     </label>
                     <label className="flex items-center justify-between cursor-pointer">
-                      <span className="text-carelink-navy">יש מינימום שעות</span>
+                      <span className="text-carefd-navy">יש מינימום שעות</span>
                       <input
                         type="checkbox"
                         checked={form.has_minimum_hours}
                         onChange={(e) => setForm(prev => ({ ...prev, has_minimum_hours: e.target.checked }))}
-                        className="w-5 h-5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
+                        className="w-5 h-5 text-carefd-teal rounded border-gray-300 focus:ring-carefd-teal"
                       />
                     </label>
                     <label className="flex items-center justify-between cursor-pointer">
-                      <span className="text-carelink-navy">כולל משלוח</span>
+                      <span className="text-carefd-navy">כולל משלוח</span>
                       <input
                         type="checkbox"
                         checked={form.has_shipping}
                         onChange={(e) => setForm(prev => ({ ...prev, has_shipping: e.target.checked }))}
-                        className="w-5 h-5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
+                        className="w-5 h-5 text-carefd-teal rounded border-gray-300 focus:ring-carefd-teal"
                       />
                     </label>
                   </>
                 ) : (
                   <label className="flex items-center justify-between cursor-pointer">
-                    <span className="text-carelink-navy">דורש כתובת</span>
+                    <span className="text-carefd-navy">דורש כתובת</span>
                     <input
                       type="checkbox"
                       checked={form.requires_address}
                       onChange={(e) => setForm(prev => ({ ...prev, requires_address: e.target.checked }))}
-                      className="w-5 h-5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
+                      className="w-5 h-5 text-carefd-teal rounded border-gray-300 focus:ring-carefd-teal"
                     />
                   </label>
                 )}
                 
                 <label className="flex items-center justify-between cursor-pointer">
-                  <span className="text-carelink-navy">פעיל</span>
+                  <span className="text-carefd-navy">פעיל</span>
                   <input
                     type="checkbox"
                     checked={form.is_active}
                     onChange={(e) => setForm(prev => ({ ...prev, is_active: e.target.checked }))}
-                    className="w-5 h-5 text-carelink-teal rounded border-gray-300 focus:ring-carelink-teal"
+                    className="w-5 h-5 text-carefd-teal rounded border-gray-300 focus:ring-carefd-teal"
                   />
                 </label>
               </div>
@@ -442,14 +442,14 @@ const AdminServiceTypes = () => {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => { setShowModal(null); resetForm(); }}
-                className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition"
               >
                 ביטול
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={!form.name.trim() || saving}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-carefd-teal text-carefd-navy rounded-lg hover:bg-carefd-teal/90 transition disabled:opacity-50"
                 data-testid="save-type-btn"
               >
                 {saving ? <FiLoader className="animate-spin" size={18} /> : <FiSave size={18} />}

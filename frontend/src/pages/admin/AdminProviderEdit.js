@@ -86,7 +86,7 @@ const EDUCATION_LEVELS = [
 ];
 
 const PROFILE_COLORS = [
-  'from-carelink-teal to-carelink-navy',
+  'from-carefd-teal to-carefd-navy',
   'from-blue-500 to-purple-600',
   'from-emerald-500 to-teal-600',
   'from-orange-500 to-red-500',
@@ -310,7 +310,7 @@ const AdminProviderEdit = () => {
     return (
       <AdminLayout>
         <div className="flex justify-center items-center h-64">
-          <div className="w-12 h-12 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-12 h-12 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
         </div>
       </AdminLayout>
     );
@@ -331,7 +331,7 @@ const AdminProviderEdit = () => {
             <div className="flex items-center gap-4">
               {/* Profile Image */}
               <div className="relative">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-carelink-teal to-carelink-navy flex items-center justify-center overflow-hidden">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-carefd-teal to-carefd-navy flex items-center justify-center overflow-hidden">
                   {formData.profile_image ? (
                     <img 
                       src={formData.profile_image} 
@@ -347,7 +347,7 @@ const AdminProviderEdit = () => {
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingImage}
-                  className="absolute bottom-0 right-0 w-6 h-6 bg-carelink-teal text-white rounded-full flex items-center justify-center shadow-lg hover:bg-carelink-teal/90 transition"
+                  className="absolute bottom-0 right-0 w-6 h-6 bg-carefd-teal text-white rounded-full flex items-center justify-center shadow-lg hover:bg-carefd-teal/90 transition"
                 >
                   {uploadingImage ? (
                     <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -364,8 +364,8 @@ const AdminProviderEdit = () => {
                 />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-carelink-navy">עריכת ספק</h1>
-                <p className="text-carelink-slate">{formData.business_name}</p>
+                <h1 className="text-2xl font-bold text-carefd-navy">עריכת ספק</h1>
+                <p className="text-carefd-slate">{formData.business_name}</p>
               </div>
             </div>
           </div>
@@ -423,8 +423,8 @@ const AdminProviderEdit = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-5 py-4 font-medium whitespace-nowrap transition border-b-2 -mb-px ${
                   activeTab === tab.id
-                    ? 'text-carelink-teal border-carelink-teal bg-carelink-teal-pale/20'
-                    : 'text-carelink-gray border-transparent hover:text-carelink-navy hover:bg-gray-50'
+                    ? 'text-carefd-teal border-carefd-teal bg-carefd-teal-pale/20'
+                    : 'text-carefd-gray border-transparent hover:text-carefd-navy hover:bg-gray-50'
                 }`}
               >
                 <tab.icon size={16} />
@@ -439,22 +439,22 @@ const AdminProviderEdit = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">שם מלא / שם העסק *</label>
+                    <label className="block text-sm font-medium text-carefd-navy mb-2">שם מלא / שם העסק *</label>
                     <input
                       type="text"
                       value={formData.business_name}
                       onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                       placeholder="ד״ר ישראל ישראלי"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">מקצוע</label>
+                    <label className="block text-sm font-medium text-carefd-navy mb-2">מקצוע</label>
                     <select
                       value={formData.profession_title}
                       onChange={(e) => setFormData({ ...formData, profession_title: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none bg-white"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none bg-white"
                     >
                       <option value="">בחר מקצוע</option>
                       {PROFESSION_OPTIONS.map(opt => (
@@ -464,11 +464,11 @@ const AdminProviderEdit = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">מגדר</label>
+                    <label className="block text-sm font-medium text-carefd-navy mb-2">מגדר</label>
                     <select
                       value={formData.gender}
                       onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none bg-white"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none bg-white"
                     >
                       <option value="">בחר מגדר</option>
                       {GENDER_OPTIONS.map(opt => (
@@ -478,12 +478,12 @@ const AdminProviderEdit = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">שנות ותק</label>
+                    <label className="block text-sm font-medium text-carefd-navy mb-2">שנות ותק</label>
                     <input
                       type="number"
                       value={formData.years_experience}
                       onChange={(e) => setFormData({ ...formData, years_experience: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                       placeholder="15"
                       min="0"
                       max="60"
@@ -491,11 +491,11 @@ const AdminProviderEdit = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">סוג ספק</label>
+                    <label className="block text-sm font-medium text-carefd-navy mb-2">סוג ספק</label>
                     <select
                       value={formData.provider_type}
                       onChange={(e) => setFormData({ ...formData, provider_type: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none bg-white"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none bg-white"
                     >
                       <option value="individual">עצמאי</option>
                       <option value="company">חברה</option>
@@ -504,46 +504,46 @@ const AdminProviderEdit = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">טלפון</label>
+                    <label className="block text-sm font-medium text-carefd-navy mb-2">טלפון</label>
                     <input
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                       placeholder="050-1234567"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">אימייל</label>
+                    <label className="block text-sm font-medium text-carefd-navy mb-2">אימייל</label>
                     <input
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                       placeholder="email@example.com"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">אתר אינטרנט</label>
+                    <label className="block text-sm font-medium text-carefd-navy mb-2">אתר אינטרנט</label>
                     <input
                       type="url"
                       value={formData.website}
                       onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                       placeholder="https://www.mywebsite.com"
                     />
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy mb-2">תיאור קצר</label>
+                  <label className="block text-sm font-medium text-carefd-navy mb-2">תיאור קצר</label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none resize-none"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none resize-none"
                     placeholder="תיאור קצר שיופיע בכרטיס הספק..."
                   />
                 </div>
@@ -554,13 +554,13 @@ const AdminProviderEdit = () => {
             {activeTab === 'about' && (
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy mb-2">אודות</label>
-                  <p className="text-sm text-carelink-gray mb-2">ספר על הספק, הניסיון, והגישה המקצועית</p>
+                  <label className="block text-sm font-medium text-carefd-navy mb-2">אודות</label>
+                  <p className="text-sm text-carefd-gray mb-2">ספר על הספק, הניסיון, והגישה המקצועית</p>
                   <textarea
                     value={formData.about}
                     onChange={(e) => setFormData({ ...formData, about: e.target.value })}
                     rows={8}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none resize-none"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none resize-none"
                     placeholder="ספר על הרקע המקצועי, ההשכלה, הניסיון וגישת הטיפול..."
                   />
                 </div>
@@ -572,7 +572,7 @@ const AdminProviderEdit = () => {
               <div className="space-y-6">
                 {/* Specializations */}
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy mb-2">התמחויות</label>
+                  <label className="block text-sm font-medium text-carefd-navy mb-2">התמחויות</label>
                   <div className="space-y-2">
                     {formData.specializations.map((spec, index) => (
                       <div key={index} className="flex gap-2">
@@ -580,7 +580,7 @@ const AdminProviderEdit = () => {
                           type="text"
                           value={spec}
                           onChange={(e) => handleArrayFieldChange('specializations', index, e.target.value)}
-                          className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                          className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:border-carefd-teal outline-none"
                           placeholder="לדוגמה: רפואת משפחה, כירורגיה..."
                         />
                         <button
@@ -596,7 +596,7 @@ const AdminProviderEdit = () => {
                   <button
                     type="button"
                     onClick={() => addArrayField('specializations')}
-                    className="mt-2 text-carelink-teal hover:underline flex items-center gap-1 text-sm"
+                    className="mt-2 text-carefd-teal hover:underline flex items-center gap-1 text-sm"
                   >
                     <FiPlus size={12} /> הוסף התמחות
                   </button>
@@ -604,7 +604,7 @@ const AdminProviderEdit = () => {
                 
                 {/* Expertise */}
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy mb-2">מומחיויות ספציפיות</label>
+                  <label className="block text-sm font-medium text-carefd-navy mb-2">מומחיויות ספציפיות</label>
                   <div className="space-y-2">
                     {formData.expertise.map((exp, index) => (
                       <div key={index} className="flex gap-2">
@@ -612,7 +612,7 @@ const AdminProviderEdit = () => {
                           type="text"
                           value={exp}
                           onChange={(e) => handleArrayFieldChange('expertise', index, e.target.value)}
-                          className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                          className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:border-carefd-teal outline-none"
                           placeholder="לדוגמה: טיפול בכאבי גב, שיקום ספורטאים..."
                         />
                         <button
@@ -628,7 +628,7 @@ const AdminProviderEdit = () => {
                   <button
                     type="button"
                     onClick={() => addArrayField('expertise')}
-                    className="mt-2 text-carelink-teal hover:underline flex items-center gap-1 text-sm"
+                    className="mt-2 text-carefd-teal hover:underline flex items-center gap-1 text-sm"
                   >
                     <FiPlus size={12} /> הוסף מומחיות
                   </button>
@@ -641,22 +641,22 @@ const AdminProviderEdit = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">כתובת</label>
+                    <label className="block text-sm font-medium text-carefd-navy mb-2">כתובת</label>
                     <input
                       type="text"
                       value={location.address}
                       onChange={(e) => setLocation({ ...location, address: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carefd-teal outline-none"
                       placeholder="רחוב, מספר בית"
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-carelink-navy mb-2">עיר</label>
+                    <label className="block text-sm font-medium text-carefd-navy mb-2">עיר</label>
                     <select
                       value={location.city}
                       onChange={(e) => setLocation({ ...location, city: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carelink-teal outline-none bg-white"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-carefd-teal outline-none bg-white"
                     >
                       <option value="">בחר עיר</option>
                       {SERVICE_AREAS.map(city => (
@@ -667,8 +667,8 @@ const AdminProviderEdit = () => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy mb-2">אזורי מתן שירות</label>
-                  <p className="text-sm text-carelink-gray mb-3">בחר את האזורים בהם הספק מספק שירות</p>
+                  <label className="block text-sm font-medium text-carefd-navy mb-2">אזורי מתן שירות</label>
+                  <p className="text-sm text-carefd-gray mb-3">בחר את האזורים בהם הספק מספק שירות</p>
                   <div className="flex flex-wrap gap-2">
                     {SERVICE_AREAS.map(area => (
                       <button
@@ -677,8 +677,8 @@ const AdminProviderEdit = () => {
                         onClick={() => toggleMultiSelect('service_areas', area)}
                         className={`px-4 py-2 rounded-full text-sm transition ${
                           formData.service_areas.includes(area)
-                            ? 'bg-carelink-teal text-white'
-                            : 'bg-gray-100 text-carelink-gray hover:bg-gray-200'
+                            ? 'bg-carefd-teal text-white'
+                            : 'bg-gray-100 text-carefd-gray hover:bg-gray-200'
                         }`}
                       >
                         {area}
@@ -693,8 +693,8 @@ const AdminProviderEdit = () => {
             {activeTab === 'availability' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="font-medium text-carelink-navy mb-2">לוח זמינות שבועי</h3>
-                  <p className="text-sm text-carelink-gray mb-4">סמן את המשמרות בהן הספק זמין לעבודה</p>
+                  <h3 className="font-medium text-carefd-navy mb-2">לוח זמינות שבועי</h3>
+                  <p className="text-sm text-carefd-gray mb-4">סמן את המשמרות בהן הספק זמין לעבודה</p>
                 </div>
                 
                 {/* Weekly Schedule Grid */}
@@ -702,11 +702,11 @@ const AdminProviderEdit = () => {
                   <table className="w-full border-collapse">
                     <thead>
                       <tr>
-                        <th className="p-3 text-right text-sm font-medium text-carelink-navy bg-gray-50 border border-gray-200 rounded-tr-lg">יום</th>
+                        <th className="p-3 text-right text-sm font-medium text-carefd-navy bg-gray-50 border border-gray-200 rounded-tr-lg">יום</th>
                         {SHIFT_OPTIONS.map(shift => (
-                          <th key={shift.value} className="p-3 text-center text-sm font-medium text-carelink-navy bg-gray-50 border border-gray-200">
+                          <th key={shift.value} className="p-3 text-center text-sm font-medium text-carefd-navy bg-gray-50 border border-gray-200">
                             <div>{shift.label}</div>
-                            <div className="text-xs text-carelink-gray font-normal">{shift.time}</div>
+                            <div className="text-xs text-carefd-gray font-normal">{shift.time}</div>
                           </th>
                         ))}
                       </tr>
@@ -714,7 +714,7 @@ const AdminProviderEdit = () => {
                     <tbody>
                       {DAYS_OF_WEEK.map((day, dayIndex) => (
                         <tr key={day.value}>
-                          <td className={`p-3 text-sm font-medium text-carelink-navy bg-gray-50 border border-gray-200 ${dayIndex === DAYS_OF_WEEK.length - 1 ? 'rounded-br-lg' : ''}`}>
+                          <td className={`p-3 text-sm font-medium text-carefd-navy bg-gray-50 border border-gray-200 ${dayIndex === DAYS_OF_WEEK.length - 1 ? 'rounded-br-lg' : ''}`}>
                             {day.label}
                           </td>
                           {SHIFT_OPTIONS.map(shift => {
@@ -757,11 +757,11 @@ const AdminProviderEdit = () => {
                 
                 {/* Legend */}
                 <div className="flex flex-wrap gap-4 pt-4 border-t border-gray-200">
-                  <span className="text-sm text-carelink-gray">מקרא משמרות:</span>
+                  <span className="text-sm text-carefd-gray">מקרא משמרות:</span>
                   {SHIFT_OPTIONS.map(shift => (
                     <div key={shift.value} className="flex items-center gap-2">
                       <div className={`w-4 h-4 rounded ${shift.color.split(' ')[0]}`}></div>
-                      <span className="text-sm text-carelink-navy">{shift.label} ({shift.time})</span>
+                      <span className="text-sm text-carefd-navy">{shift.label} ({shift.time})</span>
                     </div>
                   ))}
                 </div>
@@ -773,8 +773,8 @@ const AdminProviderEdit = () => {
               <div className="space-y-6">
                 {/* Languages */}
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy mb-2">שפות</label>
-                  <p className="text-sm text-carelink-gray mb-3">בחר את השפות בהן הספק מספק שירות</p>
+                  <label className="block text-sm font-medium text-carefd-navy mb-2">שפות</label>
+                  <p className="text-sm text-carefd-gray mb-3">בחר את השפות בהן הספק מספק שירות</p>
                   <div className="flex flex-wrap gap-2">
                     {LANGUAGE_OPTIONS.map(lang => (
                       <button
@@ -784,7 +784,7 @@ const AdminProviderEdit = () => {
                         className={`px-4 py-2 rounded-full text-sm transition flex items-center gap-2 ${
                           formData.languages.includes(lang.value)
                             ? 'bg-blue-500 text-white'
-                            : 'bg-gray-100 text-carelink-gray hover:bg-gray-200'
+                            : 'bg-gray-100 text-carefd-gray hover:bg-gray-200'
                         }`}
                       >
                         <FiGlobe size={14} />
@@ -796,8 +796,8 @@ const AdminProviderEdit = () => {
                 
                 {/* Target Audience */}
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy mb-2">קהל יעד</label>
-                  <p className="text-sm text-carelink-gray mb-3">בחר את קהלי היעד של הספק</p>
+                  <label className="block text-sm font-medium text-carefd-navy mb-2">קהל יעד</label>
+                  <p className="text-sm text-carefd-gray mb-3">בחר את קהלי היעד של הספק</p>
                   <div className="flex flex-wrap gap-2">
                     {TARGET_AUDIENCE_OPTIONS.map(audience => (
                       <button
@@ -807,7 +807,7 @@ const AdminProviderEdit = () => {
                         className={`px-4 py-2 rounded-full text-sm transition flex items-center gap-2 ${
                           formData.target_audience.includes(audience.value)
                             ? 'bg-purple-500 text-white'
-                            : 'bg-gray-100 text-carelink-gray hover:bg-gray-200'
+                            : 'bg-gray-100 text-carefd-gray hover:bg-gray-200'
                         }`}
                       >
                         <FiUsers size={14} />
@@ -831,7 +831,7 @@ const AdminProviderEdit = () => {
               <button
                 type="submit"
                 disabled={saving}
-                className="flex items-center gap-2 px-6 py-3 bg-carelink-teal text-white rounded-xl hover:bg-carelink-teal-medium transition disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-3 bg-carefd-teal text-white rounded-xl hover:bg-carefd-teal-medium transition disabled:opacity-50"
               >
                 {saving ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

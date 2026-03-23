@@ -160,7 +160,7 @@ const VerificationRequest = () => {
           <div className="mt-4 flex justify-end">
             <button
               onClick={() => navigate(isProvider ? '/provider/dashboard' : '/dashboard')}
-              className="flex items-center gap-2 text-carelink-teal hover:underline"
+              className="flex items-center gap-2 text-carefd-teal hover:underline"
             >
               <span>חזור לדאשבורד</span>
               <FaArrowRight />
@@ -176,7 +176,7 @@ const VerificationRequest = () => {
       <div className="min-h-screen bg-gray-50">
         <Navbar />
         <div className="flex items-center justify-center py-20">
-          <FaSpinner className="animate-spin text-4xl text-carelink-teal" />
+          <FaSpinner className="animate-spin text-4xl text-carefd-teal" />
         </div>
         <Footer />
       </div>
@@ -208,7 +208,7 @@ const VerificationRequest = () => {
             <ul className="space-y-2 text-gray-600">
               {verificationStatus.documents?.map((doc, index) => (
                 <li key={index} className="flex items-center gap-2">
-                  <FaFileAlt className="text-carelink-teal" />
+                  <FaFileAlt className="text-carefd-teal" />
                   <span>{doc.name || `מסמך ${index + 1}`}</span>
                 </li>
               ))}
@@ -227,13 +227,13 @@ const VerificationRequest = () => {
       <div className="max-w-3xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="w-20 h-20 bg-carelink-teal/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FaShieldAlt className="text-4xl text-carelink-teal" />
+          <div className="w-20 h-20 bg-carefd-teal/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FaShieldAlt className="text-4xl text-carefd-teal" />
           </div>
-          <h1 className="text-3xl font-bold text-carelink-navy mb-2">
+          <h1 className="text-3xl font-bold text-carefd-navy mb-2">
             בקשת אימות {isProvider ? 'ספק' : 'משתמש'}
           </h1>
-          <p className="text-carelink-gray max-w-lg mx-auto">
+          <p className="text-carefd-gray max-w-lg mx-auto">
             כדי לאמת את החשבון שלך, יש להעלות את המסמכים הנדרשים. 
             לאחר הבדיקה תקבל עדכון.
           </p>
@@ -244,8 +244,8 @@ const VerificationRequest = () => {
 
         {/* Upload Form */}
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8">
-          <h2 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-            <FaUpload className="text-carelink-teal" />
+          <h2 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+            <FaUpload className="text-carefd-teal" />
             העלאת מסמכים
           </h2>
 
@@ -253,12 +253,12 @@ const VerificationRequest = () => {
           <div className="space-y-6">
             {/* ID Card Front */}
             <div>
-              <label className="block text-sm font-semibold text-carelink-navy mb-2">
+              <label className="block text-sm font-semibold text-carefd-navy mb-2">
                 תעודת זהות - צד קדמי <span className="text-red-500">*</span>
               </label>
               <div 
                 className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all
-                  ${documents.id_card ? 'border-carelink-teal bg-carelink-teal/5' : 'border-gray-300 hover:border-carelink-teal'}`}
+                  ${documents.id_card ? 'border-carefd-teal bg-carefd-teal/5' : 'border-gray-300 hover:border-carefd-teal'}`}
                 onClick={() => document.getElementById('id_card').click()}
               >
                 <input
@@ -270,7 +270,7 @@ const VerificationRequest = () => {
                 />
                 {previews.id_card ? (
                   previews.id_card === 'pdf' ? (
-                    <div className="flex items-center justify-center gap-2 text-carelink-teal">
+                    <div className="flex items-center justify-center gap-2 text-carefd-teal">
                       <FaFileAlt className="text-2xl" />
                       <span>{documents.id_card?.name}</span>
                     </div>
@@ -289,12 +289,12 @@ const VerificationRequest = () => {
 
             {/* ID Card Back */}
             <div>
-              <label className="block text-sm font-semibold text-carelink-navy mb-2">
+              <label className="block text-sm font-semibold text-carefd-navy mb-2">
                 תעודת זהות - צד אחורי (מומלץ)
               </label>
               <div 
                 className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all
-                  ${documents.id_card_back ? 'border-carelink-teal bg-carelink-teal/5' : 'border-gray-300 hover:border-carelink-teal'}`}
+                  ${documents.id_card_back ? 'border-carefd-teal bg-carefd-teal/5' : 'border-gray-300 hover:border-carefd-teal'}`}
                 onClick={() => document.getElementById('id_card_back').click()}
               >
                 <input
@@ -306,7 +306,7 @@ const VerificationRequest = () => {
                 />
                 {previews.id_card_back ? (
                   previews.id_card_back === 'pdf' ? (
-                    <div className="flex items-center justify-center gap-2 text-carelink-teal">
+                    <div className="flex items-center justify-center gap-2 text-carefd-teal">
                       <FaFileAlt className="text-2xl" />
                       <span>{documents.id_card_back?.name}</span>
                     </div>
@@ -325,12 +325,12 @@ const VerificationRequest = () => {
             {/* Professional License - Only for providers */}
             {isProvider && (
               <div>
-                <label className="block text-sm font-semibold text-carelink-navy mb-2">
+                <label className="block text-sm font-semibold text-carefd-navy mb-2">
                   רישיון עיסוק / תעודה מקצועית <span className="text-red-500">*</span>
                 </label>
                 <div 
                   className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all
-                    ${documents.professional_license ? 'border-carelink-teal bg-carelink-teal/5' : 'border-gray-300 hover:border-carelink-teal'}`}
+                    ${documents.professional_license ? 'border-carefd-teal bg-carefd-teal/5' : 'border-gray-300 hover:border-carefd-teal'}`}
                   onClick={() => document.getElementById('professional_license').click()}
                 >
                   <input
@@ -342,7 +342,7 @@ const VerificationRequest = () => {
                   />
                   {previews.professional_license ? (
                     previews.professional_license === 'pdf' ? (
-                      <div className="flex items-center justify-center gap-2 text-carelink-teal">
+                      <div className="flex items-center justify-center gap-2 text-carefd-teal">
                         <FaFileAlt className="text-2xl" />
                         <span>{documents.professional_license?.name}</span>
                       </div>
@@ -361,12 +361,12 @@ const VerificationRequest = () => {
 
             {/* Additional Document */}
             <div>
-              <label className="block text-sm font-semibold text-carelink-navy mb-2">
+              <label className="block text-sm font-semibold text-carefd-navy mb-2">
                 מסמך נוסף (אופציונלי)
               </label>
               <div 
                 className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all
-                  ${documents.additional_doc ? 'border-carelink-teal bg-carelink-teal/5' : 'border-gray-300 hover:border-carelink-teal'}`}
+                  ${documents.additional_doc ? 'border-carefd-teal bg-carefd-teal/5' : 'border-gray-300 hover:border-carefd-teal'}`}
                 onClick={() => document.getElementById('additional_doc').click()}
               >
                 <input
@@ -378,7 +378,7 @@ const VerificationRequest = () => {
                 />
                 {previews.additional_doc ? (
                   previews.additional_doc === 'pdf' ? (
-                    <div className="flex items-center justify-center gap-2 text-carelink-teal">
+                    <div className="flex items-center justify-center gap-2 text-carefd-teal">
                       <FaFileAlt className="text-2xl" />
                       <span>{documents.additional_doc?.name}</span>
                     </div>
@@ -396,14 +396,14 @@ const VerificationRequest = () => {
 
             {/* Notes */}
             <div>
-              <label className="block text-sm font-semibold text-carelink-navy mb-2">
+              <label className="block text-sm font-semibold text-carefd-navy mb-2">
                 הערות (אופציונלי)
               </label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-carelink-teal"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-carefd-teal"
                 placeholder="הערות נוספות לצוות האימות..."
               />
             </div>
@@ -422,8 +422,8 @@ const VerificationRequest = () => {
           <button
             type="submit"
             disabled={submitting || !documents.id_card || (isProvider && !documents.professional_license)}
-            className="w-full mt-8 bg-carelink-teal text-white py-4 rounded-xl font-bold text-lg
-              hover:bg-carelink-teal-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed
+            className="w-full mt-8 bg-carefd-teal text-white py-4 rounded-xl font-bold text-lg
+              hover:bg-carefd-teal-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed
               flex items-center justify-center gap-2"
           >
             {submitting ? (

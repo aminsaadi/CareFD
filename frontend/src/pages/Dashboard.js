@@ -33,6 +33,14 @@ const Dashboard = () => {
   const { user, setUser } = useAuth();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
+
+  // Sync active tab when URL search params change (e.g. navigating from Navbar)
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl && tabFromUrl !== activeTab) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
   const [bookings, setBookings] = useState([]);
   const [requests, setRequests] = useState([]);
   const [chats, setChats] = useState([]);
@@ -48,6 +56,23 @@ const Dashboard = () => {
   const [changingPassword, setChangingPassword] = useState(false);
   const [showPw, setShowPw] = useState({ current: false, new_pw: false, confirm: false });
   const fileInputRef = useRef(null);
+
+  // Request management state
+  const [showRequestForm, setShowRequestForm] = useState(false);
+  const [editingRequest, setEditingRequest] = useState(null);
+  const [requestFilter, setRequestFilter] = useState('all');
+  const [professionOptions, setProfessionOptions] = useState([]);
+  const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
+  const [deliveryTypeOptions, setDeliveryTypeOptions] = useState([]);
+  const [regionOptions, setRegionOptions] = useState([]);
+  const [requestFormData, setRequestFormData] = useState({
+    title: '', description: '', professions: [], specialization: '',
+    service_type: '', delivery_type: '', budget: '', budget_type: '',
+    hours_needed: '', request_type: 'one_time', urgency: 'medium',
+    preferred_date: '', preferred_time: '', gender_preference: '',
+    language_preferences: [], preferences: '', city: '', address: '',
+    address_notes: '', region: '', provider_type: ''
+  });
   
   // User settings form
   const [userForm, setUserForm] = useState({
@@ -80,7 +105,29 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchDashboardData();
+    fetchRequestFormOptions();
   }, []);
+
+  const fetchRequestFormOptions = async () => {
+    try {
+      const [professionsRes, serviceTypesRes, deliveryTypesRes, regionsRes] = await Promise.all([
+        api.get('/professions').catch(() => ({ data: { professions: [] } })),
+        api.get('/service-types').catch(() => ({ data: { service_types: [] } })),
+        api.get('/delivery-types').catch(() => ({ data: { delivery_types: [] } })),
+        api.get('/regions').catch(() => ({ data: { regions: [] } })),
+      ]);
+      const profs = professionsRes.data?.professions || professionsRes.data || [];
+      setProfessionOptions(Array.isArray(profs) ? profs : []);
+      const sTypes = serviceTypesRes.data?.service_types || serviceTypesRes.data || [];
+      setServiceTypeOptions(Array.isArray(sTypes) ? sTypes : []);
+      const dTypes = deliveryTypesRes.data?.delivery_types || deliveryTypesRes.data || [];
+      setDeliveryTypeOptions(Array.isArray(dTypes) ? dTypes : []);
+      const regions = regionsRes.data?.regions || regionsRes.data || [];
+      setRegionOptions(Array.isArray(regions) ? regions : []);
+    } catch (error) {
+      console.error('Failed to fetch form options:', error);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -298,14 +345,161 @@ const Dashboard = () => {
   };
 
   const getInitials = () => {
-    const first = userForm.first_name || user?.name?.split(' ')[0] || '';
-    const last = userForm.last_name || user?.name?.split(' ')[1] || '';
-    return `${first[0] || ''}${last[0] || ''}`.toUpperCase() || 'U';
+    const first = userForm.first_name || user?.name?.split(' ')?.[0] || '';
+    const last = userForm.last_name || user?.name?.split(' ')?.[1] || '';
+    return `${first?.[0] || ''}${last?.[0] || ''}`.toUpperCase() || 'U';
   };
+
+  // === Request CRUD functions ===
+  const resetRequestForm = () => {
+    setRequestFormData({
+      title: '', description: '', professions: [], specialization: '',
+      service_type: '', delivery_type: '', budget: '', budget_type: '',
+      hours_needed: '', request_type: 'one_time', urgency: 'medium',
+      preferred_date: '', preferred_time: '', gender_preference: '',
+      language_preferences: [], preferences: '', city: '', address: '',
+      address_notes: '', region: '', provider_type: ''
+    });
+    setEditingRequest(null);
+    setShowRequestForm(false);
+  };
+
+  const handleCreateRequest = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        title: requestFormData.title,
+        description: requestFormData.description,
+        professions: requestFormData.professions?.length > 0 ? requestFormData.professions : [],
+        service_type: requestFormData.service_type || null,
+        delivery_type: requestFormData.delivery_type || null,
+        budget: requestFormData.budget ? parseFloat(requestFormData.budget) : null,
+        budget_type: requestFormData.budget_type || null,
+        hours_needed: requestFormData.hours_needed ? parseInt(requestFormData.hours_needed) : null,
+        request_type: requestFormData.request_type,
+        urgency: requestFormData.urgency,
+        preferred_date: requestFormData.preferred_date || null,
+        preferred_time: requestFormData.preferred_time || null,
+        gender_preference: requestFormData.gender_preference || null,
+        language_preferences: requestFormData.language_preferences?.length > 0 ? requestFormData.language_preferences : [],
+        preferences: requestFormData.preferences || null,
+        address_notes: requestFormData.address_notes || null,
+        region: requestFormData.region || null,
+        provider_type: requestFormData.provider_type || null,
+        specialization: requestFormData.specialization || null,
+        location: (requestFormData.city || requestFormData.address) ? {
+          city: requestFormData.city || '',
+          address: requestFormData.address || '',
+        } : null,
+      };
+      await api.post('/requests', payload);
+      toast.success('הבקשה נוצרה בהצלחה!');
+      resetRequestForm();
+      fetchDashboardData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'שגיאה ביצירת הבקשה');
+    }
+  };
+
+  const handleUpdateRequest = async (e) => {
+    e.preventDefault();
+    if (!editingRequest) return;
+    try {
+      const payload = {};
+      if (requestFormData.title) payload.title = requestFormData.title;
+      if (requestFormData.description) payload.description = requestFormData.description;
+      if (requestFormData.professions?.length > 0) payload.professions = requestFormData.professions;
+      payload.specialization = requestFormData.specialization || null;
+      payload.service_type = requestFormData.service_type || null;
+      payload.delivery_type = requestFormData.delivery_type || null;
+      payload.budget = requestFormData.budget ? parseFloat(requestFormData.budget) : null;
+      payload.budget_type = requestFormData.budget_type || null;
+      payload.hours_needed = requestFormData.hours_needed ? parseInt(requestFormData.hours_needed) : null;
+      payload.request_type = requestFormData.request_type;
+      payload.urgency = requestFormData.urgency;
+      payload.preferred_date = requestFormData.preferred_date || null;
+      payload.preferred_time = requestFormData.preferred_time || null;
+      payload.gender_preference = requestFormData.gender_preference || null;
+      if (requestFormData.language_preferences?.length > 0) payload.language_preferences = requestFormData.language_preferences;
+      payload.provider_type = requestFormData.provider_type || null;
+      payload.preferences = requestFormData.preferences || null;
+      payload.address_notes = requestFormData.address_notes || null;
+      payload.region = requestFormData.region || null;
+      if (requestFormData.city || requestFormData.address) {
+        payload.location = { city: requestFormData.city || '', address: requestFormData.address || '' };
+      }
+
+      await api.put(`/requests/${editingRequest}`, payload);
+      toast.success('הבקשה עודכנה בהצלחה!');
+      resetRequestForm();
+      fetchDashboardData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'שגיאה בעדכון הבקשה');
+    }
+  };
+
+  const handleCancelRequest = async (requestId) => {
+    if (!window.confirm('האם אתה בטוח שברצונך לבטל את הבקשה?')) return;
+    try {
+      await api.put(`/requests/${requestId}/cancel`, { reason: '' });
+      toast.success('הבקשה בוטלה');
+      fetchDashboardData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'שגיאה בביטול הבקשה');
+    }
+  };
+
+  const startEditRequest = (request) => {
+    setEditingRequest(request.request_id);
+    setRequestFormData({
+      title: request.title || '',
+      description: request.description || '',
+      professions: request.professions || [],
+      specialization: request.specialization || '',
+      service_type: request.service_type || '',
+      delivery_type: request.delivery_type || '',
+      budget: request.budget?.toString() || '',
+      budget_type: request.budget_type || '',
+      hours_needed: request.hours_needed?.toString() || '',
+      request_type: request.request_type || 'one_time',
+      urgency: request.urgency || 'medium',
+      preferred_date: request.preferred_date ? request.preferred_date.split('T')[0] : '',
+      preferred_time: request.preferred_time || '',
+      gender_preference: request.gender_preference || '',
+      language_preferences: request.language_preferences || [],
+      preferences: request.preferences || '',
+      city: request.location?.city || '',
+      address: request.location?.address || '',
+      address_notes: request.address_notes || '',
+      region: request.region || '',
+      provider_type: request.provider_type || ''
+    });
+    setShowRequestForm(true);
+  };
+
+  const getRequestStatusColor = (status) => {
+    const colors = {
+      open: 'bg-green-100 text-green-800 border-green-300',
+      in_progress: 'bg-blue-100 text-blue-800 border-blue-300',
+      completed: 'bg-gray-100 text-gray-800 border-gray-300',
+      cancelled: 'bg-red-100 text-red-800 border-red-300'
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getRequestStatusText = (status) => {
+    const texts = { open: 'פתוח', in_progress: 'בתהליך', completed: 'הושלם', cancelled: 'בוטל' };
+    return texts[status] || status;
+  };
+
+  const filteredRequests = requestFilter === 'all'
+    ? requests
+    : requests.filter(r => r.status === requestFilter);
 
   const tabs = [
     { id: 'overview', label: 'סקירה כללית', icon: FaUser },
     { id: 'bookings', label: 'ההזמנות שלי', icon: FaCalendarAlt },
+    { id: 'requests', label: 'הבקשות שלי', icon: FaFileAlt },
     { id: 'notifications', label: 'התראות', icon: FaBell, link: '/notifications' },
     { id: 'reviews', label: 'הביקורות שלי', icon: FaStar },
     { id: 'messages', label: 'הודעות', icon: FaComments },
@@ -315,17 +509,17 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-carelink-teal-pale/30 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale/30 flex flex-col">
       <Navbar />
       
       <div className="flex-1">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-carelink-navy font-heading mb-2">
+            <h1 className="text-3xl font-bold text-carefd-navy font-heading mb-2">
               שלום, {user?.name || 'משתמש'}! 👋
             </h1>
-            <p className="text-carelink-gray">ברוכים הבאים לאזור האישי שלך</p>
+            <p className="text-carefd-gray">ברוכים הבאים לאזור האישי שלך</p>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-6">
@@ -333,7 +527,7 @@ const Dashboard = () => {
             <div className="lg:w-64 flex-shrink-0">
               <div className="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-24">
                 {/* User Info */}
-                <div className="bg-gradient-to-r from-carelink-navy to-carelink-slate p-6 text-white text-center">
+                <div className="bg-gradient-to-r from-carefd-navy to-carefd-slate p-6 text-white text-center">
                   <div className={`w-20 h-20 rounded-full mx-auto mb-3 flex items-center justify-center overflow-hidden ${
                     userForm.profile_image ? '' : `bg-gradient-to-br ${userForm.profile_color}`
                   }`}>
@@ -344,7 +538,7 @@ const Dashboard = () => {
                     )}
                   </div>
                   <h3 className="font-bold text-lg">{user?.name}</h3>
-                  <p className="text-carelink-teal-pale text-sm font-mono" data-testid="user-number">
+                  <p className="text-carefd-teal-pale text-sm font-mono" data-testid="user-number">
                     {user?.user_number || `U${user?.user_id?.slice(-7) || '0000000'}`}
                   </p>
                   {/* Verification Badge */}
@@ -371,7 +565,7 @@ const Dashboard = () => {
                         key={tab.id}
                         to={tab.link}
                         data-testid={`tab-${tab.id}`}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right transition text-carelink-gray hover:bg-carelink-teal-pale/30"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right transition text-carefd-gray hover:bg-carefd-teal-pale/30"
                       >
                         <tab.icon />
                         {tab.label}
@@ -383,8 +577,8 @@ const Dashboard = () => {
                         data-testid={`tab-${tab.id}`}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right transition ${
                           activeTab === tab.id
-                            ? 'bg-carelink-teal text-white'
-                            : 'text-carelink-gray hover:bg-carelink-teal-pale/30'
+                            ? 'bg-carefd-teal text-white'
+                            : 'text-carefd-gray hover:bg-carefd-teal-pale/30'
                         }`}
                       >
                         <tab.icon />
@@ -400,7 +594,7 @@ const Dashboard = () => {
             <div className="flex-1">
               {loading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="w-12 h-12 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-12 h-12 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
                 </div>
               ) : (
                 <>
@@ -415,8 +609,8 @@ const Dashboard = () => {
                               <FaCalendarAlt className="text-blue-600 text-xl" />
                             </div>
                             <div>
-                              <div className="text-2xl font-bold text-carelink-navy">{stats.totalBookings}</div>
-                              <div className="text-sm text-carelink-gray">סה"כ הזמנות</div>
+                              <div className="text-2xl font-bold text-carefd-navy">{stats.totalBookings}</div>
+                              <div className="text-sm text-carefd-gray">סה"כ הזמנות</div>
                             </div>
                           </div>
                         </div>
@@ -426,8 +620,8 @@ const Dashboard = () => {
                               <FaHourglass className="text-yellow-600 text-xl" />
                             </div>
                             <div>
-                              <div className="text-2xl font-bold text-carelink-navy">{stats.pendingBookings}</div>
-                              <div className="text-sm text-carelink-gray">ממתינים</div>
+                              <div className="text-2xl font-bold text-carefd-navy">{stats.pendingBookings}</div>
+                              <div className="text-sm text-carefd-gray">ממתינים</div>
                             </div>
                           </div>
                         </div>
@@ -437,48 +631,48 @@ const Dashboard = () => {
                               <FaCheckCircle className="text-green-600 text-xl" />
                             </div>
                             <div>
-                              <div className="text-2xl font-bold text-carelink-navy">{stats.completedBookings}</div>
-                              <div className="text-sm text-carelink-gray">הושלמו</div>
+                              <div className="text-2xl font-bold text-carefd-navy">{stats.completedBookings}</div>
+                              <div className="text-sm text-carefd-gray">הושלמו</div>
                             </div>
                           </div>
                         </div>
-                        <div className="bg-white p-6 rounded-2xl shadow-lg">
+                        <button onClick={() => setActiveTab('requests')} className="bg-white p-6 rounded-2xl shadow-lg text-right hover:shadow-xl transition w-full">
                           <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
-                              <FaStar className="text-amber-600 text-xl" />
+                            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                              <FaFileAlt className="text-purple-600 text-xl" />
                             </div>
                             <div>
-                              <div className="text-2xl font-bold text-carelink-navy">{stats.totalReviews}</div>
-                              <div className="text-sm text-carelink-gray">ביקורות</div>
+                              <div className="text-2xl font-bold text-carefd-navy">{stats.totalRequests}</div>
+                              <div className="text-sm text-carefd-gray">בקשות</div>
                             </div>
                           </div>
-                        </div>
+                        </button>
                       </div>
 
                       {/* Quick Actions */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-lg font-bold text-carelink-navy mb-4">פעולות מהירות</h3>
+                        <h3 className="text-lg font-bold text-carefd-navy mb-4">פעולות מהירות</h3>
                         <div className="grid md:grid-cols-3 gap-4">
                           <Link
                             to="/providers"
-                            className="flex items-center gap-3 p-4 bg-carelink-teal-pale/30 rounded-xl hover:bg-carelink-teal-pale transition"
+                            className="flex items-center gap-3 p-4 bg-carefd-teal-pale/30 rounded-xl hover:bg-carefd-teal-pale transition"
                           >
-                            <FaPlus className="text-carelink-teal" />
-                            <span className="font-medium text-carelink-navy">חפש ספק חדש</span>
+                            <FaPlus className="text-carefd-teal" />
+                            <span className="font-medium text-carefd-navy">חפש ספק חדש</span>
                           </Link>
-                          <Link
-                            to="/requests/new"
-                            className="flex items-center gap-3 p-4 bg-carelink-teal-pale/30 rounded-xl hover:bg-carelink-teal-pale transition"
+                          <button
+                            onClick={() => { setActiveTab('requests'); setShowRequestForm(true); }}
+                            className="flex items-center gap-3 p-4 bg-carefd-teal-pale/30 rounded-xl hover:bg-carefd-teal-pale transition w-full"
                           >
-                            <FaFileAlt className="text-carelink-teal" />
-                            <span className="font-medium text-carelink-navy">פרסם בקשה</span>
-                          </Link>
+                            <FaFileAlt className="text-carefd-teal" />
+                            <span className="font-medium text-carefd-navy">פרסם בקשה</span>
+                          </button>
                           <Link
                             to="/chats"
-                            className="flex items-center gap-3 p-4 bg-carelink-teal-pale/30 rounded-xl hover:bg-carelink-teal-pale transition"
+                            className="flex items-center gap-3 p-4 bg-carefd-teal-pale/30 rounded-xl hover:bg-carefd-teal-pale transition"
                           >
-                            <FaComments className="text-carelink-teal" />
-                            <span className="font-medium text-carelink-navy">הצ'אטים שלי</span>
+                            <FaComments className="text-carefd-teal" />
+                            <span className="font-medium text-carefd-navy">הצ'אטים שלי</span>
                           </Link>
                         </div>
                       </div>
@@ -486,20 +680,20 @@ const Dashboard = () => {
                       {/* Recent Bookings */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
                         <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-lg font-bold text-carelink-navy">ההזמנות האחרונות</h3>
+                          <h3 className="text-lg font-bold text-carefd-navy">ההזמנות האחרונות</h3>
                           <button
                             onClick={() => setActiveTab('bookings')}
-                            className="text-carelink-teal font-medium flex items-center gap-1"
+                            className="text-carefd-teal font-medium flex items-center gap-1"
                           >
                             צפה בכל
                             <FaChevronLeft className="rtl:rotate-180" />
                           </button>
                         </div>
                         {bookings.length === 0 ? (
-                          <div className="text-center py-8 text-carelink-gray">
-                            <FaCalendarAlt className="text-4xl mx-auto mb-2 text-carelink-teal-pale" />
+                          <div className="text-center py-8 text-carefd-gray">
+                            <FaCalendarAlt className="text-4xl mx-auto mb-2 text-carefd-teal-pale" />
                             <p>עדיין אין לך הזמנות</p>
-                            <Link to="/providers" className="text-carelink-teal font-medium mt-2 inline-block">
+                            <Link to="/providers" className="text-carefd-teal font-medium mt-2 inline-block">
                               חפש ספק עכשיו
                             </Link>
                           </div>
@@ -510,15 +704,15 @@ const Dashboard = () => {
                               return (
                                 <div 
                                   key={booking.booking_id} 
-                                  className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-carelink-teal-pale/20 transition"
+                                  className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-carefd-teal-pale/20 transition"
                                   onClick={() => setShowBookingDetails(booking)}
                                 >
                                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getStatusColor(booking.status)}`}>
                                     <StatusIcon />
                                   </div>
                                   <div className="flex-1">
-                                    <p className="font-medium text-carelink-navy">{booking.service_name || 'שירות'}</p>
-                                    <p className="text-sm text-carelink-gray">
+                                    <p className="font-medium text-carefd-navy">{booking.service_name || 'שירות'}</p>
+                                    <p className="text-sm text-carefd-gray">
                                       {new Date(booking.booking_date).toLocaleDateString('he-IL')}
                                     </p>
                                   </div>
@@ -538,13 +732,13 @@ const Dashboard = () => {
                   {activeTab === 'bookings' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
                       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                        <h3 className="text-xl font-bold text-carelink-navy">ההזמנות שלי</h3>
+                        <h3 className="text-xl font-bold text-carefd-navy">ההזמנות שלי</h3>
                         <div className="flex items-center gap-3">
                           <div className="relative">
                             <select
                               value={bookingSortBy}
                               onChange={(e) => setBookingSortBy(e.target.value)}
-                              className="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 pr-10 text-sm font-medium text-carelink-navy cursor-pointer hover:border-carelink-teal transition focus:outline-none focus:ring-2 focus:ring-carelink-teal/30"
+                              className="appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 pr-10 text-sm font-medium text-carefd-navy cursor-pointer hover:border-carefd-teal transition focus:outline-none focus:ring-2 focus:ring-carefd-teal/30"
                               data-testid="booking-sort-select"
                             >
                               <option value="date_desc">חדש ← ישן</option>
@@ -552,11 +746,11 @@ const Dashboard = () => {
                               <option value="status">לפי סטטוס</option>
                               <option value="price_desc">לפי מחיר</option>
                             </select>
-                            <FaSort className="absolute left-3 top-1/2 -translate-y-1/2 text-carelink-gray pointer-events-none text-xs" />
+                            <FaSort className="absolute left-3 top-1/2 -translate-y-1/2 text-carefd-gray pointer-events-none text-xs" />
                           </div>
                           <Link
                             to="/providers"
-                            className="bg-carelink-teal text-white px-4 py-2 rounded-xl font-medium hover:bg-carelink-teal-medium transition flex items-center gap-2 text-sm"
+                            className="bg-carefd-teal text-white px-4 py-2 rounded-xl font-medium hover:bg-carefd-teal-medium transition flex items-center gap-2 text-sm"
                           >
                             <FaPlus />
                             הזמן תור חדש
@@ -564,10 +758,10 @@ const Dashboard = () => {
                         </div>
                       </div>
                       {bookings.length === 0 ? (
-                        <div className="text-center py-12 text-carelink-gray">
-                          <FaCalendarAlt className="text-5xl mx-auto mb-3 text-carelink-teal-pale" />
+                        <div className="text-center py-12 text-carefd-gray">
+                          <FaCalendarAlt className="text-5xl mx-auto mb-3 text-carefd-teal-pale" />
                           <p className="text-lg mb-2">אין לך הזמנות עדיין</p>
-                          <Link to="/providers" className="text-carelink-teal font-medium">
+                          <Link to="/providers" className="text-carefd-teal font-medium">
                             חפש ספק והזמן תור ראשון
                           </Link>
                         </div>
@@ -580,7 +774,7 @@ const Dashboard = () => {
                             return (
                               <div 
                                 key={booking.booking_id} 
-                                className={`border-2 rounded-xl transition-all duration-200 overflow-hidden ${isExpanded ? 'border-carelink-teal shadow-md' : 'border-carelink-teal-pale hover:border-carelink-teal/40'}`}
+                                className={`border-2 rounded-xl transition-all duration-200 overflow-hidden ${isExpanded ? 'border-carefd-teal shadow-md' : 'border-carefd-teal-pale hover:border-carefd-teal/40'}`}
                                 data-testid={`booking-card-${booking.booking_id}`}
                               >
                                 {/* Collapsed Header - Always Visible */}
@@ -595,11 +789,11 @@ const Dashboard = () => {
                                     </div>
                                     <div className="min-w-0 flex-1">
                                       <div className="flex items-center gap-2 flex-wrap">
-                                        <h4 className="font-bold text-carelink-navy text-sm">{booking.service_name || 'שירות'}</h4>
-                                        <span className="text-xs text-carelink-gray">•</span>
-                                        <span className="text-xs text-carelink-gray">{booking.provider_name || 'ספק'}</span>
+                                        <h4 className="font-bold text-carefd-navy text-sm">{booking.service_name || 'שירות'}</h4>
+                                        <span className="text-xs text-carefd-gray">•</span>
+                                        <span className="text-xs text-carefd-gray">{booking.provider_name || 'ספק'}</span>
                                       </div>
-                                      <div className="flex items-center gap-3 mt-0.5 text-xs text-carelink-gray">
+                                      <div className="flex items-center gap-3 mt-0.5 text-xs text-carefd-gray">
                                         <span>{new Date(booking.booking_date).toLocaleDateString('he-IL')}</span>
                                         {booking.booking_time && <span>{booking.booking_time}</span>}
                                       </div>
@@ -609,7 +803,7 @@ const Dashboard = () => {
                                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusConfig.color}`}>
                                       {statusConfig.label}
                                     </span>
-                                    {isExpanded ? <FaChevronUp className="text-carelink-gray text-xs" /> : <FaChevronDown className="text-carelink-gray text-xs" />}
+                                    {isExpanded ? <FaChevronUp className="text-carefd-gray text-xs" /> : <FaChevronDown className="text-carefd-gray text-xs" />}
                                   </div>
                                 </div>
 
@@ -618,31 +812,31 @@ const Dashboard = () => {
                                   <div className="px-4 pb-4 border-t border-gray-100 pt-3 animate-in slide-in-from-top-1 duration-200">
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
                                       <div className="bg-gray-50 rounded-lg p-3 text-center">
-                                        <p className="text-xs text-carelink-gray">תאריך</p>
-                                        <p className="font-medium text-sm text-carelink-navy">{new Date(booking.booking_date).toLocaleDateString('he-IL')}</p>
+                                        <p className="text-xs text-carefd-gray">תאריך</p>
+                                        <p className="font-medium text-sm text-carefd-navy">{new Date(booking.booking_date).toLocaleDateString('he-IL')}</p>
                                       </div>
                                       <div className="bg-gray-50 rounded-lg p-3 text-center">
-                                        <p className="text-xs text-carelink-gray">שעה</p>
-                                        <p className="font-medium text-sm text-carelink-navy">{booking.booking_time || 'יתואם'}</p>
+                                        <p className="text-xs text-carefd-gray">שעה</p>
+                                        <p className="font-medium text-sm text-carefd-navy">{booking.booking_time || 'יתואם'}</p>
                                       </div>
                                       <div className="bg-gray-50 rounded-lg p-3 text-center">
-                                        <p className="text-xs text-carelink-gray">מחיר</p>
+                                        <p className="text-xs text-carefd-gray">מחיר</p>
                                         <p className="font-medium text-sm text-green-600">{booking.price || booking.final_price ? `₪${booking.price || booking.final_price}` : 'יתואם'}</p>
                                       </div>
                                       <div className="bg-gray-50 rounded-lg p-3 text-center">
-                                        <p className="text-xs text-carelink-gray">סוג שירות</p>
-                                        <p className="font-medium text-sm text-carelink-navy">{booking.delivery_method || booking.service_type || '-'}</p>
+                                        <p className="text-xs text-carefd-gray">סוג שירות</p>
+                                        <p className="font-medium text-sm text-carefd-navy">{booking.delivery_method || booking.service_type || '-'}</p>
                                       </div>
                                     </div>
                                     {booking.notes && (
-                                      <div className="bg-blue-50 rounded-lg p-3 mb-4 text-sm text-carelink-navy">
+                                      <div className="bg-blue-50 rounded-lg p-3 mb-4 text-sm text-carefd-navy">
                                         <span className="font-medium">הערות: </span>{booking.notes}
                                       </div>
                                     )}
                                     <div className="flex flex-wrap items-center gap-2">
                                       <button
                                         onClick={(e) => { e.stopPropagation(); setShowBookingDetails(booking); }}
-                                        className="bg-carelink-navy/10 text-carelink-navy px-4 py-2 rounded-xl text-xs font-medium hover:bg-carelink-navy/20 transition flex items-center gap-1.5"
+                                        className="bg-carefd-navy/10 text-carefd-navy px-4 py-2 rounded-xl text-xs font-medium hover:bg-carefd-navy/20 transition flex items-center gap-1.5"
                                         data-testid={`view-details-${booking.booking_id}`}
                                       >
                                         <FaEye />
@@ -651,7 +845,7 @@ const Dashboard = () => {
                                       {booking.status === 'provider_completed' && (
                                         <button
                                           onClick={(e) => { e.stopPropagation(); setShowCompletionDialog(booking); }}
-                                          className="bg-carelink-teal text-white px-4 py-2 rounded-xl text-xs font-medium hover:bg-carelink-teal-medium transition"
+                                          className="bg-carefd-teal text-white px-4 py-2 rounded-xl text-xs font-medium hover:bg-carefd-teal-medium transition"
                                           data-testid={`confirm-booking-${booking.booking_id}`}
                                         >
                                           אשר השלמה
@@ -688,17 +882,17 @@ const Dashboard = () => {
                   {/* Reviews Tab */}
                   {activeTab === 'reviews' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <h3 className="text-xl font-bold text-carelink-navy mb-6">הביקורות שלי</h3>
+                      <h3 className="text-xl font-bold text-carefd-navy mb-6">הביקורות שלי</h3>
                       {myReviews.length === 0 ? (
-                        <div className="text-center py-12 text-carelink-gray">
-                          <FaStar className="text-5xl mx-auto mb-3 text-carelink-teal-pale" />
+                        <div className="text-center py-12 text-carefd-gray">
+                          <FaStar className="text-5xl mx-auto mb-3 text-carefd-teal-pale" />
                           <p className="text-lg mb-2">עדיין לא כתבת ביקורות</p>
                           <p className="text-sm">לאחר השלמת הזמנה תוכל לכתוב ביקורת על הספק</p>
                         </div>
                       ) : (
                         <div className="space-y-4">
                           {myReviews.map((review) => (
-                            <div key={review.review_id} className="border-2 border-carelink-teal-pale rounded-xl p-4">
+                            <div key={review.review_id} className="border-2 border-carefd-teal-pale rounded-xl p-4">
                               {/* Review status badge */}
                               {review.status && review.status !== 'approved' && (
                                 <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-medium mb-3 ${
@@ -726,18 +920,18 @@ const Dashboard = () => {
                                       className="w-12 h-12 rounded-full object-cover"
                                     />
                                   ) : (
-                                    <div className="w-12 h-12 bg-carelink-teal rounded-full flex items-center justify-center text-white font-bold">
+                                    <div className="w-12 h-12 bg-carefd-teal rounded-full flex items-center justify-center text-white font-bold">
                                       {review.provider?.business_name?.[0] || 'S'}
                                     </div>
                                   )}
                                   <div>
                                     <Link 
                                       to={`/providers/${review.provider_id}`}
-                                      className="font-bold text-carelink-navy hover:text-carelink-teal transition"
+                                      className="font-bold text-carefd-navy hover:text-carefd-teal transition"
                                     >
                                       {review.provider?.business_name || 'ספק'}
                                     </Link>
-                                    <p className="text-sm text-carelink-gray">
+                                    <p className="text-sm text-carefd-gray">
                                       {review.provider?.profession_title}
                                     </p>
                                   </div>
@@ -752,9 +946,9 @@ const Dashboard = () => {
                                 </div>
                               </div>
                               {review.comment && (
-                                <p className="text-carelink-slate">{review.comment}</p>
+                                <p className="text-carefd-slate">{review.comment}</p>
                               )}
-                              <p className="text-xs text-carelink-gray mt-3">
+                              <p className="text-xs text-carefd-gray mt-3">
                                 {new Date(review.created_at).toLocaleDateString('he-IL')}
                               </p>
                             </div>
@@ -767,10 +961,10 @@ const Dashboard = () => {
                   {/* Messages Tab */}
                   {activeTab === 'messages' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <h3 className="text-xl font-bold text-carelink-navy mb-6">הודעות</h3>
+                      <h3 className="text-xl font-bold text-carefd-navy mb-6">הודעות</h3>
                       {chats.length === 0 ? (
-                        <div className="text-center py-12 text-carelink-gray">
-                          <FaComments className="text-5xl mx-auto mb-3 text-carelink-teal-pale" />
+                        <div className="text-center py-12 text-carefd-gray">
+                          <FaComments className="text-5xl mx-auto mb-3 text-carefd-teal-pale" />
                           <p className="text-lg mb-2">אין לך שיחות עדיין</p>
                           <p className="text-sm">שיחות יופיעו כאן כשתיצור קשר עם ספקים</p>
                         </div>
@@ -780,17 +974,17 @@ const Dashboard = () => {
                             <Link
                               key={chat.room_id}
                               to={`/chat/${chat.room_id}`}
-                              className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-carelink-teal-pale/30 transition"
+                              className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-carefd-teal-pale/30 transition"
                             >
-                              <div className="w-12 h-12 bg-carelink-navy rounded-full flex items-center justify-center text-white font-bold">
+                              <div className="w-12 h-12 bg-carefd-navy rounded-full flex items-center justify-center text-white font-bold">
                                 {(chat.other_user_name || 'U')[0]}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="font-medium text-carelink-navy">{chat.other_user_name || 'משתמש'}</p>
-                                <p className="text-sm text-carelink-gray truncate">{chat.last_message || 'אין הודעות'}</p>
+                                <p className="font-medium text-carefd-navy">{chat.other_user_name || 'משתמש'}</p>
+                                <p className="text-sm text-carefd-gray truncate">{chat.last_message || 'אין הודעות'}</p>
                               </div>
                               {chat.unread_count > 0 && (
-                                <span className="bg-carelink-teal text-white text-xs px-2 py-1 rounded-full">
+                                <span className="bg-carefd-teal text-white text-xs px-2 py-1 rounded-full">
                                   {chat.unread_count}
                                 </span>
                               )}
@@ -801,15 +995,497 @@ const Dashboard = () => {
                     </div>
                   )}
 
+                  {/* Requests Tab */}
+                  {activeTab === 'requests' && (
+                    <div className="space-y-6">
+                      {/* Header with create button */}
+                      <div className="bg-white p-6 rounded-2xl shadow-lg">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-xl font-bold text-carefd-navy flex items-center gap-2">
+                            <FaFileAlt className="text-carefd-teal" />
+                            הבקשות שלי
+                          </h3>
+                          <button
+                            onClick={() => { resetRequestForm(); setShowRequestForm(true); }}
+                            className="bg-carefd-teal text-white px-5 py-2 rounded-lg hover:bg-carefd-teal-medium transition font-medium flex items-center gap-2"
+                          >
+                            <FaPlus /> בקשה חדשה
+                          </button>
+                        </div>
+
+                        {/* Filter buttons */}
+                        <div className="flex gap-2 flex-wrap">
+                          {[
+                            { id: 'all', label: 'הכל' },
+                            { id: 'open', label: 'פתוחות' },
+                            { id: 'in_progress', label: 'בתהליך' },
+                            { id: 'completed', label: 'הושלמו' },
+                            { id: 'cancelled', label: 'בוטלו' }
+                          ].map(f => (
+                            <button
+                              key={f.id}
+                              onClick={() => setRequestFilter(f.id)}
+                              className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
+                                requestFilter === f.id
+                                  ? 'bg-carefd-teal text-white'
+                                  : 'bg-gray-100 text-carefd-gray hover:bg-gray-200'
+                              }`}
+                            >
+                              {f.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Create / Edit Request Form */}
+                      {showRequestForm && (
+                        <div className="bg-white p-6 rounded-2xl shadow-lg border-2 border-carefd-teal">
+                          <h3 className="text-lg font-bold text-carefd-navy mb-4">
+                            {editingRequest ? 'עריכת בקשה' : 'בקשה חדשה'}
+                          </h3>
+                          <form onSubmit={editingRequest ? handleUpdateRequest : handleCreateRequest} className="space-y-4">
+                            {/* Title */}
+                            <div>
+                              <label className="block text-sm font-medium text-carefd-navy mb-1">כותרת *</label>
+                              <input
+                                type="text"
+                                required
+                                value={requestFormData.title}
+                                onChange={(e) => setRequestFormData({ ...requestFormData, title: e.target.value })}
+                                className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                placeholder="תארו בקצרה את השירות שאתם מחפשים"
+                              />
+                            </div>
+
+                            {/* Description */}
+                            <div>
+                              <label className="block text-sm font-medium text-carefd-navy mb-1">פרטים נוספים *</label>
+                              <textarea
+                                required
+                                value={requestFormData.description}
+                                onChange={(e) => setRequestFormData({ ...requestFormData, description: e.target.value })}
+                                className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                rows="3"
+                                placeholder="פרטו על הצורך, מצב רפואי רלוונטי, דרישות מיוחדות..."
+                              />
+                            </div>
+
+                            {/* Professions - multi-select chips */}
+                            <div>
+                              <label className="block text-sm font-medium text-carefd-navy mb-2">מקצוע (עד 3)</label>
+                              <div className="flex flex-wrap gap-2">
+                                {professionOptions.map((prof) => {
+                                  const profId = prof.profession_id || prof.id || prof.value;
+                                  const profName = prof.name || prof.name_he || prof.label;
+                                  const isSelected = (requestFormData.professions || []).includes(profId);
+                                  return (
+                                    <button
+                                      key={profId}
+                                      type="button"
+                                      onClick={() => {
+                                        const current = requestFormData.professions || [];
+                                        if (isSelected) {
+                                          setRequestFormData({ ...requestFormData, professions: current.filter(id => id !== profId) });
+                                        } else if (current.length < 3) {
+                                          setRequestFormData({ ...requestFormData, professions: [...current, profId] });
+                                        } else {
+                                          toast.error('ניתן לבחור עד 3 מקצועות');
+                                        }
+                                      }}
+                                      className={`px-3 py-1.5 rounded-full text-sm font-medium border-2 transition ${
+                                        isSelected
+                                          ? 'bg-carefd-teal text-white border-carefd-teal'
+                                          : 'bg-white text-carefd-navy border-carefd-light-gray hover:border-carefd-teal'
+                                      }`}
+                                    >
+                                      {profName}
+                                    </button>
+                                  );
+                                })}
+                                {professionOptions.length === 0 && (
+                                  <span className="text-sm text-gray-400">טוען מקצועות...</span>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-4">
+                              {/* Service Type - synced with backend */}
+                              <div>
+                                <label className="block text-sm font-medium text-carefd-navy mb-1">סוג שירות</label>
+                                <select
+                                  value={requestFormData.service_type}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, service_type: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                >
+                                  <option value="">-- בחר סוג שירות --</option>
+                                  {serviceTypeOptions.map((st) => (
+                                    <option key={st.type_id || st.id || st.value} value={st.value || st.type_id || st.id}>
+                                      {st.name_he || st.name || st.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              {/* Delivery Type - synced with backend */}
+                              <div>
+                                <label className="block text-sm font-medium text-carefd-navy mb-1">דרך מתן השירות</label>
+                                <select
+                                  value={requestFormData.delivery_type}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, delivery_type: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                >
+                                  <option value="">-- בחר דרך מתן שירות --</option>
+                                  {deliveryTypeOptions.map((dt) => (
+                                    <option key={dt.type_id || dt.id || dt.value} value={dt.value || dt.type_id || dt.id}>
+                                      {dt.name_he || dt.name || dt.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              {/* Budget + Budget Type */}
+                              <div>
+                                <label className="block text-sm font-medium text-carefd-navy mb-1">תקציב</label>
+                                <div className="flex gap-2">
+                                  <input
+                                    type="number"
+                                    value={requestFormData.budget}
+                                    onChange={(e) => setRequestFormData({ ...requestFormData, budget: e.target.value })}
+                                    className="flex-1 px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                    placeholder="₪"
+                                  />
+                                  <select
+                                    value={requestFormData.budget_type}
+                                    onChange={(e) => setRequestFormData({ ...requestFormData, budget_type: e.target.value })}
+                                    className="w-28 px-2 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal text-sm"
+                                  >
+                                    <option value="">סוג</option>
+                                    <option value="per_hour">לשעה</option>
+                                    <option value="per_treatment">לטיפול</option>
+                                    <option value="per_visit">לביקור</option>
+                                  </select>
+                                </div>
+                              </div>
+
+                              {/* Hours Needed - shown when budget_type is per_hour */}
+                              {requestFormData.budget_type === 'per_hour' && (
+                                <div>
+                                  <label className="block text-sm font-medium text-carefd-navy mb-1">מספר שעות דרושות</label>
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    value={requestFormData.hours_needed}
+                                    onChange={(e) => setRequestFormData({ ...requestFormData, hours_needed: e.target.value })}
+                                    className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                    placeholder="מספר שעות"
+                                  />
+                                </div>
+                              )}
+
+                              {/* Urgency */}
+                              <div>
+                                <label className="block text-sm font-medium text-carefd-navy mb-1">דחיפות</label>
+                                <select
+                                  value={requestFormData.urgency}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, urgency: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                >
+                                  <option value="low">נמוכה</option>
+                                  <option value="medium">בינונית</option>
+                                  <option value="high">גבוהה</option>
+                                  <option value="urgent">דחוף</option>
+                                </select>
+                              </div>
+
+                              {/* Request Type */}
+                              <div>
+                                <label className="block text-sm font-medium text-carefd-navy mb-1">סוג בקשה</label>
+                                <select
+                                  value={requestFormData.request_type}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, request_type: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                >
+                                  <option value="one_time">חד פעמי</option>
+                                  <option value="immediate">מיידי</option>
+                                  <option value="scheduled">מתוזמן</option>
+                                  <option value="follow_up">המשך טיפול</option>
+                                </select>
+                              </div>
+
+                              {/* Preferred Date */}
+                              <div>
+                                <label className="block text-sm font-medium text-carefd-navy mb-1">תאריך רצוי</label>
+                                <input
+                                  type="date"
+                                  value={requestFormData.preferred_date}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, preferred_date: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                />
+                              </div>
+
+                              {/* Preferred Time */}
+                              <div>
+                                <label className="block text-sm font-medium text-carefd-navy mb-1">שעה רצויה</label>
+                                <input
+                                  type="time"
+                                  value={requestFormData.preferred_time}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, preferred_time: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                />
+                              </div>
+
+                              {/* Gender Preference */}
+                              <div>
+                                <label className="block text-sm font-medium text-carefd-navy mb-1">העדפת מגדר</label>
+                                <select
+                                  value={requestFormData.gender_preference}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, gender_preference: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                >
+                                  <option value="">-- ללא העדפה --</option>
+                                  <option value="no_preference">ללא העדפה</option>
+                                  <option value="male">זכר</option>
+                                  <option value="female">נקבה</option>
+                                </select>
+                              </div>
+                            </div>
+
+                            {/* Location - Region, City, Address, Address Notes */}
+                            <div className="grid md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-sm font-medium text-carefd-navy mb-1">אזור</label>
+                                <select
+                                  value={requestFormData.region}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, region: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                >
+                                  <option value="">-- בחר אזור --</option>
+                                  {regionOptions.map((r) => (
+                                    <option key={r.region_id || r.name} value={r.name}>
+                                      {r.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-carefd-navy mb-1">עיר</label>
+                                <CitySelect
+                                  name="city"
+                                  value={requestFormData.city}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, city: e.target.value })}
+                                  placeholder="בחר עיר..."
+                                  inputClassName="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-carefd-navy mb-1">כתובת</label>
+                                <input
+                                  type="text"
+                                  value={requestFormData.address}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, address: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                  placeholder="רחוב, מספר בית"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-sm font-medium text-carefd-navy mb-1">הערות לכתובת</label>
+                                <input
+                                  type="text"
+                                  value={requestFormData.address_notes}
+                                  onChange={(e) => setRequestFormData({ ...requestFormData, address_notes: e.target.value })}
+                                  className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                  placeholder="קומה, דירה, קוד כניסה..."
+                                />
+                              </div>
+                            </div>
+
+                            {/* Language Preferences */}
+                            <div>
+                              <label className="block text-sm font-medium text-carefd-navy mb-2">העדפות שפה</label>
+                              <div className="flex flex-wrap gap-2">
+                                {[
+                                  { value: 'hebrew', label: 'עברית' },
+                                  { value: 'arabic', label: 'ערבית' },
+                                  { value: 'english', label: 'אנגלית' },
+                                  { value: 'russian', label: 'רוסית' },
+                                  { value: 'french', label: 'צרפתית' },
+                                  { value: 'amharic', label: 'אמהרית' },
+                                ].map((lang) => {
+                                  const isSelected = (requestFormData.language_preferences || []).includes(lang.value);
+                                  return (
+                                    <button
+                                      key={lang.value}
+                                      type="button"
+                                      onClick={() => {
+                                        const current = requestFormData.language_preferences || [];
+                                        if (isSelected) {
+                                          setRequestFormData({ ...requestFormData, language_preferences: current.filter(l => l !== lang.value) });
+                                        } else {
+                                          setRequestFormData({ ...requestFormData, language_preferences: [...current, lang.value] });
+                                        }
+                                      }}
+                                      className={`px-3 py-1.5 rounded-full text-sm font-medium border-2 transition ${
+                                        isSelected
+                                          ? 'bg-carefd-teal text-white border-carefd-teal'
+                                          : 'bg-white text-carefd-navy border-carefd-light-gray hover:border-carefd-teal'
+                                      }`}
+                                    >
+                                      {lang.label}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+
+                            {/* Preferences */}
+                            <div>
+                              <label className="block text-sm font-medium text-carefd-navy mb-1">העדפות נוספות</label>
+                              <textarea
+                                value={requestFormData.preferences}
+                                onChange={(e) => setRequestFormData({ ...requestFormData, preferences: e.target.value })}
+                                className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
+                                rows="2"
+                                placeholder="העדפות נוספות..."
+                              />
+                            </div>
+
+                            <div className="flex gap-3">
+                              <button
+                                type="submit"
+                                className="bg-carefd-teal text-white px-6 py-2 rounded-lg hover:bg-carefd-teal-medium transition font-medium"
+                              >
+                                {editingRequest ? 'עדכן בקשה' : 'פרסם בקשה'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={resetRequestForm}
+                                className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition"
+                              >
+                                ביטול
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      )}
+
+                      {/* Requests List */}
+                      {filteredRequests.length === 0 ? (
+                        <div className="bg-white p-6 rounded-2xl shadow-lg text-center py-12 text-carefd-gray">
+                          <FaFileAlt className="text-5xl mx-auto mb-3 text-carefd-teal-pale" />
+                          <p className="text-lg mb-2">
+                            {requestFilter === 'all' ? 'עדיין לא פרסמת בקשות' : 'אין בקשות בסטטוס זה'}
+                          </p>
+                          {requestFilter === 'all' && (
+                            <button
+                              onClick={() => { resetRequestForm(); setShowRequestForm(true); }}
+                              className="text-carefd-teal font-medium hover:underline"
+                            >
+                              פרסם בקשה ראשונה
+                            </button>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {filteredRequests.map((request) => (
+                            <div
+                              key={request.request_id}
+                              className="bg-white p-5 rounded-2xl shadow-lg border-2 border-carefd-teal-pale hover:border-carefd-teal transition"
+                            >
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex-1">
+                                  <Link
+                                    to={`/requests/${request.request_id}`}
+                                    className="text-lg font-bold text-carefd-navy hover:text-carefd-teal transition"
+                                  >
+                                    {request.title}
+                                  </Link>
+                                  <p className="text-sm text-carefd-gray mt-1 line-clamp-2">{request.description}</p>
+                                </div>
+                                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getRequestStatusColor(request.status)}`}>
+                                  {getRequestStatusText(request.status)}
+                                </span>
+                              </div>
+
+                              {/* Details row */}
+                              <div className="flex flex-wrap gap-3 mb-3 text-sm">
+                                {request.specialization && (
+                                  <span className="bg-carefd-teal-pale text-carefd-teal px-3 py-1 rounded-full">
+                                    {request.specialization}
+                                  </span>
+                                )}
+                                {request.budget && (
+                                  <span className="flex items-center gap-1 text-carefd-navy font-medium">
+                                    <FaMoneyBillWave className="text-carefd-teal" /> ₪{request.budget}
+                                  </span>
+                                )}
+                                {request.urgency && request.urgency !== 'medium' && (
+                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    request.urgency === 'urgent' ? 'bg-red-100 text-red-700' :
+                                    request.urgency === 'high' ? 'bg-orange-100 text-orange-700' :
+                                    'bg-gray-100 text-gray-600'
+                                  }`}>
+                                    {request.urgency === 'urgent' ? 'דחוף' : request.urgency === 'high' ? 'גבוה' : 'נמוך'}
+                                  </span>
+                                )}
+                                {request.offer_count > 0 && (
+                                  <span className="flex items-center gap-1 text-carefd-gray">
+                                    <FaComments className="text-carefd-teal" /> {request.offer_count} הצעות
+                                  </span>
+                                )}
+                                <span className="text-carefd-gray">
+                                  {new Date(request.created_at).toLocaleDateString('he-IL')}
+                                </span>
+                              </div>
+
+                              {/* Action buttons */}
+                              <div className="flex gap-2">
+                                <Link
+                                  to={`/requests/${request.request_id}`}
+                                  className="text-sm bg-carefd-navy text-white px-4 py-1.5 rounded-lg hover:bg-carefd-slate transition"
+                                >
+                                  {request.offer_count > 0 ? `צפה בהצעות (${request.offer_count})` : 'פרטים'}
+                                </Link>
+                                {request.status === 'open' && (
+                                  <>
+                                    <button
+                                      onClick={() => startEditRequest(request)}
+                                      className="text-sm bg-blue-50 text-blue-600 px-4 py-1.5 rounded-lg hover:bg-blue-100 transition flex items-center gap-1"
+                                    >
+                                      <FaEdit /> ערוך
+                                    </button>
+                                    <button
+                                      onClick={() => handleCancelRequest(request.request_id)}
+                                      className="text-sm bg-red-50 text-red-600 px-4 py-1.5 rounded-lg hover:bg-red-100 transition flex items-center gap-1"
+                                    >
+                                      <FaTimes /> בטל
+                                    </button>
+                                  </>
+                                )}
+                                {request.status === 'in_progress' && request.booking_id && (
+                                  <Link
+                                    to={`/bookings/${request.booking_id}`}
+                                    className="text-sm bg-carefd-teal text-white px-4 py-1.5 rounded-lg hover:bg-carefd-teal-medium transition"
+                                  >
+                                    צפה בהזמנה
+                                  </Link>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Favorites Tab */}
                   {activeTab === 'favorites' && (
                     <div className="bg-white p-6 rounded-2xl shadow-lg">
-                      <h3 className="text-xl font-bold text-carelink-navy mb-6">ספקים מועדפים</h3>
+                      <h3 className="text-xl font-bold text-carefd-navy mb-6">ספקים מועדפים</h3>
                       {favorites.length === 0 ? (
-                        <div className="text-center py-12 text-carelink-gray">
-                          <FaHeart className="text-5xl mx-auto mb-3 text-carelink-teal-pale" />
+                        <div className="text-center py-12 text-carefd-gray">
+                          <FaHeart className="text-5xl mx-auto mb-3 text-carefd-teal-pale" />
                           <p className="text-lg mb-2">אין לך מועדפים עדיין</p>
-                          <Link to="/providers" className="text-carelink-teal font-medium">
+                          <Link to="/providers" className="text-carefd-teal font-medium">
                             חפש ספקים ושמור מועדפים
                           </Link>
                         </div>
@@ -819,9 +1495,9 @@ const Dashboard = () => {
                             <Link
                               key={fav.favorite_id}
                               to={`/providers/${fav.provider_id}`}
-                              className="border-2 border-carelink-teal-pale rounded-xl p-4 hover:border-carelink-teal transition flex items-center gap-4"
+                              className="border-2 border-carefd-teal-pale rounded-xl p-4 hover:border-carefd-teal transition flex items-center gap-4"
                             >
-                              <div className="w-16 h-16 bg-carelink-teal rounded-xl flex items-center justify-center text-white text-xl font-bold overflow-hidden">
+                              <div className="w-16 h-16 bg-carefd-teal rounded-xl flex items-center justify-center text-white text-xl font-bold overflow-hidden">
                                 {fav.provider?.profile_image ? (
                                   <img src={fav.provider.profile_image} alt="" className="w-full h-full object-cover" />
                                 ) : (
@@ -829,12 +1505,12 @@ const Dashboard = () => {
                                 )}
                               </div>
                               <div>
-                                <h4 className="font-bold text-carelink-navy">{fav.provider?.business_name || 'ספק'}</h4>
-                                <p className="text-sm text-carelink-gray">{fav.provider?.profession_title}</p>
+                                <h4 className="font-bold text-carefd-navy">{fav.provider?.business_name || 'ספק'}</h4>
+                                <p className="text-sm text-carefd-gray">{fav.provider?.profession_title}</p>
                                 {fav.provider?.rating && (
                                   <div className="flex items-center gap-1 mt-1">
                                     <FaStar className="text-amber-400 text-sm" />
-                                    <span className="text-sm text-carelink-gray">{fav.provider.rating}</span>
+                                    <span className="text-sm text-carefd-gray">{fav.provider.rating}</span>
                                   </div>
                                 )}
                               </div>
@@ -850,8 +1526,8 @@ const Dashboard = () => {
                     <div className="space-y-6">
                       {/* Profile Image & Basic Info */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                          <FaUserCircle className="text-carelink-teal" />
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                          <FaUserCircle className="text-carefd-teal" />
                           תמונת פרופיל
                         </h3>
                         
@@ -870,7 +1546,7 @@ const Dashboard = () => {
                             <button
                               onClick={() => fileInputRef.current?.click()}
                               disabled={uploadingImage}
-                              className="absolute bottom-0 right-0 w-8 h-8 bg-carelink-teal text-white rounded-full flex items-center justify-center shadow-lg hover:bg-carelink-teal/90 transition"
+                              className="absolute bottom-0 right-0 w-8 h-8 bg-carefd-teal text-white rounded-full flex items-center justify-center shadow-lg hover:bg-carefd-teal/90 transition"
                               title="העלה תמונה"
                               data-testid="upload-profile-image-btn"
                             >
@@ -900,7 +1576,7 @@ const Dashboard = () => {
                           </div>
                           
                           <div className="flex-1">
-                            <p className="text-sm text-carelink-gray mb-3">בחר צבע רקע (יוצג כאשר אין תמונה)</p>
+                            <p className="text-sm text-carefd-gray mb-3">בחר צבע רקע (יוצג כאשר אין תמונה)</p>
                             <div className="flex gap-2">
                               {PROFILE_COLORS.map((color) => (
                                 <button
@@ -908,7 +1584,7 @@ const Dashboard = () => {
                                   type="button"
                                   onClick={() => setUserForm({ ...userForm, profile_color: color })}
                                   className={`w-8 h-8 rounded-full bg-gradient-to-br ${color} ${
-                                    userForm.profile_color === color ? 'ring-2 ring-offset-2 ring-carelink-teal' : ''
+                                    userForm.profile_color === color ? 'ring-2 ring-offset-2 ring-carefd-teal' : ''
                                   }`}
                                 />
                               ))}
@@ -919,29 +1595,29 @@ const Dashboard = () => {
 
                       {/* Personal Details */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                          <FaIdCard className="text-carelink-teal" />
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                          <FaIdCard className="text-carefd-teal" />
                           פרטים אישיים
                         </h3>
                         
                         <div className="grid md:grid-cols-2 gap-4 mb-6">
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">שם פרטי</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">שם פרטי</label>
                             <input
                               type="text"
                               value={userForm.first_name}
                               onChange={(e) => setUserForm({ ...userForm, first_name: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                               data-testid="first-name-input"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">שם משפחה</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">שם משפחה</label>
                             <input
                               type="text"
                               value={userForm.last_name}
                               onChange={(e) => setUserForm({ ...userForm, last_name: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                               data-testid="last-name-input"
                             />
                           </div>
@@ -950,14 +1626,14 @@ const Dashboard = () => {
 
                       {/* Contact Details */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                          <FaPhone className="text-carelink-teal" />
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                          <FaPhone className="text-carefd-teal" />
                           פרטי התקשרות
                         </h3>
                         
                         <div className="space-y-4">
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">אימייל</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">אימייל</label>
                             <input
                               type="email"
                               value={userForm.email}
@@ -966,13 +1642,13 @@ const Dashboard = () => {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">טלפון</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">טלפון</label>
                             <input
                               type="tel"
                               value={userForm.phone}
                               onChange={(e) => setUserForm({ ...userForm, phone: e.target.value })}
                               placeholder="050-0000000"
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                               data-testid="phone-input"
                             />
                           </div>
@@ -981,31 +1657,31 @@ const Dashboard = () => {
 
                       {/* Address */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                          <FaHome className="text-carelink-teal" />
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                          <FaHome className="text-carefd-teal" />
                           כתובת
                         </h3>
                         
                         <div className="grid md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">עיר</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">עיר</label>
                             <CitySelect
                               name="city"
                               value={userForm.city}
                               onChange={(e) => setUserForm({ ...userForm, city: e.target.value })}
                               placeholder="בחר עיר..."
-                              inputClassName="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              inputClassName="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                               data-testid="city-input"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">כתובת מלאה</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">כתובת מלאה</label>
                             <input
                               type="text"
                               value={userForm.address}
                               onChange={(e) => setUserForm({ ...userForm, address: e.target.value })}
                               placeholder="רחוב, מספר בית, דירה"
-                              className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                               data-testid="address-input"
                             />
                           </div>
@@ -1014,7 +1690,7 @@ const Dashboard = () => {
                         <button 
                           onClick={handleSaveSettings}
                           disabled={savingSettings}
-                          className="mt-6 bg-carelink-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carelink-teal-medium transition disabled:opacity-50 flex items-center gap-2"
+                          className="mt-6 bg-carefd-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carefd-teal-medium transition disabled:opacity-50 flex items-center gap-2"
                           data-testid="save-settings-btn"
                         >
                           {savingSettings ? (
@@ -1033,53 +1709,53 @@ const Dashboard = () => {
 
                       {/* Password */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carelink-navy mb-6 flex items-center gap-2">
-                          <FaLock className="text-carelink-teal" />
+                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
+                          <FaLock className="text-carefd-teal" />
                           שינוי סיסמה
                         </h3>
                         
                         <div className="space-y-4 max-w-md">
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">סיסמה נוכחית</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">סיסמה נוכחית</label>
                             <div className="relative">
                               <input
                                 type={showPw.current ? 'text' : 'password'}
                                 value={passwordForm.current_password}
                                 onChange={(e) => setPasswordForm({ ...passwordForm, current_password: e.target.value })}
-                                className="w-full px-4 py-3 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                className="w-full px-4 py-3 pl-12 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                 data-testid="current-password-input"
                               />
-                              <button type="button" onClick={() => setShowPw(p => ({...p, current: !p.current}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                              <button type="button" onClick={() => setShowPw(p => ({...p, current: !p.current}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
                                 {showPw.current ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                               </button>
                             </div>
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">סיסמה חדשה</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">סיסמה חדשה</label>
                             <div className="relative">
                               <input
                                 type={showPw.new_pw ? 'text' : 'password'}
                                 value={passwordForm.new_password}
                                 onChange={(e) => setPasswordForm({ ...passwordForm, new_password: e.target.value })}
-                                className="w-full px-4 py-3 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                className="w-full px-4 py-3 pl-12 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                 data-testid="new-password-input"
                               />
-                              <button type="button" onClick={() => setShowPw(p => ({...p, new_pw: !p.new_pw}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                              <button type="button" onClick={() => setShowPw(p => ({...p, new_pw: !p.new_pw}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
                                 {showPw.new_pw ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                               </button>
                             </div>
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-carelink-navy mb-2">אישור סיסמה חדשה</label>
+                            <label className="block text-sm font-medium text-carefd-navy mb-2">אישור סיסמה חדשה</label>
                             <div className="relative">
                               <input
                                 type={showPw.confirm ? 'text' : 'password'}
                                 value={passwordForm.confirm_password}
                                 onChange={(e) => setPasswordForm({ ...passwordForm, confirm_password: e.target.value })}
-                                className="w-full px-4 py-3 pl-12 border-2 border-carelink-teal-pale rounded-xl focus:border-carelink-teal focus:outline-none"
+                                className="w-full px-4 py-3 pl-12 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                 data-testid="confirm-password-input"
                               />
-                              <button type="button" onClick={() => setShowPw(p => ({...p, confirm: !p.confirm}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                              <button type="button" onClick={() => setShowPw(p => ({...p, confirm: !p.confirm}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
                                 {showPw.confirm ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                               </button>
                             </div>
@@ -1087,7 +1763,7 @@ const Dashboard = () => {
                           <button 
                             onClick={handleChangePassword}
                             disabled={changingPassword}
-                            className="bg-carelink-navy text-white px-6 py-3 rounded-xl font-medium hover:bg-carelink-slate transition disabled:opacity-50 flex items-center gap-2"
+                            className="bg-carefd-navy text-white px-6 py-3 rounded-xl font-medium hover:bg-carefd-slate transition disabled:opacity-50 flex items-center gap-2"
                             data-testid="change-password-btn"
                           >
                             {changingPassword ? (
@@ -1142,10 +1818,10 @@ const Dashboard = () => {
             data-testid="user-booking-details-modal"
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-carelink-navy">פרטי ההזמנה</h3>
+              <h3 className="text-xl font-bold text-carefd-navy">פרטי ההזמנה</h3>
               <button
                 onClick={() => setShowBookingDetails(null)}
-                className="text-carelink-gray hover:text-carelink-navy transition"
+                className="text-carefd-gray hover:text-carefd-navy transition"
               >
                 <FaTimes size={20} />
               </button>
@@ -1153,25 +1829,25 @@ const Dashboard = () => {
 
             <div className="space-y-4">
               {/* Service Info */}
-              <div className="bg-carelink-teal-pale/30 rounded-xl p-4">
-                <h4 className="font-bold text-carelink-navy mb-2">{showBookingDetails.service_name || 'שירות'}</h4>
-                <p className="text-sm text-carelink-gray">{showBookingDetails.provider_name || 'ספק'}</p>
+              <div className="bg-carefd-teal-pale/30 rounded-xl p-4">
+                <h4 className="font-bold text-carefd-navy mb-2">{showBookingDetails.service_name || 'שירות'}</h4>
+                <p className="text-sm text-carefd-gray">{showBookingDetails.provider_name || 'ספק'}</p>
                 {showBookingDetails.booking_number && (
-                  <p className="text-xs text-carelink-gray mt-1">מספר הזמנה: {showBookingDetails.booking_number}</p>
+                  <p className="text-xs text-carefd-gray mt-1">מספר הזמנה: {showBookingDetails.booking_number}</p>
                 )}
               </div>
 
               {/* Booking Details */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-carelink-gray mb-1">תאריך</p>
-                  <p className="font-medium text-carelink-navy">
+                  <p className="text-sm text-carefd-gray mb-1">תאריך</p>
+                  <p className="font-medium text-carefd-navy">
                     {showBookingDetails.booking_date ? new Date(showBookingDetails.booking_date).toLocaleDateString('he-IL') : 'יתואם'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-carelink-gray mb-1">שעה</p>
-                  <p className="font-medium text-carelink-navy">
+                  <p className="text-sm text-carefd-gray mb-1">שעה</p>
+                  <p className="font-medium text-carefd-navy">
                     {showBookingDetails.booking_time || 'לא צוין'}
                   </p>
                 </div>
@@ -1179,7 +1855,7 @@ const Dashboard = () => {
 
               {/* Status */}
               <div>
-                <p className="text-sm text-carelink-gray mb-1">סטטוס</p>
+                <p className="text-sm text-carefd-gray mb-1">סטטוס</p>
                 <span className={`inline-block px-4 py-2 rounded-xl text-sm font-medium ${getStatusColor(showBookingDetails.status)}`}>
                   {getStatusLabel(showBookingDetails.status)}
                 </span>
@@ -1195,19 +1871,19 @@ const Dashboard = () => {
                   <div className="space-y-1 text-sm">
                     {showBookingDetails.base_price && (
                       <div className="flex justify-between">
-                        <span className="text-carelink-gray">מחיר בסיס:</span>
+                        <span className="text-carefd-gray">מחיר בסיס:</span>
                         <span className="font-medium">&#8362;{showBookingDetails.base_price}</span>
                       </div>
                     )}
                     {showBookingDetails.travel_cost > 0 && (
                       <div className="flex justify-between">
-                        <span className="text-carelink-gray">עלות נסיעה:</span>
+                        <span className="text-carefd-gray">עלות נסיעה:</span>
                         <span className="font-medium">&#8362;{showBookingDetails.travel_cost}</span>
                       </div>
                     )}
                     {showBookingDetails.weekend_addition > 0 && (
                       <div className="flex justify-between">
-                        <span className="text-carelink-gray">תוספת סופ"ש:</span>
+                        <span className="text-carefd-gray">תוספת סופ"ש:</span>
                         <span className="font-medium">&#8362;{showBookingDetails.weekend_addition}</span>
                       </div>
                     )}
@@ -1225,9 +1901,9 @@ const Dashboard = () => {
                   <p className="text-sm font-medium text-orange-700 flex items-center gap-1 mb-1">
                     <FaMapMarkerAlt /> כתובת
                   </p>
-                  <p className="text-sm text-carelink-navy">
-                    {showBookingDetails.service_location.address}
-                    {showBookingDetails.service_location.city && `, ${showBookingDetails.service_location.city}`}
+                  <p className="text-sm text-carefd-navy">
+                    {showBookingDetails.service_location?.address}
+                    {showBookingDetails.service_location?.city && `, ${showBookingDetails.service_location.city}`}
                   </p>
                 </div>
               )}
@@ -1235,8 +1911,8 @@ const Dashboard = () => {
               {/* Notes */}
               {showBookingDetails.notes && (
                 <div>
-                  <p className="text-sm text-carelink-gray mb-1">הערות</p>
-                  <p className="text-carelink-slate bg-gray-50 p-3 rounded-xl">{showBookingDetails.notes}</p>
+                  <p className="text-sm text-carefd-gray mb-1">הערות</p>
+                  <p className="text-carefd-slate bg-gray-50 p-3 rounded-xl">{showBookingDetails.notes}</p>
                 </div>
               )}
 
@@ -1251,12 +1927,12 @@ const Dashboard = () => {
                     {showBookingDetails.change_requests.map((cr, idx) => (
                       <div key={idx} className="bg-white rounded-lg p-3 border border-amber-200">
                         <div className="text-sm">
-                          <p className="font-medium text-carelink-navy mb-1">
+                          <p className="font-medium text-carefd-navy mb-1">
                             {cr.new_date && `תאריך חדש: ${cr.new_date}`}
                             {cr.new_date && cr.new_time && ' | '}
                             {cr.new_time && `שעה חדשה: ${cr.new_time}`}
                           </p>
-                          {cr.reason && <p className="text-xs text-carelink-gray mb-2">{cr.reason}</p>}
+                          {cr.reason && <p className="text-xs text-carefd-gray mb-2">{cr.reason}</p>}
                           {cr.status === 'pending' && (
                             <div className="flex gap-2 mt-2">
                               <button
@@ -1319,7 +1995,7 @@ const Dashboard = () => {
                       setShowBookingDetails(null);
                       setShowCompletionDialog(showBookingDetails);
                     }}
-                    className="flex-1 bg-carelink-teal text-white py-3 rounded-xl font-medium hover:bg-carelink-teal-medium transition"
+                    className="flex-1 bg-carefd-teal text-white py-3 rounded-xl font-medium hover:bg-carefd-teal-medium transition"
                   >
                     אשר השלמה והעריך
                   </button>
@@ -1337,7 +2013,7 @@ const Dashboard = () => {
                 )}
                 <Link
                   to={`/providers/${showBookingDetails.provider_id}`}
-                  className="flex-1 bg-carelink-navy text-white py-3 rounded-xl font-medium hover:bg-carelink-slate transition text-center"
+                  className="flex-1 bg-carefd-navy text-white py-3 rounded-xl font-medium hover:bg-carefd-slate transition text-center"
                 >
                   צפה בספק
                 </Link>

@@ -10,7 +10,7 @@ import uuid
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
 # Test credentials
-ADMIN_EMAIL = "admin@carelink.co.il"
+ADMIN_EMAIL = "admin@carefd.com"
 ADMIN_PASSWORD = "password"
 
 # Store created test IDs for cleanup

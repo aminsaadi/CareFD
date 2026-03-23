@@ -79,8 +79,8 @@ const NotificationSettings = () => {
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6" dir="rtl">
-      <h2 className="text-xl font-bold text-carelink-navy mb-4 flex items-center gap-2">
-        <FiBell className="text-carelink-teal" />
+      <h2 className="text-xl font-bold text-carefd-navy mb-4 flex items-center gap-2">
+        <FiBell className="text-carefd-teal" />
         הגדרות התראות
       </h2>
 
@@ -88,8 +88,8 @@ const NotificationSettings = () => {
       <div className="mb-6 p-4 bg-gray-50 rounded-xl">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-carelink-navy">התראות Push</h3>
-            <p className="text-sm text-carelink-gray">
+            <h3 className="font-semibold text-carefd-navy">התראות Push</h3>
+            <p className="text-sm text-carefd-gray">
               {!isSupported ? (
                 'הדפדפן שלך לא תומך בהתראות Push'
               ) : permission === 'denied' ? (
@@ -108,7 +108,7 @@ const NotificationSettings = () => {
             className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
               isSubscribed
                 ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                : 'bg-carelink-teal text-white hover:bg-carelink-teal-medium'
+                : 'bg-carefd-teal text-white hover:bg-carefd-teal-medium'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {loading ? (
@@ -153,7 +153,7 @@ const NotificationSettings = () => {
       {/* Notification Preferences */}
       <div className="space-y-3">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold text-carelink-navy">סוגי התראות</h3>
+          <h3 className="font-semibold text-carefd-navy">סוגי התראות</h3>
           {prefsSaved && (
             <span className="text-sm text-emerald-500 flex items-center gap-1">
               <FiCheck /> נשמר
@@ -167,14 +167,14 @@ const NotificationSettings = () => {
             className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
           >
             <div>
-              <p className="font-medium text-carelink-navy">{label}</p>
-              <p className="text-sm text-carelink-gray">{desc}</p>
+              <p className="font-medium text-carefd-navy">{label}</p>
+              <p className="text-sm text-carefd-gray">{desc}</p>
             </div>
             <button
               onClick={() => togglePreference(key)}
               disabled={savingPrefs}
               className={`relative w-12 h-6 rounded-full transition-colors ${
-                preferences[key] ? 'bg-carelink-teal' : 'bg-gray-300'
+                preferences[key] ? 'bg-carefd-teal' : 'bg-gray-300'
               }`}
             >
               <span

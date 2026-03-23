@@ -6,6 +6,7 @@ import uuid
 from app.database import db
 from app.models import ChatRoom, Message, MessageCreate
 from app.utils import get_current_user, send_email_async, create_notification, send_push_to_user
+from app.rate_limiter import rate_limiter, get_client_ip
 
 router = APIRouter()
 
@@ -16,6 +17,9 @@ async def create_chat_room(
     request: Request = None
 ):
     """Create a chat room"""
+    # Rate limit: 20 chat rooms per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"create_chat:{get_client_ip(request)}", max_requests=20, window_seconds=900)
     user = await get_current_user(authorization, request)
 
     # Verify the authenticated user is one of the participants
@@ -237,17 +241,17 @@ async def get_messages(
     if not is_participant:
         raise HTTPException(status_code=403, detail="Not authorized")
     
-    messages = await db.messages.find(
-        {"room_id": room_id},
-        {"_id": 0}
-    ).sort("created_at", 1).skip(skip).limit(limit).to_list(limit)
-    
-    # Mark messages as read
+    # Mark messages as read first, then fetch
     await db.messages.update_many(
         {"room_id": room_id, "sender_id": {"$ne": user["user_id"]}, "is_read": False},
         {"$set": {"is_read": True}}
     )
-    
+
+    messages = await db.messages.find(
+        {"room_id": room_id},
+        {"_id": 0}
+    ).sort("created_at", 1).skip(skip).limit(limit).to_list(limit)
+
     return {"messages": messages}
 
 # ==================== ARCHIVE & DELETE ====================
@@ -294,7 +298,16 @@ async def unarchive_chat_room(
     room = await db.chat_rooms.find_one({"room_id": room_id}, {"_id": 0})
     if not room:
         raise HTTPException(status_code=404, detail="Chat room not found")
-    
+
+    # Verify user is a participant
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    is_participant = (
+        room["user_id"] == user["user_id"] or
+        (provider and room["provider_id"] == provider["provider_id"])
+    )
+    if not is_participant:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
     await db.chat_rooms.update_one(
         {"room_id": room_id},
         {"$pull": {"archived_by": user["user_id"]}}
@@ -333,9 +346,7 @@ async def delete_chat_room(
     
     # If both participants deleted, remove messages too
     all_participants = [room["user_id"]]
-    if provider:
-        all_participants.append(provider.get("user_id", ""))
-    prov_doc = await db.providers.find_one({"provider_id": room["provider_id"]}, {"_id": 0})
+    prov_doc = provider or await db.providers.find_one({"provider_id": room["provider_id"]}, {"_id": 0})
     if prov_doc:
         all_participants.append(prov_doc.get("user_id", ""))
     all_participants = list(set(all_participants))

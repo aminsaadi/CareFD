@@ -2,10 +2,35 @@ from fastapi import APIRouter, HTTPException, Header, Request, UploadFile, File
 from typing import Optional, List
 from datetime import datetime, timezone
 import uuid
+import re
 
 from app.database import db, UPLOAD_DIR
 from app.models import NotificationType, UserRole, VerificationStatus
 from app.utils import get_current_user, send_email_async, create_notification
+
+ALLOWED_VERIFICATION_EXTENSIONS = {'pdf', 'jpg', 'jpeg', 'png', 'webp'}
+
+FILE_SIGNATURES = {
+    b'\x89PNG\r\n\x1a\n': 'png',
+    b'\xff\xd8\xff': 'jpg',
+    b'%PDF': 'pdf',
+    b'RIFF': 'webp',
+    b'GIF87a': 'gif',
+    b'GIF89a': 'gif',
+}
+
+
+def _verify_file_magic(content: bytes, claimed_ext: str) -> bool:
+    """Verify file content matches claimed type using magic bytes."""
+    for signature, file_type in FILE_SIGNATURES.items():
+        if content[:len(signature)] == signature:
+            if file_type == 'jpg' and claimed_ext in ('jpg', 'jpeg'):
+                return True
+            if file_type == claimed_ext:
+                return True
+            if file_type == 'webp' and claimed_ext == 'webp' and len(content) >= 12 and content[8:12] == b'WEBP':
+                return True
+    return False
 
 router = APIRouter()
 
@@ -60,22 +85,35 @@ async def submit_verification_request(
     async def save_file(upload_file: UploadFile, doc_type: str):
         if not upload_file or not upload_file.filename:
             return None
-        
-        # Validate file type
+
+        # Validate content type
         allowed_types = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
         if upload_file.content_type not in allowed_types:
             return None
-        
+
+        # Sanitize and validate extension
+        raw_ext = upload_file.filename.rsplit('.', 1)[-1].lower() if '.' in upload_file.filename else ''
+        ext = re.sub(r'[^a-z0-9]', '', raw_ext)
+        if ext not in ALLOWED_VERIFICATION_EXTENSIONS:
+            return None
+
+        # Read content and validate size (10MB max)
+        content = await upload_file.read()
+        if len(content) > 10 * 1024 * 1024:
+            return None
+
+        # Verify magic bytes match claimed extension
+        if not _verify_file_magic(content, ext):
+            return None
+
         # Generate unique filename
-        ext = upload_file.filename.split('.')[-1]
         filename = f"{user['user_id']}_{doc_type}_{uuid.uuid4().hex[:8]}.{ext}"
         file_path = UPLOAD_DIR / filename
-        
+
         # Save file
         with open(file_path, "wb") as f:
-            content = await upload_file.read()
             f.write(content)
-        
+
         return {
             "document_id": f"doc_{uuid.uuid4().hex[:12]}",
             "document_type": doc_type,

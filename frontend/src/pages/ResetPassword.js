@@ -70,14 +70,14 @@ const ResetPassword = () => {
 
   if (validating) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-carelink-navy via-carelink-slate to-carelink-navy flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-carefd-navy via-carefd-slate to-carefd-navy flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-carelink-navy via-carelink-slate to-carelink-navy flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-carefd-navy via-carefd-slate to-carefd-navy flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -91,15 +91,15 @@ const ResetPassword = () => {
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <FaTimesCircle className="text-red-500 text-3xl" />
               </div>
-              <h2 className="text-xl font-bold text-carelink-navy mb-2">קישור לא תקף</h2>
-              <p className="text-carelink-gray mb-6">
+              <h2 className="text-xl font-bold text-carefd-navy mb-2">קישור לא תקף</h2>
+              <p className="text-carefd-gray mb-6">
                 הקישור לאיפוס הסיסמה פג תוקף או אינו תקף.
                 <br />
                 אנא בקש קישור חדש.
               </p>
               <Link
                 to="/login"
-                className="inline-flex items-center gap-2 text-carelink-teal font-medium hover:underline"
+                className="inline-flex items-center gap-2 text-carefd-teal font-medium hover:underline"
               >
                 <FaArrowLeft className="rtl:rotate-180" />
                 חזור להתחברות
@@ -111,13 +111,13 @@ const ResetPassword = () => {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <FaCheckCircle className="text-green-500 text-3xl" />
               </div>
-              <h2 className="text-xl font-bold text-carelink-navy mb-2">הסיסמה שונתה בהצלחה!</h2>
-              <p className="text-carelink-gray mb-6">
+              <h2 className="text-xl font-bold text-carefd-navy mb-2">הסיסמה שונתה בהצלחה!</h2>
+              <p className="text-carefd-gray mb-6">
                 כעת תוכל להתחבר עם הסיסמה החדשה שלך.
               </p>
               <Link
                 to="/login"
-                className="inline-block w-full bg-carelink-teal text-white py-3 rounded-xl hover:bg-carelink-teal-medium font-semibold transition text-center"
+                className="inline-block w-full bg-carefd-teal text-white py-3 rounded-xl hover:bg-carefd-teal-medium font-semibold transition text-center"
               >
                 התחבר עכשיו
               </Link>
@@ -125,44 +125,44 @@ const ResetPassword = () => {
           ) : (
             // Reset password form
             <>
-              <h2 className="text-2xl font-bold text-carelink-navy mb-2 text-center">הגדר סיסמה חדשה</h2>
-              <p className="text-carelink-gray mb-6 text-center">
+              <h2 className="text-2xl font-bold text-carefd-navy mb-2 text-center">הגדר סיסמה חדשה</h2>
+              <p className="text-carefd-gray mb-6 text-center">
                 בחר סיסמה חדשה לחשבון שלך
               </p>
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy mb-2">סיסמה חדשה</label>
+                  <label className="block text-sm font-medium text-carefd-navy mb-2">סיסמה חדשה</label>
                   <div className="relative">
-                    <FaLock className="absolute top-1/2 -translate-y-1/2 right-4 text-carelink-gray" />
+                    <FaLock className="absolute top-1/2 -translate-y-1/2 right-4 text-carefd-gray" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-12 py-3 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
-                      placeholder="לפחות 6 תווים"
+                      className="w-full px-12 py-3 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal transition-colors"
+                      placeholder="לפחות 8 תווים"
                       required
-                      minLength={6}
+                      minLength={8}
                     />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-12 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-12 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
                       {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                     </button>
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-carelink-navy mb-2">אימות סיסמה</label>
+                  <label className="block text-sm font-medium text-carefd-navy mb-2">אימות סיסמה</label>
                   <div className="relative">
-                    <FaLock className="absolute top-1/2 -translate-y-1/2 right-4 text-carelink-gray" />
+                    <FaLock className="absolute top-1/2 -translate-y-1/2 right-4 text-carefd-gray" />
                     <input
                       type={showConfirm ? 'text' : 'password'}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full px-12 py-3 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal transition-colors"
+                      className="w-full px-12 py-3 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal transition-colors"
                       placeholder="הזן שוב את הסיסמה"
                       required
                     />
-                    <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-12 top-1/2 -translate-y-1/2 text-carelink-gray hover:text-carelink-teal transition" tabIndex={-1}>
+                    <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-12 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
                       {showConfirm ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                     </button>
                   </div>
@@ -171,7 +171,7 @@ const ResetPassword = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-carelink-teal text-white py-3 rounded-xl hover:bg-carelink-teal-medium font-semibold transition disabled:opacity-50"
+                  className="w-full bg-carefd-teal text-white py-3 rounded-xl hover:bg-carefd-teal-medium font-semibold transition disabled:opacity-50"
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto" />

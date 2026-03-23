@@ -68,8 +68,8 @@ const AdminVerification = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-carelink-navy">אימות ספקים</h1>
-            <p className="text-carelink-slate mt-1">{pendingProviders.length} ספקים ממתינים לאימות</p>
+            <h1 className="text-2xl font-bold text-carefd-navy">אימות ספקים</h1>
+            <p className="text-carefd-slate mt-1">{pendingProviders.length} ספקים ממתינים לאימות</p>
           </div>
         </div>
 
@@ -81,7 +81,7 @@ const AdminVerification = () => {
                 <FiShield className="text-amber-400" size={20} />
               </div>
               <div>
-                <p className="text-carelink-slate text-sm">ממתינים לאימות</p>
+                <p className="text-carefd-slate text-sm">ממתינים לאימות</p>
                 <p className="text-2xl font-bold text-amber-400">{pendingProviders.length}</p>
               </div>
             </div>
@@ -92,8 +92,8 @@ const AdminVerification = () => {
                 <FiFile className="text-blue-400" size={20} />
               </div>
               <div>
-                <p className="text-carelink-slate text-sm">עם מסמכים</p>
-                <p className="text-2xl font-bold text-carelink-navy">
+                <p className="text-carefd-slate text-sm">עם מסמכים</p>
+                <p className="text-2xl font-bold text-carefd-navy">
                   {pendingProviders.filter(p => p.verification_documents?.length > 0).length}
                 </p>
               </div>
@@ -102,11 +102,11 @@ const AdminVerification = () => {
           <div className="bg-white rounded-xl p-4 border border-gray-100">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-slate-500/20 rounded-lg flex items-center justify-center">
-                <FiUser className="text-carelink-slate" size={20} />
+                <FiUser className="text-carefd-slate" size={20} />
               </div>
               <div>
-                <p className="text-carelink-slate text-sm">ללא מסמכים</p>
-                <p className="text-2xl font-bold text-carelink-navy">
+                <p className="text-carefd-slate text-sm">ללא מסמכים</p>
+                <p className="text-2xl font-bold text-carefd-navy">
                   {pendingProviders.filter(p => !p.verification_documents?.length).length}
                 </p>
               </div>
@@ -117,13 +117,13 @@ const AdminVerification = () => {
         {/* Pending Providers List */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="w-10 h-10 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-10 h-10 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : pendingProviders.length === 0 ? (
           <div className="bg-white rounded-xl p-12 text-center border border-gray-100">
             <FiCheck className="mx-auto text-emerald-400 mb-4" size={48} />
-            <h3 className="text-carelink-navy text-lg font-medium">אין ספקים ממתינים</h3>
-            <p className="text-carelink-slate mt-2">כל הבקשות טופלו</p>
+            <h3 className="text-carefd-navy text-lg font-medium">אין ספקים ממתינים</h3>
+            <p className="text-carefd-slate mt-2">כל הבקשות טופלו</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -137,27 +137,27 @@ const AdminVerification = () => {
                     {/* Provider Info */}
                     <div className="flex-1">
                       <div className="flex items-start gap-4">
-                        <div className="w-16 h-16 bg-gradient-to-br from-carelink-teal to-carelink-navy rounded-xl flex items-center justify-center text-carelink-navy text-2xl font-medium">
+                        <div className="w-16 h-16 bg-gradient-to-br from-carefd-teal to-carefd-navy rounded-xl flex items-center justify-center text-carefd-navy text-2xl font-medium">
                           {provider.business_name?.[0] || 'P'}
                         </div>
                         <div>
-                          <h3 className="text-carelink-navy text-lg font-semibold">{provider.business_name || 'ללא שם'}</h3>
-                          <p className="text-carelink-slate">{provider.provider_type}</p>
+                          <h3 className="text-carefd-navy text-lg font-semibold">{provider.business_name || 'ללא שם'}</h3>
+                          <p className="text-carefd-slate">{provider.provider_type}</p>
                           
                           <div className="flex flex-wrap gap-4 mt-3 text-sm">
                             {provider.user_info?.email && (
-                              <span className="flex items-center gap-1 text-carelink-slate">
+                              <span className="flex items-center gap-1 text-carefd-slate">
                                 <FiMail size={14} />
                                 {provider.user_info.email}
                               </span>
                             )}
                             {provider.location?.city && (
-                              <span className="flex items-center gap-1 text-carelink-slate">
+                              <span className="flex items-center gap-1 text-carefd-slate">
                                 <FiMapPin size={14} />
                                 {provider.location.city}
                               </span>
                             )}
-                            <span className="flex items-center gap-1 text-carelink-slate">
+                            <span className="flex items-center gap-1 text-carefd-slate">
                               <FiCalendar size={14} />
                               נרשם: {new Date(provider.created_at).toLocaleDateString('he-IL')}
                             </span>
@@ -166,7 +166,7 @@ const AdminVerification = () => {
                           {provider.specializations?.length > 0 && (
                             <div className="flex flex-wrap gap-2 mt-3">
                               {provider.specializations.map((spec, idx) => (
-                                <span key={idx} className="bg-gray-50 text-carelink-slate px-2 py-1 rounded text-xs">
+                                <span key={idx} className="bg-gray-50 text-carefd-slate px-2 py-1 rounded text-xs">
                                   {spec}
                                 </span>
                               ))}
@@ -178,7 +178,7 @@ const AdminVerification = () => {
                       {/* Documents */}
                       {provider.verification_documents?.length > 0 && (
                         <div className="mt-6">
-                          <h4 className="text-carelink-navy font-medium mb-3">מסמכים שהועלו</h4>
+                          <h4 className="text-carefd-navy font-medium mb-3">מסמכים שהועלו</h4>
                           <div className="flex flex-wrap gap-3">
                             {provider.verification_documents.map((doc, idx) => (
                               <a
@@ -186,11 +186,11 @@ const AdminVerification = () => {
                                 href={doc.file_url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 text-carelink-slate px-4 py-2 rounded-lg transition"
+                                className="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 text-carefd-slate px-4 py-2 rounded-lg transition"
                               >
-                                <FiFile className="text-carelink-teal" size={16} />
+                                <FiFile className="text-carefd-teal" size={16} />
                                 {getDocumentLabel(doc.document_type)}
-                                <FiDownload size={14} className="text-carelink-slate" />
+                                <FiDownload size={14} className="text-carefd-slate" />
                               </a>
                             ))}
                           </div>
@@ -202,21 +202,21 @@ const AdminVerification = () => {
                     <div className="flex flex-row lg:flex-col gap-3">
                       <button
                         onClick={() => verifyProvider(provider.provider_id)}
-                        className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 text-carelink-navy rounded-lg hover:bg-emerald-700 transition font-medium"
+                        className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 text-carefd-navy rounded-lg hover:bg-emerald-700 transition font-medium"
                       >
                         <FiCheck size={18} />
                         אשר
                       </button>
                       <button
                         onClick={() => setShowRejectModal(provider.provider_id)}
-                        className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-carelink-navy rounded-lg hover:bg-red-700 transition font-medium"
+                        className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-carefd-navy rounded-lg hover:bg-red-700 transition font-medium"
                       >
                         <FiX size={18} />
                         דחה
                       </button>
                       <Link
                         to={`/providers/${provider.provider_id}`}
-                        className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-gray-50 text-carelink-navy rounded-lg hover:bg-gray-100 transition font-medium"
+                        className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-gray-50 text-carefd-navy rounded-lg hover:bg-gray-100 transition font-medium"
                       >
                         <FiEye size={18} />
                         צפה
@@ -235,16 +235,16 @@ const AdminVerification = () => {
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-md border border-gray-100">
             <div className="p-4 border-b border-gray-100">
-              <h2 className="text-lg font-bold text-carelink-navy">דחיית בקשה</h2>
+              <h2 className="text-lg font-bold text-carefd-navy">דחיית בקשה</h2>
             </div>
             <div className="p-6">
-              <label className="block text-sm text-carelink-slate mb-2">סיבת הדחייה</label>
+              <label className="block text-sm text-carefd-slate mb-2">סיבת הדחייה</label>
               <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="הסבר מדוע הבקשה נדחתה..."
                 rows={4}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal outline-none resize-none"
+                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal outline-none resize-none"
               />
             </div>
             <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-100">
@@ -253,14 +253,14 @@ const AdminVerification = () => {
                   setShowRejectModal(null);
                   setRejectReason('');
                 }}
-                className="px-6 py-2.5 bg-gray-50 text-carelink-navy rounded-lg hover:bg-gray-100 transition"
+                className="px-6 py-2.5 bg-gray-50 text-carefd-navy rounded-lg hover:bg-gray-100 transition"
               >
                 ביטול
               </button>
               <button
                 onClick={rejectProvider}
                 disabled={!rejectReason.trim()}
-                className="px-6 py-2.5 bg-red-600 text-carelink-navy rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+                className="px-6 py-2.5 bg-red-600 text-carefd-navy rounded-lg hover:bg-red-700 transition disabled:opacity-50"
               >
                 דחה בקשה
               </button>

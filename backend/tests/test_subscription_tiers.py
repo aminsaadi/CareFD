@@ -1,5 +1,5 @@
 """
-Test suite for CareLink Subscription Tiers - Free, Pro, Gold
+Test suite for CareFD Subscription Tiers - Free, Pro, Gold
 Features tested:
 1. Subscription plans API (GET /api/subscription-plans)
 2. My subscription API (GET /api/subscriptions/my)
@@ -19,11 +19,11 @@ from datetime import datetime
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
 # Test credentials
-ADMIN_EMAIL = "admin@carelink.co.il"
+ADMIN_EMAIL = "admin@carefd.com"
 ADMIN_PASSWORD = "password"
-PROVIDER_EMAIL = "provider@carelink.co.il"
+PROVIDER_EMAIL = "provider@carefd.com"
 PROVIDER_PASSWORD = "password"
-USER_EMAIL = "user@carelink.co.il"
+USER_EMAIL = "user@carefd.com"
 USER_PASSWORD = "password"
 
 

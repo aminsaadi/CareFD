@@ -1,5 +1,5 @@
 """
-Push Notifications API Tests for CareLink
+Push Notifications API Tests for CareFD
 Tests VAPID key endpoint, subscription management, preferences, and admin push sending
 """
 import pytest
@@ -10,7 +10,7 @@ import uuid
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
 # Test credentials
-ADMIN_EMAIL = "admin@carelink.co.il"
+ADMIN_EMAIL = "admin@carefd.com"
 ADMIN_PASSWORD = "password"
 TEST_USER_EMAIL = f"test_push_{uuid.uuid4().hex[:8]}@test.com"
 TEST_USER_PASSWORD = "Test123!"

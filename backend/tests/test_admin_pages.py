@@ -13,9 +13,9 @@ import uuid
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
 # Test credentials
-ADMIN_EMAIL = "admin@carelink.co.il"
+ADMIN_EMAIL = "admin@carefd.com"
 ADMIN_PASSWORD = "password"
-USER_EMAIL = "user@carelink.co.il"
+USER_EMAIL = "user@carefd.com"
 USER_PASSWORD = "password"
 
 
@@ -220,26 +220,26 @@ class TestPublicPagesAPI:
         print("PASS: Non-existent page returns 404")
 
 
-class TestCarelinksPreviewPage:
-    """Test specific page endpoint: /api/pages/carelink-preview-1"""
+class TestCareFDsPreviewPage:
+    """Test specific page endpoint: /api/pages/carefd-preview-1"""
     
-    def test_carelink_preview_page(self, api_client):
-        """Test GET /api/pages/carelink-preview-1"""
+    def test_carefd_preview_page(self, api_client):
+        """Test GET /api/pages/carefd-preview-1"""
         api_client.headers.pop("Authorization", None)
         
-        response = api_client.get(f"{BASE_URL}/api/pages/carelink-preview-1")
+        response = api_client.get(f"{BASE_URL}/api/pages/carefd-preview-1")
         # May be 200 if page exists, or 404 if not yet created
-        print(f"GET /api/pages/carelink-preview-1 returned status: {response.status_code}")
+        print(f"GET /api/pages/carefd-preview-1 returned status: {response.status_code}")
         
         if response.status_code == 200:
             data = response.json()
             assert "title" in data
             assert "content" in data
             assert data.get("is_published") == True
-            print(f"PASS: carelink-preview-1 page exists with title: {data.get('title')}")
+            print(f"PASS: carefd-preview-1 page exists with title: {data.get('title')}")
         else:
             assert response.status_code == 404
-            print("INFO: carelink-preview-1 page not created yet (expected 404)")
+            print("INFO: carefd-preview-1 page not created yet (expected 404)")
 
 
 class TestAdminPagesAuthorization:

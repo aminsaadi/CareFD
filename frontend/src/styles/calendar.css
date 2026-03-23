@@ -1,4 +1,4 @@
-.carelink-calendar {
+.carefd-calendar {
   width: 100%;
   border: 2px solid #B8C2C9;
   border-radius: 12px;
@@ -10,18 +10,18 @@
 }
 
 @media (min-width: 640px) {
-  .carelink-calendar {
+  .carefd-calendar {
     padding: 10px;
   }
 }
 
-.carelink-calendar .react-calendar__navigation {
+.carefd-calendar .react-calendar__navigation {
   margin-bottom: 0.75em;
   display: flex;
   gap: 2px;
 }
 
-.carelink-calendar .react-calendar__navigation button {
+.carefd-calendar .react-calendar__navigation button {
   color: #1E4D5F;
   min-width: 36px;
   background: none;
@@ -31,38 +31,38 @@
 }
 
 @media (min-width: 640px) {
-  .carelink-calendar .react-calendar__navigation button {
+  .carefd-calendar .react-calendar__navigation button {
     min-width: 44px;
     font-size: 16px;
   }
 }
 
-.carelink-calendar .react-calendar__navigation button:enabled:hover,
-.carelink-calendar .react-calendar__navigation button:enabled:focus {
+.carefd-calendar .react-calendar__navigation button:enabled:hover,
+.carefd-calendar .react-calendar__navigation button:enabled:focus {
   background-color: #ACEDEA;
   border-radius: 6px;
 }
 
-.carelink-calendar .react-calendar__month-view__weekdays {
+.carefd-calendar .react-calendar__month-view__weekdays {
   font-size: 0.7em;
 }
 
 @media (min-width: 640px) {
-  .carelink-calendar .react-calendar__month-view__weekdays {
+  .carefd-calendar .react-calendar__month-view__weekdays {
     font-size: 0.8em;
   }
 }
 
-.carelink-calendar .react-calendar__month-view__weekdays__weekday {
+.carefd-calendar .react-calendar__month-view__weekdays__weekday {
   padding: 4px 2px;
   text-align: center;
 }
 
-.carelink-calendar .react-calendar__month-view__weekdays__weekday abbr {
+.carefd-calendar .react-calendar__month-view__weekdays__weekday abbr {
   text-decoration: none;
 }
 
-.carelink-calendar .react-calendar__tile {
+.carefd-calendar .react-calendar__tile {
   max-width: 100%;
   padding: 8px 2px;
   background: none;
@@ -74,51 +74,51 @@
 }
 
 @media (min-width: 640px) {
-  .carelink-calendar .react-calendar__tile {
+  .carefd-calendar .react-calendar__tile {
     padding: 10px 6px;
     font-size: 0.9em;
   }
 }
 
-.carelink-calendar .react-calendar__tile:enabled:hover,
-.carelink-calendar .react-calendar__tile:enabled:focus {
+.carefd-calendar .react-calendar__tile:enabled:hover,
+.carefd-calendar .react-calendar__tile:enabled:focus {
   background-color: #75D9D2;
   color: white;
 }
 
-.carelink-calendar .react-calendar__tile--active {
+.carefd-calendar .react-calendar__tile--active {
   background: #19B8BA;
   color: white;
   font-weight: 600;
 }
 
-.carelink-calendar .react-calendar__tile--active:enabled:hover,
-.carelink-calendar .react-calendar__tile--active:enabled:focus {
+.carefd-calendar .react-calendar__tile--active:enabled:hover,
+.carefd-calendar .react-calendar__tile--active:enabled:focus {
   background: #41C9C2;
 }
 
-.carelink-calendar .react-calendar__tile:disabled {
+.carefd-calendar .react-calendar__tile:disabled {
   background-color: #f3f4f6;
   color: #9ca3af;
   cursor: not-allowed;
 }
 
-.carelink-calendar .react-calendar__tile.booked-date {
+.carefd-calendar .react-calendar__tile.booked-date {
   background-color: #ACEDEA;
   color: #1E4D5F;
 }
 
-.carelink-calendar .react-calendar__month-view__days__day--weekend {
+.carefd-calendar .react-calendar__month-view__days__day--weekend {
   color: #19B8BA;
 }
 
-.carelink-calendar .react-calendar__tile--now {
+.carefd-calendar .react-calendar__tile--now {
   background: #ACEDEA;
   font-weight: 600;
 }
 
-.carelink-calendar .react-calendar__tile--now:enabled:hover,
-.carelink-calendar .react-calendar__tile--now:enabled:focus {
+.carefd-calendar .react-calendar__tile--now:enabled:hover,
+.carefd-calendar .react-calendar__tile--now:enabled:focus {
   background: #75D9D2;
   color: white;
 }

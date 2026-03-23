@@ -162,35 +162,35 @@ const ProvidersMap = ({
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-carelink-teal/20 flex items-center justify-center text-carelink-teal font-bold">
+                    <div className="w-10 h-10 rounded-full bg-carefd-teal/20 flex items-center justify-center text-carefd-teal font-bold">
                       {provider.name?.charAt(0)}
                     </div>
                   )}
                   <div>
-                    <strong className="text-carelink-navy">{provider.name}</strong>
-                    <p className="text-xs text-carelink-slate">{provider.profession_name || provider.profession}</p>
+                    <strong className="text-carefd-navy">{provider.name}</strong>
+                    <p className="text-xs text-carefd-slate">{provider.profession_name || provider.profession}</p>
                   </div>
                 </div>
 
                 <div className="text-sm space-y-1">
                   {provider.location?.city && (
-                    <p className="text-carelink-slate">📍 {provider.location.city}</p>
+                    <p className="text-carefd-slate">📍 {provider.location.city}</p>
                   )}
                   {provider.distance_km != null && (
-                    <p className="text-carelink-teal font-medium">
+                    <p className="text-carefd-teal font-medium">
                       🚗 {provider.distance_km} ק״מ ממך
                     </p>
                   )}
-                  {provider.rating > 0 && (
+                  {provider.rating != null && provider.rating > 0 && (
                     <p className="text-amber-500">
-                      ⭐ {provider.rating.toFixed(1)} ({provider.review_count} ביקורות)
+                      ⭐ {Number(provider.rating).toFixed(1)} ({provider.total_reviews || 0} ביקורות)
                     </p>
                   )}
                 </div>
 
                 <a
                   href={`/providers/${provider.provider_id}`}
-                  className="block mt-3 text-center bg-carelink-teal text-white py-1.5 px-3 rounded-lg text-sm font-medium hover:bg-carelink-teal/90 transition"
+                  className="block mt-3 text-center bg-carefd-teal text-white py-1.5 px-3 rounded-lg text-sm font-medium hover:bg-carefd-teal/90 transition"
                 >
                   צפה בפרופיל
                 </a>

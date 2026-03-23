@@ -89,10 +89,10 @@ const AdminServices = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-carelink-navy">ניהול שירותים</h1>
-            <p className="text-carelink-slate mt-1">{pagination.total} שירותים במערכת</p>
+            <h1 className="text-2xl font-bold text-carefd-navy">ניהול שירותים</h1>
+            <p className="text-carefd-slate mt-1">{pagination.total} שירותים במערכת</p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-carelink-slate rounded-lg hover:bg-gray-50 transition">
+          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-carefd-slate rounded-lg hover:bg-gray-50 transition">
             <FiDownload size={18} />
             ייצוא
           </button>
@@ -102,19 +102,19 @@ const AdminServices = () => {
         <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carelink-gray" size={18} />
+              <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carefd-gray" size={18} />
               <input
                 type="text"
                 placeholder="חפש לפי שם שירות, תיאור..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg pr-10 pl-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                className="w-full bg-gray-50 border border-gray-200 rounded-lg pr-10 pl-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
               />
             </div>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none min-w-[150px]"
+              className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none min-w-[150px]"
             >
               <option value="">כל הקטגוריות</option>
               <option value="medical">רפואה</option>
@@ -131,42 +131,42 @@ const AdminServices = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/50">
-                  <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">שירות</th>
-                  <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">ספק</th>
-                  <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">מחיר</th>
-                  <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">משך</th>
-                  <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">סוג</th>
-                  <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">סטטוס</th>
-                  <th className="text-right py-4 px-4 text-carelink-slate font-medium text-sm">פעולות</th>
+                  <th className="text-right py-4 px-4 text-carefd-slate font-medium text-sm">שירות</th>
+                  <th className="text-right py-4 px-4 text-carefd-slate font-medium text-sm">ספק</th>
+                  <th className="text-right py-4 px-4 text-carefd-slate font-medium text-sm">מחיר</th>
+                  <th className="text-right py-4 px-4 text-carefd-slate font-medium text-sm">משך</th>
+                  <th className="text-right py-4 px-4 text-carefd-slate font-medium text-sm">סוג</th>
+                  <th className="text-right py-4 px-4 text-carefd-slate font-medium text-sm">סטטוס</th>
+                  <th className="text-right py-4 px-4 text-carefd-slate font-medium text-sm">פעולות</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
                     <td colSpan={7} className="py-12 text-center">
-                      <div className="w-8 h-8 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
+                      <div className="w-8 h-8 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin mx-auto"></div>
                     </td>
                   </tr>
                 ) : services.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-carelink-gray">
+                    <td colSpan={7} className="py-12 text-center text-carefd-gray">
                       <FiPackage size={48} className="mx-auto mb-4 opacity-50" />
                       <p>לא נמצאו שירותים</p>
                     </td>
                   </tr>
                 ) : (
                   services.map((service) => (
-                    <tr key={service.service_id} className="border-b border-gray-50 hover:bg-carelink-teal-pale/10 transition">
+                    <tr key={service.service_id} className="border-b border-gray-50 hover:bg-carefd-teal-pale/10 transition">
                       <td className="py-4 px-4">
                         <div>
-                          <p className="text-carelink-navy font-medium">{service.name}</p>
-                          <p className="text-carelink-gray text-sm line-clamp-1">{service.description}</p>
+                          <p className="text-carefd-navy font-medium">{service.name}</p>
+                          <p className="text-carefd-gray text-sm line-clamp-1">{service.description}</p>
                         </div>
                       </td>
                       <td className="py-4 px-4">
                         <div>
-                          <p className="text-carelink-navy text-sm">{service.provider_name || 'לא ידוע'}</p>
-                          <p className="text-carelink-teal text-xs font-mono">{service.provider_number || ''}</p>
+                          <p className="text-carefd-navy text-sm">{service.provider_name || 'לא ידוע'}</p>
+                          <p className="text-carefd-teal text-xs font-mono">{service.provider_number || ''}</p>
                         </div>
                       </td>
                       <td className="py-4 px-4">
@@ -174,11 +174,11 @@ const AdminServices = () => {
                           {formatPrice(service.price, service.pricing_type)}
                         </span>
                       </td>
-                      <td className="py-4 px-4 text-carelink-slate text-sm">
+                      <td className="py-4 px-4 text-carefd-slate text-sm">
                         {service.duration ? `${service.duration} דקות` : '-'}
                       </td>
                       <td className="py-4 px-4">
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-carelink-slate rounded text-xs">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-carefd-slate rounded text-xs">
                           {getServiceTypeLabel(service.service_type)}
                         </span>
                       </td>
@@ -189,7 +189,7 @@ const AdminServices = () => {
                             פעיל
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-carelink-gray text-sm">
+                          <span className="inline-flex items-center gap-1 text-carefd-gray text-sm">
                             <FiX size={14} />
                             לא פעיל
                           </span>
@@ -199,14 +199,14 @@ const AdminServices = () => {
                         <div className="flex items-center gap-2">
                           <button 
                             onClick={() => setShowEditModal(service)}
-                            className="p-2 text-carelink-slate hover:text-carelink-navy hover:bg-gray-100 rounded-lg transition"
+                            className="p-2 text-carefd-slate hover:text-carefd-navy hover:bg-gray-100 rounded-lg transition"
                             title="ערוך"
                           >
                             <FiEdit2 size={16} />
                           </button>
                           <button 
                             onClick={() => setShowDeleteModal(service)}
-                            className="p-2 text-carelink-slate hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                            className="p-2 text-carefd-slate hover:text-red-500 hover:bg-red-50 rounded-lg transition"
                             title="מחק"
                           >
                             <FiTrash2 size={16} />
@@ -223,21 +223,21 @@ const AdminServices = () => {
           {/* Pagination */}
           {pagination.total > pagination.limit && (
             <div className="p-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
-              <p className="text-carelink-slate text-sm">
+              <p className="text-carefd-slate text-sm">
                 מציג {(pagination.page - 1) * pagination.limit + 1} - {Math.min(pagination.page * pagination.limit, pagination.total)} מתוך {pagination.total}
               </p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                   disabled={pagination.page === 1}
-                  className="px-4 py-2 bg-white border border-gray-200 text-carelink-navy rounded-lg hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-white border border-gray-200 text-carefd-navy rounded-lg hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   הקודם
                 </button>
                 <button
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                   disabled={pagination.page * pagination.limit >= pagination.total}
-                  className="px-4 py-2 bg-white border border-gray-200 text-carelink-navy rounded-lg hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-white border border-gray-200 text-carefd-navy rounded-lg hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   הבא
                 </button>
@@ -260,15 +260,15 @@ const AdminServices = () => {
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-200 shadow-xl">
-            <h3 className="text-lg font-bold text-carelink-navy mb-2">מחיקת שירות</h3>
-            <p className="text-carelink-slate mb-6">
+            <h3 className="text-lg font-bold text-carefd-navy mb-2">מחיקת שירות</h3>
+            <p className="text-carefd-slate mb-6">
               האם אתה בטוח שברצונך למחוק את השירות "{showDeleteModal.name}"? 
               פעולה זו לא ניתנת לביטול.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteModal(null)}
-                className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition"
               >
                 ביטול
               </button>
@@ -308,43 +308,43 @@ const EditServiceModal = ({ service, onClose, onSave }) => {
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl w-full max-w-lg p-6 border border-gray-200 shadow-xl">
-        <h3 className="text-lg font-bold text-carelink-navy mb-4">עריכת שירות</h3>
+        <h3 className="text-lg font-bold text-carefd-navy mb-4">עריכת שירות</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-carelink-navy mb-1">שם השירות</label>
+            <label className="block text-sm font-medium text-carefd-navy mb-1">שם השירות</label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-carelink-navy mb-1">תיאור</label>
+            <label className="block text-sm font-medium text-carefd-navy mb-1">תיאור</label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none resize-none"
+              className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none resize-none"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-carelink-navy mb-1">מחיר (₪)</label>
+              <label className="block text-sm font-medium text-carefd-navy mb-1">מחיר (₪)</label>
               <input
                 type="number"
                 value={formData.price}
                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-carelink-navy mb-1">משך (דקות)</label>
+              <label className="block text-sm font-medium text-carefd-navy mb-1">משך (דקות)</label>
               <input
                 type="number"
                 value={formData.duration}
                 onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
               />
             </div>
           </div>
@@ -354,21 +354,21 @@ const EditServiceModal = ({ service, onClose, onSave }) => {
               id="is_active"
               checked={formData.is_active}
               onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-              className="w-4 h-4 rounded border-gray-300 text-carelink-teal focus:ring-carelink-teal"
+              className="w-4 h-4 rounded border-gray-300 text-carefd-teal focus:ring-carefd-teal"
             />
-            <label htmlFor="is_active" className="text-sm text-carelink-navy">שירות פעיל</label>
+            <label htmlFor="is_active" className="text-sm text-carefd-navy">שירות פעיל</label>
           </div>
           <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+              className="flex-1 px-4 py-2.5 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition"
             >
               ביטול
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2.5 bg-carelink-teal text-white rounded-lg hover:bg-carelink-teal/90 transition"
+              className="flex-1 px-4 py-2.5 bg-carefd-teal text-white rounded-lg hover:bg-carefd-teal/90 transition"
             >
               שמור
             </button>

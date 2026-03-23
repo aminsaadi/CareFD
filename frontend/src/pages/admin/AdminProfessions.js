@@ -185,8 +185,8 @@ const AdminProfessions = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-carelink-navy">מקצועות וקטגוריות</h1>
-            <p className="text-carelink-slate mt-1">ניהול מקצועות, התמחויות וקטגוריות שירות</p>
+            <h1 className="text-2xl font-bold text-carefd-navy">מקצועות וקטגוריות</h1>
+            <p className="text-carefd-slate mt-1">ניהול מקצועות, התמחויות וקטגוריות שירות</p>
           </div>
         </div>
 
@@ -196,8 +196,8 @@ const AdminProfessions = () => {
             onClick={() => { setActiveTab('professions'); setExpandedProfession(null); }}
             className={`px-4 py-3 font-medium border-b-2 transition ${
               activeTab === 'professions'
-                ? 'text-carelink-teal border-carelink-teal'
-                : 'text-carelink-slate border-transparent hover:text-carelink-navy'
+                ? 'text-carefd-teal border-carefd-teal'
+                : 'text-carefd-slate border-transparent hover:text-carefd-navy'
             }`}
           >
             <FiBriefcase className="inline-block ml-2" />
@@ -207,8 +207,8 @@ const AdminProfessions = () => {
             onClick={() => { setActiveTab('categories'); setExpandedProfession(null); }}
             className={`px-4 py-3 font-medium border-b-2 transition ${
               activeTab === 'categories'
-                ? 'text-carelink-teal border-carelink-teal'
-                : 'text-carelink-slate border-transparent hover:text-carelink-navy'
+                ? 'text-carefd-teal border-carefd-teal'
+                : 'text-carefd-slate border-transparent hover:text-carefd-navy'
             }`}
           >
             <FiGrid className="inline-block ml-2" />
@@ -219,13 +219,13 @@ const AdminProfessions = () => {
         {/* Search */}
         <div className="bg-white rounded-xl p-4 border border-gray-100">
           <div className="relative">
-            <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carelink-slate" size={18} />
+            <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-carefd-slate" size={18} />
             <input
               type="text"
               placeholder={activeTab === 'professions' ? 'חפש מקצוע...' : 'חפש קטגוריה...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg pr-10 pl-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg pr-10 pl-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
               data-testid="search-profession-input"
             />
           </div>
@@ -236,9 +236,9 @@ const AdminProfessions = () => {
           <>
             {/* Add Button */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-6 flex-wrap text-sm text-carelink-slate">
+              <div className="flex items-center gap-6 flex-wrap text-sm text-carefd-slate">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-carelink-teal rounded"></div>
+                  <div className="w-4 h-4 bg-carefd-teal rounded"></div>
                   <span>מקצוע</span>
                 </div>
                 <FiChevronRight className="text-slate-600" />
@@ -249,7 +249,7 @@ const AdminProfessions = () => {
               </div>
               <button
                 onClick={() => setShowAddModal('profession')}
-                className="flex items-center gap-2 px-4 py-2 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition"
+                className="flex items-center gap-2 px-4 py-2 bg-carefd-teal text-carefd-navy rounded-lg hover:bg-carefd-teal/90 transition"
                 data-testid="add-profession-btn"
               >
                 <FiPlus size={18} />
@@ -261,12 +261,12 @@ const AdminProfessions = () => {
             <div className="space-y-3">
               {loading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="w-10 h-10 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-10 h-10 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
                 </div>
               ) : filteredProfessions.length === 0 ? (
                 <div className="bg-white rounded-xl p-12 text-center border border-gray-100">
                   <FiBriefcase className="mx-auto text-slate-600 mb-4" size={48} />
-                  <p className="text-carelink-slate">לא נמצאו מקצועות</p>
+                  <p className="text-carefd-slate">לא נמצאו מקצועות</p>
                 </div>
               ) : (
                 filteredProfessions.map((profession) => (
@@ -277,12 +277,12 @@ const AdminProfessions = () => {
                       onClick={() => setExpandedProfession(expandedProfession === profession.profession_id ? null : profession.profession_id)}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-carelink-teal/20 rounded-lg flex items-center justify-center">
-                          <FiBriefcase className="text-carelink-teal" size={20} />
+                        <div className="w-10 h-10 bg-carefd-teal/20 rounded-lg flex items-center justify-center">
+                          <FiBriefcase className="text-carefd-teal" size={20} />
                         </div>
                         <div>
-                          <h3 className="text-carelink-navy font-medium">{profession.name}</h3>
-                          <p className="text-carelink-slate text-sm">
+                          <h3 className="text-carefd-navy font-medium">{profession.name}</h3>
+                          <p className="text-carefd-slate text-sm">
                             {profession.name_en}
                             {profession.specializations?.length > 0 && ` • ${profession.specializations.length} התמחויות`}
                           </p>
@@ -294,7 +294,7 @@ const AdminProfessions = () => {
                             e.stopPropagation();
                             openEditModal('profession', profession);
                           }}
-                          className="p-2 text-carelink-slate hover:text-carelink-teal hover:bg-carelink-teal/10 rounded-lg transition"
+                          className="p-2 text-carefd-slate hover:text-carefd-teal hover:bg-carefd-teal/10 rounded-lg transition"
                           title="ערוך מקצוע"
                         >
                           <FiEdit2 size={18} />
@@ -304,13 +304,13 @@ const AdminProfessions = () => {
                             e.stopPropagation();
                             deleteItem('professions', profession.profession_id, profession.name);
                           }}
-                          className="p-2 text-carelink-slate hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
+                          className="p-2 text-carefd-slate hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
                           title="מחק מקצוע"
                         >
                           <FiTrash2 size={18} />
                         </button>
                         <FiChevronDown
-                          className={`text-carelink-slate transition-transform ${expandedProfession === profession.profession_id ? 'rotate-180' : ''}`}
+                          className={`text-carefd-slate transition-transform ${expandedProfession === profession.profession_id ? 'rotate-180' : ''}`}
                           size={20}
                         />
                       </div>
@@ -321,7 +321,7 @@ const AdminProfessions = () => {
                       <div className="border-t border-gray-100 p-4 bg-gray-50/50">
                         {profession.specializations?.length > 0 ? (
                           <>
-                            <p className="text-carelink-slate text-sm mb-3 font-medium">התמחויות:</p>
+                            <p className="text-carefd-slate text-sm mb-3 font-medium">התמחויות:</p>
                             <div className="flex flex-wrap gap-2">
                               {profession.specializations.map((spec, idx) => (
                                 <span key={idx} className="px-3 py-1.5 bg-purple-100 text-purple-700 border border-purple-200 rounded-full text-sm font-medium">
@@ -331,7 +331,7 @@ const AdminProfessions = () => {
                             </div>
                           </>
                         ) : (
-                          <p className="text-carelink-gray text-sm">אין התמחויות מוגדרות. ערוך את המקצוע להוספת התמחויות.</p>
+                          <p className="text-carefd-gray text-sm">אין התמחויות מוגדרות. ערוך את המקצוע להוספת התמחויות.</p>
                         )}
                       </div>
                     )}
@@ -346,9 +346,9 @@ const AdminProfessions = () => {
         {activeTab === 'categories' && (
           <>
             {/* Guide */}
-            <div className="flex items-center gap-6 flex-wrap text-sm text-carelink-slate">
+            <div className="flex items-center gap-6 flex-wrap text-sm text-carefd-slate">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-carelink-teal rounded"></div>
+                <div className="w-4 h-4 bg-carefd-teal rounded"></div>
                 <span>קטגוריה (מקצוע)</span>
               </div>
               <FiChevronRight className="text-slate-600" />
@@ -367,12 +367,12 @@ const AdminProfessions = () => {
             <div className="space-y-3">
               {loading ? (
                 <div className="flex items-center justify-center py-12">
-                  <div className="w-10 h-10 border-4 border-carelink-teal border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-10 h-10 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
                 </div>
               ) : filteredProfessions.length === 0 ? (
                 <div className="bg-white rounded-xl p-12 text-center border border-gray-100">
                   <FiGrid className="mx-auto text-slate-600 mb-4" size={48} />
-                  <p className="text-carelink-slate">לא נמצאו קטגוריות</p>
+                  <p className="text-carefd-slate">לא נמצאו קטגוריות</p>
                 </div>
               ) : (
                 filteredProfessions.map((profession) => (
@@ -383,12 +383,12 @@ const AdminProfessions = () => {
                       onClick={() => setExpandedProfession(expandedProfession === profession.profession_id ? null : profession.profession_id)}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-carelink-teal/20 rounded-lg flex items-center justify-center">
-                          <FiGrid className="text-carelink-teal" size={20} />
+                        <div className="w-10 h-10 bg-carefd-teal/20 rounded-lg flex items-center justify-center">
+                          <FiGrid className="text-carefd-teal" size={20} />
                         </div>
                         <div>
-                          <h3 className="text-carelink-navy font-medium">{profession.name}</h3>
-                          <p className="text-carelink-slate text-sm">
+                          <h3 className="text-carefd-navy font-medium">{profession.name}</h3>
+                          <p className="text-carefd-slate text-sm">
                             {profession.name_en} • {profession.sub_professions?.length || 0} תתי-קטגוריות
                           </p>
                         </div>
@@ -400,13 +400,13 @@ const AdminProfessions = () => {
                             setSelectedParent(profession.profession_id);
                             setShowAddModal('sub');
                           }}
-                          className="p-2 text-carelink-slate hover:text-purple-500 hover:bg-purple-500/10 rounded-lg transition"
+                          className="p-2 text-carefd-slate hover:text-purple-500 hover:bg-purple-500/10 rounded-lg transition"
                           title="הוסף תת-קטגוריה"
                         >
                           <FiPlus size={18} />
                         </button>
                         <FiChevronDown
-                          className={`text-carelink-slate transition-transform ${expandedProfession === profession.profession_id ? 'rotate-180' : ''}`}
+                          className={`text-carefd-slate transition-transform ${expandedProfession === profession.profession_id ? 'rotate-180' : ''}`}
                           size={20}
                         />
                       </div>
@@ -416,7 +416,7 @@ const AdminProfessions = () => {
                     {expandedProfession === profession.profession_id && (
                       <div className="border-t border-gray-100">
                         {profession.sub_professions?.length === 0 ? (
-                          <div className="p-4 text-center text-carelink-gray">
+                          <div className="p-4 text-center text-carefd-gray">
                             אין תתי-קטגוריות. לחץ על + להוספה.
                           </div>
                         ) : (
@@ -432,8 +432,8 @@ const AdminProfessions = () => {
                                     <FiTag className="text-purple-500" size={16} />
                                   </div>
                                   <div>
-                                    <h4 className="text-carelink-navy text-sm font-medium">{subProf.name}</h4>
-                                    <p className="text-carelink-gray text-xs">{subProf.name_en} • {subProf.categories?.length || 0} שירותים</p>
+                                    <h4 className="text-carefd-navy text-sm font-medium">{subProf.name}</h4>
+                                    <p className="text-carefd-gray text-xs">{subProf.name_en} • {subProf.categories?.length || 0} שירותים</p>
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -442,7 +442,7 @@ const AdminProfessions = () => {
                                       e.stopPropagation();
                                       openEditModal('sub', subProf);
                                     }}
-                                    className="p-1.5 text-carelink-slate hover:text-purple-500 hover:bg-purple-500/10 rounded-lg transition"
+                                    className="p-1.5 text-carefd-slate hover:text-purple-500 hover:bg-purple-500/10 rounded-lg transition"
                                     title="ערוך"
                                   >
                                     <FiEdit2 size={16} />
@@ -453,7 +453,7 @@ const AdminProfessions = () => {
                                       setSelectedParent(subProf.sub_profession_id);
                                       setShowAddModal('category');
                                     }}
-                                    className="p-1.5 text-carelink-slate hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition"
+                                    className="p-1.5 text-carefd-slate hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition"
                                     title="הוסף שירות"
                                   >
                                     <FiPlus size={16} />
@@ -463,13 +463,13 @@ const AdminProfessions = () => {
                                       e.stopPropagation();
                                       deleteItem('sub-professions', subProf.sub_profession_id, subProf.name);
                                     }}
-                                    className="p-1.5 text-carelink-slate hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
+                                    className="p-1.5 text-carefd-slate hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
                                     title="מחק"
                                   >
                                     <FiTrash2 size={16} />
                                   </button>
                                   <FiChevronDown
-                                    className={`text-carelink-slate transition-transform ${expandedSubProfession === subProf.sub_profession_id ? 'rotate-180' : ''}`}
+                                    className={`text-carefd-slate transition-transform ${expandedSubProfession === subProf.sub_profession_id ? 'rotate-180' : ''}`}
                                     size={16}
                                   />
                                 </div>
@@ -479,7 +479,7 @@ const AdminProfessions = () => {
                               {expandedSubProfession === subProf.sub_profession_id && (
                                 <div className="pr-16 pb-4">
                                   {subProf.categories?.length === 0 ? (
-                                    <p className="text-carelink-gray text-sm py-2">אין שירותים</p>
+                                    <p className="text-carefd-gray text-sm py-2">אין שירותים</p>
                                   ) : (
                                     <div className="flex flex-wrap gap-2">
                                       {subProf.categories?.map((cat) => (
@@ -519,61 +519,61 @@ const AdminProfessions = () => {
       {showAddModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-100">
-            <h3 className="text-lg font-bold text-carelink-navy mb-4">
+            <h3 className="text-lg font-bold text-carefd-navy mb-4">
               {showAddModal === 'profession' && 'הוסף מקצוע חדש'}
               {showAddModal === 'sub' && 'הוסף תת-קטגוריה'}
               {showAddModal === 'category' && 'הוסף שירות'}
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-carelink-slate mb-1">שם בעברית *</label>
+                <label className="block text-sm text-carefd-slate mb-1">שם בעברית *</label>
                 <input
                   type="text"
                   value={newItemName}
                   onChange={(e) => setNewItemName(e.target.value)}
                   placeholder="הזן שם..."
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                   data-testid="new-item-name"
                 />
               </div>
               <div>
-                <label className="block text-sm text-carelink-slate mb-1">שם באנגלית</label>
+                <label className="block text-sm text-carefd-slate mb-1">שם באנגלית</label>
                 <input
                   type="text"
                   value={newItemNameEn}
                   onChange={(e) => setNewItemNameEn(e.target.value)}
                   placeholder="Enter name..."
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                   dir="ltr"
                   data-testid="new-item-name-en"
                 />
               </div>
               {showAddModal === 'profession' && (
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-1">התמחויות (מופרדות בפסיקים)</label>
+                  <label className="block text-sm text-carefd-slate mb-1">התמחויות (מופרדות בפסיקים)</label>
                   <input
                     type="text"
                     value={newSpecializations}
                     onChange={(e) => setNewSpecializations(e.target.value)}
                     placeholder="התמחות 1, התמחות 2, התמחות 3..."
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                     data-testid="new-item-specializations"
                   />
-                  <p className="text-xs text-carelink-gray mt-1">ההתמחויות יוצגו כאופציות בפרופיל הספק</p>
+                  <p className="text-xs text-carefd-gray mt-1">ההתמחויות יוצגו כאופציות בפרופיל הספק</p>
                 </div>
               )}
             </div>
             <div className="flex gap-3 mt-6">
               <button
                 onClick={closeAddModal}
-                className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition"
               >
                 ביטול
               </button>
               <button
                 onClick={addItem}
                 disabled={!newItemName.trim() || saving}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-carefd-teal text-carefd-navy rounded-lg hover:bg-carefd-teal/90 transition disabled:opacity-50"
                 data-testid="confirm-add-btn"
               >
                 {saving ? <FiLoader className="animate-spin" size={18} /> : <FiPlus size={18} />}
@@ -588,56 +588,56 @@ const AdminProfessions = () => {
       {showEditModal && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-100">
-            <h3 className="text-lg font-bold text-carelink-navy mb-4">
+            <h3 className="text-lg font-bold text-carefd-navy mb-4">
               {showEditModal.type === 'profession' ? 'עריכת מקצוע' : 'עריכת תת-קטגוריה'}
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-carelink-slate mb-1">שם בעברית *</label>
+                <label className="block text-sm text-carefd-slate mb-1">שם בעברית *</label>
                 <input
                   type="text"
                   value={newItemName}
                   onChange={(e) => setNewItemName(e.target.value)}
                   placeholder="הזן שם..."
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                 />
               </div>
               <div>
-                <label className="block text-sm text-carelink-slate mb-1">שם באנגלית</label>
+                <label className="block text-sm text-carefd-slate mb-1">שם באנגלית</label>
                 <input
                   type="text"
                   value={newItemNameEn}
                   onChange={(e) => setNewItemNameEn(e.target.value)}
                   placeholder="Enter name..."
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                   dir="ltr"
                 />
               </div>
               {showEditModal.type === 'profession' && (
                 <div>
-                  <label className="block text-sm text-carelink-slate mb-1">התמחויות (מופרדות בפסיקים)</label>
+                  <label className="block text-sm text-carefd-slate mb-1">התמחויות (מופרדות בפסיקים)</label>
                   <input
                     type="text"
                     value={newSpecializations}
                     onChange={(e) => setNewSpecializations(e.target.value)}
                     placeholder="התמחות 1, התמחות 2, התמחות 3..."
-                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carelink-navy placeholder-carelink-gray focus:border-carelink-teal focus:ring-1 focus:ring-carelink-teal outline-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 text-carefd-navy placeholder-carefd-gray focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                   />
-                  <p className="text-xs text-carelink-gray mt-1">ההתמחויות יוצגו כאופציות בפרופיל הספק</p>
+                  <p className="text-xs text-carefd-gray mt-1">ההתמחויות יוצגו כאופציות בפרופיל הספק</p>
                 </div>
               )}
             </div>
             <div className="flex gap-3 mt-6">
               <button
                 onClick={closeEditModal}
-                className="flex-1 px-4 py-2.5 bg-gray-100 text-carelink-navy rounded-lg hover:bg-gray-200 transition"
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition"
               >
                 ביטול
               </button>
               <button
                 onClick={updateItem}
                 disabled={!newItemName.trim() || saving}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-carelink-teal text-carelink-navy rounded-lg hover:bg-carelink-teal/90 transition disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-carefd-teal text-carefd-navy rounded-lg hover:bg-carefd-teal/90 transition disabled:opacity-50"
               >
                 {saving ? <FiLoader className="animate-spin" size={18} /> : <FiSave size={18} />}
                 שמור

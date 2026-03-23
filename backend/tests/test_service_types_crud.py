@@ -21,7 +21,7 @@ def api_client():
 def admin_token(api_client):
     """Get admin authentication token"""
     response = api_client.post(f"{BASE_URL}/api/auth/login", json={
-        "email": "admin@carelink.co.il",
+        "email": "admin@carefd.com",
         "password": "password"
     })
     if response.status_code == 200:

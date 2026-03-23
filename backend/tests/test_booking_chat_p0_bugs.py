@@ -5,9 +5,9 @@ Testing the following fixes:
 2. Chat messages and rooms - other_user enrichment fixed, unread_count now computed
 
 Test credentials:
-- User: user@carelink.co.il / password  
-- Provider: provider@carelink.co.il / password
-- Admin: admin@carelink.co.il / password
+- User: user@carefd.com / password  
+- Provider: provider@carefd.com / password
+- Admin: admin@carefd.com / password
 
 Test service: srv_2d5267fcaebb (home_visit type)
 Existing chat room: room_e5afd083284f
@@ -18,7 +18,7 @@ import requests
 import os
 from datetime import datetime, timedelta
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://carelink-preview-5.preview.emergentagent.com').rstrip('/')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://carefd-preview-5.preview.emergentagent.com').rstrip('/')
 
 # Test service ID for home_visit service
 TEST_SERVICE_ID = "srv_2d5267fcaebb"
@@ -32,7 +32,7 @@ class TestAuthentication:
     def user_session(self):
         """Login as user and return session token"""
         response = requests.post(f"{BASE_URL}/api/auth/login", json={
-            "email": "user@carelink.co.il",
+            "email": "user@carefd.com",
             "password": "password"
         })
         assert response.status_code == 200, f"User login failed: {response.text}"
@@ -47,7 +47,7 @@ class TestAuthentication:
     def provider_session(self):
         """Login as provider and return session token"""
         response = requests.post(f"{BASE_URL}/api/auth/login", json={
-            "email": "provider@carelink.co.il",
+            "email": "provider@carefd.com",
             "password": "password"
         })
         assert response.status_code == 200, f"Provider login failed: {response.text}"
@@ -61,13 +61,13 @@ class TestAuthentication:
     def test_user_login(self, user_session):
         """Test user login returns session_token"""
         assert user_session["token"] is not None
-        assert user_session["user"]["email"] == "user@carelink.co.il"
+        assert user_session["user"]["email"] == "user@carefd.com"
         print(f"User logged in successfully: {user_session['user']['user_id']}")
     
     def test_provider_login(self, provider_session):
         """Test provider login returns session_token"""
         assert provider_session["token"] is not None
-        assert provider_session["user"]["email"] == "provider@carelink.co.il"
+        assert provider_session["user"]["email"] == "provider@carefd.com"
         print(f"Provider logged in successfully: {provider_session['user']['user_id']}")
 
 
@@ -78,7 +78,7 @@ class TestBookingFlowP0Fix:
     def user_session(self):
         """Login as user and return session token"""
         response = requests.post(f"{BASE_URL}/api/auth/login", json={
-            "email": "user@carelink.co.il",
+            "email": "user@carefd.com",
             "password": "password"
         })
         assert response.status_code == 200, f"User login failed: {response.text}"
@@ -256,7 +256,7 @@ class TestChatFlowP0Fix:
     def user_session(self):
         """Login as user"""
         response = requests.post(f"{BASE_URL}/api/auth/login", json={
-            "email": "user@carelink.co.il",
+            "email": "user@carefd.com",
             "password": "password"
         })
         assert response.status_code == 200
@@ -267,7 +267,7 @@ class TestChatFlowP0Fix:
     def provider_session(self):
         """Login as provider"""
         response = requests.post(f"{BASE_URL}/api/auth/login", json={
-            "email": "provider@carelink.co.il",
+            "email": "provider@carefd.com",
             "password": "password"
         })
         assert response.status_code == 200

@@ -84,34 +84,85 @@ export const healthFunds = [
   { id: 'private', name: 'פרטי', color: '#6b7280' }
 ];
 
-// Professions/Occupations for healthcare
+// Professions/Occupations for healthcare - synced with DB professions hierarchy
 export const healthcareProfessions = [
-  { id: 'nurse', name: 'אחות/אח', searchTerms: ['אחות', 'אח', 'סיעוד', 'אחות מוסמכת', 'אחות מעשית'] },
-  { id: 'doctor', name: 'רופא/ה', searchTerms: ['רופא', 'רופאה', 'דוקטור', 'מומחה'] },
-  { id: 'family_doctor', name: 'רופא משפחה', searchTerms: ['רופא משפחה', 'רופא כללי', 'רפואה משפחתית'] },
-  { id: 'pediatrician', name: 'רופא ילדים', searchTerms: ['רופא ילדים', 'פדיאטר', 'רפואת ילדים'] },
-  { id: 'physiotherapist', name: 'פיזיותרפיסט/ית', searchTerms: ['פיזיותרפיה', 'פיזיותרפיסט', 'שיקום'] },
-  { id: 'occupational_therapist', name: 'מרפא/ה בעיסוק', searchTerms: ['ריפוי בעיסוק', 'מרפא בעיסוק', 'OT'] },
-  { id: 'speech_therapist', name: 'קלינאי/ת תקשורת', searchTerms: ['קלינאי תקשורת', 'דיבור', 'תקשורת'] },
-  { id: 'psychologist', name: 'פסיכולוג/ית', searchTerms: ['פסיכולוג', 'פסיכולוגיה', 'טיפול נפשי'] },
-  { id: 'social_worker', name: 'עובד/ת סוציאלי/ת', searchTerms: ['עובד סוציאלי', 'עבודה סוציאלית'] },
-  { id: 'dietitian', name: 'דיאטן/ית', searchTerms: ['דיאטה', 'דיאטנית', 'תזונה', 'יועץ תזונה'] },
-  { id: 'caregiver', name: 'מטפל/ת סיעודי/ת', searchTerms: ['מטפל', 'מטפלת', 'טיפול סיעודי', 'עזרה בבית'] },
-  { id: 'massage_therapist', name: 'מעסה/ית', searchTerms: ['עיסוי', 'מעסה', 'עיסוי רפואי'] },
-  { id: 'geriatric_nurse', name: 'אחות גריאטרית', searchTerms: ['גריאטריה', 'קשישים', 'גיל שלישי'] },
-  { id: 'midwife', name: 'מיילדת', searchTerms: ['מיילדת', 'לידה', 'היריון', 'אחות מיילדת'] },
-  { id: 'dentist', name: 'רופא/ת שיניים', searchTerms: ['רופא שיניים', 'שיניים', 'דנטלי'] },
-  { id: 'optometrist', name: 'אופטומטריסט/ית', searchTerms: ['אופטומטריה', 'ראייה', 'משקפיים', 'עיניים'] },
-  { id: 'podiatrist', name: 'פודיאטר/ית', searchTerms: ['פודיאטריה', 'כף רגל', 'רגליים'] },
-  { id: 'chiropractor', name: 'כירופרקט/ית', searchTerms: ['כירופרקטיקה', 'עמוד שדרה', 'גב'] },
+  // רפואה (Medicine)
+  { id: 'prof_medicine', name: 'רפואה', searchTerms: ['רופא', 'רופאה', 'רפואה', 'דוקטור', 'מומחה'] },
+  { id: 'sub_family_med', name: 'רופא/ת משפחה', searchTerms: ['רופא משפחה', 'רופא כללי', 'רפואה משפחתית'] },
+  { id: 'sub_pediatrics', name: 'רופא/ת ילדים', searchTerms: ['רופא ילדים', 'פדיאטר', 'רפואת ילדים'] },
+  { id: 'sub_geriatrics', name: 'גריאטריה', searchTerms: ['גריאטריה', 'קשישים', 'גיל שלישי'] },
+  { id: 'sub_internal', name: 'רפואה פנימית', searchTerms: ['רפואה פנימית', 'פנימאי'] },
+  { id: 'sub_surgery', name: 'כירורגיה', searchTerms: ['כירורגיה', 'כירורג', 'ניתוח'] },
+  { id: 'sub_orthopedics', name: 'אורתופדיה', searchTerms: ['אורתופדיה', 'אורתופד', 'עצמות'] },
+  { id: 'sub_cardiology', name: 'קרדיולוגיה', searchTerms: ['קרדיולוגיה', 'קרדיולוג', 'לב'] },
+  { id: 'sub_neurology', name: 'נוירולוגיה', searchTerms: ['נוירולוגיה', 'נוירולוג', 'מוח', 'עצבים'] },
+  { id: 'sub_dermatology', name: 'עור ומין', searchTerms: ['עור', 'דרמטולוגיה', 'דרמטולוג'] },
+  { id: 'sub_ent', name: 'אף אוזן גרון', searchTerms: ['אף אוזן גרון', 'אא"ג'] },
+  { id: 'sub_ophthalmology', name: 'רפואת עיניים', searchTerms: ['עיניים', 'רופא עיניים', 'אופתלמולוג'] },
+  { id: 'sub_oncology', name: 'אונקולוגיה', searchTerms: ['אונקולוגיה', 'אונקולוג', 'סרטן'] },
+  { id: 'sub_urology', name: 'אורולוגיה', searchTerms: ['אורולוגיה', 'אורולוג'] },
+  { id: 'sub_gynecology', name: 'גינקולוגיה', searchTerms: ['גינקולוגיה', 'גינקולוג', 'נשים'] },
+  { id: 'sub_endocrinology', name: 'אנדוקרינולוגיה', searchTerms: ['אנדוקרינולוגיה', 'הורמונים', 'סוכרת'] },
+  { id: 'sub_gastroenterology', name: 'גסטרואנטרולוגיה', searchTerms: ['גסטרואנטרולוגיה', 'קיבה', 'מעיים'] },
+  { id: 'sub_pulmonology', name: 'ריאות', searchTerms: ['ריאות', 'ריאתי', 'נשימה'] },
+  { id: 'sub_rheumatology', name: 'ראומטולוגיה', searchTerms: ['ראומטולוגיה', 'מפרקים', 'שגרון'] },
+  // אחיות (Nursing)
+  { id: 'prof_nursing', name: 'אחיות/סיעוד', searchTerms: ['אחות', 'אח', 'סיעוד', 'אחות מוסמכת', 'אחות מעשית'] },
+  { id: 'sub_home_care', name: 'סיעוד ביתי', searchTerms: ['סיעוד ביתי', 'טיפול בבית', 'אחות בית'] },
+  { id: 'sub_elderly_care', name: 'טיפול בקשישים', searchTerms: ['טיפול בקשישים', 'סיעוד קשישים'] },
+  { id: 'sub_post_op', name: 'סיעוד אחרי ניתוח', searchTerms: ['אחרי ניתוח', 'סיעוד לאחר ניתוח'] },
+  { id: 'sub_palliative', name: 'טיפול פליאטיבי', searchTerms: ['פליאטיבי', 'טיפול תומך', 'הוספיס'] },
+  { id: 'sub_child_nursing', name: 'סיעוד ילדים', searchTerms: ['סיעוד ילדים', 'אחות ילדים'] },
+  // רפואת שיניים (Dentistry)
+  { id: 'prof_dental', name: 'רפואת שיניים', searchTerms: ['רופא שיניים', 'שיניים', 'דנטלי'] },
+  { id: 'sub_orthodontics', name: 'אורתודונטיה', searchTerms: ['אורתודונטיה', 'יישור שיניים', 'גשר'] },
+  { id: 'sub_periodontics', name: 'פריודונטיה', searchTerms: ['פריודונטיה', 'חניכיים', 'שתלים'] },
+  { id: 'sub_endodontics', name: 'אנדודונטיה', searchTerms: ['אנדודונטיה', 'טיפול שורש'] },
+  { id: 'sub_child_dental', name: 'רפואת שיניים לילדים', searchTerms: ['שיניים ילדים', 'רופא שיניים ילדים'] },
+  // טיפולי שיקום (Rehabilitation)
+  { id: 'prof_therapy', name: 'טיפולי שיקום', searchTerms: ['שיקום', 'טיפולי שיקום'] },
+  { id: 'sub_physio', name: 'פיזיותרפיסט/ית', searchTerms: ['פיזיותרפיה', 'פיזיותרפיסט', 'שיקום'] },
+  { id: 'sub_occupational', name: 'מרפא/ה בעיסוק', searchTerms: ['ריפוי בעיסוק', 'מרפא בעיסוק', 'OT'] },
+  { id: 'sub_speech', name: 'קלינאי/ת תקשורת', searchTerms: ['קלינאי תקשורת', 'דיבור', 'תקשורת'] },
+  { id: 'sub_podiatry', name: 'פודיאטר/ית', searchTerms: ['פודיאטריה', 'כף רגל', 'רגליים'] },
+  { id: 'sub_chiropractic', name: 'כירופרקט/ית', searchTerms: ['כירופרקטיקה', 'עמוד שדרה', 'גב'] },
+  // בריאות הנפש (Mental Health)
+  { id: 'prof_mental', name: 'בריאות הנפש', searchTerms: ['בריאות הנפש', 'נפשי', 'פסיכו'] },
+  { id: 'sub_clinical_psych', name: 'פסיכולוג/ית קליני/ת', searchTerms: ['פסיכולוג', 'פסיכולוגיה', 'טיפול נפשי'] },
+  { id: 'sub_psychiatry', name: 'פסיכיאטר/ית', searchTerms: ['פסיכיאטר', 'פסיכיאטריה'] },
+  { id: 'sub_couple_family', name: 'טיפול זוגי ומשפחתי', searchTerms: ['טיפול זוגי', 'טיפול משפחתי', 'ייעוץ זוגי'] },
+  { id: 'sub_child_psych', name: 'פסיכולוגיית ילדים', searchTerms: ['פסיכולוג ילדים', 'ADHD', 'אוטיזם'] },
+  { id: 'sub_social_work', name: 'עובד/ת סוציאלי/ת', searchTerms: ['עובד סוציאלי', 'עבודה סוציאלית'] },
+  // תזונה ודיאטה (Nutrition)
+  { id: 'prof_nutrition', name: 'תזונה ודיאטה', searchTerms: ['דיאטה', 'דיאטנית', 'תזונה', 'יועץ תזונה'] },
+  { id: 'sub_clinical_diet', name: 'דיאטה קלינית', searchTerms: ['דיאטה קלינית', 'תזונה קלינית'] },
+  { id: 'sub_sports_nutrition', name: 'תזונת ספורט', searchTerms: ['תזונת ספורט', 'ספורטאים'] },
+  { id: 'sub_eating_disorders', name: 'הפרעות אכילה', searchTerms: ['הפרעות אכילה', 'אנורקסיה', 'בולימיה'] },
+  // רפואה משלימה (Alternative Medicine)
+  { id: 'prof_alternative', name: 'רפואה משלימה', searchTerms: ['רפואה משלימה', 'אלטרנטיבי'] },
+  { id: 'sub_acupuncture', name: 'דיקור סיני', searchTerms: ['דיקור', 'דיקור סיני', 'אקופונקטורה'] },
+  { id: 'sub_naturopathy', name: 'נטורופתיה', searchTerms: ['נטורופתיה', 'צמחי מרפא'] },
+  { id: 'sub_massage', name: 'עיסוי רפואי', searchTerms: ['עיסוי', 'מעסה', 'עיסוי רפואי', 'שיאצו'] },
+  { id: 'sub_osteopathy', name: 'אוסטאופתיה', searchTerms: ['אוסטאופתיה'] },
+  { id: 'sub_homeopathy', name: 'הומאופתיה', searchTerms: ['הומאופתיה'] },
+  // אופטומטריה (Optometry)
+  { id: 'prof_optometry', name: 'אופטומטריסט/ית', searchTerms: ['אופטומטריה', 'ראייה', 'משקפיים', 'עיניים'] },
+  // מיילדות (Midwifery)
+  { id: 'prof_midwifery', name: 'מיילדת', searchTerms: ['מיילדת', 'לידה', 'היריון', 'דולה', 'הנקה'] },
+  { id: 'sub_pregnancy', name: 'ליווי הריון', searchTerms: ['הריון', 'ליווי הריון', 'הכנה ללידה'] },
+  { id: 'sub_postpartum', name: 'לאחר לידה', searchTerms: ['אחרי לידה', 'לאחר לידה', 'הנקה'] },
+  // טיפול וסיוע (Caregiving)
+  { id: 'prof_caregiving', name: 'טיפול וסיוע', searchTerms: ['מטפל', 'מטפלת', 'טיפול סיעודי', 'עזרה בבית'] },
+  { id: 'sub_caregiver', name: 'מטפל/ת סיעודי/ת', searchTerms: ['מטפל סיעודי', 'מטפלת סיעודית', 'סיוע יומיומי'] },
+  { id: 'sub_medical_escort', name: 'ליווי רפואי', searchTerms: ['ליווי רפואי', 'ליווי לרופא', 'ליווי לבית חולים'] },
 ];
 
-// Popular searches for each category
+// Popular searches for each category - synced with DB professions
 export const popularSearches = {
   providers: [
-    'אחות', 'רופא משפחה', 'פיזיותרפיסט', 'מטפל סיעודי', 
-    'פסיכולוג', 'דיאטנית', 'רופא ילדים', 'מעסה',
-    'קלינאי תקשורת', 'מרפא בעיסוק'
+    'רפואה', 'אחיות', 'רפואת שיניים', 'טיפולי שיקום',
+    'בריאות הנפש', 'תזונה ודיאטה', 'רפואה משלימה', 'אופטומטריה',
+    'מיילדות', 'טיפול וסיוע'
   ],
   services: [
     'ביקור בית', 'טיפול סיעודי', 'פיזיותרפיה', 'ייעוץ רפואי',
@@ -130,16 +181,16 @@ export const serviceTypes = [
   { id: 'product', name: 'מוצר', icon: 'FaBox' },
 ];
 
-// Service categories
+// Service categories - synced with DB professions as top-level categories
 export const serviceCategories = [
-  { id: 'nursing', name: 'סיעוד' },
-  { id: 'physiotherapy', name: 'פיזיותרפיה' },
-  { id: 'doctor', name: 'רופא בבית' },
-  { id: 'eldercare', name: 'טיפול בקשישים' },
-  { id: 'therapy', name: 'טיפול רגשי' },
-  { id: 'baby', name: 'טיפול בתינוקות' },
-  { id: 'rehabilitation', name: 'שיקום' },
-  { id: 'nutrition', name: 'תזונה' },
-  { id: 'dental', name: 'טיפולי שיניים' },
-  { id: 'alternative', name: 'רפואה משלימה' },
+  { id: 'prof_medicine', name: 'רפואה' },
+  { id: 'prof_nursing', name: 'אחיות/סיעוד' },
+  { id: 'prof_dental', name: 'רפואת שיניים' },
+  { id: 'prof_therapy', name: 'טיפולי שיקום' },
+  { id: 'prof_mental', name: 'בריאות הנפש' },
+  { id: 'prof_nutrition', name: 'תזונה ודיאטה' },
+  { id: 'prof_alternative', name: 'רפואה משלימה' },
+  { id: 'prof_optometry', name: 'אופטומטריה' },
+  { id: 'prof_midwifery', name: 'מיילדות' },
+  { id: 'prof_caregiving', name: 'טיפול וסיוע' },
 ];

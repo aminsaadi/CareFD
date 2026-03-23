@@ -54,7 +54,7 @@ const AddReviewForm = ({ providerId, onReviewAdded }) => {
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Star Rating */}
       <div>
-        <label className="block text-sm font-medium text-carelink-navy mb-2">דירוג</label>
+        <label className="block text-sm font-medium text-carefd-navy mb-2">דירוג</label>
         <div className="flex gap-1">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
@@ -75,7 +75,7 @@ const AddReviewForm = ({ providerId, onReviewAdded }) => {
               />
             </button>
           ))}
-          <span className="mr-2 text-sm text-carelink-gray">
+          <span className="mr-2 text-sm text-carefd-gray">
             {rating > 0 && `${rating} מתוך 5`}
           </span>
         </div>
@@ -83,16 +83,16 @@ const AddReviewForm = ({ providerId, onReviewAdded }) => {
 
       {/* Comment */}
       <div>
-        <label className="block text-sm font-medium text-carelink-navy mb-2">הביקורת שלך</label>
+        <label className="block text-sm font-medium text-carefd-navy mb-2">הביקורת שלך</label>
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           placeholder="ספר/י על החוויה שלך עם הספק..."
           rows={4}
-          className="w-full px-4 py-3 border-2 border-carelink-teal-pale rounded-xl focus:outline-none focus:border-carelink-teal resize-none"
+          className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal resize-none"
           data-testid="review-comment"
         />
-        <p className="text-xs text-carelink-gray mt-1">{comment.length}/500 תווים</p>
+        <p className="text-xs text-carefd-gray mt-1">{comment.length}/500 תווים</p>
       </div>
 
       {/* Error Message */}
@@ -113,7 +113,7 @@ const AddReviewForm = ({ providerId, onReviewAdded }) => {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-carelink-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carelink-teal-medium transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full bg-carefd-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         data-testid="submit-review-btn"
       >
         {isSubmitting ? (

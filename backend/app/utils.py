@@ -27,9 +27,12 @@ SECRET_KEY = os.environ.get('SECRET_KEY', '')
 if not SECRET_KEY:
     import secrets
     SECRET_KEY = secrets.token_hex(32)
-    logger.warning("SECRET_KEY not set! Generated a random key. Sessions will NOT survive restarts. Set SECRET_KEY in Railway variables.")
+    if IS_PRODUCTION:
+        logger.error("CRITICAL: SECRET_KEY not set in production! JWT sessions will NOT survive restarts. Set SECRET_KEY in environment variables immediately.")
+    else:
+        logger.warning("SECRET_KEY not set. Generated a random key for development. Sessions will NOT survive restarts.")
 
-SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'carelink.co.il@gmail.com')
+SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'carefd.com@gmail.com')
 SMTP_HOST = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
 try:
     SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
@@ -40,20 +43,21 @@ SMTP_USER = os.environ.get('SMTP_USER', '')
 SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
 VAPID_PUBLIC_KEY = os.environ.get('VAPID_PUBLIC_KEY', '')
 VAPID_PRIVATE_KEY = os.environ.get('VAPID_PRIVATE_KEY', '')
-VAPID_CLAIMS_EMAIL = os.environ.get('VAPID_CLAIMS_EMAIL', 'admin@carelink.co.il')
+VAPID_CLAIMS_EMAIL = os.environ.get('VAPID_CLAIMS_EMAIL', 'admin@carefd.com')
 
 # Resend API (preferred over SMTP on Railway where SMTP ports are blocked)
 RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
 if RESEND_API_KEY:
     resend.api_key = RESEND_API_KEY
 
-SITE_URL = os.environ.get('SITE_URL', 'https://carelink.co.il')
+SITE_URL = os.environ.get('SITE_URL', 'https://carefd.com')
 
 
 async def get_site_url():
     """Get the frontend site URL from DB settings, fallback to constant"""
     settings = await db.site_settings.find_one({}, {"_id": 0, "site_url": 1})
-    return (settings or {}).get("site_url") or SITE_URL
+    url = (settings or {}).get("site_url") or SITE_URL
+    return url.rstrip('/')
 
 
 def hash_password(password: str) -> str:
@@ -95,6 +99,8 @@ async def get_current_user(authorization: Optional[str] = Header(None), request:
     user_doc = await db.users.find_one({"user_id": session_doc["user_id"]}, {"_id": 0, "password_hash": 0})
     if not user_doc:
         raise HTTPException(status_code=404, detail="User not found")
+    if user_doc.get("is_suspended"):
+        raise HTTPException(status_code=403, detail="Account is suspended")
     return user_doc
 
 
@@ -216,7 +222,7 @@ async def send_email_async(recipient: str, subject: str, html_content: str):
     try:
         # Prefer Resend API (works on Railway where SMTP ports are blocked)
         if RESEND_API_KEY:
-            sender = f"CareLink <{SENDER_EMAIL}>"
+            sender = f"CareFD <{SENDER_EMAIL}>"
             result = await asyncio.to_thread(_send_email_resend, recipient, subject, html_content, sender)
             if result:
                 return result
