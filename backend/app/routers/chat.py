@@ -146,6 +146,9 @@ async def send_message(
     request: Request = None
 ):
     """Send a message"""
+    # Rate limit: 60 messages per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"chat_msg:{get_client_ip(request)}", max_requests=60, window_seconds=900)
     user = await get_current_user(authorization, request)
     
     # Verify room access

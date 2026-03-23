@@ -568,7 +568,7 @@ async def accept_offer(
     # Atomically claim the request
     req_claim = await db.requests.update_one(
         {"request_id": offer["request_id"], "status": RequestStatus.OPEN},
-        {"$set": {"status": RequestStatus.BOOKED}}
+        {"$set": {"status": RequestStatus.IN_PROGRESS}}
     )
     if req_claim.matched_count == 0:
         await db.offers.update_one({"offer_id": offer_id}, {"$set": {"status": OfferStatus.PENDING}})
@@ -576,10 +576,17 @@ async def accept_offer(
 
     now = datetime.now(timezone.utc)
 
-    # Get provider info
+    # Get provider info and verify they're still verified
     provider = await db.providers.find_one({"provider_id": offer["provider_id"]}, {"_id": 0})
     if not provider:
+        await db.offers.update_one({"offer_id": offer_id}, {"$set": {"status": OfferStatus.PENDING}})
+        await db.requests.update_one({"request_id": offer["request_id"]}, {"$set": {"status": RequestStatus.OPEN}})
         raise HTTPException(status_code=404, detail="Provider not found")
+
+    if not provider.get("is_verified") and provider.get("verification_status") != "verified":
+        await db.offers.update_one({"offer_id": offer_id}, {"$set": {"status": OfferStatus.PENDING}})
+        await db.requests.update_one({"request_id": offer["request_id"]}, {"$set": {"status": RequestStatus.OPEN}})
+        raise HTTPException(status_code=400, detail="הספק אינו מאומת יותר")
 
     # Resolve service info if suggested_service_id exists
     service = None
@@ -644,17 +651,16 @@ async def accept_offer(
         await db.chat_rooms.insert_one(room_dict)
         room_id = chat_room.room_id
 
-    # 3. Update accepted offer
+    # 3. Update accepted offer with acceptance timestamp
     await db.offers.update_one(
         {"offer_id": offer_id},
-        {"$set": {"status": OfferStatus.ACCEPTED}}
+        {"$set": {"status": OfferStatus.ACCEPTED, "accepted_at": now.isoformat()}}
     )
 
-    # 4. Update request
+    # 4. Update request with booking details
     await db.requests.update_one(
         {"request_id": offer["request_id"]},
         {"$set": {
-            "status": RequestStatus.IN_PROGRESS,
             "accepted_offer_id": offer_id,
             "accepted_at": now.isoformat(),
             "booking_id": booking.booking_id,

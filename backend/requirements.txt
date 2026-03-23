@@ -65,6 +65,7 @@ openai==1.99.9
 packaging==26.0
 pandas==3.0.0
 passlib==1.7.4
+cryptography>=46.0.4
 pathspec==1.0.4
 pillow==12.1.0
 platformdirs==4.5.1

@@ -53,13 +53,26 @@ async def update_smtp_settings(
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     
+    from cryptography.fernet import Fernet
+    import base64
+    import hashlib
+    from app.utils import SECRET_KEY
+
+    # Derive a Fernet key from SECRET_KEY for encrypting SMTP password
+    fernet_key = base64.urlsafe_b64encode(hashlib.sha256(SECRET_KEY.encode()).digest())
+    fernet = Fernet(fernet_key)
+
+    smtp_password = data.get("smtp_password", "")
+    encrypted_password = fernet.encrypt(smtp_password.encode()).decode() if smtp_password else ""
+
     settings = {
         "_id": "smtp_config",
         "sender_email": data.get("sender_email", ""),
         "smtp_host": data.get("smtp_host", "smtp.gmail.com"),
         "smtp_port": int(data.get("smtp_port", 587)),
         "smtp_user": data.get("smtp_user", ""),
-        "smtp_password": data.get("smtp_password", ""),
+        "smtp_password_encrypted": encrypted_password,
+        "smtp_password": "",  # Clear plaintext for backward compat
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "updated_by": user.get("user_id")
     }
@@ -176,7 +189,11 @@ async def admin_get_users(
     user = await get_current_user(authorization, request)
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
-    
+
+    # Enforce pagination bounds
+    limit = max(1, min(limit, 100))
+    skip = max(0, skip)
+
     query = {}
     if role:
         query["role"] = role
@@ -186,7 +203,7 @@ async def admin_get_users(
             {"name": {"$regex": safe_search, "$options": "i"}},
             {"email": {"$regex": safe_search, "$options": "i"}}
         ]
-    
+
     users = await db.users.find(
         query,
         {"_id": 0, "password_hash": 0}
@@ -506,7 +523,10 @@ async def admin_get_services(
     admin = await get_current_user(authorization, request)
     if admin.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
-    
+
+    limit = max(1, min(limit, 100))
+    skip = max(0, skip)
+
     query = {}
     if provider_id:
         query["provider_id"] = provider_id
@@ -595,7 +615,10 @@ async def admin_get_bookings(
     user = await get_current_user(authorization, request)
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
-    
+
+    limit = max(1, min(limit, 100))
+    skip = max(0, skip)
+
     query = {}
     if status:
         query["status"] = status
@@ -618,7 +641,10 @@ async def admin_get_all_providers(
     user = await get_current_user(authorization, request)
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
-    
+
+    limit = max(1, min(limit, 100))
+    skip = max(0, skip)
+
     query = {}
     
     if search:
@@ -681,7 +707,10 @@ async def admin_get_pending_providers(
     user = await get_current_user(authorization, request)
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
-    
+
+    limit = max(1, min(limit, 100))
+    skip = max(0, skip)
+
     query = {
         "$or": [
             {"verification_status": VerificationStatus.PENDING},
@@ -2912,6 +2941,9 @@ async def admin_get_requests(
     if admin.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
 
+    limit = max(1, min(limit, 100))
+    skip = max(0, skip)
+
     query = {}
     if status:
         query["status"] = status
@@ -3042,6 +3074,9 @@ async def admin_get_offers(
     admin = await get_current_user(authorization, request)
     if admin.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
+
+    limit = max(1, min(limit, 100))
+    skip = max(0, skip)
 
     query = {}
     if status:

@@ -72,6 +72,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Content-Security-Policy"] = "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; frame-ancestors 'none'"
+        response.headers["X-Permitted-Cross-Domain-Policies"] = "none"
         if IS_PRODUCTION:
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         return response
@@ -101,8 +103,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
     allow_origins=cors_origins,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"],
 )
 
 # Debug: test POST endpoint (only available in non-production)
@@ -133,14 +135,15 @@ async def startup_db_client():
     """Verify database connection and environment on startup."""
     logger.info(f"Starting CareFD in {ENVIRONMENT} mode")
 
-    # Log all registered routes for debugging
-    logger.info("=== Registered Routes ===")
-    for route in app.routes:
-        if hasattr(route, 'methods') and hasattr(route, 'path'):
-            logger.info(f"  {route.methods} {route.path}")
-        elif hasattr(route, 'path'):
-            logger.info(f"  MOUNT {route.path}")
-    logger.info(f"=== Total: {len(app.routes)} routes ===")
+    # Log registered routes only in non-production (avoid leaking endpoint info)
+    if not IS_PRODUCTION:
+        logger.info("=== Registered Routes ===")
+        for route in app.routes:
+            if hasattr(route, 'methods') and hasattr(route, 'path'):
+                logger.info(f"  {route.methods} {route.path}")
+            elif hasattr(route, 'path'):
+                logger.info(f"  MOUNT {route.path}")
+        logger.info(f"=== Total: {len(app.routes)} routes ===")
 
     # Verify database connection
     logger.info("Checking MongoDB connection on startup...")
@@ -150,13 +153,24 @@ async def startup_db_client():
         logger.error("Check MONGO_URL and DB_NAME environment variables on Railway")
     else:
         logger.info("MongoDB connection verified successfully")
+        # Clean up expired sessions on startup
+        try:
+            from datetime import datetime, timezone
+            from app.database import db
+            result = await db.user_sessions.delete_many({
+                "expires_at": {"$lt": datetime.now(timezone.utc).isoformat()}
+            })
+            if result.deleted_count > 0:
+                logger.info(f"Cleaned up {result.deleted_count} expired sessions")
+        except Exception as e:
+            logger.warning(f"Session cleanup failed: {e}")
 
     # Check SMTP configuration
     smtp_user = os.environ.get('SMTP_USER', '')
     smtp_password = os.environ.get('SMTP_PASSWORD', '')
     smtp_port_raw = os.environ.get('SMTP_PORT', '587')
     if smtp_user and smtp_password:
-        logger.info(f"SMTP: Configured via env vars (user={smtp_user[:3]}***, port={smtp_port_raw})")
+        logger.info(f"SMTP: Configured via env vars (port={smtp_port_raw})")
     else:
         logger.warning("SMTP: SMTP_USER/SMTP_PASSWORD not set in env vars. Checking DB settings on first email...")
 

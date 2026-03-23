@@ -9,6 +9,7 @@ from pathlib import Path
 
 from app.database import db, UPLOAD_DIR
 from app.utils import get_current_user, get_site_url
+from app.rate_limiter import rate_limiter, get_client_ip
 
 router = APIRouter()
 
@@ -54,6 +55,9 @@ async def upload_file(
     request: Request = None
 ):
     """Upload a file and return its URL"""
+    # Rate limit: 20 uploads per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"upload:{get_client_ip(request)}", max_requests=20, window_seconds=900)
     user = await get_current_user(authorization, request)
     
     # Validate file type
@@ -100,6 +104,9 @@ async def upload_image(
     request: Request = None
 ):
     """Upload an image file (for profile pictures)"""
+    # Rate limit: 20 uploads per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"upload_img:{get_client_ip(request)}", max_requests=20, window_seconds=900)
     user = await get_current_user(authorization, request)
 
     # Validate file type - images only
@@ -121,7 +128,7 @@ async def upload_image(
     if ext == 'svg':
         try:
             svg_text = content.decode('utf-8', errors='ignore').lower()
-            dangerous_patterns = ['<script', 'javascript:', 'onerror=', 'onload=', 'onclick=', 'onmouseover=', 'onfocus=', 'eval(', 'expression(']
+            dangerous_patterns = ['<script', 'javascript:', 'onerror=', 'onload=', 'onclick=', 'onmouseover=', 'onfocus=', 'eval(', 'expression(', 'onmouseenter=', 'onfocusin=', 'onanimationstart=', 'data:', 'xlink:href']
             for pattern in dangerous_patterns:
                 if pattern in svg_text:
                     raise HTTPException(status_code=400, detail="SVG file contains potentially dangerous content")
@@ -130,8 +137,9 @@ async def upload_image(
         except Exception:
             raise HTTPException(status_code=400, detail="Invalid SVG file")
     elif ext == 'ico':
-        # ICO files skip magic byte verification
-        pass
+        # ICO files: verify basic structure (must start with reserved=0, type=1 for ICO)
+        if len(content) < 6 or content[0:4] != b'\x00\x00\x01\x00':
+            raise HTTPException(status_code=400, detail="Invalid ICO file format")
     else:
         # Verify file content matches claimed type
         if not _verify_file_magic(content, ext):
