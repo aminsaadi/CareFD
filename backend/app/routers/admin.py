@@ -1413,7 +1413,20 @@ async def admin_update_settings(
         "address", "footer_text", "social_links", "hero_title", "hero_subtitle",
         "hero_image", "allow_registrations", "require_email_verification",
         "google_analytics_id", "meta_description", "meta_keywords",
-        "maintenance_mode", "maintenance_message"
+        "maintenance_mode", "maintenance_message",
+        # App settings
+        "app_name", "app_short_name", "app_description", "app_icon_url",
+        "app_theme_color", "app_background_color",
+        "app_primary_color", "app_secondary_color", "app_accent_color",
+        # Home screen settings
+        "home_hero_title", "home_hero_subtitle", "home_hero_image",
+        "home_cta_text", "home_cta_url",
+        "home_show_search", "home_show_categories",
+        "home_show_featured", "home_show_stats",
+        # Existing site settings that frontend sends
+        "site_tagline", "contact_address", "footer_links",
+        "social_facebook", "social_instagram", "social_twitter",
+        "social_linkedin", "social_youtube",
     }
     filtered_data = {k: v for k, v in settings_data.items() if k in ALLOWED_SETTINGS_FIELDS}
     filtered_data["updated_at"] = datetime.now(timezone.utc).isoformat()

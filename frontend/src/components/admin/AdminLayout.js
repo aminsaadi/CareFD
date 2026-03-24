@@ -110,6 +110,7 @@ const AdminLayout = ({ children }) => {
       icon: FiSettings,
       submenu: [
         { id: 'site-settings', label: 'הגדרות אתר', icon: FiGlobe, path: '/admin/settings' },
+        { id: 'app-settings', label: 'הגדרות אפליקציה', icon: FiLayout, path: '/admin/app-settings' },
       ]
     },
   ];
