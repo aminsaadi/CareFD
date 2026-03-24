@@ -1,7 +1,7 @@
 {
   "short_name": "CareFD",
-  "name": "CareFD - HealthCare Providers Zone",
-  "description": "CareFD - HealthCare Providers Zone",
+  "name": "CareFD - שירותי בריאות",
+  "description": "CareFD - מחברים בין מטופלים לספקי שירותי בריאות",
   "icons": [
     {
       "src": "logo192.png",
@@ -18,7 +18,7 @@
   ],
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#29afb7",
+  "theme_color": "#19B8BA",
   "background_color": "#ffffff",
   "dir": "rtl",
   "lang": "he",

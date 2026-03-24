@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="430" viewBox="0 0 430 140" height="140" preserveAspectRatio="xMidYMid meet">
   <defs>
     <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#29afb7;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#1a8a90;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#19B8BA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1E4D5F;stop-opacity:1" />
     </linearGradient>
   </defs>
   <!-- Icon: Medical cross + location pin -->
@@ -14,9 +14,9 @@
     <rect x="37" y="34" width="36" height="16" rx="3" fill="white" />
   </g>
   <!-- Text: Care -->
-  <text x="120" y="85" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="72" font-weight="700" fill="#1e3a4f" letter-spacing="-1">Care</text>
+  <text x="120" y="85" font-family="'Outfit', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="72" font-weight="700" fill="#1E4D5F" letter-spacing="-1">Care</text>
   <!-- Text: FD -->
-  <text x="310" y="85" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="72" font-weight="700" fill="#29afb7" letter-spacing="-1">FD</text>
+  <text x="310" y="85" font-family="'Outfit', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="72" font-weight="700" fill="#19B8BA" letter-spacing="-1">FD</text>
   <!-- Tagline -->
-  <text x="122" y="115" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="400" fill="#6b7d8e" letter-spacing="3">HealthCare Providers Zone</text>
+  <text x="122" y="115" font-family="'Outfit', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="16" font-weight="400" fill="#4C6D7F" letter-spacing="3">HealthCare Providers Zone</text>
 </svg>

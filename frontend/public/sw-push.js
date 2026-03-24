@@ -2,7 +2,7 @@
 
 // Service Worker for Push Notifications - CareFD
 
-const CACHE_NAME = 'carefd-v2';
+const CACHE_NAME = 'carefd-v3';
 
 // Install event
 self.addEventListener('install', (event) => {

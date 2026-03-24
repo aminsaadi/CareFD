@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Logo from './Logo';
-import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaPhone, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaPhone, FaEnvelope, FaMapMarkerAlt, FaDownload, FaMobileAlt } from 'react-icons/fa';
 import api from '../utils/api';
 import { useSiteSettings } from '../context/SiteSettingsContext';
+import usePWAInstall from '../hooks/usePWAInstall';
 
 const Footer = () => {
   const { settings: siteSettings, siteName } = useSiteSettings();
+  const { canInstall, isInstalled, isIOS, install } = usePWAInstall();
+  const [showIOSGuide, setShowIOSGuide] = useState(false);
   const [settings, setSettings] = useState({
     contact_phone: '03-1234567',
     contact_email: '',
@@ -219,6 +222,59 @@ const Footer = () => {
           </div>
         </div>
       </div>
+
+      {/* Download App Banner */}
+      {!isInstalled && (
+        <div className="border-t border-carefd-slate">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="bg-gradient-to-l from-carefd-teal/20 to-carefd-navy rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="bg-carefd-teal/20 p-3 rounded-full">
+                  <FaMobileAlt className="text-carefd-teal text-2xl" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-white text-lg">הורד את האפליקציה</h4>
+                  <p className="text-carefd-light-gray text-sm">גישה מהירה מהמסך הראשי של הטלפון</p>
+                </div>
+              </div>
+              {canInstall ? (
+                <button
+                  onClick={install}
+                  className="bg-carefd-teal text-white px-6 py-3 rounded-lg hover:bg-carefd-teal-medium transition-colors font-bold flex items-center gap-2 whitespace-nowrap"
+                >
+                  <FaDownload />
+                  התקן אפליקציה
+                </button>
+              ) : isIOS ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setShowIOSGuide(!showIOSGuide)}
+                    className="bg-carefd-teal text-white px-6 py-3 rounded-lg hover:bg-carefd-teal-medium transition-colors font-bold flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <FaDownload />
+                    הוסף למסך הבית
+                  </button>
+                  {showIOSGuide && (
+                    <div className="absolute bottom-full mb-3 left-0 right-0 bg-white text-carefd-navy p-4 rounded-xl shadow-xl text-sm w-72 z-50">
+                      <p className="font-bold mb-2">להתקנה באייפון:</p>
+                      <ol className="space-y-1 list-decimal list-inside text-carefd-slate">
+                        <li>לחץ על כפתור השיתוף <span className="inline-block rotate-90">⤴</span></li>
+                        <li>גלול למטה ובחר "הוסף למסך הבית"</li>
+                        <li>לחץ "הוסף"</li>
+                      </ol>
+                      <button onClick={() => setShowIOSGuide(false)} className="mt-2 text-carefd-teal text-xs">סגור</button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <span className="text-carefd-light-gray text-sm">
+                  פתח ב-Chrome להתקנת האפליקציה
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bottom Bar - synced with admin static pages */}
       <div className="border-t border-carefd-slate">
