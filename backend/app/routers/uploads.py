@@ -5,10 +5,12 @@ from datetime import datetime, timezone
 import uuid
 import re
 import os
+import base64
 from pathlib import Path
 
 from app.database import db, UPLOAD_DIR
 from app.utils import get_current_user, get_site_url
+from app.rate_limiter import rate_limiter, get_client_ip
 
 router = APIRouter()
 
@@ -54,6 +56,9 @@ async def upload_file(
     request: Request = None
 ):
     """Upload a file and return its URL"""
+    # Rate limit: 20 uploads per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"upload:{get_client_ip(request)}", max_requests=20, window_seconds=900)
     user = await get_current_user(authorization, request)
     
     # Validate file type
@@ -78,9 +83,24 @@ async def upload_file(
     unique_filename = f"{uuid.uuid4().hex}.{ext}"
     file_path = UPLOAD_DIR / unique_filename
 
-    # Save file
+    # Save file to disk (cache)
     with open(file_path, "wb") as f:
         f.write(content)
+
+    # Also save to MongoDB for persistence across deploys
+    await db.uploaded_files.update_one(
+        {"filename": unique_filename},
+        {"$set": {
+            "filename": unique_filename,
+            "content_base64": base64.b64encode(content).decode('utf-8'),
+            "content_type": content_type,
+            "original_name": file.filename,
+            "size": len(content),
+            "uploaded_by": user["user_id"],
+            "uploaded_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
 
     # Generate URL
     base_url = await get_site_url()
@@ -100,6 +120,9 @@ async def upload_image(
     request: Request = None
 ):
     """Upload an image file (for profile pictures)"""
+    # Rate limit: 20 uploads per IP per 15 minutes
+    if request:
+        rate_limiter.check(f"upload_img:{get_client_ip(request)}", max_requests=20, window_seconds=900)
     user = await get_current_user(authorization, request)
 
     # Validate file type - images only
@@ -121,7 +144,7 @@ async def upload_image(
     if ext == 'svg':
         try:
             svg_text = content.decode('utf-8', errors='ignore').lower()
-            dangerous_patterns = ['<script', 'javascript:', 'onerror=', 'onload=', 'onclick=', 'onmouseover=', 'onfocus=', 'eval(', 'expression(']
+            dangerous_patterns = ['<script', 'javascript:', 'onerror=', 'onload=', 'onclick=', 'onmouseover=', 'onfocus=', 'eval(', 'expression(', 'onmouseenter=', 'onfocusin=', 'onanimationstart=', 'data:', 'xlink:href']
             for pattern in dangerous_patterns:
                 if pattern in svg_text:
                     raise HTTPException(status_code=400, detail="SVG file contains potentially dangerous content")
@@ -130,8 +153,9 @@ async def upload_image(
         except Exception:
             raise HTTPException(status_code=400, detail="Invalid SVG file")
     elif ext == 'ico':
-        # ICO files skip magic byte verification
-        pass
+        # ICO files: verify basic structure (must start with reserved=0, type=1 for ICO)
+        if len(content) < 6 or content[0:4] != b'\x00\x00\x01\x00':
+            raise HTTPException(status_code=400, detail="Invalid ICO file format")
     else:
         # Verify file content matches claimed type
         if not _verify_file_magic(content, ext):
@@ -140,9 +164,24 @@ async def upload_image(
     unique_filename = f"img_{uuid.uuid4().hex}.{ext}"
     file_path = UPLOAD_DIR / unique_filename
 
-    # Save file
+    # Save file to disk (cache)
     with open(file_path, "wb") as f:
         f.write(content)
+
+    # Also save to MongoDB for persistence across deploys
+    await db.uploaded_files.update_one(
+        {"filename": unique_filename},
+        {"$set": {
+            "filename": unique_filename,
+            "content_base64": base64.b64encode(content).decode('utf-8'),
+            "content_type": content_type,
+            "original_name": file.filename,
+            "size": len(content),
+            "uploaded_by": user["user_id"],
+            "uploaded_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
 
     # Generate URL
     base_url = await get_site_url()
@@ -168,7 +207,7 @@ CONTENT_TYPE_MAP = {
 
 @router.get("/files/{filename}")
 async def get_file(filename: str):
-    """Serve uploaded files"""
+    """Serve uploaded files - from disk cache or MongoDB fallback"""
     # Prevent path traversal - only allow alphanumeric filenames with dots
     if not re.match(r'^[a-zA-Z0-9_]+\.[a-z]+$', filename):
         raise HTTPException(status_code=400, detail="Invalid filename")
@@ -179,11 +218,19 @@ async def get_file(filename: str):
     if not str(file_path).startswith(str(UPLOAD_DIR.resolve())):
         raise HTTPException(status_code=403, detail="Access denied")
 
-    if not file_path.exists():
-        raise HTTPException(status_code=404, detail="File not found")
-
     ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
     media_type = CONTENT_TYPE_MAP.get(ext)
+
+    # If file doesn't exist on disk, try to restore from MongoDB
+    if not file_path.exists():
+        stored_file = await db.uploaded_files.find_one({"filename": filename}, {"_id": 0})
+        if not stored_file:
+            raise HTTPException(status_code=404, detail="File not found")
+
+        # Restore file to disk for future requests
+        content = base64.b64decode(stored_file["content_base64"])
+        with open(file_path, "wb") as f:
+            f.write(content)
 
     # For SVG files, add Content-Security-Policy to block inline scripts
     if ext == 'svg':

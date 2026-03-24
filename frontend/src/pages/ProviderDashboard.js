@@ -304,6 +304,16 @@ const ProviderDashboard = () => {
     }
   };
 
+  const handleCancellationResponse = async (bookingId, action) => {
+    try {
+      await api.put(`/bookings/${bookingId}/${action}-cancellation`);
+      toast.success(action === 'approve' ? 'בקשת הביטול אושרה' : 'בקשת הביטול נדחתה');
+      fetchDashboardData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'שגיאה בעדכון');
+    }
+  };
+
   // Service Management Functions
   const resetServiceForm = () => {
     setServiceForm({
@@ -561,6 +571,7 @@ const ProviderDashboard = () => {
       case 'provider_completed': return 'bg-purple-100 text-purple-600';
       case 'in_progress': return 'bg-cyan-100 text-cyan-600';
       case 'cancelled': return 'bg-red-100 text-red-600';
+      case 'cancellation_requested': return 'bg-orange-100 text-orange-600';
       case 'rejected': return 'bg-red-100 text-red-600';
       case 'on_hold': return 'bg-gray-100 text-gray-600';
       default: return 'bg-gray-100 text-gray-600';
@@ -575,6 +586,7 @@ const ProviderDashboard = () => {
       provider_completed: 'סומן כהושלם',
       completed: 'הושלם',
       cancelled: 'בוטל',
+      cancellation_requested: 'בקשת ביטול מלקוח',
       rejected: 'נדחה',
       on_hold: 'בהשהיה'
     };
@@ -591,7 +603,7 @@ const ProviderDashboard = () => {
       case 'date_desc': return sorted.sort((a, b) => new Date(b.created_at || b.booking_date) - new Date(a.created_at || a.booking_date));
       case 'date_asc': return sorted.sort((a, b) => new Date(a.created_at || a.booking_date) - new Date(b.created_at || b.booking_date));
       case 'status': {
-        const order = { pending: 0, confirmed: 1, in_progress: 2, provider_completed: 3, on_hold: 4, completed: 5, cancelled: 6, rejected: 7 };
+        const order = { cancellation_requested: 0, pending: 1, confirmed: 2, in_progress: 3, provider_completed: 4, on_hold: 5, completed: 6, cancelled: 7, rejected: 8 };
         return sorted.sort((a, b) => (order[a.status] ?? 99) - (order[b.status] ?? 99));
       }
       case 'price_desc': return sorted.sort((a, b) => (b.final_price || b.price || 0) - (a.final_price || a.price || 0));
@@ -1061,6 +1073,42 @@ const ProviderDashboard = () => {
                                           className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition font-medium"
                                         >
                                           דחה
+                                        </button>
+                                      </>
+                                    )}
+                                    {booking.status === 'cancellation_requested' && (
+                                      <>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setConfirmDialog({
+                                              isOpen: true,
+                                              title: 'אישור ביטול הזמנה',
+                                              message: `הלקוח ${booking.user_name || ''} מבקש לבטל את ההזמנה ל-${booking.service_name || 'שירות'}. האם לאשר?`,
+                                              type: 'warning',
+                                              onConfirm: () => handleCancellationResponse(booking.booking_id, 'approve')
+                                            });
+                                          }}
+                                          className="bg-orange-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-orange-600 transition font-medium"
+                                        >
+                                          <FaCheckCircle className="inline ml-1" />
+                                          אשר ביטול
+                                        </button>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setConfirmDialog({
+                                              isOpen: true,
+                                              title: 'דחיית בקשת ביטול',
+                                              message: `האם לדחות את בקשת הביטול של ${booking.user_name || 'הלקוח'}?`,
+                                              type: 'danger',
+                                              onConfirm: () => handleCancellationResponse(booking.booking_id, 'reject')
+                                            });
+                                          }}
+                                          className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition font-medium"
+                                        >
+                                          <FaTimes className="inline ml-1" />
+                                          דחה ביטול
                                         </button>
                                       </>
                                     )}

@@ -54,6 +54,8 @@ const AdminBookings = () => {
         return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
       case 'cancelled':
         return 'bg-red-500/20 text-red-400 border-red-500/30';
+      case 'cancellation_requested':
+        return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
       case 'completed':
         return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
       default:
@@ -66,6 +68,7 @@ const AdminBookings = () => {
       case 'confirmed': return 'מאושר';
       case 'pending': return 'ממתין';
       case 'cancelled': return 'בוטל';
+      case 'cancellation_requested': return 'ממתין לאישור ביטול';
       case 'completed': return 'הושלם';
       default: return status;
     }

@@ -2,7 +2,7 @@
 
 // Service Worker for Push Notifications - CareFD
 
-const CACHE_NAME = 'carefd-v1';
+const CACHE_NAME = 'carefd-v3';
 
 // Install event
 self.addEventListener('install', (event) => {
@@ -10,10 +10,18 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activate event
+// Activate event - clear old caches to force icon refresh
 self.addEventListener('activate', (event) => {
   console.log('Service Worker activated');
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames
+          .filter((name) => name !== CACHE_NAME)
+          .map((name) => caches.delete(name))
+      );
+    }).then(() => self.clients.claim())
+  );
 });
 
 // Push notification received
