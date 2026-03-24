@@ -44,6 +44,7 @@ import AdminBlog from './pages/admin/AdminBlog';
 import AdminAds from './pages/admin/AdminAds';
 import AdminFeatured from './pages/admin/AdminFeatured';
 import AdminSettings from './pages/admin/AdminSettings';
+import AdminAppSettings from './pages/admin/AdminAppSettings';
 import AdminReports from './pages/admin/AdminReports';
 import AdminServices from './pages/admin/AdminServices';
 import AdminServiceTypes from './pages/admin/AdminServiceTypes';
@@ -334,6 +335,14 @@ function AppRouter() {
         element={
           <ProtectedRoute>
             <AdminRoute><AdminSettings /></AdminRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/app-settings"
+        element={
+          <ProtectedRoute>
+            <AdminRoute><AdminAppSettings /></AdminRoute>
           </ProtectedRoute>
         }
       />
