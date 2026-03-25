@@ -14,7 +14,8 @@ from app.utils import (
     get_current_user, send_email_async, create_notification,
     send_push_to_user, hash_password,
     SMTP_USER, SMTP_PASSWORD, SENDER_EMAIL as _SENDER_EMAIL,
-    SMTP_HOST, SMTP_PORT, _get_smtp_settings
+    SMTP_HOST, SMTP_PORT, _get_smtp_settings,
+    ZEPTOMAIL_API_KEY, RESEND_API_KEY, _email_provider_cache
 )
 
 router = APIRouter()
@@ -25,20 +26,24 @@ async def get_smtp_settings(
     authorization: Optional[str] = Header(None),
     request: Request = None
 ):
-    """Admin: Get current SMTP settings"""
+    """Admin: Get current email provider settings (SMTP + ZeptoMail)"""
     user = await get_current_user(authorization, request)
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
-    
+
     db_settings = await db.smtp_settings.find_one({"_id": "smtp_config"}, {"_id": 0})
-    
+
     return {
         "source": "database" if db_settings else "environment",
+        "email_provider": (db_settings or {}).get("email_provider", "smtp"),
         "sender_email": db_settings.get("sender_email", _SENDER_EMAIL) if db_settings else _SENDER_EMAIL,
         "smtp_host": db_settings.get("smtp_host", SMTP_HOST) if db_settings else SMTP_HOST,
         "smtp_port": db_settings.get("smtp_port", SMTP_PORT) if db_settings else SMTP_PORT,
         "smtp_user": db_settings.get("smtp_user", SMTP_USER) if db_settings else SMTP_USER,
-        "smtp_password_set": bool(db_settings.get("smtp_password") if db_settings else SMTP_PASSWORD),
+        "smtp_password_set": bool(db_settings.get("smtp_password_encrypted") if db_settings else SMTP_PASSWORD),
+        "zeptomail_api_key_set": bool((db_settings or {}).get("zeptomail_api_key_encrypted") or ZEPTOMAIL_API_KEY),
+        "zeptomail_sender_email": (db_settings or {}).get("zeptomail_sender_email", ""),
+        "resend_api_key_set": bool(RESEND_API_KEY),
     }
 
 
@@ -48,43 +53,61 @@ async def update_smtp_settings(
     authorization: Optional[str] = Header(None),
     request: Request = None
 ):
-    """Admin: Update SMTP settings in database"""
+    """Admin: Update email provider settings in database"""
     user = await get_current_user(authorization, request)
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
-    
+
     from cryptography.fernet import Fernet
     import base64
     import hashlib
     from app.utils import SECRET_KEY
 
-    # Derive a Fernet key from SECRET_KEY for encrypting SMTP password
     fernet_key = base64.urlsafe_b64encode(hashlib.sha256(SECRET_KEY.encode()).digest())
     fernet = Fernet(fernet_key)
 
+    # Validate email_provider
+    email_provider = data.get("email_provider", "smtp")
+    if email_provider not in ("smtp", "zeptomail"):
+        raise HTTPException(status_code=400, detail="ספק מיילים לא חוקי. בחר smtp או zeptomail.")
+
+    # Load existing settings to preserve fields not being updated
+    existing = await db.smtp_settings.find_one({"_id": "smtp_config"}) or {}
+
+    # SMTP password encryption
     smtp_password = data.get("smtp_password", "")
-    encrypted_password = fernet.encrypt(smtp_password.encode()).decode() if smtp_password else ""
+    encrypted_smtp = fernet.encrypt(smtp_password.encode()).decode() if smtp_password else existing.get("smtp_password_encrypted", "")
+
+    # ZeptoMail API key encryption
+    zeptomail_key = data.get("zeptomail_api_key", "")
+    encrypted_zeptomail = fernet.encrypt(zeptomail_key.encode()).decode() if zeptomail_key else existing.get("zeptomail_api_key_encrypted", "")
 
     settings = {
         "_id": "smtp_config",
-        "sender_email": data.get("sender_email", ""),
-        "smtp_host": data.get("smtp_host", "smtp.gmail.com"),
-        "smtp_port": int(data.get("smtp_port", 587)),
-        "smtp_user": data.get("smtp_user", ""),
-        "smtp_password_encrypted": encrypted_password,
-        "smtp_password": "",  # Clear plaintext for backward compat
+        "email_provider": email_provider,
+        "sender_email": data.get("sender_email", existing.get("sender_email", "")),
+        "smtp_host": data.get("smtp_host", existing.get("smtp_host", "smtp.gmail.com")),
+        "smtp_port": int(data.get("smtp_port", existing.get("smtp_port", 587))),
+        "smtp_user": data.get("smtp_user", existing.get("smtp_user", "")),
+        "smtp_password_encrypted": encrypted_smtp,
+        "smtp_password": "",
+        "zeptomail_api_key_encrypted": encrypted_zeptomail,
+        "zeptomail_sender_email": data.get("zeptomail_sender_email", existing.get("zeptomail_sender_email", "")),
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "updated_by": user.get("user_id")
     }
-    
+
     await db.smtp_settings.replace_one({"_id": "smtp_config"}, settings, upsert=True)
-    
-    # Clear cache so new settings take effect immediately
+
+    # Clear all email caches so new settings take effect immediately
     from app.utils import _smtp_cache
     _smtp_cache["settings"] = None
     _smtp_cache["fetched_at"] = None
-    
-    return {"message": "SMTP settings updated successfully"}
+    _email_provider_cache["provider"] = None
+    _email_provider_cache["settings"] = None
+    _email_provider_cache["fetched_at"] = None
+
+    return {"message": "הגדרות שליחת מיילים עודכנו בהצלחה"}
 
 
 @router.get("/admin/smtp-check")
@@ -92,16 +115,17 @@ async def check_smtp_status(
     authorization: Optional[str] = Header(None),
     request: Request = None
 ):
-    """Admin: Check SMTP configuration and test connection"""
+    """Admin: Check email provider configuration and test connection"""
     user = await get_current_user(authorization, request)
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
-    
+
     import smtplib
     smtp_cfg = await _get_smtp_settings()
+    db_settings = await db.smtp_settings.find_one({"_id": "smtp_config"})
     smtp_login_ok = False
     smtp_error = None
-    
+
     if smtp_cfg["smtp_user"] and smtp_cfg["smtp_password"]:
         try:
             with smtplib.SMTP(smtp_cfg["smtp_host"], smtp_cfg["smtp_port"], timeout=10) as server:
@@ -110,15 +134,18 @@ async def check_smtp_status(
                 smtp_login_ok = True
         except Exception as e:
             smtp_error = str(e)
-    
+
     return {
+        "email_provider": (db_settings or {}).get("email_provider", "smtp"),
         "sender_email": smtp_cfg["sender_email"],
         "smtp_host": smtp_cfg["smtp_host"],
         "smtp_port": smtp_cfg["smtp_port"],
         "smtp_user_set": bool(smtp_cfg["smtp_user"]),
         "smtp_password_set": bool(smtp_cfg["smtp_password"]),
         "smtp_login_ok": smtp_login_ok,
-        "smtp_error": smtp_error
+        "smtp_error": smtp_error,
+        "zeptomail_configured": bool((db_settings or {}).get("zeptomail_api_key_encrypted") or ZEPTOMAIL_API_KEY),
+        "resend_configured": bool(RESEND_API_KEY),
     }
 
 
@@ -137,12 +164,17 @@ async def admin_test_email(
     if not recipient:
         raise HTTPException(status_code=400, detail="Email address required")
     
+    # Check that at least one email provider is configured
     smtp_cfg = await _get_smtp_settings()
+    db_settings = await db.smtp_settings.find_one({"_id": "smtp_config"})
+    has_zeptomail = bool((db_settings or {}).get("zeptomail_api_key_encrypted") or ZEPTOMAIL_API_KEY)
+    has_resend = bool(RESEND_API_KEY)
+    has_smtp = bool(smtp_cfg["smtp_user"] and smtp_cfg["smtp_password"])
 
-    if not smtp_cfg["smtp_user"] or not smtp_cfg["smtp_password"]:
+    if not has_zeptomail and not has_resend and not has_smtp:
         raise HTTPException(
             status_code=400,
-            detail="SMTP לא מוגדר. הגדר SMTP_USER ו-SMTP_PASSWORD בהגדרות או ב-env vars."
+            detail="אין ספק מיילים מוגדר. הגדר ZeptoMail, Resend, או SMTP."
         )
 
     result = await send_email_async(
@@ -161,18 +193,13 @@ async def admin_test_email(
     if not result:
         raise HTTPException(
             status_code=500,
-            detail="שליחת המייל נכשלה. בדוק את הלוגים לפרטים נוספים. אם משתמש ב-Gmail, ודא שאתה משתמש ב-App Password."
+            detail="שליחת המייל נכשלה. בדוק את הלוגים לפרטים נוספים."
         )
 
     return {
         "success": True,
         "recipient": recipient,
-        "smtp_status": {
-            "source": "database" if (await db.smtp_settings.find_one({"_id": "smtp_config"})) else "environment",
-            "smtp_host": smtp_cfg["smtp_host"],
-            "smtp_port": smtp_cfg["smtp_port"],
-            "sender_email": smtp_cfg["sender_email"]
-        }
+        "provider": result.get("provider", "smtp"),
     }
 
 
