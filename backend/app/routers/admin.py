@@ -1350,7 +1350,14 @@ async def get_public_settings():
         "contact_email", "contact_phone", "contact_address",
         "footer_text", "social_facebook", "social_instagram",
         "social_twitter", "social_linkedin", "social_youtube",
-        "footer_links", "site_name", "site_tagline", "logo_url", "favicon_url"
+        "footer_links", "site_name", "site_tagline", "logo_url", "favicon_url",
+        "app_name", "app_short_name", "app_description", "app_icon_url",
+        "app_theme_color", "app_background_color",
+        "app_primary_color", "app_secondary_color", "app_accent_color",
+        "home_hero_title", "home_hero_subtitle", "home_hero_image",
+        "home_cta_text", "home_cta_url",
+        "home_show_search", "home_show_categories",
+        "home_show_featured", "home_show_stats",
     ]
     return {k: v for k, v in settings.items() if k in public_fields}
 

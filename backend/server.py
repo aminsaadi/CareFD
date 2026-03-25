@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response as StarletteResponse
@@ -112,6 +112,42 @@ if not IS_PRODUCTION:
     @api_router.post("/debug/test-post")
     async def test_post():
         return {"message": "POST works!"}
+
+# Dynamic manifest.json endpoint - reads app settings from DB
+@app.get("/manifest.json")
+async def dynamic_manifest():
+    """Serve a dynamic manifest.json based on admin app settings."""
+    from app.database import db
+    settings = await db.site_settings.find_one({}, {"_id": 0}) or {}
+
+    manifest = {
+        "short_name": settings.get("app_short_name") or settings.get("site_name") or "CareFD",
+        "name": settings.get("app_name") or settings.get("site_name") or "CareFD - שירותי בריאות",
+        "description": settings.get("app_description") or "CareFD - מחברים בין מטופלים לספקי שירותי בריאות",
+        "start_url": "/",
+        "display": "standalone",
+        "theme_color": settings.get("app_theme_color") or "#19B8BA",
+        "background_color": settings.get("app_background_color") or "#ffffff",
+        "dir": "rtl",
+        "lang": "he",
+        "scope": "/",
+        "orientation": "any",
+        "icons": []
+    }
+
+    app_icon = settings.get("app_icon_url")
+    if app_icon:
+        manifest["icons"] = [
+            {"src": app_icon, "type": "image/png", "sizes": "192x192", "purpose": "any maskable"},
+            {"src": app_icon, "type": "image/png", "sizes": "512x512", "purpose": "any maskable"},
+        ]
+    else:
+        manifest["icons"] = [
+            {"src": "/logo192.png", "type": "image/png", "sizes": "192x192", "purpose": "any maskable"},
+            {"src": "/logo512.png", "type": "image/png", "sizes": "512x512", "purpose": "any maskable"},
+        ]
+
+    return JSONResponse(content=manifest, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 # Serve frontend static files if available
 STATIC_DIR = Path(__file__).parent / "static"
