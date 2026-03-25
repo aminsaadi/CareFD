@@ -1385,6 +1385,7 @@ async def get_public_settings():
         "home_cta_text", "home_cta_url",
         "home_show_search", "home_show_categories",
         "home_show_featured", "home_show_stats",
+        "maintenance_mode", "maintenance_message",
     ]
     return {k: v for k, v in settings.items() if k in public_fields}
 

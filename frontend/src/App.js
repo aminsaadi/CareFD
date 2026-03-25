@@ -82,6 +82,28 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
+const MaintenancePage = ({ message }) => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100" dir="rtl">
+    <div className="text-center p-8 max-w-md">
+      <div className="text-6xl mb-6">&#x1F6E0;&#xFE0F;</div>
+      <h1 className="text-2xl font-bold text-carefd-navy mb-4">האתר במצב תחזוקה</h1>
+      <p className="text-carefd-slate mb-6">{message || 'אנחנו עובדים על שיפורים. נחזור בקרוב!'}</p>
+      <div className="w-16 h-1 bg-carefd-teal mx-auto rounded-full"></div>
+    </div>
+  </div>
+);
+
+const MaintenanceGate = ({ children }) => {
+  const { maintenanceMode, maintenanceMessage } = useSiteSettings();
+  const { user } = useAuth();
+
+  // Admins bypass maintenance mode
+  if (maintenanceMode && user?.role !== 'admin') {
+    return <MaintenancePage message={maintenanceMessage} />;
+  }
+  return children;
+};
+
 const NotFound = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
     <div className="text-center">
@@ -451,9 +473,11 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <NotificationProvider>
-            <AppRouter />
-            <CookieConsent />
-            <AccessibilityWidget />
+            <MaintenanceGate>
+              <AppRouter />
+              <CookieConsent />
+              <AccessibilityWidget />
+            </MaintenanceGate>
           </NotificationProvider>
         </BrowserRouter>
       </AuthProvider>
