@@ -463,8 +463,10 @@ class ServiceRequest(BaseModel):
     status: str = RequestStatus.OPEN
     offer_count: int = 0
     accepted_offer_id: Optional[str] = None
+    accepted_offer_ids: List[str] = []
     accepted_at: Optional[datetime] = None
     booking_id: Optional[str] = None
+    booking_ids: List[str] = []
     cancelled_at: Optional[datetime] = None
     cancellation_reason: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

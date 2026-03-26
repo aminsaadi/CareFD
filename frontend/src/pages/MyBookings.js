@@ -32,35 +32,12 @@ const MyBookings = () => {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/bookings');
+      const response = await api.get('/bookings/my');
       const bookingsData = response.data.bookings || [];
-      
-      // Fetch service and provider details for each booking
-      const enrichedBookings = await Promise.all(
-        bookingsData.map(async (booking) => {
-          try {
-            const serviceResponse = await api.get(`/services?service_id=${booking.service_id}`);
-            const services = serviceResponse.data.services || [];
-            const service = services.find(s => s.service_id === booking.service_id);
-            
-            if (service) {
-              const providerResponse = await api.get(`/providers/${service.provider_id}`);
-              return {
-                ...booking,
-                service,
-                provider: providerResponse.data
-              };
-            }
-            return booking;
-          } catch (error) {
-            return booking;
-          }
-        })
-      );
-      
-      setBookings(enrichedBookings);
+      setBookings(bookingsData);
     } catch (error) {
       console.error('Failed to fetch bookings:', error);
+      toast.error('שגיאה בטעינת ההזמנות');
     } finally {
       setLoading(false);
     }
@@ -103,7 +80,7 @@ const MyBookings = () => {
 
     try {
       await api.post('/reviews', {
-        provider_id: booking.provider?.provider_id || booking.service?.provider_id,
+        provider_id: booking.provider_id || booking.provider?.provider_id,
         booking_id: booking.booking_id,
         rating: reviewRating,
         comment: reviewComment.trim()
@@ -126,11 +103,30 @@ const MyBookings = () => {
     const colors = {
       pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
       confirmed: 'bg-carefd-teal-pale text-carefd-teal border-carefd-teal',
+      in_progress: 'bg-blue-100 text-blue-800 border-blue-300',
+      provider_completed: 'bg-purple-100 text-purple-800 border-purple-300',
       completed: 'bg-green-100 text-green-800 border-green-300',
       cancelled: 'bg-red-100 text-red-800 border-red-300',
-      cancellation_requested: 'bg-orange-100 text-orange-800 border-orange-300'
+      rejected: 'bg-red-100 text-red-800 border-red-300',
+      cancellation_requested: 'bg-orange-100 text-orange-800 border-orange-300',
+      on_hold: 'bg-gray-100 text-gray-800 border-gray-300'
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getStatusLabel = (status) => {
+    const labels = {
+      pending: 'ממתין לאישור',
+      confirmed: 'מאושר',
+      in_progress: 'בביצוע',
+      provider_completed: 'הספק סיים - ממתין לאישורך',
+      completed: 'הושלם',
+      cancelled: 'בוטל',
+      rejected: 'נדחה',
+      cancellation_requested: 'בקשת ביטול',
+      on_hold: 'בהמתנה'
+    };
+    return labels[status] || status;
   };
 
   const filteredBookings = bookings.filter(booking => {
@@ -226,18 +222,14 @@ const MyBookings = () => {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-xl font-bold text-carefd-navy">
-                      {booking.service?.name || 'שירות'}
+                      {booking.service_name || booking.service?.name || 'שירות'}
                     </h3>
                     <p className="text-carefd-gray">
-                      {booking.provider?.business_name || 'ספק שירותים'}
+                      {booking.provider_name || booking.provider?.business_name || 'ספק שירותים'}
                     </p>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium border-2 ${getStatusColor(booking.status)}`}>
-                    {booking.status === 'pending' && 'ממתין לאישור'}
-                    {booking.status === 'confirmed' && 'מאושר'}
-                    {booking.status === 'completed' && 'הושלם'}
-                    {booking.status === 'cancelled' && 'בוטל'}
-                    {booking.status === 'cancellation_requested' && 'ממתין לאישור ביטול'}
+                    {getStatusLabel(booking.status)}
                   </span>
                 </div>
 
@@ -248,10 +240,10 @@ const MyBookings = () => {
                       {booking.booking_date ? format(new Date(booking.booking_date), 'dd/MM/yyyy HH:mm') : ''}
                     </span>
                   </div>
-                  {booking.service?.price && (
+                  {(booking.final_price || booking.base_price || booking.service?.price) && (
                     <div>
                       <span className="font-semibold text-carefd-navy">מחיר:</span>
-                      <span className="text-carefd-teal font-bold mr-2">₪{booking.service.price}</span>
+                      <span className="text-carefd-teal font-bold mr-2">₪{booking.final_price || booking.base_price || booking.service?.price}</span>
                     </div>
                   )}
                 </div>
@@ -286,7 +278,7 @@ const MyBookings = () => {
                       כתוב ביקורת
                     </button>
                     <Link
-                      to={`/providers/${booking.provider?.provider_id || booking.service?.provider_id}`}
+                      to={`/providers/${booking.provider_id || booking.provider?.provider_id}`}
                       className="bg-carefd-teal text-white px-4 py-2 rounded-lg hover:bg-carefd-teal-medium transition-colors"
                     >
                       צפה בפרופיל הספק

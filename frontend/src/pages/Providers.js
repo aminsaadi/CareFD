@@ -70,7 +70,10 @@ const Providers = () => {
     latitude: searchParams.get('latitude') ? parseFloat(searchParams.get('latitude')) : null,
     longitude: searchParams.get('longitude') ? parseFloat(searchParams.get('longitude')) : null,
     radius: searchParams.get('radius_km') ? parseFloat(searchParams.get('radius_km')) : null,
-    useMyLocation: searchParams.has('latitude') && searchParams.has('longitude')
+    useMyLocation: searchParams.has('latitude') && searchParams.has('longitude'),
+    gender: searchParams.get('gender') || null,
+    languages: searchParams.get('languages') ? searchParams.get('languages').split(',') : [],
+    healthFunds: searchParams.get('health_funds') ? searchParams.get('health_funds').split(',') : []
   });
 
   // Initialize location if provided via URL
@@ -193,6 +196,9 @@ const Providers = () => {
       if (filters.minExperience) params.append('min_experience', filters.minExperience.toString());
       if (filters.verifiedOnly) params.append('verified_only', 'true');
       if (filters.recommendedOnly) params.append('recommended_only', 'true');
+      if (filters.gender) params.append('gender', filters.gender);
+      if (filters.languages?.length > 0) params.append('languages', filters.languages.join(','));
+      if (filters.healthFunds?.length > 0) params.append('health_funds', filters.healthFunds.join(','));
       if (filters.latitude && filters.longitude) {
         params.append('latitude', filters.latitude.toString());
         params.append('longitude', filters.longitude.toString());

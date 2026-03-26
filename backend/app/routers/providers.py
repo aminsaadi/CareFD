@@ -191,6 +191,10 @@ async def search_providers(
     service_type: Optional[str] = None,  # home_visit, clinic_visit, video_call, phone_call
     # Experience filter (years)
     min_experience: Optional[int] = None,
+    # Additional filters (aligned with services search)
+    gender: Optional[str] = None,
+    languages: Optional[str] = None,  # comma-separated
+    health_funds: Optional[str] = None,  # comma-separated
     # Verification filters
     verified_only: Optional[bool] = False,
     recommended_only: Optional[bool] = False,
@@ -323,7 +327,21 @@ async def search_providers(
     # Experience filter (in years)
     if min_experience:
         query["$and"].append({"years_experience": {"$gte": int(min_experience)}})
-    
+
+    # Gender filter
+    if gender:
+        query["$and"].append({"gender": gender})
+
+    # Languages filter
+    if languages:
+        lang_list = [l.strip() for l in languages.split(",")]
+        query["$and"].append({"languages": {"$in": lang_list}})
+
+    # Health funds filter
+    if health_funds:
+        fund_list = [f.strip() for f in health_funds.split(",")]
+        query["$and"].append({"health_funds": {"$in": fund_list}})
+
     # Execute query
     providers = await db.providers.find(query, {"_id": 0}).to_list(500)
     

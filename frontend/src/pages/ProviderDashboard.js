@@ -257,13 +257,14 @@ const ProviderDashboard = () => {
         totalBookings: providerBookings.length,
         pendingBookings: providerBookings.filter(b => b.status === 'pending').length,
         completedBookings: completed.length,
-        totalEarnings: completed.reduce((acc, b) => acc + (parseFloat(b.price) || 0), 0),
+        totalEarnings: completed.reduce((acc, b) => acc + (parseFloat(b.final_price || b.price) || 0), 0),
         averageRating: providerRes.data?.rating || 0,
         totalReviews: providerRes.data?.total_reviews || 0,
         profileViews: providerRes.data?.views_count || 0
       });
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
+      toast.error('שגיאה בטעינת נתוני הדשבורד');
     } finally {
       setLoading(false);
     }
@@ -959,7 +960,7 @@ const ProviderDashboard = () => {
                                     </div>
                                     <div className="bg-gray-50 rounded-lg p-3 text-center">
                                       <p className="text-xs text-carefd-gray">סוג</p>
-                                      <p className="font-medium text-sm text-carefd-navy">{booking.delivery_method || booking.service_type || '-'}</p>
+                                      <p className="font-medium text-sm text-carefd-navy">{booking.delivery_type || booking.service_type || '-'}</p>
                                     </div>
                                   </div>
                                   {booking.notes && (
@@ -1178,8 +1179,8 @@ const ProviderDashboard = () => {
                                       </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                      {booking.price && (
-                                        <span className="text-sm font-bold text-carefd-teal">₪{booking.price}</span>
+                                      {(booking.final_price || booking.price) && (
+                                        <span className="text-sm font-bold text-carefd-teal">₪{booking.final_price || booking.price}</span>
                                       )}
                                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
                                         {getStatusLabel(booking.status)}
