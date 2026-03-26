@@ -71,31 +71,6 @@ const getProfessionLabel = (professionValue) => {
   return professionTitles[professionValue] || professionValue;
 };
 
-// Demo reviews for display
-const demoReviews = [
-  {
-    review_id: 'review_1',
-    rating: 5,
-    comment: 'שירות מקצועי ואדיב מאוד. ממליץ בחום!',
-    created_at: '2025-01-10T10:00:00Z',
-    user: { name: 'יוסי כהן', picture: null }
-  },
-  {
-    review_id: 'review_2',
-    rating: 5,
-    comment: 'הטיפול עזר לי מאוד. צוות מסור ומקצועי.',
-    created_at: '2025-01-05T14:00:00Z',
-    user: { name: 'רחל לוי', picture: null }
-  },
-  {
-    review_id: 'review_3',
-    rating: 4,
-    comment: 'חוויה טובה, זמני המתנה סבירים והצוות נעים.',
-    created_at: '2024-12-20T09:00:00Z',
-    user: { name: 'דוד ישראלי', picture: null }
-  }
-];
-
 const ProviderProfile = () => {
   const { t } = useTranslation();
   const { providerId } = useParams();
@@ -415,6 +390,18 @@ const ProviderProfile = () => {
                 </button>
                 )}
                 
+                {provider.website && (
+                <a
+                  href={provider.website.startsWith('http') ? provider.website : `https://${provider.website}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-white text-carefd-navy px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-pale transition"
+                >
+                  <FaLink />
+                  אתר אינטרנט
+                </a>
+                )}
+
                 <button
                   onClick={() => setActiveTab('services')}
                   className="inline-flex items-center gap-2 bg-white text-carefd-navy px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-pale transition"
@@ -423,7 +410,7 @@ const ProviderProfile = () => {
                   <FaCalendarAlt />
                   הזמן תור
                 </button>
-                
+
                 {isOwner && (
                   <button
                     onClick={() => navigate(`/provider/edit/${providerId}`)}

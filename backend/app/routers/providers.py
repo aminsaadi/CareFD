@@ -403,6 +403,7 @@ async def search_providers(
             "service_type": service_type,
             "min_rating": min_rating,
             "radius_km": radius_km,
+            "min_experience": min_experience,
             "verified_only": verified_only,
             "recommended_only": recommended_only
         }

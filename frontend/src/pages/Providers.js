@@ -1,5 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -227,17 +227,6 @@ const Providers = () => {
     const nextPage = page + 1;
     setPage(nextPage);
     fetchProviders(nextPage);
-  };
-
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return Math.round(R * c * 10) / 10;
   };
 
   const handleSearch = (e) => {
@@ -750,6 +739,31 @@ const Providers = () => {
                 {filters.recommendedOnly && (
                   <span className="inline-flex items-center gap-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1 rounded-full text-sm">
                     מומלצים בלבד
+                    <button onClick={() => setFilters(prev => ({ ...prev, recommendedOnly: false }))}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.serviceType && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
+                    סוג שירות: {filters.serviceType === 'home_visit' ? 'ביקור בית' : filters.serviceType === 'clinic_visit' ? 'מרפאה' : filters.serviceType === 'video_call' ? 'טלרפואה' : 'שיחה טלפונית'}
+                    <button onClick={() => setFilters(prev => ({ ...prev, serviceType: null }))}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.providerType && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
+                    סוג ספק: {filters.providerType === 'individual' ? 'עצמאי' : filters.providerType === 'clinic' ? 'מרפאה' : 'חברה'}
+                    <button onClick={() => setFilters(prev => ({ ...prev, providerType: null }))}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.minRating && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
+                    דירוג: {filters.minRating}+
+                    <button onClick={() => setFilters(prev => ({ ...prev, minRating: null }))}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.minExperience && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
+                    ניסיון: {filters.minExperience}+ שנים
+                    <button onClick={() => setFilters(prev => ({ ...prev, minExperience: null }))}><FaTimes className="text-xs" /></button>
                   </span>
                 )}
                 <button
@@ -868,9 +882,9 @@ const Providers = () => {
                         </div>
                       ) : (
                         providers.map((provider) => (
-                          <a
+                          <Link
                             key={provider.provider_id}
-                            href={`/providers/${provider.provider_id}`}
+                            to={`/providers/${provider.provider_id}`}
                             className="flex items-center gap-3 p-3 hover:bg-carefd-teal/5 transition group"
                           >
                             {provider.profile_image ? (
@@ -882,7 +896,7 @@ const Providers = () => {
                             )}
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-carefd-navy text-sm truncate group-hover:text-carefd-teal transition">{provider.business_name}</p>
-                              <p className="text-xs text-carefd-gray truncate">{provider.profession_name || provider.profession} • {provider.location?.city}</p>
+                              <p className="text-xs text-carefd-gray truncate">{provider.profession_name || provider.profession_title} • {provider.location?.city}</p>
                               <div className="flex items-center gap-3 mt-0.5">
                                 {provider.rating != null && provider.rating > 0 && (
                                   <span className="text-xs text-amber-500">⭐ {Number(provider.rating).toFixed(1)}</span>
@@ -893,7 +907,7 @@ const Providers = () => {
                               </div>
                             </div>
                             <FaChevronLeft className="text-gray-300 group-hover:text-carefd-teal text-xs flex-shrink-0" />
-                          </a>
+                          </Link>
                         ))
                       )}
                     </div>
