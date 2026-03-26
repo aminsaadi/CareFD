@@ -200,8 +200,9 @@ const ProviderProfile = () => {
   };
 
   const handleWhatsApp = () => {
-    if (!provider?.phone) return;
-    const phone = provider.phone.replace(/[^0-9]/g, '');
+    const wpNumber = provider?.whatsapp_number || provider?.phone;
+    if (!wpNumber) return;
+    const phone = wpNumber.replace(/[^0-9]/g, '');
     window.open(`https://wa.me/${phone}?text=שלום, מצאתי אתכם ב-${siteName} ואשמח לקבל מידע נוסף`, '_blank');
   };
 
@@ -392,6 +393,7 @@ const ProviderProfile = () => {
               
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3">
+                {(provider.show_whatsapp !== false) && (provider.whatsapp_number || provider.phone) && (
                 <button
                   onClick={handleWhatsApp}
                   className="inline-flex items-center gap-2 bg-green-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-600 transition shadow-lg"
@@ -400,7 +402,9 @@ const ProviderProfile = () => {
                   <FaWhatsapp className="text-xl" />
                   WhatsApp
                 </button>
+                )}
 
+                {(provider.show_phone !== false) && provider.phone && (
                 <button
                   onClick={handleCall}
                   className="inline-flex items-center gap-2 bg-carefd-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition shadow-lg"
@@ -409,6 +413,7 @@ const ProviderProfile = () => {
                   <FaPhone />
                   התקשר
                 </button>
+                )}
                 
                 <button
                   onClick={() => setActiveTab('services')}

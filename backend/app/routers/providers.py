@@ -531,15 +531,33 @@ async def update_provider(
     
     # Whitelist allowed fields to prevent mass assignment attacks
     ALLOWED_FIELDS = {
-        "business_name", "description", "phone", "email", "website",
-        "provider_type", "location", "address", "city", "professions",
-        "sub_professions", "categories", "languages", "education",
-        "experience_years", "about", "specializations", "target_audiences",
-        "profile_image", "cover_image", "gallery", "working_hours",
-        "availability", "services", "social_links", "gender",
-        "shifts", "travel_radius", "home_visit", "online_service",
-        "instant_booking", "cancellation_policy", "payment_methods",
-        "insurance_accepted", "certifications", "awards",
+        # Basic info
+        "business_name", "description", "about", "profile_image", "profile_color",
+        "gender", "provider_type",
+        # Profession & skills
+        "profession_id", "profession_name", "profession_title",
+        "specialization_id", "specialization_name",
+        "specializations", "expertise", "service_categories",
+        "professions", "sub_professions", "categories",
+        # Contact
+        "phone", "email", "website", "whatsapp_number",
+        "show_phone", "show_email", "show_whatsapp",
+        # Location & service
+        "location", "address", "city", "service_areas",
+        "service_types", "services",
+        # Availability
+        "availability", "working_hours", "shifts",
+        # Experience & qualifications
+        "years_experience", "experience_years",
+        "education", "certifications",
+        "languages", "target_audience", "target_audiences",
+        # Payment & policy
+        "health_funds", "payment_methods",
+        "cancellation_policy", "cancellation_notice_hours",
+        # Extras
+        "cover_image", "gallery", "social_links",
+        "travel_radius", "home_visit", "online_service",
+        "instant_booking", "insurance_accepted", "awards",
     }
 
     # Filter out any non-allowed fields

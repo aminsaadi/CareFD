@@ -238,9 +238,23 @@ class Provider(BaseModel):
     phone: Optional[str] = None
     email: Optional[str] = None
     website: Optional[str] = None
+    whatsapp_number: Optional[str] = None
+    show_phone: bool = True
+    show_email: bool = True
+    show_whatsapp: bool = True
     years_experience: Optional[int] = None
     service_types: List[str] = []
     views_count: int = 0
+    # Payment & health funds
+    health_funds: List[str] = []
+    payment_methods: List[str] = []
+    cancellation_policy: Optional[str] = None
+    cancellation_notice_hours: Optional[int] = None
+    # Education & certifications
+    education: List[dict] = []           # [{degree, institution, year, field}]
+    certifications: List[dict] = []      # [{name, issuer, year, license_number, document_url}]
+    # Profile appearance
+    profile_color: Optional[str] = None
 
 PROFESSION_TITLES = [
     {"value": "doctor", "label": "רופא", "label_en": "Doctor",
