@@ -188,7 +188,9 @@ const Services = () => {
       if (flatList.length > 0) {
         setApiProfessions(flatList);
       }
-    }).catch(() => {});
+    }).catch(() => {
+      console.warn('Failed to load professions, using defaults');
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
