@@ -834,3 +834,12 @@ class MessageCreate(BaseModel):
     message_type: str = "text"  # text, image, file
     attachment_url: Optional[str] = None
     attachment_name: Optional[str] = None
+
+    @field_validator('content', mode='before')
+    @classmethod
+    def validate_content(cls, v, info):
+        return v or ""
+
+    def model_post_init(self, __context):
+        if not self.content.strip() and not self.attachment_url:
+            raise ValueError("Message must have content or an attachment")
