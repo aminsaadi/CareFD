@@ -97,7 +97,9 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
           ...filters,
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
-          useMyLocation: true
+          useMyLocation: true,
+          city: null,
+          radius: filters.radius || 10
         });
         setGettingLocation(false);
       },
