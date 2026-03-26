@@ -8,7 +8,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { useConfirm } from '../hooks/useConfirm';
-import { FaStar, FaSpinner } from 'react-icons/fa';
+import { FaStar, FaSpinner, FaCheckCircle } from 'react-icons/fa';
 
 const MyBookings = () => {
   const { t } = useTranslation();
@@ -62,6 +62,27 @@ const MyBookings = () => {
       fetchBookings();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'שגיאה בביטול ההזמנה');
+    }
+  };
+
+  const handleConfirmCompletion = async (booking) => {
+    try {
+      await confirm({
+        title: 'אישור השלמת שירות',
+        message: `האם השירות "${booking.service_name || 'שירות'}" הושלם לשביעות רצונך?`,
+        type: 'success',
+        confirmText: 'אשר השלמה',
+        cancelText: 'עדיין לא'
+      });
+      await api.put(`/bookings/${booking.booking_id}/client-confirm`, {
+        final_price: booking.final_price || booking.base_price
+      });
+      toast.success('השירות אושר כהושלם! תוכל לכתוב ביקורת.');
+      fetchBookings();
+    } catch (error) {
+      if (error?.response) {
+        toast.error(error.response?.data?.detail || 'שגיאה באישור ההשלמה');
+      }
     }
   };
 
@@ -265,7 +286,32 @@ const MyBookings = () => {
                     <span>בקשת ביטול נשלחה לספק - ממתין לאישור</span>
                   </div>
                 )}
-                
+
+                {/* Confirm completion for provider_completed */}
+                {booking.status === 'provider_completed' && (
+                  <div className="mt-4 pt-4 border-t border-purple-200 bg-purple-50 rounded-lg p-4">
+                    <p className="text-purple-800 font-medium mb-3 flex items-center gap-2">
+                      <FaCheckCircle />
+                      הספק סימן שהשירות הושלם — אנא אשר
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleConfirmCompletion(booking)}
+                        className="bg-green-500 text-white px-5 py-2 rounded-lg hover:bg-green-600 transition-colors flex items-center gap-2 font-medium"
+                      >
+                        <FaCheckCircle />
+                        אשר השלמה
+                      </button>
+                      <Link
+                        to={`/providers/${booking.provider_id || booking.provider?.provider_id}`}
+                        className="bg-carefd-teal text-white px-4 py-2 rounded-lg hover:bg-carefd-teal-medium transition-colors"
+                      >
+                        צפה בפרופיל הספק
+                      </Link>
+                    </div>
+                  </div>
+                )}
+
                 {/* Review button for completed bookings */}
                 {booking.status === 'completed' && !reviewedBookings.includes(booking.booking_id) && (
                   <div className="flex gap-2 mt-4 pt-4 border-t border-carefd-teal-pale">

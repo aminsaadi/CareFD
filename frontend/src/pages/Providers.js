@@ -165,6 +165,9 @@ const Providers = () => {
     if (filters.minExperience) count++;
     if (filters.verifiedOnly) count++;
     if (filters.recommendedOnly) count++;
+    if (filters.gender) count++;
+    if (filters.languages?.length > 0) count++;
+    if (filters.healthFunds?.length > 0) count++;
     if (filters.useMyLocation) count++;
     setActiveFiltersCount(count);
   }, [filters]);
@@ -664,6 +667,7 @@ const Providers = () => {
                 >
                   <option value="rating">מיון: דירוג</option>
                   <option value="reviews">מיון: ביקורות</option>
+                  <option value="price">מיון: מחיר</option>
                   {(filters.useMyLocation || (filters.latitude && filters.longitude)) && <option value="distance">מיון: מרחק</option>}
                 </select>
               </div>

@@ -388,7 +388,20 @@ async def search_providers(
         providers.sort(key=lambda x: x.get("rating") or 0, reverse=True)
     elif sort_by == "reviews":
         providers.sort(key=lambda x: x.get("total_reviews") or 0, reverse=True)
-    
+    elif sort_by == "price":
+        # Fetch min service price for each provider
+        provider_ids = [p["provider_id"] for p in providers]
+        if provider_ids:
+            pipeline = [
+                {"$match": {"provider_id": {"$in": provider_ids}, "is_active": True}},
+                {"$group": {"_id": "$provider_id", "min_price": {"$min": "$price"}}}
+            ]
+            price_docs = await db.services.aggregate(pipeline).to_list(500)
+            price_map = {d["_id"]: d["min_price"] for d in price_docs}
+            for p in providers:
+                p["min_price"] = price_map.get(p["provider_id"], float('inf'))
+        providers.sort(key=lambda x: x.get("min_price", float('inf')))
+
     total = len(providers)
     
     # Apply pagination after filtering and sorting

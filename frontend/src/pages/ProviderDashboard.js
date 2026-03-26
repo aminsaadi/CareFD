@@ -1126,10 +1126,40 @@ const ProviderDashboard = () => {
 
                   {/* Calendar Tab */}
                   {activeTab === 'calendar' && (
+                    <div className="space-y-6">
+                    {/* Availability Section */}
+                    <div className="bg-white p-6 rounded-2xl shadow-lg">
+                      <h3 className="text-xl font-bold text-carefd-navy mb-4 flex items-center gap-2">
+                        <FaCalendarAlt className="text-carefd-teal" />
+                        שעות פעילות
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'].map((day, idx) => {
+                          const avail = provider?.availability?.[idx] || {};
+                          return (
+                            <div key={day} className={`flex items-center justify-between p-3 rounded-xl border ${avail.is_active !== false ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
+                              <span className="font-medium text-carefd-navy w-16">{day}</span>
+                              {avail.is_active !== false ? (
+                                <span className="text-sm text-green-700 font-medium" dir="ltr">
+                                  {avail.start || '09:00'} - {avail.end || '17:00'}
+                                </span>
+                              ) : (
+                                <span className="text-sm text-gray-400">סגור</span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <p className="text-xs text-carefd-gray mt-3">
+                        לעריכת שעות פעילות, עבור ל<Link to={`/provider/edit/${provider?.provider_id}`} className="text-carefd-teal hover:underline">עריכת פרופיל</Link> &gt; זמינות
+                      </p>
+                    </div>
+
+                    {/* Bookings Calendar */}
                     <div className="bg-white p-6 rounded-2xl shadow-lg" data-testid="provider-calendar">
                       <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
                         <FaClock className="text-carefd-teal" />
-                        לוח שנה - הזמנות מאושרות
+                        הזמנות מאושרות
                       </h3>
                       {getCalendarBookings().length === 0 ? (
                         <div className="text-center py-12 text-carefd-gray">
@@ -1193,6 +1223,7 @@ const ProviderDashboard = () => {
                           ))}
                         </div>
                       )}
+                    </div>
                     </div>
                   )}
 

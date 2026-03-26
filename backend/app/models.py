@@ -822,9 +822,15 @@ class Message(BaseModel):
     sender_id: str
     sender_role: str
     content: str
+    message_type: str = "text"  # text, image, file
+    attachment_url: Optional[str] = None
+    attachment_name: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     is_read: bool = False
 
 class MessageCreate(BaseModel):
     room_id: str
-    content: str = Field(..., min_length=1, max_length=2000)
+    content: str = Field(default="", max_length=2000)
+    message_type: str = "text"  # text, image, file
+    attachment_url: Optional[str] = None
+    attachment_name: Optional[str] = None

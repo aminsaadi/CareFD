@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
   FaFilter, FaTimes, FaMapMarkerAlt, FaCrosshairs, FaStar,
   FaUserMd, FaBriefcase, FaHome, FaVideo, FaClinicMedical, FaPhoneAlt,
-  FaCheckCircle, FaAward, FaClock, FaChevronDown, FaChevronUp
+  FaCheckCircle, FaAward, FaClock, FaChevronDown, FaChevronUp,
+  FaVenusMars, FaLanguage, FaHospital
 } from 'react-icons/fa';
 import api from '../utils/api';
 
@@ -51,6 +52,9 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
     providerType: false,
     rating: false,
     experience: false,
+    gender: false,
+    languages: false,
+    healthFunds: false,
     badges: false
   });
   const [gettingLocation, setGettingLocation] = useState(false);
@@ -370,6 +374,79 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
               }`}
             >
               {option.label}
+            </button>
+          ))}
+        </div>
+      </FilterSection>
+
+      {/* Gender Filter */}
+      <FilterSection title="מגדר" icon={FaVenusMars} sectionKey="gender">
+        <div className="flex flex-wrap gap-2">
+          {[
+            { value: null, label: 'הכל' },
+            { value: 'male', label: 'זכר' },
+            { value: 'female', label: 'נקבה' }
+          ].map((option) => (
+            <button
+              key={option.value || 'all'}
+              onClick={() => onFilterChange({ ...filters, gender: option.value })}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                filters.gender === option.value
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </FilterSection>
+
+      {/* Languages Filter */}
+      <FilterSection title="שפות" icon={FaLanguage} sectionKey="languages">
+        <div className="flex flex-wrap gap-2">
+          {['עברית', 'ערבית', 'רוסית', 'אנגלית', 'אמהרית', 'צרפתית'].map((lang) => (
+            <button
+              key={lang}
+              onClick={() => {
+                const current = filters.languages || [];
+                const updated = current.includes(lang)
+                  ? current.filter(l => l !== lang)
+                  : [...current, lang];
+                onFilterChange({ ...filters, languages: updated });
+              }}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                (filters.languages || []).includes(lang)
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
+              }`}
+            >
+              {lang}
+            </button>
+          ))}
+        </div>
+      </FilterSection>
+
+      {/* Health Funds Filter */}
+      <FilterSection title="קופות חולים" icon={FaHospital} sectionKey="healthFunds">
+        <div className="flex flex-wrap gap-2">
+          {['כללית', 'מכבי', 'מאוחדת', 'לאומית'].map((fund) => (
+            <button
+              key={fund}
+              onClick={() => {
+                const current = filters.healthFunds || [];
+                const updated = current.includes(fund)
+                  ? current.filter(f => f !== fund)
+                  : [...current, fund];
+                onFilterChange({ ...filters, healthFunds: updated });
+              }}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                (filters.healthFunds || []).includes(fund)
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
+              }`}
+            >
+              {fund}
             </button>
           ))}
         </div>
