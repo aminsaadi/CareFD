@@ -1209,8 +1209,8 @@ const ProviderDashboard = () => {
                                       </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                      {(booking.final_price || booking.price) && (
-                                        <span className="text-sm font-bold text-carefd-teal">₪{booking.final_price || booking.price}</span>
+                                      {(booking.final_price || booking.base_price) && (
+                                        <span className="text-sm font-bold text-carefd-teal">₪{booking.final_price || booking.base_price}</span>
                                       )}
                                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
                                         {getStatusLabel(booking.status)}
