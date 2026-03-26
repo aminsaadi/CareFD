@@ -60,7 +60,7 @@ async def create_provider(provider_data: ProviderRegister, authorization: Option
             {"provider_id": provider.provider_id, "user_id": user["user_id"]}
         )
     
-    return provider.model_dump(exclude={"created_at": False})
+    return provider_dict
 
 @router.get("/providers/me")
 async def get_my_provider(authorization: Optional[str] = Header(None), request: Request = None):
@@ -322,8 +322,7 @@ async def search_providers(
 
     # Experience filter (in years)
     if min_experience:
-        cutoff_date = datetime.now(timezone.utc) - timedelta(days=min_experience * 365)
-        query["$and"].append({"created_at": {"$lte": cutoff_date.isoformat()}})
+        query["$and"].append({"years_experience": {"$gte": int(min_experience)}})
     
     # Execute query
     providers = await db.providers.find(query, {"_id": 0}).to_list(500)
@@ -548,9 +547,9 @@ async def update_provider(
         # Availability
         "availability", "working_hours", "shifts",
         # Experience & qualifications
-        "years_experience", "experience_years",
+        "years_experience",
         "education", "certifications",
-        "languages", "target_audience", "target_audiences",
+        "languages", "target_audience",
         # Payment & policy
         "health_funds", "payment_methods",
         "cancellation_policy", "cancellation_notice_hours",
