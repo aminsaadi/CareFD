@@ -240,6 +240,9 @@ def _send_email_zeptomail(recipient: str, subject: str, html_content: str, sende
     if not token:
         logger.error("ZeptoMail API key not configured")
         return None
+    # Strip prefix if user included it in the key
+    if token.startswith("Zoho-enczapikey "):
+        token = token[len("Zoho-enczapikey "):]
     try:
         logger.info(f"Sending email via ZeptoMail to {recipient} - Subject: {subject}")
         if '<' in sender and '>' in sender:

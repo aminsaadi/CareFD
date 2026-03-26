@@ -60,7 +60,7 @@ async def create_provider(provider_data: ProviderRegister, authorization: Option
             {"provider_id": provider.provider_id, "user_id": user["user_id"]}
         )
     
-    return provider.model_dump(exclude={"created_at": False})
+    return provider_dict
 
 @router.get("/providers/me")
 async def get_my_provider(authorization: Optional[str] = Header(None), request: Request = None):
@@ -191,6 +191,10 @@ async def search_providers(
     service_type: Optional[str] = None,  # home_visit, clinic_visit, video_call, phone_call
     # Experience filter (years)
     min_experience: Optional[int] = None,
+    # Additional filters (aligned with services search)
+    gender: Optional[str] = None,
+    languages: Optional[str] = None,  # comma-separated
+    health_funds: Optional[str] = None,  # comma-separated
     # Verification filters
     verified_only: Optional[bool] = False,
     recommended_only: Optional[bool] = False,
@@ -322,9 +326,22 @@ async def search_providers(
 
     # Experience filter (in years)
     if min_experience:
-        cutoff_date = datetime.now(timezone.utc) - timedelta(days=min_experience * 365)
-        query["$and"].append({"created_at": {"$lte": cutoff_date.isoformat()}})
-    
+        query["$and"].append({"years_experience": {"$gte": int(min_experience)}})
+
+    # Gender filter
+    if gender:
+        query["$and"].append({"gender": gender})
+
+    # Languages filter
+    if languages:
+        lang_list = [l.strip() for l in languages.split(",")]
+        query["$and"].append({"languages": {"$in": lang_list}})
+
+    # Health funds filter
+    if health_funds:
+        fund_list = [f.strip() for f in health_funds.split(",")]
+        query["$and"].append({"health_funds": {"$in": fund_list}})
+
     # Execute query
     providers = await db.providers.find(query, {"_id": 0}).to_list(500)
     
@@ -371,7 +388,20 @@ async def search_providers(
         providers.sort(key=lambda x: x.get("rating") or 0, reverse=True)
     elif sort_by == "reviews":
         providers.sort(key=lambda x: x.get("total_reviews") or 0, reverse=True)
-    
+    elif sort_by == "price":
+        # Fetch min service price for each provider
+        provider_ids = [p["provider_id"] for p in providers]
+        if provider_ids:
+            pipeline = [
+                {"$match": {"provider_id": {"$in": provider_ids}, "is_active": True}},
+                {"$group": {"_id": "$provider_id", "min_price": {"$min": "$price"}}}
+            ]
+            price_docs = await db.services.aggregate(pipeline).to_list(500)
+            price_map = {d["_id"]: d["min_price"] for d in price_docs}
+            for p in providers:
+                p["min_price"] = price_map.get(p["provider_id"], float('inf'))
+        providers.sort(key=lambda x: x.get("min_price", float('inf')))
+
     total = len(providers)
     
     # Apply pagination after filtering and sorting
@@ -404,6 +434,7 @@ async def search_providers(
             "service_type": service_type,
             "min_rating": min_rating,
             "radius_km": radius_km,
+            "min_experience": min_experience,
             "verified_only": verified_only,
             "recommended_only": recommended_only
         }
@@ -531,15 +562,33 @@ async def update_provider(
     
     # Whitelist allowed fields to prevent mass assignment attacks
     ALLOWED_FIELDS = {
-        "business_name", "description", "phone", "email", "website",
-        "provider_type", "location", "address", "city", "professions",
-        "sub_professions", "categories", "languages", "education",
-        "experience_years", "about", "specializations", "target_audiences",
-        "profile_image", "cover_image", "gallery", "working_hours",
-        "availability", "services", "social_links", "gender",
-        "shifts", "travel_radius", "home_visit", "online_service",
-        "instant_booking", "cancellation_policy", "payment_methods",
-        "insurance_accepted", "certifications", "awards",
+        # Basic info
+        "business_name", "description", "about", "profile_image", "profile_color",
+        "gender", "provider_type",
+        # Profession & skills
+        "profession_id", "profession_name", "profession_title",
+        "specialization_id", "specialization_name",
+        "specializations", "expertise", "service_categories",
+        "professions", "sub_professions", "categories",
+        # Contact
+        "phone", "email", "website", "whatsapp_number",
+        "show_phone", "show_email", "show_whatsapp",
+        # Location & service
+        "location", "address", "city", "service_areas",
+        "service_types", "services",
+        # Availability
+        "availability", "working_hours", "shifts",
+        # Experience & qualifications
+        "years_experience",
+        "education", "certifications",
+        "languages", "target_audience",
+        # Payment & policy
+        "health_funds", "payment_methods",
+        "cancellation_policy", "cancellation_notice_hours",
+        # Extras
+        "cover_image", "gallery", "social_links",
+        "travel_radius", "home_visit", "online_service",
+        "instant_booking", "insurance_accepted", "awards",
     }
 
     # Filter out any non-allowed fields

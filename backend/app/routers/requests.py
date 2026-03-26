@@ -646,12 +646,18 @@ async def accept_offer(
         {"$set": {"status": OfferStatus.ACCEPTED, "accepted_at": now.isoformat()}}
     )
 
-    # 4. Update request - add booking to list, keep request OPEN for more offers
+    # 4. Update request - add booking to list, transition to in_progress
     await db.requests.update_one(
         {"request_id": offer["request_id"]},
         {
             "$push": {"booking_ids": booking.booking_id, "accepted_offer_ids": offer_id},
-            "$set": {"updated_at": now.isoformat()}
+            "$set": {
+                "status": RequestStatus.IN_PROGRESS,
+                "accepted_offer_id": offer_id,
+                "booking_id": booking.booking_id,
+                "accepted_at": now.isoformat(),
+                "updated_at": now.isoformat()
+            }
         }
     )
 

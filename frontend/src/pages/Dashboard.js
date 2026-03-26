@@ -177,6 +177,7 @@ const Dashboard = () => {
       });
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
+      toast.error('שגיאה בטעינת נתוני הדשבורד');
     } finally {
       setLoading(false);
     }

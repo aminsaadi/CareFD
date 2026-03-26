@@ -156,7 +156,7 @@ async def search_services(
         ]})
 
     if service_type:
-        conditions.append({"service_type": service_type})
+        conditions.append({"delivery_types": {"$in": [service_type]}})
 
     if service_category:
         conditions.append({"service_category": service_category})

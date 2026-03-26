@@ -257,13 +257,14 @@ const ProviderDashboard = () => {
         totalBookings: providerBookings.length,
         pendingBookings: providerBookings.filter(b => b.status === 'pending').length,
         completedBookings: completed.length,
-        totalEarnings: completed.reduce((acc, b) => acc + (parseFloat(b.price) || 0), 0),
+        totalEarnings: completed.reduce((acc, b) => acc + (parseFloat(b.final_price || b.price) || 0), 0),
         averageRating: providerRes.data?.rating || 0,
         totalReviews: providerRes.data?.total_reviews || 0,
         profileViews: providerRes.data?.views_count || 0
       });
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
+      toast.error('שגיאה בטעינת נתוני הדשבורד');
     } finally {
       setLoading(false);
     }
@@ -959,7 +960,7 @@ const ProviderDashboard = () => {
                                     </div>
                                     <div className="bg-gray-50 rounded-lg p-3 text-center">
                                       <p className="text-xs text-carefd-gray">סוג</p>
-                                      <p className="font-medium text-sm text-carefd-navy">{booking.delivery_method || booking.service_type || '-'}</p>
+                                      <p className="font-medium text-sm text-carefd-navy">{booking.delivery_type || booking.service_type || '-'}</p>
                                     </div>
                                   </div>
                                   {booking.notes && (
@@ -1125,10 +1126,40 @@ const ProviderDashboard = () => {
 
                   {/* Calendar Tab */}
                   {activeTab === 'calendar' && (
+                    <div className="space-y-6">
+                    {/* Availability Section */}
+                    <div className="bg-white p-6 rounded-2xl shadow-lg">
+                      <h3 className="text-xl font-bold text-carefd-navy mb-4 flex items-center gap-2">
+                        <FaCalendarAlt className="text-carefd-teal" />
+                        שעות פעילות
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'].map((day, idx) => {
+                          const avail = provider?.availability?.[idx] || {};
+                          return (
+                            <div key={day} className={`flex items-center justify-between p-3 rounded-xl border ${avail.is_active !== false ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
+                              <span className="font-medium text-carefd-navy w-16">{day}</span>
+                              {avail.is_active !== false ? (
+                                <span className="text-sm text-green-700 font-medium" dir="ltr">
+                                  {avail.start || '09:00'} - {avail.end || '17:00'}
+                                </span>
+                              ) : (
+                                <span className="text-sm text-gray-400">סגור</span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <p className="text-xs text-carefd-gray mt-3">
+                        לעריכת שעות פעילות, עבור ל<Link to={`/provider/edit/${provider?.provider_id}`} className="text-carefd-teal hover:underline">עריכת פרופיל</Link> &gt; זמינות
+                      </p>
+                    </div>
+
+                    {/* Bookings Calendar */}
                     <div className="bg-white p-6 rounded-2xl shadow-lg" data-testid="provider-calendar">
                       <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
                         <FaClock className="text-carefd-teal" />
-                        לוח שנה - הזמנות מאושרות
+                        הזמנות מאושרות
                       </h3>
                       {getCalendarBookings().length === 0 ? (
                         <div className="text-center py-12 text-carefd-gray">
@@ -1178,8 +1209,8 @@ const ProviderDashboard = () => {
                                       </div>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                      {booking.price && (
-                                        <span className="text-sm font-bold text-carefd-teal">₪{booking.price}</span>
+                                      {(booking.final_price || booking.price) && (
+                                        <span className="text-sm font-bold text-carefd-teal">₪{booking.final_price || booking.price}</span>
                                       )}
                                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
                                         {getStatusLabel(booking.status)}
@@ -1192,6 +1223,7 @@ const ProviderDashboard = () => {
                           ))}
                         </div>
                       )}
+                    </div>
                     </div>
                   )}
 

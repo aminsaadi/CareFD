@@ -7,10 +7,8 @@ import os
 
 from app.database import db
 from app.models import Booking, BookingCreate, BookingStatus, ContactPerson, ServiceLocation, NotificationType
-from app.utils import get_current_user, send_email_async, create_notification, send_push_to_user
+from app.utils import get_current_user, send_email_async, create_notification, send_push_to_user, get_site_url
 from app.rate_limiter import rate_limiter, get_client_ip
-
-SITE_URL = os.environ.get('SITE_URL', 'https://carefd.co.il').rstrip('/')
 
 router = APIRouter()
 
@@ -236,7 +234,9 @@ async def create_booking(
     
     # Format booking date nicely
     booking_time_str = booking_data.booking_time or "יתואם טלפונית"
-    
+
+    site_url = await get_site_url()
+
     # Send notification email to provider
     provider_user = await db.users.find_one({"user_id": provider["user_id"]}, {"_id": 0})
     if provider_user:
@@ -280,7 +280,7 @@ async def create_booking(
                     {f'<div style="background: #e8f5f3; padding: 15px; border-radius: 10px; margin-top: 20px;"><strong>הערות:</strong> {booking_data.notes}</div>' if booking_data.notes else ''}
                     
                     <div style="text-align: center; margin-top: 30px;">
-                        <a href="{SITE_URL}/provider/dashboard" style="background: #00a99d; color: white; padding: 15px 40px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">אשר את ההזמנה</a>
+                        <a href="{site_url}/provider/dashboard" style="background: #00a99d; color: white; padding: 15px 40px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">אשר את ההזמנה</a>
                     </div>
                 </div>
             </body>
@@ -340,7 +340,7 @@ async def create_booking(
                     </div>
                     
                     <div style="text-align: center; margin-top: 30px;">
-                        <a href="{SITE_URL}/dashboard" style="background: #00a99d; color: white; padding: 15px 40px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">צפה בהזמנות שלי</a>
+                        <a href="{site_url}/dashboard" style="background: #00a99d; color: white; padding: 15px 40px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">צפה בהזמנות שלי</a>
                     </div>
 
                     <p style="text-align: center; color: #999; font-size: 12px; margin-top: 30px;">
@@ -545,6 +545,7 @@ async def request_booking_change(
     )
     
     # Send email to client
+    site_url = await get_site_url()
     client_user = await db.users.find_one({"user_id": booking["user_id"]}, {"_id": 0})
     if client_user and client_user.get("email"):
         await send_email_async(
@@ -566,7 +567,7 @@ async def request_booking_change(
                     </div>
                     <p>אנא היכנס לאזור האישי שלך לאשר או לדחות את הבקשה.</p>
                     <div style="text-align: center; margin-top: 20px;">
-                        <a href="{SITE_URL}/dashboard" style="background: #00a99d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold;">לאזור האישי</a>
+                        <a href="{site_url}/dashboard" style="background: #00a99d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold;">לאזור האישי</a>
                     </div>
                 </div>
             </div>
@@ -1039,6 +1040,7 @@ async def reject_booking(
     )
     
     # Send email to client
+    site_url = await get_site_url()
     client_user = await db.users.find_one({"user_id": booking["user_id"]}, {"_id": 0})
     if client_user and client_user.get("email"):
         await send_email_async(
@@ -1062,7 +1064,7 @@ async def reject_booking(
                     </div>
                     <p>מומלץ לחפש ספק חלופי באתר.</p>
                     <div style="text-align: center; margin-top: 20px;">
-                        <a href="{SITE_URL}/providers" style="background: #00a99d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold;">חפש ספק אחר</a>
+                        <a href="{site_url}/providers" style="background: #00a99d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold;">חפש ספק אחר</a>
                     </div>
                 </div>
             </body>

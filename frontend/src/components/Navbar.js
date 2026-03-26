@@ -19,6 +19,9 @@ const Navbar = () => {
   useEffect(() => {
     if (isAuthenticated) {
       fetchUnreadChats();
+      // Refresh unread count every 30 seconds
+      const interval = setInterval(fetchUnreadChats, 30000);
+      return () => clearInterval(interval);
     }
   }, [isAuthenticated]);
 
@@ -26,11 +29,10 @@ const Navbar = () => {
     try {
       const response = await api.get('/chat/rooms');
       const rooms = response.data.rooms || [];
-      // Count rooms that actually have unread messages
       const unreadRooms = rooms.filter(room => room.unread_count > 0);
       setUnreadChats(unreadRooms.length);
     } catch (error) {
-      console.error('Failed to fetch chat rooms:', error);
+      // Silent fail for background polling
     }
   };
 

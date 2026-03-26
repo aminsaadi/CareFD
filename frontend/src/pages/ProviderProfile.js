@@ -5,7 +5,6 @@ import { useAuth } from '../context/AuthContext';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import AddReviewForm from '../components/AddReviewForm';
 import api from '../utils/api';
 import { 
   FaStar, FaMapMarkerAlt, FaClock, FaEdit, FaPhone, FaEnvelope,
@@ -70,31 +69,6 @@ const educationLevelLabels = {
 const getProfessionLabel = (professionValue) => {
   return professionTitles[professionValue] || professionValue;
 };
-
-// Demo reviews for display
-const demoReviews = [
-  {
-    review_id: 'review_1',
-    rating: 5,
-    comment: 'שירות מקצועי ואדיב מאוד. ממליץ בחום!',
-    created_at: '2025-01-10T10:00:00Z',
-    user: { name: 'יוסי כהן', picture: null }
-  },
-  {
-    review_id: 'review_2',
-    rating: 5,
-    comment: 'הטיפול עזר לי מאוד. צוות מסור ומקצועי.',
-    created_at: '2025-01-05T14:00:00Z',
-    user: { name: 'רחל לוי', picture: null }
-  },
-  {
-    review_id: 'review_3',
-    rating: 4,
-    comment: 'חוויה טובה, זמני המתנה סבירים והצוות נעים.',
-    created_at: '2024-12-20T09:00:00Z',
-    user: { name: 'דוד ישראלי', picture: null }
-  }
-];
 
 const ProviderProfile = () => {
   const { t } = useTranslation();
@@ -200,8 +174,9 @@ const ProviderProfile = () => {
   };
 
   const handleWhatsApp = () => {
-    if (!provider?.phone) return;
-    const phone = provider.phone.replace(/[^0-9]/g, '');
+    const wpNumber = provider?.whatsapp_number || provider?.phone;
+    if (!wpNumber) return;
+    const phone = wpNumber.replace(/[^0-9]/g, '');
     window.open(`https://wa.me/${phone}?text=שלום, מצאתי אתכם ב-${siteName} ואשמח לקבל מידע נוסף`, '_blank');
   };
 
@@ -286,16 +261,16 @@ const ProviderProfile = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex flex-col lg:flex-row gap-8 items-start">
             {/* Provider Avatar/Logo */}
-            <div className="w-32 h-32 lg:w-40 lg:h-40 bg-white rounded-2xl shadow-xl flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <div className={`w-32 h-32 lg:w-40 lg:h-40 rounded-2xl shadow-xl flex items-center justify-center flex-shrink-0 overflow-hidden ${provider.profile_image ? 'bg-white' : `bg-gradient-to-br ${provider.profile_color || 'from-carefd-teal to-carefd-navy'}`}`}>
               {provider.profile_image ? (
-                <img 
-                  src={provider.profile_image} 
-                  alt={provider.business_name || 'Profile'} 
+                <img
+                  src={provider.profile_image}
+                  alt={provider.business_name || 'Profile'}
                   className="w-full h-full object-cover"
                   data-testid="provider-profile-image"
                 />
               ) : (
-                <span className="text-5xl lg:text-6xl font-bold text-carefd-teal">
+                <span className="text-5xl lg:text-6xl font-bold text-white">
                   {(provider.business_name || 'ס')[0]}
                 </span>
               )}
@@ -392,6 +367,7 @@ const ProviderProfile = () => {
               
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3">
+                {(provider.show_whatsapp !== false) && (provider.whatsapp_number || provider.phone) && (
                 <button
                   onClick={handleWhatsApp}
                   className="inline-flex items-center gap-2 bg-green-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-600 transition shadow-lg"
@@ -400,7 +376,9 @@ const ProviderProfile = () => {
                   <FaWhatsapp className="text-xl" />
                   WhatsApp
                 </button>
+                )}
 
+                {(provider.show_phone !== false) && provider.phone && (
                 <button
                   onClick={handleCall}
                   className="inline-flex items-center gap-2 bg-carefd-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition shadow-lg"
@@ -409,7 +387,20 @@ const ProviderProfile = () => {
                   <FaPhone />
                   התקשר
                 </button>
+                )}
                 
+                {provider.website && (
+                <a
+                  href={provider.website.startsWith('http') ? provider.website : `https://${provider.website}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-white text-carefd-navy px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-pale transition"
+                >
+                  <FaLink />
+                  אתר אינטרנט
+                </a>
+                )}
+
                 <button
                   onClick={() => setActiveTab('services')}
                   className="inline-flex items-center gap-2 bg-white text-carefd-navy px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-pale transition"
@@ -418,7 +409,7 @@ const ProviderProfile = () => {
                   <FaCalendarAlt />
                   הזמן תור
                 </button>
-                
+
                 {isOwner && (
                   <button
                     onClick={() => navigate(`/provider/edit/${providerId}`)}
@@ -646,14 +637,18 @@ const ProviderProfile = () => {
                       </div>
                     </div>
 
-                    {/* Add Review Form */}
-                    {isAuthenticated && !isOwner && (
-                      <div className="bg-carefd-teal-pale/20 rounded-xl p-6 mb-6">
-                        <h4 className="font-bold text-carefd-navy mb-4">הוסף ביקורת</h4>
-                        <AddReviewForm 
-                          providerId={providerId} 
-                          onReviewAdded={fetchReviews}
-                        />
+                    {/* Review notice - only customers who booked can review */}
+                    {isAuthenticated && !isOwner && reviews.length === 0 && (
+                      <div className="bg-carefd-teal-pale/20 rounded-xl p-6 mb-6 text-center">
+                        <p className="text-carefd-navy font-medium mb-2">רוצה לכתוב ביקורת?</p>
+                        <p className="text-sm text-carefd-gray mb-3">ניתן לכתוב ביקורת רק לאחר קבלת שירות מהספק</p>
+                        <Link
+                          to="/my-bookings"
+                          className="inline-flex items-center gap-2 bg-carefd-teal text-white px-5 py-2 rounded-xl font-medium hover:bg-carefd-teal-medium transition text-sm"
+                        >
+                          <FaCalendarAlt />
+                          ההזמנות שלי
+                        </Link>
                       </div>
                     )}
 
@@ -978,10 +973,29 @@ const ProviderProfile = () => {
                   <FaMapMarkerAlt className="text-carefd-teal" />
                   מיקום
                 </h3>
-                <p className="text-carefd-slate mb-4">
+                <p className="text-carefd-slate mb-2">
                   {provider.location.address && `${provider.location.address}, `}
                   {provider.location.city}
                 </p>
+                {provider.location.coverage_radius_km && (
+                  <p className="text-sm text-carefd-gray mb-4">
+                    רדיוס שירות: {provider.location.coverage_radius_km} ק״מ
+                  </p>
+                )}
+                {/* Map */}
+                {provider.location.latitude && provider.location.longitude && (
+                  <div className="rounded-xl overflow-hidden border border-gray-200 mb-4" style={{ height: '250px' }}>
+                    <iframe
+                      title="מיקום הספק"
+                      width="100%"
+                      height="100%"
+                      frameBorder="0"
+                      style={{ border: 0 }}
+                      src={`https://www.openstreetmap.org/export/embed.html?bbox=${provider.location.longitude - 0.01},${provider.location.latitude - 0.008},${provider.location.longitude + 0.01},${provider.location.latitude + 0.008}&layer=mapnik&marker=${provider.location.latitude},${provider.location.longitude}`}
+                      loading="lazy"
+                    />
+                  </div>
+                )}
                 {/* Service Areas */}
                 {provider.service_areas && provider.service_areas.length > 0 && (
                   <div className="mt-3 pt-3 border-t border-gray-100">

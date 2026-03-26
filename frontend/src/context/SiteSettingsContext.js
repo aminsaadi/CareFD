@@ -107,9 +107,11 @@ export const SiteSettingsProvider = ({ children }) => {
   }, []);
 
   const siteName = settings.site_name || DEFAULT_SETTINGS.site_name;
+  const maintenanceMode = settings.maintenance_mode || false;
+  const maintenanceMessage = settings.maintenance_message || '';
 
   return (
-    <SiteSettingsContext.Provider value={{ settings, siteName, loaded }}>
+    <SiteSettingsContext.Provider value={{ settings, siteName, loaded, maintenanceMode, maintenanceMessage }}>
       {children}
     </SiteSettingsContext.Provider>
   );
