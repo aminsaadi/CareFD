@@ -55,6 +55,7 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
   });
   const [gettingLocation, setGettingLocation] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [cities, setCities] = useState([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -78,6 +79,13 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
       }
     };
     fetchCategories();
+    const fetchCities = async () => {
+      try {
+        const res = await api.get('/localities?limit=500');
+        setCities(res.data.localities || []);
+      } catch { /* ignore */ }
+    };
+    fetchCities();
   }, []);
 
   const toggleSection = (section) => {
@@ -210,11 +218,41 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
             <CitySelect
               name="city"
               value={filters.city || ''}
-              onChange={(e) => onFilterChange({ ...filters, city: e.target.value || null, latitude: null, longitude: null, useMyLocation: false, radius: null })}
+              onChange={(e) => {
+                const cityName = e.target.value || null;
+                const matchedCity = cities.find(c => c.name === cityName);
+                if (matchedCity && matchedCity.lat && matchedCity.lng) {
+                  onFilterChange({ ...filters, city: cityName, latitude: matchedCity.lat, longitude: matchedCity.lng, useMyLocation: false, radius: filters.radius || 25 });
+                } else {
+                  onFilterChange({ ...filters, city: cityName, latitude: null, longitude: null, useMyLocation: false, radius: null });
+                }
+              }}
               placeholder="כל הערים"
               inputClassName="w-full px-4 py-2 rounded-xl border-2 border-carefd-teal-pale focus:border-carefd-teal focus:outline-none"
             />
           </div>
+
+          {/* Radius for City */}
+          {filters.city && filters.latitude && (
+            <div>
+              <label className="block text-sm font-medium text-carefd-navy mb-2">רדיוס חיפוש</label>
+              <div className="flex flex-wrap gap-2">
+                {radiusOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => onFilterChange({ ...filters, radius: option.value })}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                      filters.radius === option.value
+                        ? 'bg-carefd-teal text-white'
+                        : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </FilterSection>
 

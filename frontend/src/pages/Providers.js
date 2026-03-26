@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import ProviderCard from '../components/ProviderCard';
 import AdvancedFilters from '../components/AdvancedFilters';
 import api from '../utils/api';
+import { toast } from 'sonner';
 import { israeliLocalities } from '../data/israeliLocalities';
 import { israeliRegions, healthcareProfessions, popularSearches as searchData } from '../data/searchData';
 import { 
@@ -213,6 +214,7 @@ const Providers = () => {
       setTotalProviders(response.data.total || 0);
     } catch (error) {
       console.error('Failed to fetch providers:', error);
+      toast.error('שגיאה בטעינת ספקים. נסו שוב.');
       if (pageNum === 0) {
         setProviders([]);
         setTotalProviders(0);
