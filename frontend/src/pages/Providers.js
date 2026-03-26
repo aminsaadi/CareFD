@@ -28,6 +28,8 @@ const Providers = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // grid or list
   const [sortBy, setSortBy] = useState('rating');
+  const [page, setPage] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [locationQuery, setLocationQuery] = useState(searchParams.get('city') || '');
   const [isLocating, setIsLocating] = useState(false);
@@ -164,15 +166,22 @@ const Providers = () => {
   }, [filters]);
 
   useEffect(() => {
-    fetchProviders();
+    setPage(0);
+    fetchProviders(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, sortBy]);
 
-  const fetchProviders = async () => {
+  const PAGE_SIZE = 20;
+
+  const fetchProviders = async (pageNum = 0) => {
     try {
-      setLoading(true);
+      if (pageNum === 0) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
       const params = new URLSearchParams();
-      
+
       if (filters.search) params.append('search', filters.search);
       if (filters.city) params.append('city', filters.city);
       if (filters.category) params.append('category', filters.category);
@@ -190,21 +199,34 @@ const Providers = () => {
       }
       params.append('sort_by', sortBy);
       params.append('sort_order', 'desc');
-      
+      params.append('skip', (pageNum * PAGE_SIZE).toString());
+      params.append('limit', PAGE_SIZE.toString());
+
       const response = await api.get(`/providers?${params.toString()}`);
       let apiProviders = response.data.providers || [];
-      
-      // Show actual providers from API (no dummy data fallback)
-      setProviders(apiProviders);
+
+      if (pageNum === 0) {
+        setProviders(apiProviders);
+      } else {
+        setProviders(prev => [...prev, ...apiProviders]);
+      }
       setTotalProviders(response.data.total || 0);
     } catch (error) {
       console.error('Failed to fetch providers:', error);
-      // Show empty on error - no dummy data
-      setProviders([]);
-      setTotalProviders(0);
+      if (pageNum === 0) {
+        setProviders([]);
+        setTotalProviders(0);
+      }
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
+  };
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchProviders(nextPage);
   };
 
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -893,6 +915,28 @@ const Providers = () => {
                       <ProviderCard provider={provider} />
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Load More */}
+              {providers.length < totalProviders && !loading && (
+                <div className="mt-8 text-center">
+                  <button
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                    className="inline-flex items-center gap-2 px-8 py-3 bg-carefd-teal text-white font-medium rounded-xl hover:bg-carefd-teal/90 transition disabled:opacity-50"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <FaSpinner className="animate-spin" />
+                        טוען...
+                      </>
+                    ) : (
+                      <>
+                        טען עוד ({providers.length} מתוך {totalProviders})
+                      </>
+                    )}
+                  </button>
                 </div>
               )}
             </div>
