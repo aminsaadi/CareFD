@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -32,13 +32,6 @@ const serviceTypeOptions = [
   { value: 'phone_call', label: 'שיחה טלפונית', icon: FaPhoneAlt }
 ];
 
-const pricingTypeOptions = [
-  { value: 'per_hour', label: 'לפי שעה' },
-  { value: 'per_session', label: 'לפי טיפול' },
-  { value: 'consultation', label: 'ייעוץ' },
-  { value: 'package', label: 'חבילה' }
-];
-
 const providerTypeOptions = [
   { value: 'individual', label: 'עצמאי' },
   { value: 'clinic', label: 'מרפאה' },
@@ -52,7 +45,7 @@ const availableSpecializations = [
 ];
 
 const ProviderDashboard = () => {
-  const { t } = useTranslation();
+
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -235,6 +228,7 @@ const ProviderDashboard = () => {
         setMyOffers(myOffersRes.data.offers || []);
       } catch (e) {
         console.error('Failed to fetch offers:', e);
+        toast.error('שגיאה בטעינת ההצעות');
       }
 
       // Fetch reviews
@@ -257,7 +251,7 @@ const ProviderDashboard = () => {
         totalBookings: providerBookings.length,
         pendingBookings: providerBookings.filter(b => b.status === 'pending').length,
         completedBookings: completed.length,
-        totalEarnings: completed.reduce((acc, b) => acc + (parseFloat(b.final_price || b.price) || 0), 0),
+        totalEarnings: completed.reduce((acc, b) => acc + (parseFloat(b.final_price || b.base_price) || 0), 0),
         averageRating: providerRes.data?.rating || 0,
         totalReviews: providerRes.data?.total_reviews || 0,
         profileViews: providerRes.data?.views_count || 0
@@ -278,17 +272,11 @@ const ProviderDashboard = () => {
         'rejected': `/bookings/${bookingId}/reject`,
         'on_hold': `/bookings/${bookingId}/hold`,
         'provider_completed': `/bookings/${bookingId}/provider-complete`,
-        'cancelled': `/bookings/${bookingId}/status`
+        'cancelled': `/bookings/${bookingId}/cancel`
       };
-      
-      const endpoint = endpointMap[status];
-      if (!endpoint) {
-        await api.put(`/bookings/${bookingId}/status`, { status });
-      } else if (status === 'cancelled') {
-        await api.put(endpoint, { status });
-      } else {
-        await api.put(endpoint, {});
-      }
+
+      const endpoint = endpointMap[status] || `/bookings/${bookingId}/status`;
+      await api.put(endpoint, status === 'cancelled' ? { reason: 'ביטול על ידי הספק' } : {});
       
       const statusLabels = {
         confirmed: 'ההזמנה אושרה',
@@ -367,6 +355,11 @@ const ProviderDashboard = () => {
   const handleSaveService = async () => {
     if (!serviceForm.name || !serviceForm.price) {
       toast.error('נא למלא שם שירות ומחיר');
+      return;
+    }
+
+    if (!serviceForm.service_category) {
+      toast.error('נא לבחור סוג שירות');
       return;
     }
 
@@ -986,7 +979,11 @@ const ProviderDashboard = () => {
                                             provider_id: provider.provider_id,
                                             booking_id: booking.booking_id
                                           });
-                                          navigate(`/chat/${res.data.room_id}`);
+                                          if (res.data?.room_id) {
+                                            navigate(`/chat/${res.data.room_id}`);
+                                          } else {
+                                            toast.error('שגיאה בקבלת מזהה הצ\'אט');
+                                          }
                                         } catch { toast.error('שגיאה ביצירת צ\'אט'); }
                                       }}
                                       className="bg-carefd-teal/10 text-carefd-teal px-3 py-1.5 rounded-lg text-xs hover:bg-carefd-teal/20 transition font-medium flex items-center gap-1"
@@ -1200,10 +1197,10 @@ const ProviderDashboard = () => {
                                       <div className="border-r border-green-200 pr-4">
                                         <p className="font-medium text-carefd-navy">{booking.user_name || 'לקוח'}</p>
                                         <p className="text-sm text-carefd-gray">{booking.service_name}</p>
-                                        {booking.service_city && (
+                                        {(booking.service_location?.city || booking.service_city) && (
                                           <p className="text-xs text-carefd-gray flex items-center gap-1 mt-0.5">
                                             <FaMapMarkerAlt className="text-carefd-teal" />
-                                            {booking.service_city}
+                                            {booking.service_location?.city || booking.service_city}
                                           </p>
                                         )}
                                       </div>
@@ -2284,36 +2281,25 @@ const ProviderDashboard = () => {
                       {/* Account Settings */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">
                         <h3 className="text-xl font-bold text-carefd-navy mb-6">הגדרות חשבון</h3>
-                        <div className="space-y-6">
-                          <div>
-                            <label className="block text-sm font-medium text-carefd-navy mb-2">שם העסק</label>
-                            <input
-                              type="text"
-                              defaultValue={provider?.business_name}
-                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
-                            />
+                        <div className="space-y-4">
+                          <div className="p-4 bg-gray-50 rounded-xl">
+                            <p className="text-sm text-carefd-gray">שם העסק</p>
+                            <p className="font-medium text-carefd-navy">{provider?.business_name || '-'}</p>
                           </div>
-                          <div>
-                            <label className="block text-sm font-medium text-carefd-navy mb-2">אימייל</label>
-                            <input
-                              type="email"
-                              defaultValue={user?.email}
-                              disabled
-                              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-gray-50 text-gray-500"
-                            />
+                          <div className="p-4 bg-gray-50 rounded-xl">
+                            <p className="text-sm text-carefd-gray">אימייל</p>
+                            <p className="font-medium text-carefd-navy">{user?.email || '-'}</p>
                           </div>
-                          <div>
-                            <label className="block text-sm font-medium text-carefd-navy mb-2">טלפון</label>
-                            <input
-                              type="tel"
-                              defaultValue={provider?.phone}
-                              placeholder="050-0000000"
-                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
-                            />
+                          <div className="p-4 bg-gray-50 rounded-xl">
+                            <p className="text-sm text-carefd-gray">טלפון</p>
+                            <p className="font-medium text-carefd-navy">{provider?.phone || '-'}</p>
                           </div>
-                          <button className="bg-carefd-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carefd-teal-medium transition">
-                            שמור שינויים
-                          </button>
+                          <Link
+                            to="/provider/edit"
+                            className="inline-flex items-center gap-2 bg-carefd-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carefd-teal-medium transition"
+                          >
+                            <FaCog /> ערוך פרופיל מלא
+                          </Link>
                         </div>
                       </div>
                     </div>
