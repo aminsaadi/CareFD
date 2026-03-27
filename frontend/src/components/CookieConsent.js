@@ -7,7 +7,7 @@ const CookieConsent = () => {
   const [showDetails, setShowDetails] = useState(false);
   const [preferences, setPreferences] = useState({
     necessary: true,
-    analytics: true,
+    analytics: false,
     marketing: false
   });
 
@@ -69,9 +69,10 @@ const CookieConsent = () => {
             <FaCookieBite className="text-2xl text-carefd-teal" />
             <h3 className="text-lg font-bold text-white">הגדרות עוגיות</h3>
           </div>
-          <button 
-            onClick={handleRejectAll}
+          <button
+            onClick={handleAcceptSelected}
             className="text-white/70 hover:text-white transition"
+            aria-label="סגור באנר עוגיות"
           >
             <FaTimes />
           </button>
@@ -107,6 +108,9 @@ const CookieConsent = () => {
                   className={`relative w-12 h-6 rounded-full transition-colors ${
                     preferences.analytics ? 'bg-carefd-teal' : 'bg-gray-300'
                   }`}
+                  aria-label={preferences.analytics ? 'כבה עוגיות אנליטיקה' : 'הפעל עוגיות אנליטיקה'}
+                  role="switch"
+                  aria-checked={preferences.analytics}
                 >
                   <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
                     preferences.analytics ? 'right-0.5' : 'right-6'
@@ -124,6 +128,9 @@ const CookieConsent = () => {
                   className={`relative w-12 h-6 rounded-full transition-colors ${
                     preferences.marketing ? 'bg-carefd-teal' : 'bg-gray-300'
                   }`}
+                  aria-label={preferences.marketing ? 'כבה עוגיות שיווק' : 'הפעל עוגיות שיווק'}
+                  role="switch"
+                  aria-checked={preferences.marketing}
                 >
                   <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
                     preferences.marketing ? 'right-0.5' : 'right-6'

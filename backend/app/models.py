@@ -238,9 +238,23 @@ class Provider(BaseModel):
     phone: Optional[str] = None
     email: Optional[str] = None
     website: Optional[str] = None
+    whatsapp_number: Optional[str] = None
+    show_phone: bool = True
+    show_email: bool = True
+    show_whatsapp: bool = True
     years_experience: Optional[int] = None
     service_types: List[str] = []
     views_count: int = 0
+    # Payment & health funds
+    health_funds: List[str] = []
+    payment_methods: List[str] = []
+    cancellation_policy: Optional[str] = None
+    cancellation_notice_hours: Optional[int] = None
+    # Education & certifications
+    education: List[dict] = []           # [{degree, institution, year, field}]
+    certifications: List[dict] = []      # [{name, issuer, year, license_number, document_url}]
+    # Profile appearance
+    profile_color: Optional[str] = None
 
 PROFESSION_TITLES = [
     {"value": "doctor", "label": "רופא", "label_en": "Doctor",
@@ -449,8 +463,10 @@ class ServiceRequest(BaseModel):
     status: str = RequestStatus.OPEN
     offer_count: int = 0
     accepted_offer_id: Optional[str] = None
+    accepted_offer_ids: List[str] = []
     accepted_at: Optional[datetime] = None
     booking_id: Optional[str] = None
+    booking_ids: List[str] = []
     cancelled_at: Optional[datetime] = None
     cancellation_reason: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -798,6 +814,8 @@ class ChatRoom(BaseModel):
     booking_id: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     last_message_at: Optional[datetime] = None
+    archived_by: List[str] = []
+    deleted_by: List[str] = []
 
 class Message(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -806,9 +824,24 @@ class Message(BaseModel):
     sender_id: str
     sender_role: str
     content: str
+    message_type: str = "text"  # text, image, file
+    attachment_url: Optional[str] = None
+    attachment_name: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     is_read: bool = False
 
 class MessageCreate(BaseModel):
     room_id: str
-    content: str = Field(..., min_length=1, max_length=2000)
+    content: str = Field(default="", max_length=2000)
+    message_type: str = "text"  # text, image, file
+    attachment_url: Optional[str] = None
+    attachment_name: Optional[str] = None
+
+    @field_validator('content', mode='before')
+    @classmethod
+    def validate_content(cls, v, info):
+        return v or ""
+
+    def model_post_init(self, __context):
+        if not self.content.strip() and not self.attachment_url:
+            raise ValueError("Message must have content or an attachment")

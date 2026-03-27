@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response as StarletteResponse
@@ -78,6 +78,69 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         return response
 
+
+# Maintenance mode middleware
+import time
+
+_maintenance_cache = {"enabled": False, "message": "", "checked_at": 0}
+
+class MaintenanceModeMiddleware(BaseHTTPMiddleware):
+    """Block non-admin API requests when maintenance mode is enabled."""
+
+    BYPASS_PATHS = {
+        "/api", "/api/", "/api/settings/public", "/api/auth/login",
+        "/api/admin/settings", "/api/admin/smtp-settings", "/api/admin/smtp-check",
+        "/api/admin/test-email",
+    }
+    BYPASS_PREFIXES = ("/api/admin/",)
+
+    async def dispatch(self, request: Request, call_next):
+        path = request.url.path
+
+        # Only intercept API requests (not static files / frontend)
+        if not path.startswith("/api"):
+            return await call_next(request)
+
+        # Always allow bypass paths (health check, public settings, login, admin)
+        if path in self.BYPASS_PATHS or any(path.startswith(p) for p in self.BYPASS_PREFIXES):
+            return await call_next(request)
+
+        # Check maintenance mode (cache for 30 seconds)
+        now = time.time()
+        if now - _maintenance_cache["checked_at"] > 30:
+            from app.database import db
+            settings = await db.site_settings.find_one({}, {"_id": 0, "maintenance_mode": 1, "maintenance_message": 1})
+            _maintenance_cache["enabled"] = bool((settings or {}).get("maintenance_mode"))
+            _maintenance_cache["message"] = (settings or {}).get("maintenance_message", "")
+            _maintenance_cache["checked_at"] = now
+
+        if not _maintenance_cache["enabled"]:
+            return await call_next(request)
+
+        # Check if user is admin (let admins through)
+        auth_header = request.headers.get("authorization", "")
+        token = None
+        if auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+        if not token:
+            token = request.cookies.get("session_token")
+
+        if token:
+            from app.database import db
+            session = await db.user_sessions.find_one({"session_token": token}, {"_id": 0, "user_id": 1})
+            if session:
+                user = await db.users.find_one({"user_id": session["user_id"]}, {"_id": 0, "role": 1})
+                if user and user.get("role") == "admin":
+                    return await call_next(request)
+
+        msg = _maintenance_cache["message"] or "האתר במצב תחזוקה. נחזור בקרוב."
+        return JSONResponse(
+            status_code=503,
+            content={"detail": msg, "maintenance": True}
+        )
+
+
+app.add_middleware(MaintenanceModeMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
 
 # CORS: In production, require explicit origins. In staging/dev, allow all.
@@ -112,6 +175,42 @@ if not IS_PRODUCTION:
     @api_router.post("/debug/test-post")
     async def test_post():
         return {"message": "POST works!"}
+
+# Dynamic manifest.json endpoint - reads app settings from DB
+@app.get("/manifest.json")
+async def dynamic_manifest():
+    """Serve a dynamic manifest.json based on admin app settings."""
+    from app.database import db
+    settings = await db.site_settings.find_one({}, {"_id": 0}) or {}
+
+    manifest = {
+        "short_name": settings.get("app_short_name") or settings.get("site_name") or "CareFD",
+        "name": settings.get("app_name") or settings.get("site_name") or "CareFD - שירותי בריאות",
+        "description": settings.get("app_description") or "CareFD - מחברים בין מטופלים לספקי שירותי בריאות",
+        "start_url": "/",
+        "display": "standalone",
+        "theme_color": settings.get("app_theme_color") or "#19B8BA",
+        "background_color": settings.get("app_background_color") or "#ffffff",
+        "dir": "rtl",
+        "lang": "he",
+        "scope": "/",
+        "orientation": "any",
+        "icons": []
+    }
+
+    app_icon = settings.get("app_icon_url")
+    if app_icon:
+        manifest["icons"] = [
+            {"src": app_icon, "type": "image/png", "sizes": "192x192", "purpose": "any maskable"},
+            {"src": app_icon, "type": "image/png", "sizes": "512x512", "purpose": "any maskable"},
+        ]
+    else:
+        manifest["icons"] = [
+            {"src": "/logo192.png", "type": "image/png", "sizes": "192x192", "purpose": "any maskable"},
+            {"src": "/logo512.png", "type": "image/png", "sizes": "512x512", "purpose": "any maskable"},
+        ]
+
+    return JSONResponse(content=manifest, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
 # Serve frontend static files if available
 STATIC_DIR = Path(__file__).parent / "static"

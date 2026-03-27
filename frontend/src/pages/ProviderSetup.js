@@ -213,7 +213,7 @@ const ProviderSetup = () => {
                         : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
                     }`}
                   >
-                    {formData.specialization_id === sub.sub_profession_id && <FaCheck className="inline ml-1" size={12} />}
+                    {formData.specialization_id === sub.sub_profession_id && <FaCheck className="inline ms-1" size={12} />}
                     {sub.name}
                   </button>
                 ))}

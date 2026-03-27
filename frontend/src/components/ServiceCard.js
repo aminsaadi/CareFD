@@ -107,7 +107,7 @@ const ServiceCard = ({ service, showProvider = true }) => {
           <div className="text-left">
             <span className="text-2xl font-extrabold text-carefd-navy">₪{service.price ?? 0}</span>
             {priceUnit && (
-              <span className="text-xs text-gray-500 mr-1">/{priceUnit}</span>
+              <span className="text-xs text-gray-500 me-1">/{priceUnit}</span>
             )}
           </div>
         </div>

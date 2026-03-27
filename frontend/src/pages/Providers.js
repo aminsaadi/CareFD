@@ -1,11 +1,12 @@
 import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ProviderCard from '../components/ProviderCard';
 import AdvancedFilters from '../components/AdvancedFilters';
 import api from '../utils/api';
+import { toast } from 'sonner';
 import { israeliLocalities } from '../data/israeliLocalities';
 import { israeliRegions, healthcareProfessions, popularSearches as searchData } from '../data/searchData';
 import { 
@@ -28,6 +29,8 @@ const Providers = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // grid or list
   const [sortBy, setSortBy] = useState('rating');
+  const [page, setPage] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [locationQuery, setLocationQuery] = useState(searchParams.get('city') || '');
   const [isLocating, setIsLocating] = useState(false);
@@ -67,7 +70,10 @@ const Providers = () => {
     latitude: searchParams.get('latitude') ? parseFloat(searchParams.get('latitude')) : null,
     longitude: searchParams.get('longitude') ? parseFloat(searchParams.get('longitude')) : null,
     radius: searchParams.get('radius_km') ? parseFloat(searchParams.get('radius_km')) : null,
-    useMyLocation: searchParams.has('latitude') && searchParams.has('longitude')
+    useMyLocation: searchParams.has('latitude') && searchParams.has('longitude'),
+    gender: searchParams.get('gender') || null,
+    languages: searchParams.get('languages') ? searchParams.get('languages').split(',') : [],
+    healthFunds: searchParams.get('health_funds') ? searchParams.get('health_funds').split(',') : []
   });
 
   // Initialize location if provided via URL
@@ -159,20 +165,30 @@ const Providers = () => {
     if (filters.minExperience) count++;
     if (filters.verifiedOnly) count++;
     if (filters.recommendedOnly) count++;
+    if (filters.gender) count++;
+    if (filters.languages?.length > 0) count++;
+    if (filters.healthFunds?.length > 0) count++;
     if (filters.useMyLocation) count++;
     setActiveFiltersCount(count);
   }, [filters]);
 
   useEffect(() => {
-    fetchProviders();
+    setPage(0);
+    fetchProviders(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, sortBy]);
 
-  const fetchProviders = async () => {
+  const PAGE_SIZE = 20;
+
+  const fetchProviders = async (pageNum = 0) => {
     try {
-      setLoading(true);
+      if (pageNum === 0) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
       const params = new URLSearchParams();
-      
+
       if (filters.search) params.append('search', filters.search);
       if (filters.city) params.append('city', filters.city);
       if (filters.category) params.append('category', filters.category);
@@ -183,6 +199,9 @@ const Providers = () => {
       if (filters.minExperience) params.append('min_experience', filters.minExperience.toString());
       if (filters.verifiedOnly) params.append('verified_only', 'true');
       if (filters.recommendedOnly) params.append('recommended_only', 'true');
+      if (filters.gender) params.append('gender', filters.gender);
+      if (filters.languages?.length > 0) params.append('languages', filters.languages.join(','));
+      if (filters.healthFunds?.length > 0) params.append('health_funds', filters.healthFunds.join(','));
       if (filters.latitude && filters.longitude) {
         params.append('latitude', filters.latitude.toString());
         params.append('longitude', filters.longitude.toString());
@@ -190,32 +209,35 @@ const Providers = () => {
       }
       params.append('sort_by', sortBy);
       params.append('sort_order', 'desc');
-      
+      params.append('skip', (pageNum * PAGE_SIZE).toString());
+      params.append('limit', PAGE_SIZE.toString());
+
       const response = await api.get(`/providers?${params.toString()}`);
       let apiProviders = response.data.providers || [];
-      
-      // Show actual providers from API (no dummy data fallback)
-      setProviders(apiProviders);
+
+      if (pageNum === 0) {
+        setProviders(apiProviders);
+      } else {
+        setProviders(prev => [...prev, ...apiProviders]);
+      }
       setTotalProviders(response.data.total || 0);
     } catch (error) {
       console.error('Failed to fetch providers:', error);
-      // Show empty on error - no dummy data
-      setProviders([]);
-      setTotalProviders(0);
+      toast.error('שגיאה בטעינת ספקים. נסו שוב.');
+      if (pageNum === 0) {
+        setProviders([]);
+        setTotalProviders(0);
+      }
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return Math.round(R * c * 10) / 10;
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchProviders(nextPage);
   };
 
   const handleSearch = (e) => {
@@ -462,7 +484,7 @@ const Providers = () => {
                         >
                           <FaCrosshairs className="text-lg" />
                           <span className="font-medium">השתמש במיקום שלי</span>
-                          {isLocating && <FaSpinner className="animate-spin mr-auto" />}
+                          {isLocating && <FaSpinner className="animate-spin me-auto" />}
                         </button>
                         
                         {/* Regions */}
@@ -528,7 +550,7 @@ const Providers = () => {
                                 >
                                   <FaMapMarkerAlt className="text-carefd-gray text-sm" />
                                   <span>{city.name || city.name_he}</span>
-                                  {city.region && <span className="text-xs text-carefd-gray mr-auto">{city.region}</span>}
+                                  {city.region && <span className="text-xs text-carefd-gray me-auto">{city.region}</span>}
                                 </button>
                               ))}
                             </div>
@@ -645,6 +667,7 @@ const Providers = () => {
                 >
                   <option value="rating">מיון: דירוג</option>
                   <option value="reviews">מיון: ביקורות</option>
+                  <option value="price">מיון: מחיר</option>
                   {(filters.useMyLocation || (filters.latitude && filters.longitude)) && <option value="distance">מיון: מרחק</option>}
                 </select>
               </div>
@@ -728,6 +751,31 @@ const Providers = () => {
                 {filters.recommendedOnly && (
                   <span className="inline-flex items-center gap-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1 rounded-full text-sm">
                     מומלצים בלבד
+                    <button onClick={() => setFilters(prev => ({ ...prev, recommendedOnly: false }))}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.serviceType && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
+                    סוג שירות: {filters.serviceType === 'home_visit' ? 'ביקור בית' : filters.serviceType === 'clinic_visit' ? 'מרפאה' : filters.serviceType === 'video_call' ? 'טלרפואה' : 'שיחה טלפונית'}
+                    <button onClick={() => setFilters(prev => ({ ...prev, serviceType: null }))}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.providerType && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
+                    סוג ספק: {filters.providerType === 'individual' ? 'עצמאי' : filters.providerType === 'clinic' ? 'מרפאה' : 'חברה'}
+                    <button onClick={() => setFilters(prev => ({ ...prev, providerType: null }))}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.minRating && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
+                    דירוג: {filters.minRating}+
+                    <button onClick={() => setFilters(prev => ({ ...prev, minRating: null }))}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.minExperience && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
+                    ניסיון: {filters.minExperience}+ שנים
+                    <button onClick={() => setFilters(prev => ({ ...prev, minExperience: null }))}><FaTimes className="text-xs" /></button>
                   </span>
                 )}
                 <button
@@ -846,9 +894,9 @@ const Providers = () => {
                         </div>
                       ) : (
                         providers.map((provider) => (
-                          <a
+                          <Link
                             key={provider.provider_id}
-                            href={`/providers/${provider.provider_id}`}
+                            to={`/providers/${provider.provider_id}`}
                             className="flex items-center gap-3 p-3 hover:bg-carefd-teal/5 transition group"
                           >
                             {provider.profile_image ? (
@@ -860,7 +908,7 @@ const Providers = () => {
                             )}
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-carefd-navy text-sm truncate group-hover:text-carefd-teal transition">{provider.business_name}</p>
-                              <p className="text-xs text-carefd-gray truncate">{provider.profession_name || provider.profession} • {provider.location?.city}</p>
+                              <p className="text-xs text-carefd-gray truncate">{provider.profession_name || provider.profession_title} • {provider.location?.city}</p>
                               <div className="flex items-center gap-3 mt-0.5">
                                 {provider.rating != null && provider.rating > 0 && (
                                   <span className="text-xs text-amber-500">⭐ {Number(provider.rating).toFixed(1)}</span>
@@ -871,7 +919,7 @@ const Providers = () => {
                               </div>
                             </div>
                             <FaChevronLeft className="text-gray-300 group-hover:text-carefd-teal text-xs flex-shrink-0" />
-                          </a>
+                          </Link>
                         ))
                       )}
                     </div>
@@ -893,6 +941,28 @@ const Providers = () => {
                       <ProviderCard provider={provider} />
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Load More */}
+              {providers.length < totalProviders && !loading && (
+                <div className="mt-8 text-center">
+                  <button
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                    className="inline-flex items-center gap-2 px-8 py-3 bg-carefd-teal text-white font-medium rounded-xl hover:bg-carefd-teal/90 transition disabled:opacity-50"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <FaSpinner className="animate-spin" />
+                        טוען...
+                      </>
+                    ) : (
+                      <>
+                        טען עוד ({providers.length} מתוך {totalProviders})
+                      </>
+                    )}
+                  </button>
                 </div>
               )}
             </div>

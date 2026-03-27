@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { SiteSettingsProvider, useSiteSettings } from './context/SiteSettingsContext';
@@ -44,6 +44,7 @@ import AdminBlog from './pages/admin/AdminBlog';
 import AdminAds from './pages/admin/AdminAds';
 import AdminFeatured from './pages/admin/AdminFeatured';
 import AdminSettings from './pages/admin/AdminSettings';
+import AdminAppSettings from './pages/admin/AdminAppSettings';
 import AdminReports from './pages/admin/AdminReports';
 import AdminServices from './pages/admin/AdminServices';
 import AdminServiceTypes from './pages/admin/AdminServiceTypes';
@@ -81,14 +82,36 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
+const MaintenancePage = ({ message }) => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100" dir="rtl">
+    <div className="text-center p-8 max-w-md">
+      <div className="text-6xl mb-6">&#x1F6E0;&#xFE0F;</div>
+      <h1 className="text-2xl font-bold text-carefd-navy mb-4">האתר במצב תחזוקה</h1>
+      <p className="text-carefd-slate mb-6">{message || 'אנחנו עובדים על שיפורים. נחזור בקרוב!'}</p>
+      <div className="w-16 h-1 bg-carefd-teal mx-auto rounded-full"></div>
+    </div>
+  </div>
+);
+
+const MaintenanceGate = ({ children }) => {
+  const { maintenanceMode, maintenanceMessage } = useSiteSettings();
+  const { user } = useAuth();
+
+  // Admins bypass maintenance mode
+  if (maintenanceMode && user?.role !== 'admin') {
+    return <MaintenancePage message={maintenanceMessage} />;
+  }
+  return children;
+};
+
 const NotFound = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
     <div className="text-center">
       <h1 className="text-6xl font-bold text-gray-300 mb-4">404</h1>
       <p className="text-xl text-gray-600 mb-6">הדף לא נמצא</p>
-      <a href="/" className="bg-carefd-teal text-white px-6 py-3 rounded-lg hover:bg-carefd-teal-medium transition">
+      <Link to="/" className="bg-carefd-teal text-white px-6 py-3 rounded-lg hover:bg-carefd-teal-medium transition">
         חזרה לדף הבית
-      </a>
+      </Link>
     </div>
   </div>
 );
@@ -338,6 +361,14 @@ function AppRouter() {
         }
       />
       <Route
+        path="/admin/app-settings"
+        element={
+          <ProtectedRoute>
+            <AdminRoute><AdminAppSettings /></AdminRoute>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/admin/reports"
         element={
           <ProtectedRoute>
@@ -442,9 +473,11 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <NotificationProvider>
-            <AppRouter />
-            <CookieConsent />
-            <AccessibilityWidget />
+            <MaintenanceGate>
+              <AppRouter />
+              <CookieConsent />
+              <AccessibilityWidget />
+            </MaintenanceGate>
           </NotificationProvider>
         </BrowserRouter>
       </AuthProvider>

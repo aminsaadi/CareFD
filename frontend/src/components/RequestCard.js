@@ -117,7 +117,7 @@ const RequestCard = ({ request, showActions = false, onMakeOffer, professionMap 
             <span className="text-lg font-bold text-carefd-teal">
               ₪{request.budget}
               {request.budget_type && (
-                <span className="text-sm font-normal text-carefd-gray mr-1">
+                <span className="text-sm font-normal text-carefd-gray me-1">
                   {BUDGET_TYPE_LABELS[request.budget_type] || request.budget_type}
                 </span>
               )}

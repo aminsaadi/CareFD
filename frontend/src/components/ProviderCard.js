@@ -43,7 +43,7 @@ const ProviderCard = ({ provider, showContact = true }) => {
   const [showPhoneModal, setShowPhoneModal] = useState(false);
 
   // Determine service types offered (from services or default)
-  const serviceTypes = provider.service_types || ['home_visit', 'clinic_visit'];
+  const serviceTypes = provider.service_types && provider.service_types.length > 0 ? provider.service_types : [];
 
   const handleWhatsApp = (e) => {
     e.preventDefault();
@@ -177,10 +177,10 @@ const ProviderCard = ({ provider, showContact = true }) => {
 
         {provider.location && (
           <div className="flex items-center text-sm text-carefd-gray mb-4">
-            <FaMapMarkerAlt className="text-carefd-teal ml-1" />
+            <FaMapMarkerAlt className="text-carefd-teal ms-1" />
             <span>{provider.location.city}</span>
             {provider.distance_km != null && (
-              <span className="mr-auto bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1" data-testid="distance-badge">
+              <span className="ms-auto bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1" data-testid="distance-badge">
                 <FaMapMarkerAlt className="text-[10px]" />
                 {provider.distance_km} ק״מ
               </span>

@@ -60,7 +60,7 @@ async def create_provider(provider_data: ProviderRegister, authorization: Option
             {"provider_id": provider.provider_id, "user_id": user["user_id"]}
         )
     
-    return provider.model_dump(exclude={"created_at": False})
+    return provider_dict
 
 @router.get("/providers/me")
 async def get_my_provider(authorization: Optional[str] = Header(None), request: Request = None):
@@ -143,6 +143,109 @@ async def get_my_documents(authorization: Optional[str] = Header(None), request:
         "verification_notes": provider.get("verification_notes")
     }
 
+# Get available filter options
+@router.get("/providers/filters/options")
+async def get_filter_options():
+    """Get available filter options based on existing data"""
+    # Get unique cities
+    cities = await db.providers.distinct("location.city")
+    cities = [c for c in cities if c]
+
+    # Get unique specializations
+    specializations = await db.providers.distinct("specializations")
+    specializations = [s for s in specializations if s]
+
+    # Get unique provider types
+    provider_types = await db.providers.distinct("provider_type")
+
+    # Categories from admin professions hierarchy
+    professions_data = await db.professions.find({}, {"_id": 0}).to_list(100)
+    categories = []
+    for prof in professions_data:
+        categories.append({
+            "id": prof.get("profession_id", ""),
+            "name": prof.get("name", ""),
+            "name_en": prof.get("name_en", ""),
+            "icon": prof.get("icon", "briefcase"),
+        })
+
+    # Service types
+    service_types = [
+        {"id": "home_visit", "name": "ביקור בית", "name_en": "Home Visit"},
+        {"id": "clinic_visit", "name": "ביקור במרפאה", "name_en": "Clinic Visit"},
+        {"id": "video_call", "name": "טלרפואה", "name_en": "Video Call"},
+        {"id": "phone_call", "name": "שיחה טלפונית", "name_en": "Phone Call"}
+    ]
+
+    # Provider types with labels
+    provider_type_options = [
+        {"id": "individual", "name": "עצמאי", "name_en": "Individual"},
+        {"id": "clinic", "name": "מרפאה", "name_en": "Clinic"},
+        {"id": "company", "name": "חברה", "name_en": "Company"}
+    ]
+
+    # Rating options
+    rating_options = [
+        {"value": 4.5, "label": "4.5+ כוכבים"},
+        {"value": 4.0, "label": "4.0+ כוכבים"},
+        {"value": 3.5, "label": "3.5+ כוכבים"},
+        {"value": 3.0, "label": "3.0+ כוכבים"}
+    ]
+
+    # Experience options
+    experience_options = [
+        {"value": 1, "label": "שנה+"},
+        {"value": 3, "label": "3 שנים+"},
+        {"value": 5, "label": "5 שנים+"},
+        {"value": 10, "label": "10 שנים+"}
+    ]
+
+    # Radius options
+    radius_options = [
+        {"value": 5, "label": "5 ק\"מ"},
+        {"value": 10, "label": "10 ק\"מ"},
+        {"value": 25, "label": "25 ק\"מ"},
+        {"value": 50, "label": "50 ק\"מ"},
+        {"value": 100, "label": "100 ק\"מ"}
+    ]
+
+    # Shift options for availability
+    shift_options = [
+        {"value": "morning", "label": "בוקר", "label_en": "Morning", "default_start": "06:00", "default_end": "12:00"},
+        {"value": "afternoon", "label": "צהריים", "label_en": "Afternoon", "default_start": "12:00", "default_end": "18:00"},
+        {"value": "evening", "label": "ערב", "label_en": "Evening", "default_start": "18:00", "default_end": "22:00"},
+        {"value": "night", "label": "לילה", "label_en": "Night", "default_start": "22:00", "default_end": "06:00"},
+    ]
+
+    # Days of week
+    days_of_week = [
+        {"value": "sunday", "label": "ראשון", "label_en": "Sunday"},
+        {"value": "monday", "label": "שני", "label_en": "Monday"},
+        {"value": "tuesday", "label": "שלישי", "label_en": "Tuesday"},
+        {"value": "wednesday", "label": "רביעי", "label_en": "Wednesday"},
+        {"value": "thursday", "label": "חמישי", "label_en": "Thursday"},
+        {"value": "friday", "label": "שישי", "label_en": "Friday"},
+        {"value": "saturday", "label": "שבת", "label_en": "Saturday"},
+    ]
+
+    return {
+        "cities": sorted(cities) if cities else ["תל אביב", "ירושלים", "חיפה", "באר שבע", "רמת גן", "הרצליה", "פתח תקווה"],
+        "specializations": sorted(specializations) if specializations else [],
+        "categories": categories,
+        "professions": professions_data,  # Full hierarchy for provider forms
+        "service_types": service_types,
+        "provider_types": provider_type_options,
+        "rating_options": rating_options,
+        "experience_options": experience_options,
+        "radius_options": radius_options,
+        "profession_titles": PROFESSION_TITLES,
+        "gender_options": GENDER_OPTIONS,
+        "language_options": LANGUAGE_OPTIONS,
+        "target_audience_options": TARGET_AUDIENCE_OPTIONS,
+        "shift_options": shift_options,
+        "days_of_week": days_of_week
+    }
+
 @router.get("/providers/{provider_id}")
 async def get_provider(provider_id: str):
     """Get provider details"""
@@ -191,6 +294,10 @@ async def search_providers(
     service_type: Optional[str] = None,  # home_visit, clinic_visit, video_call, phone_call
     # Experience filter (years)
     min_experience: Optional[int] = None,
+    # Additional filters (aligned with services search)
+    gender: Optional[str] = None,
+    languages: Optional[str] = None,  # comma-separated
+    health_funds: Optional[str] = None,  # comma-separated
     # Verification filters
     verified_only: Optional[bool] = False,
     recommended_only: Optional[bool] = False,
@@ -322,9 +429,22 @@ async def search_providers(
 
     # Experience filter (in years)
     if min_experience:
-        cutoff_date = datetime.now(timezone.utc) - timedelta(days=min_experience * 365)
-        query["$and"].append({"created_at": {"$lte": cutoff_date.isoformat()}})
-    
+        query["$and"].append({"years_experience": {"$gte": int(min_experience)}})
+
+    # Gender filter
+    if gender:
+        query["$and"].append({"gender": gender})
+
+    # Languages filter
+    if languages:
+        lang_list = [l.strip() for l in languages.split(",")]
+        query["$and"].append({"languages": {"$in": lang_list}})
+
+    # Health funds filter
+    if health_funds:
+        fund_list = [f.strip() for f in health_funds.split(",")]
+        query["$and"].append({"health_funds": {"$in": fund_list}})
+
     # Execute query
     providers = await db.providers.find(query, {"_id": 0}).to_list(500)
     
@@ -371,7 +491,20 @@ async def search_providers(
         providers.sort(key=lambda x: x.get("rating") or 0, reverse=True)
     elif sort_by == "reviews":
         providers.sort(key=lambda x: x.get("total_reviews") or 0, reverse=True)
-    
+    elif sort_by == "price":
+        # Fetch min service price for each provider
+        provider_ids = [p["provider_id"] for p in providers]
+        if provider_ids:
+            pipeline = [
+                {"$match": {"provider_id": {"$in": provider_ids}, "is_active": True}},
+                {"$group": {"_id": "$provider_id", "min_price": {"$min": "$price"}}}
+            ]
+            price_docs = await db.services.aggregate(pipeline).to_list(500)
+            price_map = {d["_id"]: d["min_price"] for d in price_docs}
+            for p in providers:
+                p["min_price"] = price_map.get(p["provider_id"], float('inf'))
+        providers.sort(key=lambda x: x.get("min_price", float('inf')))
+
     total = len(providers)
     
     # Apply pagination after filtering and sorting
@@ -404,112 +537,10 @@ async def search_providers(
             "service_type": service_type,
             "min_rating": min_rating,
             "radius_km": radius_km,
+            "min_experience": min_experience,
             "verified_only": verified_only,
             "recommended_only": recommended_only
         }
-    }
-
-# Get available filter options
-@router.get("/providers/filters/options")
-async def get_filter_options():
-    """Get available filter options based on existing data"""
-    # Get unique cities
-    cities = await db.providers.distinct("location.city")
-    cities = [c for c in cities if c]
-    
-    # Get unique specializations
-    specializations = await db.providers.distinct("specializations")
-    specializations = [s for s in specializations if s]
-
-    # Get unique provider types
-    provider_types = await db.providers.distinct("provider_type")
-
-    # Categories from admin professions hierarchy
-    professions_data = await db.professions.find({}, {"_id": 0}).to_list(100)
-    categories = []
-    for prof in professions_data:
-        categories.append({
-            "id": prof.get("profession_id", ""),
-            "name": prof.get("name", ""),
-            "name_en": prof.get("name_en", ""),
-            "icon": prof.get("icon", "briefcase"),
-        })
-    
-    # Service types
-    service_types = [
-        {"id": "home_visit", "name": "ביקור בית", "name_en": "Home Visit"},
-        {"id": "clinic_visit", "name": "ביקור במרפאה", "name_en": "Clinic Visit"},
-        {"id": "video_call", "name": "טלרפואה", "name_en": "Video Call"},
-        {"id": "phone_call", "name": "שיחה טלפונית", "name_en": "Phone Call"}
-    ]
-    
-    # Provider types with labels
-    provider_type_options = [
-        {"id": "individual", "name": "עצמאי", "name_en": "Individual"},
-        {"id": "clinic", "name": "מרפאה", "name_en": "Clinic"},
-        {"id": "company", "name": "חברה", "name_en": "Company"}
-    ]
-    
-    # Rating options
-    rating_options = [
-        {"value": 4.5, "label": "4.5+ כוכבים"},
-        {"value": 4.0, "label": "4.0+ כוכבים"},
-        {"value": 3.5, "label": "3.5+ כוכבים"},
-        {"value": 3.0, "label": "3.0+ כוכבים"}
-    ]
-    
-    # Experience options
-    experience_options = [
-        {"value": 1, "label": "שנה+"},
-        {"value": 3, "label": "3 שנים+"},
-        {"value": 5, "label": "5 שנים+"},
-        {"value": 10, "label": "10 שנים+"}
-    ]
-    
-    # Radius options
-    radius_options = [
-        {"value": 5, "label": "5 ק\"מ"},
-        {"value": 10, "label": "10 ק\"מ"},
-        {"value": 25, "label": "25 ק\"מ"},
-        {"value": 50, "label": "50 ק\"מ"},
-        {"value": 100, "label": "100 ק\"מ"}
-    ]
-    
-    # Shift options for availability
-    shift_options = [
-        {"value": "morning", "label": "בוקר", "label_en": "Morning", "default_start": "06:00", "default_end": "12:00"},
-        {"value": "afternoon", "label": "צהריים", "label_en": "Afternoon", "default_start": "12:00", "default_end": "18:00"},
-        {"value": "evening", "label": "ערב", "label_en": "Evening", "default_start": "18:00", "default_end": "22:00"},
-        {"value": "night", "label": "לילה", "label_en": "Night", "default_start": "22:00", "default_end": "06:00"},
-    ]
-    
-    # Days of week
-    days_of_week = [
-        {"value": "sunday", "label": "ראשון", "label_en": "Sunday"},
-        {"value": "monday", "label": "שני", "label_en": "Monday"},
-        {"value": "tuesday", "label": "שלישי", "label_en": "Tuesday"},
-        {"value": "wednesday", "label": "רביעי", "label_en": "Wednesday"},
-        {"value": "thursday", "label": "חמישי", "label_en": "Thursday"},
-        {"value": "friday", "label": "שישי", "label_en": "Friday"},
-        {"value": "saturday", "label": "שבת", "label_en": "Saturday"},
-    ]
-    
-    return {
-        "cities": sorted(cities) if cities else ["תל אביב", "ירושלים", "חיפה", "באר שבע", "רמת גן", "הרצליה", "פתח תקווה"],
-        "specializations": sorted(specializations) if specializations else [],
-        "categories": categories,
-        "professions": professions_data,  # Full hierarchy for provider forms
-        "service_types": service_types,
-        "provider_types": provider_type_options,
-        "rating_options": rating_options,
-        "experience_options": experience_options,
-        "radius_options": radius_options,
-        "profession_titles": PROFESSION_TITLES,
-        "gender_options": GENDER_OPTIONS,
-        "language_options": LANGUAGE_OPTIONS,
-        "target_audience_options": TARGET_AUDIENCE_OPTIONS,
-        "shift_options": shift_options,
-        "days_of_week": days_of_week
     }
 
 @router.put("/providers/{provider_id}")
@@ -531,15 +562,33 @@ async def update_provider(
     
     # Whitelist allowed fields to prevent mass assignment attacks
     ALLOWED_FIELDS = {
-        "business_name", "description", "phone", "email", "website",
-        "provider_type", "location", "address", "city", "professions",
-        "sub_professions", "categories", "languages", "education",
-        "experience_years", "about", "specializations", "target_audiences",
-        "profile_image", "cover_image", "gallery", "working_hours",
-        "availability", "services", "social_links", "gender",
-        "shifts", "travel_radius", "home_visit", "online_service",
-        "instant_booking", "cancellation_policy", "payment_methods",
-        "insurance_accepted", "certifications", "awards",
+        # Basic info
+        "business_name", "description", "about", "profile_image", "profile_color",
+        "gender", "provider_type",
+        # Profession & skills
+        "profession_id", "profession_name", "profession_title",
+        "specialization_id", "specialization_name",
+        "specializations", "expertise", "service_categories",
+        "professions", "sub_professions", "categories",
+        # Contact
+        "phone", "email", "website", "whatsapp_number",
+        "show_phone", "show_email", "show_whatsapp",
+        # Location & service
+        "location", "address", "city", "service_areas",
+        "service_types", "services",
+        # Availability
+        "availability", "working_hours", "shifts",
+        # Experience & qualifications
+        "years_experience",
+        "education", "certifications",
+        "languages", "target_audience",
+        # Payment & policy
+        "health_funds", "payment_methods",
+        "cancellation_policy", "cancellation_notice_hours",
+        # Extras
+        "cover_image", "gallery", "social_links",
+        "travel_radius", "home_visit", "online_service",
+        "instant_booking", "insurance_accepted", "awards",
     }
 
     # Filter out any non-allowed fields

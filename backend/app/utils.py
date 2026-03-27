@@ -50,6 +50,9 @@ RESEND_API_KEY = os.environ.get('RESEND_API_KEY', '')
 if RESEND_API_KEY:
     resend.api_key = RESEND_API_KEY
 
+# ZeptoMail API (Zoho transactional email service)
+ZEPTOMAIL_API_KEY = os.environ.get('ZEPTOMAIL_API_KEY', '')
+
 SITE_URL = os.environ.get('SITE_URL', 'https://carefd.com')
 
 
@@ -230,17 +233,113 @@ def _send_email_resend(recipient: str, subject: str, html_content: str, sender: 
         return None
 
 
+def _send_email_zeptomail(recipient: str, subject: str, html_content: str, sender: str, api_key: str = None):
+    """Send email via ZeptoMail (Zoho) API."""
+    import httpx
+    token = api_key or ZEPTOMAIL_API_KEY
+    if not token:
+        logger.error("ZeptoMail API key not configured")
+        return None
+    # Strip prefix if user included it in the key
+    if token.startswith("Zoho-enczapikey "):
+        token = token[len("Zoho-enczapikey "):]
+    try:
+        logger.info(f"Sending email via ZeptoMail to {recipient} - Subject: {subject}")
+        if '<' in sender and '>' in sender:
+            sender_name = sender.split('<')[0].strip()
+            sender_email = sender.split('<')[1].rstrip('>')
+        else:
+            sender_name = "CareFD"
+            sender_email = sender
+
+        payload = {
+            "from": {"address": sender_email, "name": sender_name},
+            "to": [{"email_address": {"address": recipient}}],
+            "subject": subject,
+            "htmlbody": html_content,
+        }
+        headers = {
+            "Authorization": f"Zoho-enczapikey {token}",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        }
+        resp = httpx.post(
+            "https://api.zeptomail.com/v1.1/email",
+            json=payload,
+            headers=headers,
+            timeout=15,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        logger.info(f"Email sent via ZeptoMail to {recipient} - request_id: {data.get('request_id', 'unknown')}")
+        return {"success": True, "recipient": recipient, "provider": "zeptomail"}
+    except Exception as e:
+        logger.error(f"ZeptoMail failed for {recipient} - {type(e).__name__}: {str(e)}")
+        return None
+
+
+_email_provider_cache = {"provider": None, "settings": None, "fetched_at": None}
+
+async def _get_email_provider_settings():
+    """Get active email provider from DB settings, fallback to env vars."""
+    import time
+    now = time.time()
+    if _email_provider_cache["settings"] and _email_provider_cache["fetched_at"] and (now - _email_provider_cache["fetched_at"]) < 300:
+        return _email_provider_cache["provider"], _email_provider_cache["settings"]
+
+    db_settings = await db.smtp_settings.find_one({"_id": "smtp_config"})
+    provider = (db_settings or {}).get("email_provider", "smtp")
+    settings = {}
+
+    if provider == "zeptomail" and db_settings:
+        # Decrypt ZeptoMail API key
+        encrypted_key = db_settings.get("zeptomail_api_key_encrypted", "")
+        if encrypted_key:
+            try:
+                import base64, hashlib
+                from cryptography.fernet import Fernet
+                fernet_key = base64.urlsafe_b64encode(hashlib.sha256(SECRET_KEY.encode()).digest())
+                fernet = Fernet(fernet_key)
+                settings["zeptomail_api_key"] = fernet.decrypt(encrypted_key.encode()).decode()
+            except Exception:
+                logger.error("Failed to decrypt ZeptoMail API key from database")
+                settings["zeptomail_api_key"] = ""
+        settings["sender_email"] = db_settings.get("zeptomail_sender_email", "") or db_settings.get("sender_email", SENDER_EMAIL)
+
+    _email_provider_cache["provider"] = provider
+    _email_provider_cache["settings"] = settings
+    _email_provider_cache["fetched_at"] = now
+    return provider, settings
+
+
 async def send_email_async(recipient: str, subject: str, html_content: str):
     try:
-        # Prefer Resend API (works on Railway where SMTP ports are blocked)
-        if RESEND_API_KEY:
-            sender = f"CareFD <{SENDER_EMAIL}>"
-            result = await asyncio.to_thread(_send_email_resend, recipient, subject, html_content, sender)
-            if result:
-                return result
-            logger.warning("Resend failed, falling back to SMTP...")
+        # Check admin-selected email provider
+        provider, provider_settings = await _get_email_provider_settings()
 
-        # Fallback to SMTP
+        if provider == "zeptomail":
+            api_key = provider_settings.get("zeptomail_api_key", "") or ZEPTOMAIL_API_KEY
+            sender_email = provider_settings.get("sender_email", SENDER_EMAIL)
+            if api_key:
+                sender = f"CareFD <{sender_email}>"
+                result = await asyncio.to_thread(_send_email_zeptomail, recipient, subject, html_content, sender, api_key)
+                if result:
+                    return result
+                logger.warning("ZeptoMail failed, falling back to SMTP...")
+            else:
+                logger.warning("ZeptoMail selected but no API key configured, falling back to SMTP...")
+
+        elif provider == "resend":
+            if RESEND_API_KEY:
+                sender = f"CareFD <{SENDER_EMAIL}>"
+                result = await asyncio.to_thread(_send_email_resend, recipient, subject, html_content, sender)
+                if result:
+                    return result
+                logger.warning("Resend failed, falling back to SMTP...")
+            else:
+                logger.warning("Resend selected but no API key configured, falling back to SMTP...")
+
+        # Default / fallback: SMTP
         smtp_cfg = await _get_smtp_settings()
         result = await asyncio.to_thread(send_email_smtp_with_config, recipient, subject, html_content, smtp_cfg)
         return result

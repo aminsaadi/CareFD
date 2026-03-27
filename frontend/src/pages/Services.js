@@ -188,7 +188,9 @@ const Services = () => {
       if (flatList.length > 0) {
         setApiProfessions(flatList);
       }
-    }).catch(() => {});
+    }).catch(() => {
+      console.warn('Failed to load professions, using defaults');
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -468,7 +470,7 @@ const Services = () => {
                     >
                       <FaCrosshairs className="text-lg" />
                       <span className="font-medium">השתמש במיקום שלי</span>
-                      {isLocating && <FaSpinner className="animate-spin mr-auto" />}
+                      {isLocating && <FaSpinner className="animate-spin me-auto" />}
                     </button>
 
                     {!locationQuery && (

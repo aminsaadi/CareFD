@@ -6,10 +6,10 @@ import api from '../utils/api';
 import { format, isToday, isYesterday } from 'date-fns';
 import { he } from 'date-fns/locale';
 import { toast } from 'sonner';
-import { 
+import {
   FaPaperPlane, FaArrowRight, FaEllipsisV,
   FaCheckDouble, FaCheck, FaClock, FaUserMd,
-  FaSpinner, FaArchive, FaTrash
+  FaSpinner, FaArchive, FaTrash, FaImage, FaTimes
 } from 'react-icons/fa';
 
 const ChatRoom = () => {
@@ -22,10 +22,14 @@ const ChatRoom = () => {
   const [sending, setSending] = useState(false);
   const [roomInfo, setRoomInfo] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
   const pollIntervalRef = useRef(null);
   const inputRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     fetchRoomInfo();
@@ -73,17 +77,42 @@ const ChatRoom = () => {
     }
   };
 
+  const handleImageSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('ניתן לשלוח קבצי תמונה בלבד');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('גודל התמונה מוגבל ל-5MB');
+      return;
+    }
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const clearImagePreview = () => {
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || sending) return;
+    if ((!newMessage.trim() && !imageFile) || sending) return;
 
     const messageContent = newMessage.trim();
+    const hasImage = !!imageFile;
     setNewMessage('');
-    
+
     const tempMessage = {
       message_id: `temp_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       sender_id: user?.user_id,
-      content: messageContent,
+      content: hasImage ? (messageContent || '📷 תמונה') : messageContent,
+      message_type: hasImage ? 'image' : 'text',
+      attachment_url: imagePreview,
       created_at: new Date().toISOString(),
       status: 'sending'
     };
@@ -91,14 +120,38 @@ const ChatRoom = () => {
 
     try {
       setSending(true);
-      await api.post('/chat/messages', { room_id: roomId, content: messageContent });
+      let attachmentUrl = null;
+      let attachmentName = null;
+
+      if (hasImage) {
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('file', imageFile);
+        const uploadRes = await api.post('/upload/image', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        attachmentUrl = uploadRes.data.url;
+        attachmentName = uploadRes.data.original_name;
+        setUploading(false);
+        clearImagePreview();
+      }
+
+      await api.post('/chat/messages', {
+        room_id: roomId,
+        content: messageContent || (hasImage ? '📷 תמונה' : ''),
+        message_type: hasImage ? 'image' : 'text',
+        attachment_url: attachmentUrl,
+        attachment_name: attachmentName
+      });
       fetchMessages(true);
     } catch (error) {
       setMessages(prev => prev.filter(m => m.message_id !== tempMessage.message_id));
       setNewMessage(messageContent);
+      clearImagePreview();
       toast.error('שגיאה בשליחת ההודעה');
     } finally {
       setSending(false);
+      setUploading(false);
     }
   };
 
@@ -286,7 +339,24 @@ const ChatRoom = () => {
                             : 'bg-white text-carefd-navy rounded-bl-md'
                         }`}
                       >
-                        <p className="break-words whitespace-pre-wrap text-[15px]">{message.content}</p>
+                        {message.message_type === 'image' && message.attachment_url ? (
+                          <>
+                            <div className="mb-1">
+                              <img
+                                src={message.attachment_url}
+                                alt={message.attachment_name || 'תמונה'}
+                                className="max-w-[250px] max-h-[300px] rounded-lg cursor-pointer object-cover"
+                                onClick={() => window.open(message.attachment_url, '_blank')}
+                                loading="lazy"
+                              />
+                            </div>
+                            {message.content && message.content !== '📷 תמונה' && (
+                              <p className="break-words whitespace-pre-wrap text-[15px]">{message.content}</p>
+                            )}
+                          </>
+                        ) : (
+                          <p className="break-words whitespace-pre-wrap text-[15px]">{message.content}</p>
+                        )}
                         <div className={`flex items-center gap-1 mt-1 ${isOwn ? 'justify-end' : 'justify-start'}`}>
                           <span className={`text-xs ${isOwn ? 'text-white/70' : 'text-carefd-gray'}`}>
                             {formatMessageDate(message.created_at)}
@@ -307,7 +377,40 @@ const ChatRoom = () => {
 
         {/* Message Input - Fixed at bottom */}
         <div className="bg-white/10 backdrop-blur-md border-t border-white/20 p-4 flex-shrink-0">
+          {/* Image Preview */}
+          {imagePreview && (
+            <div className="mb-3 relative inline-block">
+              <img src={imagePreview} alt="תצוגה מקדימה" className="max-h-32 rounded-xl border-2 border-white/30" />
+              <button
+                onClick={clearImagePreview}
+                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg hover:bg-red-600"
+              >
+                <FaTimes className="text-xs" />
+              </button>
+              {uploading && (
+                <div className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center">
+                  <FaSpinner className="animate-spin text-white text-xl" />
+                </div>
+              )}
+            </div>
+          )}
           <form onSubmit={handleSendMessage} className="flex items-end gap-3">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageSelect}
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={sending}
+              className="text-white/70 hover:text-white p-3 rounded-full hover:bg-white/10 transition disabled:opacity-50"
+              title="שלח תמונה"
+            >
+              <FaImage className="text-xl" />
+            </button>
             <div className="flex-1 relative">
               <textarea
                 ref={inputRef}
@@ -330,7 +433,7 @@ const ChatRoom = () => {
             </div>
             <button
               type="submit"
-              disabled={sending || !newMessage.trim()}
+              disabled={sending || (!newMessage.trim() && !imageFile)}
               className="bg-white text-carefd-teal p-3 rounded-full hover:bg-carefd-teal-pale transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
               data-testid="send-message-btn"
             >

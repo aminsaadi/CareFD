@@ -104,7 +104,7 @@ async def get_chat_rooms(
     
     # Filter by archive status
     if archived:
-        query["archived_by"] = user["user_id"]
+        query["archived_by"] = {"$in": [user["user_id"]]}
     else:
         query["$or"] = [
             {"archived_by": {"$exists": False}},
@@ -172,7 +172,10 @@ async def send_message(
         room_id=message_data.room_id,
         sender_id=user["user_id"],
         sender_role=sender_role,
-        content=message_data.content
+        content=message_data.content,
+        message_type=message_data.message_type,
+        attachment_url=message_data.attachment_url,
+        attachment_name=message_data.attachment_name
     )
     
     message_dict = message.model_dump()

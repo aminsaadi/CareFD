@@ -44,8 +44,12 @@ const AdminSettings = () => {
   const [newFooterLink, setNewFooterLink] = useState({ label: '', url: '' });
   const [testEmail, setTestEmail] = useState('');
   const [sendingTestEmail, setSendingTestEmail] = useState(false);
+  const [emailProvider, setEmailProvider] = useState('smtp');
   const [smtpSettings, setSmtpSettings] = useState({
     sender_email: '', smtp_host: 'smtp.gmail.com', smtp_port: 587, smtp_user: '', smtp_password: ''
+  });
+  const [zeptomailSettings, setZeptomailSettings] = useState({
+    zeptomail_api_key: '', zeptomail_sender_email: ''
   });
   const [smtpLoading, setSmtpLoading] = useState(false);
   const [smtpStatus, setSmtpStatus] = useState(null);
@@ -187,12 +191,17 @@ const AdminSettings = () => {
     try {
       const res = await api.get('/admin/smtp-settings');
       const d = res.data;
+      setEmailProvider(d.email_provider || 'smtp');
       setSmtpSettings({
         sender_email: d.sender_email || '',
         smtp_host: d.smtp_host || 'smtp.gmail.com',
         smtp_port: d.smtp_port || 587,
         smtp_user: d.smtp_user || '',
         smtp_password: ''
+      });
+      setZeptomailSettings({
+        zeptomail_api_key: '',
+        zeptomail_sender_email: d.zeptomail_sender_email || ''
       });
     } catch (e) {
       console.error('Failed to load SMTP settings:', e);
@@ -202,13 +211,20 @@ const AdminSettings = () => {
   const saveSmtpSettings = async () => {
     setSmtpLoading(true);
     try {
-      const payload = { ...smtpSettings };
+      const payload = {
+        email_provider: emailProvider,
+        ...smtpSettings,
+        zeptomail_sender_email: zeptomailSettings.zeptomail_sender_email,
+      };
       if (!payload.smtp_password) delete payload.smtp_password;
+      if (zeptomailSettings.zeptomail_api_key) {
+        payload.zeptomail_api_key = zeptomailSettings.zeptomail_api_key;
+      }
       await api.put('/admin/smtp-settings', payload);
-      toast.success('הגדרות SMTP נשמרו בהצלחה');
+      toast.success('הגדרות שליחת מיילים נשמרו בהצלחה');
       checkSmtpConnection();
     } catch (e) {
-      toast.error('שגיאה בשמירת הגדרות SMTP');
+      toast.error('שגיאה בשמירת הגדרות שליחת מיילים');
     } finally {
       setSmtpLoading(false);
     }
@@ -568,7 +584,7 @@ const AdminSettings = () => {
                         <span className="text-carefd-slate text-sm" dir="ltr">{link.url}</span>
                         <button
                           onClick={() => removeFooterLink(index)}
-                          className="mr-auto text-carefd-gray hover:text-red-500"
+                          className="me-auto text-carefd-gray hover:text-red-500"
                         >
                           ✕
                         </button>
@@ -648,79 +664,158 @@ const AdminSettings = () => {
             {activeTab === 'advanced' && (
               <div className="space-y-6">
                 <h2 className="text-lg font-semibold text-carefd-navy mb-4">הגדרות מתקדמות</h2>
-                
-                {/* SMTP Configuration */}
+
+                {/* Email Provider Selection */}
                 <div className="p-5 bg-white border-2 border-blue-100 rounded-xl">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-carefd-navy font-bold text-base">הגדרות שליחת מיילים (SMTP)</h3>
-                    {smtpStatus && (
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${smtpStatus.smtp_login_ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {smtpStatus.smtp_login_ok ? 'מחובר' : 'לא מחובר'}
-                      </span>
+                  <h3 className="text-carefd-navy font-bold text-base mb-4">בחירת ספק שליחת מיילים</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                    <button
+                      onClick={() => setEmailProvider('smtp')}
+                      className={`p-4 rounded-xl border-2 text-right transition ${
+                        emailProvider === 'smtp'
+                          ? 'border-carefd-teal bg-carefd-teal/5'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-bold text-carefd-navy">SMTP</span>
+                        {emailProvider === 'smtp' && (
+                          <span className="px-2 py-0.5 bg-carefd-teal text-white rounded-full text-xs">פעיל</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-carefd-slate">שליחה דרך שרת SMTP (Gmail, Outlook...)</p>
+                    </button>
+                    <button
+                      onClick={() => setEmailProvider('zeptomail')}
+                      className={`p-4 rounded-xl border-2 text-right transition ${
+                        emailProvider === 'zeptomail'
+                          ? 'border-carefd-teal bg-carefd-teal/5'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-bold text-carefd-navy">ZeptoMail</span>
+                        {emailProvider === 'zeptomail' && (
+                          <span className="px-2 py-0.5 bg-carefd-teal text-white rounded-full text-xs">פעיל</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-carefd-slate">שליחה דרך ZeptoMail API (Zoho)</p>
+                    </button>
+                  </div>
+                </div>
+
+                {/* SMTP Configuration */}
+                {emailProvider === 'smtp' && (
+                  <div className="p-5 bg-white border-2 border-blue-100 rounded-xl">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-carefd-navy font-bold text-base">הגדרות SMTP</h3>
+                      {smtpStatus && (
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${smtpStatus.smtp_login_ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          {smtpStatus.smtp_login_ok ? 'מחובר' : 'לא מחובר'}
+                        </span>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm text-carefd-slate mb-1">אימייל שולח</label>
+                        <input type="email" value={smtpSettings.sender_email}
+                          onChange={(e) => setSmtpSettings(p => ({...p, sender_email: e.target.value}))}
+                          placeholder="your-email@gmail.com" dir="ltr"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
+                          data-testid="smtp-sender-email" />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-carefd-slate mb-1">שרת SMTP</label>
+                        <input type="text" value={smtpSettings.smtp_host}
+                          onChange={(e) => setSmtpSettings(p => ({...p, smtp_host: e.target.value}))}
+                          placeholder="smtp.gmail.com" dir="ltr"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
+                          data-testid="smtp-host" />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-carefd-slate mb-1">שם משתמש SMTP</label>
+                        <input type="text" value={smtpSettings.smtp_user}
+                          onChange={(e) => setSmtpSettings(p => ({...p, smtp_user: e.target.value}))}
+                          placeholder="your-email@gmail.com" dir="ltr"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
+                          data-testid="smtp-user" />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-carefd-slate mb-1">פורט</label>
+                        <input type="number" value={smtpSettings.smtp_port}
+                          onChange={(e) => setSmtpSettings(p => ({...p, smtp_port: parseInt(e.target.value) || 587}))}
+                          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
+                          data-testid="smtp-port" />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm text-carefd-slate mb-1">סיסמת SMTP (App Password)</label>
+                        <input type="password" value={smtpSettings.smtp_password}
+                          onChange={(e) => setSmtpSettings(p => ({...p, smtp_password: e.target.value}))}
+                          placeholder="השאר ריק אם לא רוצה לשנות"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
+                          data-testid="smtp-password" />
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button onClick={saveSmtpSettings} disabled={smtpLoading}
+                        className="px-4 py-2 bg-carefd-teal text-white rounded-lg hover:bg-carefd-teal/90 transition text-sm font-medium disabled:opacity-50"
+                        data-testid="save-smtp-btn">
+                        {smtpLoading ? 'שומר...' : 'שמור הגדרות'}
+                      </button>
+                      <button onClick={checkSmtpConnection}
+                        className="px-4 py-2 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition text-sm font-medium"
+                        data-testid="check-smtp-btn">
+                        בדוק חיבור
+                      </button>
+                    </div>
+                    {smtpStatus && !smtpStatus.smtp_login_ok && smtpStatus.smtp_error && (
+                      <p className="mt-3 text-sm text-red-600 bg-red-50 p-2 rounded-lg">{smtpStatus.smtp_error}</p>
                     )}
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <label className="block text-sm text-carefd-slate mb-1">אימייל שולח</label>
-                      <input type="email" value={smtpSettings.sender_email}
-                        onChange={(e) => setSmtpSettings(p => ({...p, sender_email: e.target.value}))}
-                        placeholder="your-email@gmail.com" dir="ltr"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
-                        data-testid="smtp-sender-email" />
+                )}
+
+                {/* ZeptoMail Configuration */}
+                {emailProvider === 'zeptomail' && (
+                  <div className="p-5 bg-white border-2 border-blue-100 rounded-xl">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-carefd-navy font-bold text-base">הגדרות ZeptoMail</h3>
+                      {smtpStatus && (
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${smtpStatus.zeptomail_configured ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          {smtpStatus.zeptomail_configured ? 'מוגדר' : 'לא מוגדר'}
+                        </span>
+                      )}
                     </div>
-                    <div>
-                      <label className="block text-sm text-carefd-slate mb-1">שרת SMTP</label>
-                      <input type="text" value={smtpSettings.smtp_host}
-                        onChange={(e) => setSmtpSettings(p => ({...p, smtp_host: e.target.value}))}
-                        placeholder="smtp.gmail.com" dir="ltr"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
-                        data-testid="smtp-host" />
+                    <div className="space-y-4 mb-4">
+                      <div>
+                        <label className="block text-sm text-carefd-slate mb-1">מפתח API של ZeptoMail</label>
+                        <input type="password" value={zeptomailSettings.zeptomail_api_key}
+                          onChange={(e) => setZeptomailSettings(p => ({...p, zeptomail_api_key: e.target.value}))}
+                          placeholder="השאר ריק אם לא רוצה לשנות"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
+                          dir="ltr" />
+                        <p className="text-xs text-carefd-gray mt-1">ניתן למצוא את המפתח בלוח הבקרה של ZeptoMail תחת Settings &gt; Send Mail Token</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm text-carefd-slate mb-1">אימייל שולח</label>
+                        <input type="email" value={zeptomailSettings.zeptomail_sender_email}
+                          onChange={(e) => setZeptomailSettings(p => ({...p, zeptomail_sender_email: e.target.value}))}
+                          placeholder="noreply@your-domain.com"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
+                          dir="ltr" />
+                        <p className="text-xs text-carefd-gray mt-1">הדומיין חייב להיות מאומת ב-ZeptoMail</p>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm text-carefd-slate mb-1">שם משתמש SMTP</label>
-                      <input type="text" value={smtpSettings.smtp_user}
-                        onChange={(e) => setSmtpSettings(p => ({...p, smtp_user: e.target.value}))}
-                        placeholder="your-email@gmail.com" dir="ltr"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
-                        data-testid="smtp-user" />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-carefd-slate mb-1">פורט</label>
-                      <input type="number" value={smtpSettings.smtp_port}
-                        onChange={(e) => setSmtpSettings(p => ({...p, smtp_port: parseInt(e.target.value) || 587}))}
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
-                        data-testid="smtp-port" />
-                    </div>
-                    <div className="md:col-span-2">
-                      <label className="block text-sm text-carefd-slate mb-1">סיסמת SMTP (App Password)</label>
-                      <input type="password" value={smtpSettings.smtp_password}
-                        onChange={(e) => setSmtpSettings(p => ({...p, smtp_password: e.target.value}))}
-                        placeholder="השאר ריק אם לא רוצה לשנות"
-                        className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-carefd-teal outline-none"
-                        data-testid="smtp-password" />
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
                     <button onClick={saveSmtpSettings} disabled={smtpLoading}
-                      className="px-4 py-2 bg-carefd-teal text-white rounded-lg hover:bg-carefd-teal/90 transition text-sm font-medium disabled:opacity-50"
-                      data-testid="save-smtp-btn">
-                      {smtpLoading ? 'שומר...' : 'שמור הגדרות SMTP'}
-                    </button>
-                    <button onClick={checkSmtpConnection}
-                      className="px-4 py-2 bg-gray-100 text-carefd-navy rounded-lg hover:bg-gray-200 transition text-sm font-medium"
-                      data-testid="check-smtp-btn">
-                      בדוק חיבור
+                      className="px-4 py-2 bg-carefd-teal text-white rounded-lg hover:bg-carefd-teal/90 transition text-sm font-medium disabled:opacity-50">
+                      {smtpLoading ? 'שומר...' : 'שמור הגדרות'}
                     </button>
                   </div>
-                  {smtpStatus && !smtpStatus.smtp_login_ok && smtpStatus.smtp_error && (
-                    <p className="mt-3 text-sm text-red-600 bg-red-50 p-2 rounded-lg">{smtpStatus.smtp_error}</p>
-                  )}
-                </div>
+                )}
 
                 {/* Test Email */}
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                   <h3 className="text-carefd-navy font-medium mb-2">בדיקת שליחת מיילים</h3>
-                  <p className="text-carefd-slate text-sm mb-3">שלח מייל בדיקה כדי לוודא שהגדרות ה-SMTP עובדות</p>
+                  <p className="text-carefd-slate text-sm mb-3">שלח מייל בדיקה כדי לוודא שהגדרות שליחת המיילים עובדות</p>
                   <div className="flex gap-2">
                     <input
                       type="email"
@@ -731,7 +826,7 @@ const AdminSettings = () => {
                       dir="ltr"
                       data-testid="test-email-input"
                     />
-                    <button 
+                    <button
                       type="button"
                       disabled={sendingTestEmail}
                       onClick={async () => {
@@ -740,7 +835,8 @@ const AdminSettings = () => {
                         try {
                           const res = await api.post('/admin/test-email', { email: testEmail });
                           if (res.data.success) {
-                            toast.success('מייל בדיקה נשלח בהצלחה! בדוק את תיבת הדואר');
+                            const providerName = res.data.provider === 'zeptomail' ? 'ZeptoMail' : res.data.provider === 'resend' ? 'Resend' : 'SMTP';
+                            toast.success(`מייל בדיקה נשלח בהצלחה דרך ${providerName}! בדוק את תיבת הדואר`);
                           } else {
                             toast.error('שליחת מייל נכשלה: ' + (res.data.error || 'שגיאה'));
                           }

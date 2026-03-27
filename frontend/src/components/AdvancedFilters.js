@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import {
   FaFilter, FaTimes, FaMapMarkerAlt, FaCrosshairs, FaStar,
   FaUserMd, FaBriefcase, FaHome, FaVideo, FaClinicMedical, FaPhoneAlt,
-  FaCheckCircle, FaAward, FaClock, FaChevronDown, FaChevronUp
+  FaCheckCircle, FaAward, FaClock, FaChevronDown, FaChevronUp,
+  FaVenusMars, FaLanguage, FaHospital
 } from 'react-icons/fa';
 import api from '../utils/api';
 
@@ -51,10 +52,14 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
     providerType: false,
     rating: false,
     experience: false,
+    gender: false,
+    languages: false,
+    healthFunds: false,
     badges: false
   });
   const [gettingLocation, setGettingLocation] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [cities, setCities] = useState([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -78,6 +83,13 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
       }
     };
     fetchCategories();
+    const fetchCities = async () => {
+      try {
+        const res = await api.get('/localities?limit=500');
+        setCities(res.data.localities || []);
+      } catch { /* ignore */ }
+    };
+    fetchCities();
   }, []);
 
   const toggleSection = (section) => {
@@ -97,7 +109,9 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
           ...filters,
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
-          useMyLocation: true
+          useMyLocation: true,
+          city: null,
+          radius: filters.radius || 10
         });
         setGettingLocation(false);
       },
@@ -208,11 +222,41 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
             <CitySelect
               name="city"
               value={filters.city || ''}
-              onChange={(e) => onFilterChange({ ...filters, city: e.target.value || null, latitude: null, longitude: null, useMyLocation: false, radius: null })}
+              onChange={(e) => {
+                const cityName = e.target.value || null;
+                const matchedCity = cities.find(c => c.name === cityName);
+                if (matchedCity && matchedCity.lat && matchedCity.lng) {
+                  onFilterChange({ ...filters, city: cityName, latitude: matchedCity.lat, longitude: matchedCity.lng, useMyLocation: false, radius: filters.radius || 25 });
+                } else {
+                  onFilterChange({ ...filters, city: cityName, latitude: null, longitude: null, useMyLocation: false, radius: null });
+                }
+              }}
               placeholder="כל הערים"
               inputClassName="w-full px-4 py-2 rounded-xl border-2 border-carefd-teal-pale focus:border-carefd-teal focus:outline-none"
             />
           </div>
+
+          {/* Radius for City */}
+          {filters.city && filters.latitude && (
+            <div>
+              <label className="block text-sm font-medium text-carefd-navy mb-2">רדיוס חיפוש</label>
+              <div className="flex flex-wrap gap-2">
+                {radiusOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => onFilterChange({ ...filters, radius: option.value })}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                      filters.radius === option.value
+                        ? 'bg-carefd-teal text-white'
+                        : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </FilterSection>
 
@@ -330,6 +374,93 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
               }`}
             >
               {option.label}
+            </button>
+          ))}
+        </div>
+      </FilterSection>
+
+      {/* Gender Filter */}
+      <FilterSection title="מגדר" icon={FaVenusMars} sectionKey="gender">
+        <div className="flex flex-wrap gap-2">
+          {[
+            { value: null, label: 'הכל' },
+            { value: 'male', label: 'זכר' },
+            { value: 'female', label: 'נקבה' }
+          ].map((option) => (
+            <button
+              key={option.value || 'all'}
+              onClick={() => onFilterChange({ ...filters, gender: option.value })}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                filters.gender === option.value
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </FilterSection>
+
+      {/* Languages Filter */}
+      <FilterSection title="שפות" icon={FaLanguage} sectionKey="languages">
+        <div className="flex flex-wrap gap-2">
+          {[
+            { value: 'hebrew', label: 'עברית' },
+            { value: 'arabic', label: 'ערבית' },
+            { value: 'russian', label: 'רוסית' },
+            { value: 'english', label: 'אנגלית' },
+            { value: 'amharic', label: 'אמהרית' },
+            { value: 'french', label: 'צרפתית' },
+            { value: 'spanish', label: 'ספרדית' }
+          ].map((lang) => (
+            <button
+              key={lang.value}
+              onClick={() => {
+                const current = filters.languages || [];
+                const updated = current.includes(lang.value)
+                  ? current.filter(l => l !== lang.value)
+                  : [...current, lang.value];
+                onFilterChange({ ...filters, languages: updated });
+              }}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                (filters.languages || []).includes(lang.value)
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
+              }`}
+            >
+              {lang.label}
+            </button>
+          ))}
+        </div>
+      </FilterSection>
+
+      {/* Health Funds Filter */}
+      <FilterSection title="קופות חולים" icon={FaHospital} sectionKey="healthFunds">
+        <div className="flex flex-wrap gap-2">
+          {[
+            { value: 'clalit', label: 'כללית' },
+            { value: 'maccabi', label: 'מכבי' },
+            { value: 'meuhedet', label: 'מאוחדת' },
+            { value: 'leumit', label: 'לאומית' },
+            { value: 'private', label: 'פרטי בלבד' }
+          ].map((fund) => (
+            <button
+              key={fund.value}
+              onClick={() => {
+                const current = filters.healthFunds || [];
+                const updated = current.includes(fund.value)
+                  ? current.filter(f => f !== fund.value)
+                  : [...current, fund.value];
+                onFilterChange({ ...filters, healthFunds: updated });
+              }}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                (filters.healthFunds || []).includes(fund.value)
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
+              }`}
+            >
+              {fund.label}
             </button>
           ))}
         </div>
