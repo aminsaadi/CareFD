@@ -143,6 +143,109 @@ async def get_my_documents(authorization: Optional[str] = Header(None), request:
         "verification_notes": provider.get("verification_notes")
     }
 
+# Get available filter options
+@router.get("/providers/filters/options")
+async def get_filter_options():
+    """Get available filter options based on existing data"""
+    # Get unique cities
+    cities = await db.providers.distinct("location.city")
+    cities = [c for c in cities if c]
+
+    # Get unique specializations
+    specializations = await db.providers.distinct("specializations")
+    specializations = [s for s in specializations if s]
+
+    # Get unique provider types
+    provider_types = await db.providers.distinct("provider_type")
+
+    # Categories from admin professions hierarchy
+    professions_data = await db.professions.find({}, {"_id": 0}).to_list(100)
+    categories = []
+    for prof in professions_data:
+        categories.append({
+            "id": prof.get("profession_id", ""),
+            "name": prof.get("name", ""),
+            "name_en": prof.get("name_en", ""),
+            "icon": prof.get("icon", "briefcase"),
+        })
+
+    # Service types
+    service_types = [
+        {"id": "home_visit", "name": "ביקור בית", "name_en": "Home Visit"},
+        {"id": "clinic_visit", "name": "ביקור במרפאה", "name_en": "Clinic Visit"},
+        {"id": "video_call", "name": "טלרפואה", "name_en": "Video Call"},
+        {"id": "phone_call", "name": "שיחה טלפונית", "name_en": "Phone Call"}
+    ]
+
+    # Provider types with labels
+    provider_type_options = [
+        {"id": "individual", "name": "עצמאי", "name_en": "Individual"},
+        {"id": "clinic", "name": "מרפאה", "name_en": "Clinic"},
+        {"id": "company", "name": "חברה", "name_en": "Company"}
+    ]
+
+    # Rating options
+    rating_options = [
+        {"value": 4.5, "label": "4.5+ כוכבים"},
+        {"value": 4.0, "label": "4.0+ כוכבים"},
+        {"value": 3.5, "label": "3.5+ כוכבים"},
+        {"value": 3.0, "label": "3.0+ כוכבים"}
+    ]
+
+    # Experience options
+    experience_options = [
+        {"value": 1, "label": "שנה+"},
+        {"value": 3, "label": "3 שנים+"},
+        {"value": 5, "label": "5 שנים+"},
+        {"value": 10, "label": "10 שנים+"}
+    ]
+
+    # Radius options
+    radius_options = [
+        {"value": 5, "label": "5 ק\"מ"},
+        {"value": 10, "label": "10 ק\"מ"},
+        {"value": 25, "label": "25 ק\"מ"},
+        {"value": 50, "label": "50 ק\"מ"},
+        {"value": 100, "label": "100 ק\"מ"}
+    ]
+
+    # Shift options for availability
+    shift_options = [
+        {"value": "morning", "label": "בוקר", "label_en": "Morning", "default_start": "06:00", "default_end": "12:00"},
+        {"value": "afternoon", "label": "צהריים", "label_en": "Afternoon", "default_start": "12:00", "default_end": "18:00"},
+        {"value": "evening", "label": "ערב", "label_en": "Evening", "default_start": "18:00", "default_end": "22:00"},
+        {"value": "night", "label": "לילה", "label_en": "Night", "default_start": "22:00", "default_end": "06:00"},
+    ]
+
+    # Days of week
+    days_of_week = [
+        {"value": "sunday", "label": "ראשון", "label_en": "Sunday"},
+        {"value": "monday", "label": "שני", "label_en": "Monday"},
+        {"value": "tuesday", "label": "שלישי", "label_en": "Tuesday"},
+        {"value": "wednesday", "label": "רביעי", "label_en": "Wednesday"},
+        {"value": "thursday", "label": "חמישי", "label_en": "Thursday"},
+        {"value": "friday", "label": "שישי", "label_en": "Friday"},
+        {"value": "saturday", "label": "שבת", "label_en": "Saturday"},
+    ]
+
+    return {
+        "cities": sorted(cities) if cities else ["תל אביב", "ירושלים", "חיפה", "באר שבע", "רמת גן", "הרצליה", "פתח תקווה"],
+        "specializations": sorted(specializations) if specializations else [],
+        "categories": categories,
+        "professions": professions_data,  # Full hierarchy for provider forms
+        "service_types": service_types,
+        "provider_types": provider_type_options,
+        "rating_options": rating_options,
+        "experience_options": experience_options,
+        "radius_options": radius_options,
+        "profession_titles": PROFESSION_TITLES,
+        "gender_options": GENDER_OPTIONS,
+        "language_options": LANGUAGE_OPTIONS,
+        "target_audience_options": TARGET_AUDIENCE_OPTIONS,
+        "shift_options": shift_options,
+        "days_of_week": days_of_week
+    }
+
 @router.get("/providers/{provider_id}")
 async def get_provider(provider_id: str):
     """Get provider details"""
@@ -438,109 +541,6 @@ async def search_providers(
             "verified_only": verified_only,
             "recommended_only": recommended_only
         }
-    }
-
-# Get available filter options
-@router.get("/providers/filters/options")
-async def get_filter_options():
-    """Get available filter options based on existing data"""
-    # Get unique cities
-    cities = await db.providers.distinct("location.city")
-    cities = [c for c in cities if c]
-    
-    # Get unique specializations
-    specializations = await db.providers.distinct("specializations")
-    specializations = [s for s in specializations if s]
-
-    # Get unique provider types
-    provider_types = await db.providers.distinct("provider_type")
-
-    # Categories from admin professions hierarchy
-    professions_data = await db.professions.find({}, {"_id": 0}).to_list(100)
-    categories = []
-    for prof in professions_data:
-        categories.append({
-            "id": prof.get("profession_id", ""),
-            "name": prof.get("name", ""),
-            "name_en": prof.get("name_en", ""),
-            "icon": prof.get("icon", "briefcase"),
-        })
-    
-    # Service types
-    service_types = [
-        {"id": "home_visit", "name": "ביקור בית", "name_en": "Home Visit"},
-        {"id": "clinic_visit", "name": "ביקור במרפאה", "name_en": "Clinic Visit"},
-        {"id": "video_call", "name": "טלרפואה", "name_en": "Video Call"},
-        {"id": "phone_call", "name": "שיחה טלפונית", "name_en": "Phone Call"}
-    ]
-    
-    # Provider types with labels
-    provider_type_options = [
-        {"id": "individual", "name": "עצמאי", "name_en": "Individual"},
-        {"id": "clinic", "name": "מרפאה", "name_en": "Clinic"},
-        {"id": "company", "name": "חברה", "name_en": "Company"}
-    ]
-    
-    # Rating options
-    rating_options = [
-        {"value": 4.5, "label": "4.5+ כוכבים"},
-        {"value": 4.0, "label": "4.0+ כוכבים"},
-        {"value": 3.5, "label": "3.5+ כוכבים"},
-        {"value": 3.0, "label": "3.0+ כוכבים"}
-    ]
-    
-    # Experience options
-    experience_options = [
-        {"value": 1, "label": "שנה+"},
-        {"value": 3, "label": "3 שנים+"},
-        {"value": 5, "label": "5 שנים+"},
-        {"value": 10, "label": "10 שנים+"}
-    ]
-    
-    # Radius options
-    radius_options = [
-        {"value": 5, "label": "5 ק\"מ"},
-        {"value": 10, "label": "10 ק\"מ"},
-        {"value": 25, "label": "25 ק\"מ"},
-        {"value": 50, "label": "50 ק\"מ"},
-        {"value": 100, "label": "100 ק\"מ"}
-    ]
-    
-    # Shift options for availability
-    shift_options = [
-        {"value": "morning", "label": "בוקר", "label_en": "Morning", "default_start": "06:00", "default_end": "12:00"},
-        {"value": "afternoon", "label": "צהריים", "label_en": "Afternoon", "default_start": "12:00", "default_end": "18:00"},
-        {"value": "evening", "label": "ערב", "label_en": "Evening", "default_start": "18:00", "default_end": "22:00"},
-        {"value": "night", "label": "לילה", "label_en": "Night", "default_start": "22:00", "default_end": "06:00"},
-    ]
-    
-    # Days of week
-    days_of_week = [
-        {"value": "sunday", "label": "ראשון", "label_en": "Sunday"},
-        {"value": "monday", "label": "שני", "label_en": "Monday"},
-        {"value": "tuesday", "label": "שלישי", "label_en": "Tuesday"},
-        {"value": "wednesday", "label": "רביעי", "label_en": "Wednesday"},
-        {"value": "thursday", "label": "חמישי", "label_en": "Thursday"},
-        {"value": "friday", "label": "שישי", "label_en": "Friday"},
-        {"value": "saturday", "label": "שבת", "label_en": "Saturday"},
-    ]
-    
-    return {
-        "cities": sorted(cities) if cities else ["תל אביב", "ירושלים", "חיפה", "באר שבע", "רמת גן", "הרצליה", "פתח תקווה"],
-        "specializations": sorted(specializations) if specializations else [],
-        "categories": categories,
-        "professions": professions_data,  # Full hierarchy for provider forms
-        "service_types": service_types,
-        "provider_types": provider_type_options,
-        "rating_options": rating_options,
-        "experience_options": experience_options,
-        "radius_options": radius_options,
-        "profession_titles": PROFESSION_TITLES,
-        "gender_options": GENDER_OPTIONS,
-        "language_options": LANGUAGE_OPTIONS,
-        "target_audience_options": TARGET_AUDIENCE_OPTIONS,
-        "shift_options": shift_options,
-        "days_of_week": days_of_week
     }
 
 @router.put("/providers/{provider_id}")

@@ -489,6 +489,10 @@ async def reset_password(data: dict, request: Request = None):
     
     if len(new_password) < 8:
         raise HTTPException(status_code=400, detail="Password must be at least 8 characters with letters and digits")
+    if not any(c.isdigit() for c in new_password):
+        raise HTTPException(status_code=400, detail="Password must contain at least one digit")
+    if not any(c.isalpha() for c in new_password):
+        raise HTTPException(status_code=400, detail="Password must contain at least one letter")
 
     # Find reset request
     reset_doc = await db.password_resets.find_one({"token": token})

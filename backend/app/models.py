@@ -814,6 +814,8 @@ class ChatRoom(BaseModel):
     booking_id: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     last_message_at: Optional[datetime] = None
+    archived_by: List[str] = []
+    deleted_by: List[str] = []
 
 class Message(BaseModel):
     model_config = ConfigDict(extra="ignore")
