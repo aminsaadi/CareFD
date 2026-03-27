@@ -311,7 +311,7 @@ const UnifiedAdvancedFilters = ({
                         >
                           <FaMapMarkerAlt className="text-xs" />
                           <span>{city.name || city}</span>
-                          {city.region && <span className="text-xs text-carefd-gray mr-auto">({city.region})</span>}
+                          {city.region && <span className="text-xs text-carefd-gray me-auto">({city.region})</span>}
                         </button>
                       ))}
                     </div>
@@ -337,7 +337,7 @@ const UnifiedAdvancedFilters = ({
                   setLocationSearch('');
                   onFilterChange({ ...filters, city: '', region: '' });
                 }}
-                className="mr-auto text-carefd-gray hover:text-red-500"
+                className="me-auto text-carefd-gray hover:text-red-500"
               >
                 <FaTimes className="text-xs" />
               </button>
@@ -485,7 +485,7 @@ const UnifiedAdvancedFilters = ({
                   style={{ backgroundColor: fund.color }}
                 />
                 {fund.name}
-                {isSelected && <FaCheckCircle className="mr-auto text-xs" />}
+                {isSelected && <FaCheckCircle className="me-auto text-xs" />}
               </button>
             );
           })}

@@ -120,6 +120,70 @@ async def delete_service(
     
     return {"message": "Service deleted successfully"}
 
+@router.get("/services/my")
+async def get_my_services(
+    authorization: Optional[str] = Header(None),
+    request: Request = None
+):
+    """Get services for current provider"""
+    user = await get_current_user(authorization, request)
+
+    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+
+    services = await db.services.find(
+        {"provider_id": provider["provider_id"], "is_active": True},
+        {"_id": 0}
+    ).to_list(100)
+
+    return {"services": services}
+
+
+@router.get("/services/{service_id}")
+async def get_service_by_id(service_id: str):
+    """Get a single service by ID, enriched with provider info"""
+    service = await db.services.find_one({"service_id": service_id}, {"_id": 0})
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+
+    # Enrich with provider info
+    provider = None
+    pid = service.get("provider_id")
+    if pid:
+        provider = await db.providers.find_one({"provider_id": pid}, {"_id": 0})
+
+    if provider:
+        total_reviews = provider.get("total_reviews") or provider.get("review_count", 0)
+        service["provider"] = {
+            "provider_id": provider.get("provider_id"),
+            "business_name": provider.get("business_name"),
+            "rating": provider.get("rating", 0),
+            "total_reviews": total_reviews,
+            "location": provider.get("location"),
+            "phone": provider.get("phone"),
+            "gender": provider.get("gender"),
+            "languages": provider.get("languages", []),
+            "health_funds": provider.get("health_funds", []),
+            "specializations": provider.get("specializations", []),
+            "profession": provider.get("profession"),
+            "profession_title": provider.get("profession_title"),
+            "is_verified": provider.get("is_verified", False),
+            "is_recommended": provider.get("is_recommended", False),
+        }
+    else:
+        service["provider"] = {
+            "provider_id": pid,
+            "business_name": "",
+            "rating": 0,
+            "total_reviews": 0,
+            "is_verified": False,
+            "is_recommended": False,
+        }
+
+    return service
+
+
 @router.get("/services")
 async def search_services(
     search: Optional[str] = None,
@@ -341,25 +405,6 @@ async def search_services(
         "skip": skip,
         "limit": limit,
     }
-
-@router.get("/services/my")
-async def get_my_services(
-    authorization: Optional[str] = Header(None),
-    request: Request = None
-):
-    """Get services for current provider"""
-    user = await get_current_user(authorization, request)
-    
-    provider = await db.providers.find_one({"user_id": user["user_id"]}, {"_id": 0})
-    if not provider:
-        raise HTTPException(status_code=404, detail="Provider not found")
-    
-    services = await db.services.find(
-        {"provider_id": provider["provider_id"], "is_active": True},
-        {"_id": 0}
-    ).to_list(100)
-    
-    return {"services": services}
 
 # ==================== REQUEST & OFFER ROUTES ====================
 

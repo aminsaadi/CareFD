@@ -507,19 +507,19 @@ const AdminUsers = () => {
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <span className="text-carefd-slate">מספר ספק:</span>
-                        <span className="font-mono text-carefd-teal mr-2">{userDetails.provider.provider_number}</span>
+                        <span className="font-mono text-carefd-teal me-2">{userDetails.provider.provider_number}</span>
                       </div>
                       <div>
                         <span className="text-carefd-slate">שם עסק:</span>
-                        <span className="text-carefd-navy mr-2">{userDetails.provider.business_name || '-'}</span>
+                        <span className="text-carefd-navy me-2">{userDetails.provider.business_name || '-'}</span>
                       </div>
                       <div>
                         <span className="text-carefd-slate">סוג:</span>
-                        <span className="text-carefd-navy mr-2">{userDetails.provider.provider_type}</span>
+                        <span className="text-carefd-navy me-2">{userDetails.provider.provider_type}</span>
                       </div>
                       <div>
                         <span className="text-carefd-slate">סטטוס אימות:</span>
-                        <span className={`mr-2 ${userDetails.provider.is_verified ? 'text-emerald-600' : 'text-amber-500'}`}>
+                        <span className={`me-2 ${userDetails.provider.is_verified ? 'text-emerald-600' : 'text-amber-500'}`}>
                           {userDetails.provider.is_verified ? 'מאומת' : 'לא מאומת'}
                         </span>
                       </div>

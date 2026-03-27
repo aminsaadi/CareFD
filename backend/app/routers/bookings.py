@@ -982,7 +982,7 @@ async def confirm_booking(
                     <p><strong>ספק:</strong> {provider_info.get('business_name', 'ספק') if provider_info else 'ספק'}</p>
                     <p><strong>תאריך:</strong> {booking.get('booking_date', '')[:10]}</p>
                     <p><strong>שעה:</strong> {booking.get('booking_time', 'לא צוין')}</p>
-                    <p><strong>כתובת:</strong> {booking.get('service_address', 'לא צוין')}, {booking.get('service_city', '')}</p>
+                    <p><strong>כתובת:</strong> {(booking.get('service_location') or {}).get('address', 'לא צוין')}, {(booking.get('service_location') or {}).get('city', '')}</p>
                 </div>
                 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #888;">

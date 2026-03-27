@@ -111,7 +111,7 @@ const ProviderSubscription = ({ provider, onRefresh }) => {
               <h3 className="text-2xl font-bold text-gray-900">
                 {currentPlan?.name_he || 'חינם'}
                 {currentSub?.is_trial && (
-                  <span className="text-sm font-normal text-orange-600 mr-2">(תקופת ניסיון)</span>
+                  <span className="text-sm font-normal text-orange-600 me-2">(תקופת ניסיון)</span>
                 )}
               </h3>
               {currentSub?.is_trial && currentSub?.trial_end_date && (

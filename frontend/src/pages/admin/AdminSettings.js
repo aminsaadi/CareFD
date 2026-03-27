@@ -584,7 +584,7 @@ const AdminSettings = () => {
                         <span className="text-carefd-slate text-sm" dir="ltr">{link.url}</span>
                         <button
                           onClick={() => removeFooterLink(index)}
-                          className="mr-auto text-carefd-gray hover:text-red-500"
+                          className="me-auto text-carefd-gray hover:text-red-500"
                         >
                           ✕
                         </button>

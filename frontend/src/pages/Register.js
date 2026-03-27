@@ -29,6 +29,20 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (formData.password.length < 8) {
+      setError('הסיסמה חייבת להכיל לפחות 8 תווים');
+      return;
+    }
+    if (!/\d/.test(formData.password)) {
+      setError('הסיסמה חייבת להכיל לפחות ספרה אחת');
+      return;
+    }
+    if (!/[a-zA-Z]/.test(formData.password)) {
+      setError('הסיסמה חייבת להכיל לפחות אות אחת');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -196,7 +210,7 @@ const Register = () => {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-12 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition"
-                    tabIndex={-1}
+                    aria-label={showPassword ? 'הסתר סיסמה' : 'הצג סיסמה'}
                     data-testid="toggle-password-visibility"
                   >
                     {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}

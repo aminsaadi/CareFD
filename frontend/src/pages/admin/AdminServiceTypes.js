@@ -193,7 +193,7 @@ const AdminServiceTypes = () => {
                 : 'text-carefd-slate border-transparent hover:text-carefd-navy'
             }`}
           >
-            <FiPackage className="inline-block ml-2" />
+            <FiPackage className="inline-block ms-2" />
             סוגי שירות ({serviceTypes.length})
           </button>
           <button
@@ -204,7 +204,7 @@ const AdminServiceTypes = () => {
                 : 'text-carefd-slate border-transparent hover:text-carefd-navy'
             }`}
           >
-            <FiMapPin className="inline-block ml-2" />
+            <FiMapPin className="inline-block ms-2" />
             אופני מתן שירות ({deliveryTypes.length})
           </button>
         </div>

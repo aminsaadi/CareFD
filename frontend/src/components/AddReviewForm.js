@@ -75,7 +75,7 @@ const AddReviewForm = ({ providerId, onReviewAdded }) => {
               />
             </button>
           ))}
-          <span className="mr-2 text-sm text-carefd-gray">
+          <span className="me-2 text-sm text-carefd-gray">
             {rating > 0 && `${rating} מתוך 5`}
           </span>
         </div>

@@ -257,14 +257,14 @@ const MyBookings = () => {
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <span className="font-semibold text-carefd-navy">תאריך:</span>
-                    <span className="mr-2 text-carefd-slate">
+                    <span className="me-2 text-carefd-slate">
                       {booking.booking_date ? format(new Date(booking.booking_date), 'dd/MM/yyyy HH:mm') : ''}
                     </span>
                   </div>
                   {(booking.final_price || booking.base_price || booking.service?.price) && (
                     <div>
                       <span className="font-semibold text-carefd-navy">מחיר:</span>
-                      <span className="text-carefd-teal font-bold mr-2">₪{booking.final_price || booking.base_price || booking.service?.price}</span>
+                      <span className="text-carefd-teal font-bold me-2">₪{booking.final_price || booking.base_price || booking.service?.price}</span>
                     </div>
                   )}
                 </div>
@@ -387,7 +387,7 @@ const MyBookings = () => {
                     />
                   </button>
                 ))}
-                <span className="mr-3 text-sm text-carefd-gray self-center">
+                <span className="me-3 text-sm text-carefd-gray self-center">
                   {reviewRating > 0 && `${reviewRating} מתוך 5`}
                 </span>
               </div>

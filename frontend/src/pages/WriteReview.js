@@ -92,7 +92,7 @@ const WriteReview = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (rating === 0) {
+    if (!rating || rating < 1 || rating > 5) {
       toast.error('נא לבחור דירוג');
       return;
     }

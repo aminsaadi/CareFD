@@ -182,7 +182,7 @@ const AdminLayout = ({ children }) => {
                     )}
                   </button>
                   {sidebarOpen && expandedMenus.includes(item.id) && (
-                    <div className="mt-1 mr-4 space-y-1">
+                    <div className="mt-1 me-4 space-y-1">
                       {item.submenu.map((subItem) => (
                         <Link
                           key={subItem.id}
@@ -196,7 +196,7 @@ const AdminLayout = ({ children }) => {
                           <subItem.icon size={16} />
                           <span>{subItem.label}</span>
                           {subItem.badgeKey && badgeCounts[subItem.badgeKey] > 0 && (
-                            <span className="mr-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                            <span className="me-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
                               {badgeCounts[subItem.badgeKey]}
                             </span>
                           )}
@@ -259,7 +259,7 @@ const AdminLayout = ({ children }) => {
       </aside>
 
       {/* Main Content */}
-      <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'mr-64' : 'mr-20'}`}>
+      <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'me-64' : 'me-20'}`}>
         {/* Top Bar */}
         <header className="h-16 bg-white/80 backdrop-blur-sm border-b border-gray-100 flex items-center justify-between px-6 sticky top-0 z-40">
           <div>

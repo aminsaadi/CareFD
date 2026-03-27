@@ -405,23 +405,31 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
       {/* Languages Filter */}
       <FilterSection title="שפות" icon={FaLanguage} sectionKey="languages">
         <div className="flex flex-wrap gap-2">
-          {['עברית', 'ערבית', 'רוסית', 'אנגלית', 'אמהרית', 'צרפתית'].map((lang) => (
+          {[
+            { value: 'hebrew', label: 'עברית' },
+            { value: 'arabic', label: 'ערבית' },
+            { value: 'russian', label: 'רוסית' },
+            { value: 'english', label: 'אנגלית' },
+            { value: 'amharic', label: 'אמהרית' },
+            { value: 'french', label: 'צרפתית' },
+            { value: 'spanish', label: 'ספרדית' }
+          ].map((lang) => (
             <button
-              key={lang}
+              key={lang.value}
               onClick={() => {
                 const current = filters.languages || [];
-                const updated = current.includes(lang)
-                  ? current.filter(l => l !== lang)
-                  : [...current, lang];
+                const updated = current.includes(lang.value)
+                  ? current.filter(l => l !== lang.value)
+                  : [...current, lang.value];
                 onFilterChange({ ...filters, languages: updated });
               }}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
-                (filters.languages || []).includes(lang)
+                (filters.languages || []).includes(lang.value)
                   ? 'bg-carefd-teal text-white'
                   : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
               }`}
             >
-              {lang}
+              {lang.label}
             </button>
           ))}
         </div>
@@ -430,23 +438,29 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
       {/* Health Funds Filter */}
       <FilterSection title="קופות חולים" icon={FaHospital} sectionKey="healthFunds">
         <div className="flex flex-wrap gap-2">
-          {['כללית', 'מכבי', 'מאוחדת', 'לאומית'].map((fund) => (
+          {[
+            { value: 'clalit', label: 'כללית' },
+            { value: 'maccabi', label: 'מכבי' },
+            { value: 'meuhedet', label: 'מאוחדת' },
+            { value: 'leumit', label: 'לאומית' },
+            { value: 'private', label: 'פרטי בלבד' }
+          ].map((fund) => (
             <button
-              key={fund}
+              key={fund.value}
               onClick={() => {
                 const current = filters.healthFunds || [];
-                const updated = current.includes(fund)
-                  ? current.filter(f => f !== fund)
-                  : [...current, fund];
+                const updated = current.includes(fund.value)
+                  ? current.filter(f => f !== fund.value)
+                  : [...current, fund.value];
                 onFilterChange({ ...filters, healthFunds: updated });
               }}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
-                (filters.healthFunds || []).includes(fund)
+                (filters.healthFunds || []).includes(fund.value)
                   ? 'bg-carefd-teal text-white'
                   : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
               }`}
             >
-              {fund}
+              {fund.label}
             </button>
           ))}
         </div>

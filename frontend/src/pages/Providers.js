@@ -484,7 +484,7 @@ const Providers = () => {
                         >
                           <FaCrosshairs className="text-lg" />
                           <span className="font-medium">השתמש במיקום שלי</span>
-                          {isLocating && <FaSpinner className="animate-spin mr-auto" />}
+                          {isLocating && <FaSpinner className="animate-spin me-auto" />}
                         </button>
                         
                         {/* Regions */}
@@ -550,7 +550,7 @@ const Providers = () => {
                                 >
                                   <FaMapMarkerAlt className="text-carefd-gray text-sm" />
                                   <span>{city.name || city.name_he}</span>
-                                  {city.region && <span className="text-xs text-carefd-gray mr-auto">{city.region}</span>}
+                                  {city.region && <span className="text-xs text-carefd-gray me-auto">{city.region}</span>}
                                 </button>
                               ))}
                             </div>

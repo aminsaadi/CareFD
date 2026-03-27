@@ -104,7 +104,7 @@ async def get_chat_rooms(
     
     # Filter by archive status
     if archived:
-        query["archived_by"] = user["user_id"]
+        query["archived_by"] = {"$in": [user["user_id"]]}
     else:
         query["$or"] = [
             {"archived_by": {"$exists": False}},

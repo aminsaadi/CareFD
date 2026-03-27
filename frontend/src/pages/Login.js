@@ -249,7 +249,7 @@ const Login = () => {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-12 top-1/2 -translate-y-1/2 text-carefd-gray/50 hover:text-carefd-teal transition"
-                    tabIndex={-1}
+                    aria-label={showPassword ? 'הסתר סיסמה' : 'הצג סיסמה'}
                     data-testid="toggle-password-visibility"
                   >
                     {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}

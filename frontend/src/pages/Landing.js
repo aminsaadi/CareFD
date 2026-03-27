@@ -513,7 +513,7 @@ const Landing = () => {
                             >
                               <FaCrosshairs className="text-lg" />
                               <span className="font-medium">השתמש במיקום שלי</span>
-                              {isLocating && <FaSpinner className="animate-spin mr-auto" />}
+                              {isLocating && <FaSpinner className="animate-spin me-auto" />}
                             </button>
                             
                             {/* Regions */}
