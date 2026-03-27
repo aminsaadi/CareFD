@@ -20,7 +20,7 @@ import {
   FaHourglass, FaTimes, FaEdit, FaChartBar, FaMoneyBillWave,
   FaUsers, FaEye, FaEyeSlash, FaBriefcase, FaPhone, FaEnvelope, FaTrash,
   FaHome, FaVideo, FaClinicMedical, FaPhoneAlt, FaSave, FaAward,
-  FaWhatsapp, FaGlobe, FaUserTie, FaBell, FaCrown, FaBuilding,
+  FaWhatsapp, FaBell, FaCrown, FaBuilding,
   FaSort, FaChevronDown, FaChevronUp
 } from 'react-icons/fa';
 
@@ -32,17 +32,6 @@ const serviceTypeOptions = [
   { value: 'phone_call', label: 'שיחה טלפונית', icon: FaPhoneAlt }
 ];
 
-const providerTypeOptions = [
-  { value: 'individual', label: 'עצמאי' },
-  { value: 'clinic', label: 'מרפאה' },
-  { value: 'company', label: 'חברה' }
-];
-
-const availableSpecializations = [
-  'סיעוד', 'פיזיותרפיה', 'ריפוי בעיסוק', 'רפואת משפחה', 
-  'גריאטריה', 'רפואה משלימה', 'פסיכולוגיה', 'דיאטה ותזונה',
-  'שיקום', 'דיקור', 'עיסוי רפואי', 'ריפוי בדיבור'
-];
 
 const ProviderDashboard = () => {
 
@@ -105,20 +94,6 @@ const ProviderDashboard = () => {
   });
 
   // Profile form state - Provider business profile
-  const [profileForm, setProfileForm] = useState({
-    business_name: '',
-    description: '',
-    provider_type: 'individual',
-    phone: '',
-    email: '',
-    website: '',
-    city: '',
-    address: '',
-    specializations: [],
-    service_types: [],
-    years_experience: ''
-  });
-
   // User info form state - Personal user details
   const [userInfoForm, setUserInfoForm] = useState({
     first_name: '',
@@ -172,19 +147,7 @@ const ProviderDashboard = () => {
 
   useEffect(() => {
     if (provider) {
-      setProfileForm({
-        business_name: provider.business_name || '',
-        description: provider.description || '',
-        provider_type: provider.provider_type || 'individual',
-        phone: provider.phone || '',
-        email: provider.email || user?.email || '',
-        website: provider.website || '',
-        city: provider.location?.city || '',
-        address: provider.location?.address || '',
-        specializations: provider.specializations || [],
-        service_types: provider.service_types || [],
-        years_experience: provider.years_experience || ''
-      });
+      // Profile editing is handled in /provider/edit
     }
     
     // Load user info
@@ -428,60 +391,6 @@ const ProviderDashboard = () => {
     });
   };
 
-  // Profile Management Functions
-  const toggleSpecialization = (spec) => {
-    setProfileForm(prev => ({
-      ...prev,
-      specializations: prev.specializations.includes(spec)
-        ? prev.specializations.filter(s => s !== spec)
-        : [...prev.specializations, spec]
-    }));
-  };
-
-  const toggleServiceType = (type) => {
-    setProfileForm(prev => ({
-      ...prev,
-      service_types: prev.service_types.includes(type)
-        ? prev.service_types.filter(t => t !== type)
-        : [...prev.service_types, type]
-    }));
-  };
-
-  const handleSaveProfile = async () => {
-    if (!profileForm.business_name) {
-      toast.error('נא למלא שם עסק');
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const profileData = {
-        business_name: profileForm.business_name,
-        description: profileForm.description,
-        provider_type: profileForm.provider_type,
-        phone: profileForm.phone,
-        email: profileForm.email,
-        website: profileForm.website,
-        specializations: profileForm.specializations,
-        service_types: profileForm.service_types,
-        years_experience: profileForm.years_experience ? parseInt(profileForm.years_experience) : null,
-        location: {
-          city: profileForm.city,
-          address: profileForm.address
-        }
-      };
-
-      await api.put(`/providers/${provider.provider_id}`, profileData);
-      await fetchDashboardData();
-      toast.success('הפרופיל נשמר בהצלחה!');
-    } catch (error) {
-      console.error('Failed to save profile:', error);
-      toast.error('שגיאה בשמירת הפרופיל');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const handleSaveUserInfo = async () => {
     setSaving(true);
     try {
@@ -552,7 +461,6 @@ const ProviderDashboard = () => {
     { id: 'messages', label: 'הודעות', icon: FaComments },
     { id: 'reviews', label: 'ביקורות', icon: FaStar },
     { id: 'user_info', label: 'פרטי משתמש', icon: FaUser },
-    { id: 'provider_profile', label: 'פרופיל ספק', icon: FaUserTie },
     { id: 'verification', label: 'אימות חשבון', icon: FaAward, link: '/verify-account' },
     { id: 'settings', label: 'הגדרות', icon: FaCog }
   ];
@@ -2006,232 +1914,6 @@ const ProviderDashboard = () => {
                           ))}
                         </div>
                       )}
-                    </div>
-                  )}
-
-                  {/* Profile Tab - Enhanced */}
-                  {activeTab === 'provider_profile' && (
-                    <div className="space-y-6">
-                      {/* Basic Info */}
-                      <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
-                          <FaUser className="text-carefd-teal" />
-                          פרטי העסק
-                        </h3>
-                        <div className="grid md:grid-cols-2 gap-6">
-                          <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-carefd-navy mb-2">שם העסק *</label>
-                            <input
-                              type="text"
-                              value={profileForm.business_name}
-                              onChange={(e) => setProfileForm({ ...profileForm, business_name: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
-                              placeholder="שם המרפאה/העסק"
-                            />
-                          </div>
-                          <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-carefd-navy mb-2">תיאור העסק</label>
-                            <textarea
-                              value={profileForm.description}
-                              onChange={(e) => setProfileForm({ ...profileForm, description: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none h-32 resize-none"
-                              placeholder="ספר על העסק שלך, הניסיון וההתמחויות..."
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-carefd-navy mb-2">סוג ספק</label>
-                            <select
-                              value={profileForm.provider_type}
-                              onChange={(e) => setProfileForm({ ...profileForm, provider_type: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
-                            >
-                              {providerTypeOptions.map((opt) => (
-                                <option key={opt.value} value={opt.value}>{opt.label}</option>
-                              ))}
-                            </select>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-carefd-navy mb-2">שנות ניסיון</label>
-                            <input
-                              type="number"
-                              value={profileForm.years_experience}
-                              onChange={(e) => setProfileForm({ ...profileForm, years_experience: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
-                              placeholder="0"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Contact Info */}
-                      <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
-                          <FaPhone className="text-carefd-teal" />
-                          פרטי התקשרות
-                        </h3>
-                        <div className="grid md:grid-cols-2 gap-6">
-                          <div>
-                            <label className="block text-sm font-medium text-carefd-navy mb-2">טלפון</label>
-                            <div className="relative">
-                              <FaPhone className="absolute right-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
-                              <input
-                                type="tel"
-                                value={profileForm.phone}
-                                onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })}
-                                className="w-full px-4 py-3 pr-12 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
-                                placeholder="050-0000000"
-                              />
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-carefd-navy mb-2">אימייל</label>
-                            <div className="relative">
-                              <FaEnvelope className="absolute right-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
-                              <input
-                                type="email"
-                                value={profileForm.email}
-                                onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
-                                className="w-full px-4 py-3 pr-12 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
-                                placeholder="your@email.com"
-                              />
-                            </div>
-                          </div>
-                          <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-carefd-navy mb-2">אתר אינטרנט</label>
-                            <div className="relative">
-                              <FaGlobe className="absolute right-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
-                              <input
-                                type="url"
-                                value={profileForm.website}
-                                onChange={(e) => setProfileForm({ ...profileForm, website: e.target.value })}
-                                className="w-full px-4 py-3 pr-12 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
-                                placeholder="https://www.example.com"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Location */}
-                      <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
-                          <FaMapMarkerAlt className="text-carefd-teal" />
-                          מיקום
-                        </h3>
-                        <div className="grid md:grid-cols-2 gap-6">
-                          <div>
-                            <label className="block text-sm font-medium text-carefd-navy mb-2">עיר</label>
-                            <input
-                              type="text"
-                              value={profileForm.city}
-                              onChange={(e) => setProfileForm({ ...profileForm, city: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
-                              placeholder="תל אביב"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-carefd-navy mb-2">כתובת</label>
-                            <input
-                              type="text"
-                              value={profileForm.address}
-                              onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })}
-                              className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
-                              placeholder="רחוב, מספר בית"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Specializations */}
-                      <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
-                          <FaAward className="text-carefd-teal" />
-                          התמחויות
-                        </h3>
-                        <p className="text-sm text-carefd-gray mb-4">בחר את ההתמחויות שלך (ניתן לבחור כמה)</p>
-                        <div className="flex flex-wrap gap-2">
-                          {availableSpecializations.map((spec) => (
-                            <button
-                              key={spec}
-                              type="button"
-                              onClick={() => toggleSpecialization(spec)}
-                              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                                profileForm.specializations.includes(spec)
-                                  ? 'bg-carefd-teal text-white'
-                                  : 'bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale'
-                              }`}
-                            >
-                              {spec}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Service Types */}
-                      <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
-                          <FaBriefcase className="text-carefd-teal" />
-                          סוגי שירות
-                        </h3>
-                        <p className="text-sm text-carefd-gray mb-4">באילו דרכים אתה מציע שירות?</p>
-                        <div className="grid md:grid-cols-2 gap-3">
-                          {serviceTypeOptions.map((type) => {
-                            const Icon = type.icon;
-                            return (
-                              <button
-                                key={type.value}
-                                type="button"
-                                onClick={() => toggleServiceType(type.value)}
-                                className={`flex items-center gap-3 p-4 rounded-xl text-right font-medium transition border-2 ${
-                                  profileForm.service_types.includes(type.value)
-                                    ? 'border-carefd-teal bg-carefd-teal-pale/30'
-                                    : 'border-carefd-teal-pale hover:border-carefd-teal'
-                                }`}
-                              >
-                                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                                  profileForm.service_types.includes(type.value)
-                                    ? 'bg-carefd-teal text-white'
-                                    : 'bg-carefd-teal-pale text-carefd-teal'
-                                }`}>
-                                  <Icon />
-                                </div>
-                                <span className="text-carefd-navy">{type.label}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Advanced Profile Link */}
-                      <div className="bg-gradient-to-r from-carefd-teal-pale/50 to-blue-50 p-6 rounded-2xl border border-carefd-teal/20">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="text-lg font-bold text-carefd-navy mb-1">עריכת פרופיל מתקדמת</h3>
-                            <p className="text-sm text-carefd-gray">
-                              עדכן השכלה, תעודות, קופות חולים, אמצעי תשלום, מדיניות ביטולים והגדרות פרטיות
-                            </p>
-                          </div>
-                          <Link
-                            to={`/provider/edit/${provider?.provider_id}`}
-                            className="bg-carefd-teal text-white px-6 py-3 rounded-xl font-medium hover:bg-carefd-teal-medium transition flex items-center gap-2"
-                          >
-                            <FaEdit />
-                            עריכה מתקדמת
-                          </Link>
-                        </div>
-                      </div>
-
-                      {/* Save Button */}
-                      <div className="flex justify-end">
-                        <button
-                          onClick={handleSaveProfile}
-                          disabled={saving}
-                          className="bg-carefd-teal text-white px-8 py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition flex items-center gap-2 disabled:opacity-50"
-                        >
-                          <FaSave />
-                          {saving ? 'שומר...' : 'שמור פרופיל'}
-                        </button>
-                      </div>
                     </div>
                   )}
 
