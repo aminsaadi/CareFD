@@ -260,38 +260,38 @@ const RequestDetails = () => {
                 {(!request.professions || request.professions.length === 0) && request.specialization && (
                   <div>
                     <span className="font-semibold text-carefd-navy">{t('specialization')}:</span>
-                    <span className="mr-2 text-carefd-slate">{request.specialization}</span>
+                    <span className="me-2 text-carefd-slate">{request.specialization}</span>
                   </div>
                 )}
 
                 {request.service_type && (
                   <div>
                     <span className="font-semibold text-carefd-navy">סוג שירות:</span>
-                    <span className="mr-2 text-carefd-slate">{t(request.service_type)}</span>
+                    <span className="me-2 text-carefd-slate">{t(request.service_type)}</span>
                   </div>
                 )}
 
                 {request.delivery_type && (
                   <div>
                     <span className="font-semibold text-carefd-navy">דרך מתן השירות:</span>
-                    <span className="mr-2 text-carefd-slate">{t(request.delivery_type)}</span>
+                    <span className="me-2 text-carefd-slate">{t(request.delivery_type)}</span>
                   </div>
                 )}
 
                 {request.request_type && (
                   <div>
                     <span className="font-semibold text-carefd-navy">{t('requestType')}:</span>
-                    <span className="mr-2 text-carefd-slate">{t(request.request_type)}</span>
+                    <span className="me-2 text-carefd-slate">{t(request.request_type)}</span>
                   </div>
                 )}
 
                 {request.budget && (
                   <div>
                     <span className="font-semibold text-carefd-navy">{t('budget')}:</span>
-                    <span className="text-carefd-teal font-bold text-xl mr-2">
+                    <span className="text-carefd-teal font-bold text-xl me-2">
                       ₪{request.budget}
                       {request.budget_type && (
-                        <span className="text-sm font-normal text-carefd-gray mr-1">
+                        <span className="text-sm font-normal text-carefd-gray me-1">
                           {request.budget_type === 'per_hour' ? 'לשעה' :
                            request.budget_type === 'per_treatment' ? 'לטיפול' :
                            request.budget_type === 'per_visit' ? 'לביקור' : request.budget_type}
@@ -315,7 +315,7 @@ const RequestDetails = () => {
                 {request.gender_preference && request.gender_preference !== 'no_preference' && (
                   <div>
                     <span className="font-semibold text-carefd-navy">העדפת מגדר:</span>
-                    <span className="mr-2 text-carefd-slate">
+                    <span className="me-2 text-carefd-slate">
                       {request.gender_preference === 'male' ? 'זכר' :
                        request.gender_preference === 'female' ? 'נקבה' : request.gender_preference}
                     </span>
@@ -351,7 +351,7 @@ const RequestDetails = () => {
                 {request.location && (request.location.city || request.location.address) && (
                   <div>
                     <span className="font-semibold text-carefd-navy">מיקום:</span>
-                    <span className="mr-2 text-carefd-slate">
+                    <span className="me-2 text-carefd-slate">
                       {request.location.city}
                       {request.location.city && request.location.address && ', '}
                       {request.location.address}
@@ -421,10 +421,10 @@ const RequestDetails = () => {
                             <div className="flex items-center gap-3 text-sm text-carefd-gray">
                               {offer.provider?.rating != null && offer.provider.rating > 0 && (
                                 <div className="flex items-center">
-                                  <FaStar className="text-yellow-500 ml-1" />
+                                  <FaStar className="text-yellow-500 ms-1" />
                                   <span>{Number(offer.provider.rating).toFixed(1)}</span>
                                   {offer.provider?.total_reviews > 0 && (
-                                    <span className="text-xs mr-1">({offer.provider.total_reviews})</span>
+                                    <span className="text-xs me-1">({offer.provider.total_reviews})</span>
                                   )}
                                 </div>
                               )}

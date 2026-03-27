@@ -85,7 +85,7 @@ const Navbar = () => {
             </Link>
             
             {/* Desktop navigation links */}
-            <div className="hidden md:flex mr-10 gap-1">
+            <div className="hidden md:flex me-10 gap-1">
               <Link
                 to="/providers"
                 className="text-carefd-slate hover:text-carefd-teal px-4 py-2 rounded-lg transition-colors font-medium hover:bg-carefd-teal-pale/20"
@@ -142,7 +142,7 @@ const Navbar = () => {
             {isAuthenticated && <NotificationBell />}
             
             {/* Desktop Auth */}
-            <div className="hidden md:flex items-center mr-2">
+            <div className="hidden md:flex items-center me-2">
               {isAuthenticated ? (
                 <div className="relative" ref={profileDropdownRef}>
                   <button
@@ -263,6 +263,8 @@ const Navbar = () => {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2.5 rounded-lg hover:bg-carefd-teal-pale/30 text-carefd-slate"
+              aria-label={mobileMenuOpen ? 'סגור תפריט' : 'פתח תפריט'}
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <FaTimes /> : <FaBars />}
             </button>

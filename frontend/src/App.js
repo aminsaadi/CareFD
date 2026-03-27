@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { SiteSettingsProvider, useSiteSettings } from './context/SiteSettingsContext';
@@ -109,9 +109,9 @@ const NotFound = () => (
     <div className="text-center">
       <h1 className="text-6xl font-bold text-gray-300 mb-4">404</h1>
       <p className="text-xl text-gray-600 mb-6">הדף לא נמצא</p>
-      <a href="/" className="bg-carefd-teal text-white px-6 py-3 rounded-lg hover:bg-carefd-teal-medium transition">
+      <Link to="/" className="bg-carefd-teal text-white px-6 py-3 rounded-lg hover:bg-carefd-teal-medium transition">
         חזרה לדף הבית
-      </a>
+      </Link>
     </div>
   </div>
 );

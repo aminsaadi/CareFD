@@ -156,7 +156,7 @@ const ChatList = () => {
                 <h3 className={`font-bold truncate ${hasUnread ? 'text-carefd-navy' : 'text-carefd-slate'}`}>
                   {name}
                 </h3>
-                <span className={`text-xs flex-shrink-0 mr-2 ${hasUnread ? 'text-carefd-teal font-bold' : 'text-carefd-gray'}`}>
+                <span className={`text-xs flex-shrink-0 me-2 ${hasUnread ? 'text-carefd-teal font-bold' : 'text-carefd-gray'}`}>
                   {formatLastMessageTime(room.last_message_at)}
                 </span>
               </div>

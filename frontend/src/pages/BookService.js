@@ -114,8 +114,8 @@ const BookService = () => {
   const fetchServiceDetails = async () => {
     try {
       setLoading(true);
-      const serviceRes = await api.get(`/services?service_id=${serviceId}`);
-      const found = (serviceRes.data.services || []).find(s => s.service_id === serviceId);
+      const serviceRes = await api.get(`/services/${serviceId}`);
+      const found = serviceRes.data;
       if (!found) throw new Error('Service not found');
       setService(found);
       
@@ -136,7 +136,11 @@ const BookService = () => {
       } catch { setBookedSlots([]); }
     } catch (error) {
       console.error('Failed to fetch service:', error);
-      toast.error('שירות לא נמצא');
+      if (error?.response?.status === 404) {
+        toast.error('השירות לא נמצא או שהוסר');
+      } else {
+        toast.error('אירעה שגיאה בטעינת השירות');
+      }
       navigate('/services');
     } finally {
       setLoading(false);
@@ -435,7 +439,7 @@ const BookService = () => {
             {!isAuthenticated && !guestMode && !authChecked && (
               <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 sm:p-5" data-testid="auth-banner">
                 <p className="text-sm font-semibold text-carefd-navy mb-3 text-center">
-                  <FaInfoCircle className="inline ml-1 text-amber-500" />
+                  <FaInfoCircle className="inline ms-1 text-amber-500" />
                   כדי להשלים הזמנה, התחבר או המשך כאורח
                 </p>
                 <div className="flex gap-3 justify-center">
@@ -483,7 +487,7 @@ const BookService = () => {
                   <p className="text-carefd-gray text-sm mt-0.5">{provider.business_name} &bull; {categoryConfig.label}</p>
                   <div className="mt-2 sm:hidden">
                     <span className="text-xl font-bold text-carefd-teal">₪{isSeries && service.series_price ? service.series_price : service.price}</span>
-                    <span className="text-xs text-carefd-gray mr-1">{isSeries && service.series_price ? 'לסדרה' : categoryConfig.pricingLabel}</span>
+                    <span className="text-xs text-carefd-gray me-1">{isSeries && service.series_price ? 'לסדרה' : categoryConfig.pricingLabel}</span>
                   </div>
                 </div>
                 <div className="text-left flex-shrink-0 hidden sm:block">
@@ -648,7 +652,7 @@ const BookService = () => {
                         onClick={() => setServiceAddress(prev => ({ ...prev, street: user.address || prev.street, city: user.city || prev.city }))}
                         className="text-xs text-carefd-teal bg-carefd-teal-pale/40 hover:bg-carefd-teal-pale px-3 py-1.5 rounded-full transition"
                         data-testid="fill-my-address-btn">
-                        <FaMapMarkerAlt className="inline text-[10px] ml-1" />הכתובת שלי
+                        <FaMapMarkerAlt className="inline text-[10px] ms-1" />הכתובת שלי
                       </button>
                     )}
                   </div>
@@ -749,7 +753,7 @@ const BookService = () => {
                     onClick={() => setContactPerson({ name: user.name || '', phone: user.phone || '', relationship: 'self' })}
                     className="text-xs text-carefd-teal bg-carefd-teal-pale/40 hover:bg-carefd-teal-pale px-3 py-1.5 rounded-full transition"
                     data-testid="fill-my-details-btn">
-                    <FaUser className="inline text-[10px] ml-1" /> הפרטים שלי
+                    <FaUser className="inline text-[10px] ms-1" /> הפרטים שלי
                   </button>
                 )}
               </div>

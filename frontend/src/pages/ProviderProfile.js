@@ -569,7 +569,7 @@ const ProviderProfile = () => {
                                 <div className="text-left">
                                   <span className="text-3xl font-bold text-carefd-teal">₪{service.price}</span>
                                   {priceUnit && (
-                                    <span className="text-sm text-carefd-gray mr-1">/{priceUnit}</span>
+                                    <span className="text-sm text-carefd-gray me-1">/{priceUnit}</span>
                                   )}
                                 </div>
                                 <button
@@ -676,7 +676,7 @@ const ProviderProfile = () => {
                                 </span>
                               </div>
                               <p className="text-carefd-slate leading-relaxed">
-                                <FaQuoteRight className="inline text-carefd-teal-pale ml-2" />
+                                <FaQuoteRight className="inline text-carefd-teal-pale ms-2" />
                                 {review.comment}
                               </p>
                             </div>

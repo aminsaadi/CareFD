@@ -772,7 +772,7 @@ const ProviderEdit = () => {
                               : 'bg-white text-carefd-navy border-gray-200 hover:border-carefd-teal hover:bg-carefd-teal-pale/20'
                           }`}
                         >
-                          {isSelected && <FaCheck className="inline ml-1.5" size={12} />}
+                          {isSelected && <FaCheck className="inline ms-1.5" size={12} />}
                           {opt.label}
                         </button>
                       );
@@ -863,7 +863,7 @@ const ProviderEdit = () => {
                   return (
                     <div>
                       <label className="block text-sm font-medium text-carefd-navy mb-2">
-                        <FaBriefcase className="inline ml-1" />
+                        <FaBriefcase className="inline ms-1" />
                         התמחות
                       </label>
                       <p className="text-sm text-carefd-gray mb-2">בחר את תחום ההתמחות שלך בתוך {selectedProfession?.name}</p>
@@ -883,7 +883,7 @@ const ProviderEdit = () => {
                                   : 'bg-white text-carefd-navy border-gray-200 hover:border-carefd-teal hover:bg-carefd-teal/5'
                               }`}
                             >
-                              {formData.specialization_id === sub.sub_profession_id && <FaCheck className="inline ml-1" size={12} />}
+                              {formData.specialization_id === sub.sub_profession_id && <FaCheck className="inline ms-1" size={12} />}
                               {sub.name}
                             </button>
                           ))}
@@ -945,7 +945,7 @@ const ProviderEdit = () => {
                   return (
                     <div>
                       <label className="block text-sm font-medium text-carefd-navy mb-2">
-                        <FaGraduationCap className="inline ml-1" />
+                        <FaGraduationCap className="inline ms-1" />
                         קטגוריות שירות ({selectedCategories.length}/3)
                       </label>
                       <p className="text-sm text-carefd-gray mb-3">בחר עד 3 קטגוריות שירות שאתה מציע</p>
@@ -957,7 +957,7 @@ const ProviderEdit = () => {
                             <span key={cat.category_id} className="inline-flex items-center gap-1 px-3 py-1.5 bg-carefd-teal/10 text-carefd-teal border border-carefd-teal/30 rounded-full text-sm font-medium">
                               {cat.name}
                               <span className="text-xs text-carefd-gray">({cat.profession_name})</span>
-                              <button onClick={() => toggleCategory(cat)} className="mr-1 hover:text-red-500">
+                              <button onClick={() => toggleCategory(cat)} className="me-1 hover:text-red-500">
                                 <FaTimes size={10} />
                               </button>
                             </span>
@@ -985,7 +985,7 @@ const ProviderEdit = () => {
                                           : 'bg-white text-carefd-navy border-gray-200 hover:border-carefd-teal'
                                     }`}
                                   >
-                                    {isSelected(cat.category_id) && <FaCheck className="inline ml-1" size={10} />}
+                                    {isSelected(cat.category_id) && <FaCheck className="inline ms-1" size={10} />}
                                     {cat.name}
                                   </button>
                                 ))}

@@ -1012,7 +1012,7 @@ const ProviderDashboard = () => {
                                           className="bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-green-600 transition font-medium"
                                           data-testid={`confirm-booking-${booking.booking_id}`}
                                         >
-                                          <FaCheckCircle className="inline ml-1" />
+                                          <FaCheckCircle className="inline ms-1" />
                                           אשר
                                         </button>
                                         <button
@@ -1029,7 +1029,7 @@ const ProviderDashboard = () => {
                                           className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition font-medium"
                                           data-testid={`reject-booking-${booking.booking_id}`}
                                         >
-                                          <FaTimes className="inline ml-1" />
+                                          <FaTimes className="inline ms-1" />
                                           דחה
                                         </button>
                                         <button
@@ -1037,7 +1037,7 @@ const ProviderDashboard = () => {
                                           className="bg-gray-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-gray-600 transition font-medium"
                                           data-testid={`hold-booking-${booking.booking_id}`}
                                         >
-                                          <FaHourglass className="inline ml-1" />
+                                          <FaHourglass className="inline ms-1" />
                                           השהה
                                         </button>
                                       </>
@@ -1057,7 +1057,7 @@ const ProviderDashboard = () => {
                                         className="bg-purple-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-purple-600 transition font-medium"
                                         data-testid={`complete-booking-${booking.booking_id}`}
                                       >
-                                        <FaCheckCircle className="inline ml-1" />
+                                        <FaCheckCircle className="inline ms-1" />
                                         סמן כהושלם
                                       </button>
                                     )}
@@ -1092,7 +1092,7 @@ const ProviderDashboard = () => {
                                           }}
                                           className="bg-orange-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-orange-600 transition font-medium"
                                         >
-                                          <FaCheckCircle className="inline ml-1" />
+                                          <FaCheckCircle className="inline ms-1" />
                                           אשר ביטול
                                         </button>
                                         <button
@@ -1108,7 +1108,7 @@ const ProviderDashboard = () => {
                                           }}
                                           className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs hover:bg-red-600 transition font-medium"
                                         >
-                                          <FaTimes className="inline ml-1" />
+                                          <FaTimes className="inline ms-1" />
                                           דחה ביטול
                                         </button>
                                       </>
@@ -1353,7 +1353,7 @@ const ProviderDashboard = () => {
                                         {selectedCats.map(cat => (
                                           <span key={cat.category_id} className="inline-flex items-center gap-1 px-3 py-1 bg-carefd-teal/10 text-carefd-teal border border-carefd-teal/30 rounded-full text-sm">
                                             {cat.name}
-                                            <button onClick={() => toggleCat(cat)} className="mr-1 hover:text-red-500">×</button>
+                                            <button onClick={() => toggleCat(cat)} className="me-1 hover:text-red-500">×</button>
                                           </span>
                                         ))}
                                       </div>
@@ -1768,7 +1768,7 @@ const ProviderDashboard = () => {
                                   </Link>
                                   <p className="text-sm text-carefd-gray line-clamp-2 mt-1">{request.description}</p>
                                 </div>
-                                <div className="flex flex-col items-end gap-1 mr-4">
+                                <div className="flex flex-col items-end gap-1 me-4">
                                   {request.budget && (
                                     <span className="text-xl font-bold text-carefd-teal">₪{request.budget}</span>
                                   )}

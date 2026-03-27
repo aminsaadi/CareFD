@@ -293,7 +293,7 @@ const SendNotificationModal = ({ onClose, onSend, sending }) => {
           </div>
           
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-700">
-            <FiAlertCircle className="inline mr-1" size={14} />
+            <FiAlertCircle className="inline me-1" size={14} />
             ההתראה תישלח גם כהודעה במערכת לכל המשתמשים הנבחרים
           </div>
           

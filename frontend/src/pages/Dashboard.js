@@ -1951,7 +1951,7 @@ const Dashboard = () => {
                                 className="bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-green-600 transition"
                                 data-testid={`approve-change-${cr.request_id}`}
                               >
-                                <FaCheckCircle className="inline ml-1" />
+                                <FaCheckCircle className="inline ms-1" />
                                 אשר שינוי
                               </button>
                               <button
@@ -1969,7 +1969,7 @@ const Dashboard = () => {
                                 className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-red-600 transition"
                                 data-testid={`reject-change-${cr.request_id}`}
                               >
-                                <FaTimes className="inline ml-1" />
+                                <FaTimes className="inline ms-1" />
                                 דחה שינוי
                               </button>
                             </div>

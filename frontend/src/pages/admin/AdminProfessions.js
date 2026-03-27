@@ -200,7 +200,7 @@ const AdminProfessions = () => {
                 : 'text-carefd-slate border-transparent hover:text-carefd-navy'
             }`}
           >
-            <FiBriefcase className="inline-block ml-2" />
+            <FiBriefcase className="inline-block ms-2" />
             מקצועות והתמחויות ({professions.length})
           </button>
           <button
@@ -211,7 +211,7 @@ const AdminProfessions = () => {
                 : 'text-carefd-slate border-transparent hover:text-carefd-navy'
             }`}
           >
-            <FiGrid className="inline-block ml-2" />
+            <FiGrid className="inline-block ms-2" />
             קטגוריות ותתי קטגוריות ({totalSubCategories})
           </button>
         </div>
