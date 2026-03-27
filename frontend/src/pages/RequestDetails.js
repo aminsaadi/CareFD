@@ -99,6 +99,9 @@ const RequestDetails = () => {
       const { booking_id, room_id } = response.data;
       toast.success('ההצעה התקבלה! נוצרה הזמנה חדשה.');
       fetchRequestDetails();
+      if (booking_id) {
+        setTimeout(() => navigate('/bookings'), 1500);
+      }
     } catch (error) {
       toast.error(error.response?.data?.detail || t('errorOccurred'));
     }
