@@ -2880,9 +2880,12 @@ async def admin_get_reports(
     # Reviews in period
     reviews_in_period = await db.reviews.count_documents({"created_at": {"$gte": start_date_str}})
     
-    # Average rating
-    all_reviews = await db.reviews.find({}, {"_id": 0, "rating": 1}).to_list(10000)
-    avg_rating = sum(r.get("rating", 0) for r in all_reviews) / len(all_reviews) if all_reviews else 0
+    # Average rating (use aggregation to avoid loading all reviews into memory)
+    avg_pipeline = [
+        {"$group": {"_id": None, "avg_rating": {"$avg": "$rating"}}}
+    ]
+    avg_result = await db.reviews.aggregate(avg_pipeline).to_list(1)
+    avg_rating = avg_result[0]["avg_rating"] if avg_result and avg_result[0].get("avg_rating") else 0
     
     return {
         "period": period,

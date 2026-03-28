@@ -66,8 +66,6 @@ const ProviderDashboard = () => {
   // Service form states
   const [showServiceForm, setShowServiceForm] = useState(false);
   const [editingService, setEditingService] = useState(null);
-  const [serviceTypes, setServiceTypes] = useState([]);
-  const [deliveryTypes, setDeliveryTypes] = useState([]);
   const [serviceForm, setServiceForm] = useState({
     name: '',
     description: '',
@@ -119,7 +117,6 @@ const ProviderDashboard = () => {
 
   useEffect(() => {
     fetchDashboardData();
-    fetchServiceAndDeliveryTypes();
     fetchProfessions();
   }, []);
 
@@ -132,17 +129,6 @@ const ProviderDashboard = () => {
     }
   };
 
-  const fetchServiceAndDeliveryTypes = async () => {
-    try {
-      const [serviceRes, deliveryRes] = await Promise.all([
-        api.get('/service-types'),
-        api.get('/delivery-types')
-      ]);
-      setServiceTypes(serviceRes.data.service_types || []);
-      setDeliveryTypes(deliveryRes.data.delivery_types || []);
-    } catch (error) {
-      console.error('Failed to fetch types:', error);
-    }
   };
 
   useEffect(() => {
@@ -206,6 +192,7 @@ const ProviderDashboard = () => {
         setChats(chatsRes.data.rooms || []);
       } catch (chatError) {
         console.error('Failed to fetch chats:', chatError);
+        toast.error('שגיאה בטעינת הודעות');
       }
 
       // Calculate stats

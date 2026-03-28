@@ -266,25 +266,24 @@ async def startup_db_client():
 
         # Initialize default service types and delivery types if empty
         try:
-            from app.database import db as _db
-            if await _db.service_types.count_documents({}) == 0:
+            if await db.service_types.count_documents({}) == 0:
                 default_service_types = [
                     {"type_id": "visit", "name": "שירות ביקור", "name_en": "Visit Service", "description": "שירות הניתן בביקור אחד", "icon": "home", "requires_location": True, "is_active": True},
                     {"type_id": "hourly", "name": "שירות שעתי", "name_en": "Hourly Service", "description": "שירות המחושב לפי שעות", "icon": "clock", "requires_location": True, "has_minimum_hours": True, "is_active": True},
                     {"type_id": "consultation", "name": "שירות ייעוץ", "name_en": "Consultation Service", "description": "שירות ייעוץ מקצועי", "icon": "message-circle", "requires_location": False, "is_active": True},
                     {"type_id": "product", "name": "מוצר", "name_en": "Product", "description": "מוצר למכירה", "icon": "package", "requires_location": False, "has_shipping": True, "is_active": True}
                 ]
-                await _db.service_types.insert_many(default_service_types)
+                await db.service_types.insert_many(default_service_types)
                 logger.info("Initialized 4 default service types")
 
-            if await _db.delivery_types.count_documents({}) == 0:
+            if await db.delivery_types.count_documents({}) == 0:
                 default_delivery_types = [
                     {"type_id": "home_visit", "name": "בבית", "name_en": "At Home", "description": "השירות יינתן בבית הלקוח", "icon": "home", "requires_address": True, "is_active": True},
                     {"type_id": "hospital", "name": "בבית חולים / מוסד", "name_en": "Hospital / Institution", "description": "השירות יינתן בבית חולים או מוסד רפואי", "icon": "building", "requires_address": True, "is_active": True},
                     {"type_id": "clinic", "name": "בקליניקה", "name_en": "At Clinic", "description": "השירות יינתן בקליניקה של הספק", "icon": "building-2", "requires_address": False, "is_active": True},
                     {"type_id": "virtual", "name": "וירטואלי", "name_en": "Virtual", "description": "השירות יינתן בטלפון או וידאו", "icon": "video", "requires_address": False, "sub_types": ["phone", "video"], "is_active": True}
                 ]
-                await _db.delivery_types.insert_many(default_delivery_types)
+                await db.delivery_types.insert_many(default_delivery_types)
                 logger.info("Initialized 4 default delivery types")
         except Exception as e:
             logger.warning(f"Default data initialization failed: {e}")

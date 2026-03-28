@@ -269,8 +269,7 @@ async def get_available_slots(provider_id: str, date: Optional[str] = None):
     for b in bookings:
         if b.get("booking_date"):
             try:
-                from datetime import datetime as dt
-                bd = dt.fromisoformat(b["booking_date"].replace("Z", "+00:00"))
+                bd = datetime.fromisoformat(b["booking_date"].replace("Z", "+00:00"))
                 booked_slots.append(bd.strftime("%Y-%m-%d %H:%M"))
             except (ValueError, AttributeError):
                 pass
