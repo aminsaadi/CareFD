@@ -31,7 +31,11 @@ const loadFiltersFromSession = (searchParams) => {
     healthFunds: searchParams.get('healthFunds')?.split(',').filter(Boolean) || [],
     minRating: searchParams.get('minRating') ? parseFloat(searchParams.get('minRating')) : null,
     verifiedOnly: searchParams.get('verifiedOnly') === 'true',
-    recommendedOnly: searchParams.get('recommendedOnly') === 'true'
+    recommendedOnly: searchParams.get('recommendedOnly') === 'true',
+    latitude: searchParams.get('latitude') ? parseFloat(searchParams.get('latitude')) : null,
+    longitude: searchParams.get('longitude') ? parseFloat(searchParams.get('longitude')) : null,
+    radius: searchParams.get('radius_km') ? parseFloat(searchParams.get('radius_km')) : null,
+    useMyLocation: searchParams.has('latitude') && searchParams.has('longitude')
   };
 
   // If URL has meaningful params, prefer them over sessionStorage
@@ -98,6 +102,22 @@ const Services = () => {
 
   const [filters, setFilters] = useState(() => loadFiltersFromSession(searchParams));
 
+  const radiusOptions = [
+    { value: 5, label: '5 ק"מ' },
+    { value: 10, label: '10 ק"מ' },
+    { value: 25, label: '25 ק"מ' },
+    { value: 50, label: '50 ק"מ' },
+    { value: 100, label: '100 ק"מ' }
+  ];
+
+  // Initialize location display from URL
+  useEffect(() => {
+    if (searchParams.has('latitude') && searchParams.has('longitude') && !locationQuery) {
+      setLocationQuery('המיקום שלי');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Build query params from current filter state
   const buildQueryParams = useCallback((skip = 0) => {
     const params = {};
@@ -115,6 +135,11 @@ const Services = () => {
     if (filters.minRating) params.min_rating = filters.minRating;
     if (filters.verifiedOnly) params.verified_only = true;
     if (filters.recommendedOnly) params.recommended_only = true;
+    if (filters.latitude && filters.longitude) {
+      params.latitude = filters.latitude;
+      params.longitude = filters.longitude;
+      if (filters.radius) params.radius_km = filters.radius;
+    }
     if (sortBy && sortBy !== 'popular') params.sort_by = sortBy;
     else params.sort_by = 'popular';
     params.skip = skip;
@@ -241,12 +266,47 @@ const Services = () => {
   const handleSearch = (e) => {
     e.preventDefault();
 
-    const newFilters = {
-      ...filters,
-      city: locationQuery && locationQuery !== 'המיקום שלי' ? locationQuery : filters.city,
-      profession: professionQuery || filters.profession
-    };
+    const newFilters = { ...filters };
+    if (professionQuery) newFilters.profession = professionQuery;
+
+    // If using GPS location, don't overwrite lat/lng with city text
+    if (!newFilters.useMyLocation && locationQuery && locationQuery !== 'המיקום שלי') {
+      // Try to find city coordinates from localities
+      const matchedCity = israeliLocalities.find(c => c.name === locationQuery);
+      if (matchedCity && matchedCity.lat && matchedCity.lng) {
+        newFilters.city = '';
+        newFilters.latitude = matchedCity.lat;
+        newFilters.longitude = matchedCity.lng;
+        newFilters.radius = newFilters.radius || 25;
+      } else {
+        newFilters.city = locationQuery;
+        newFilters.latitude = null;
+        newFilters.longitude = null;
+        newFilters.radius = null;
+      }
+    } else if (!locationQuery) {
+      newFilters.city = '';
+      newFilters.latitude = null;
+      newFilters.longitude = null;
+      newFilters.radius = null;
+      newFilters.useMyLocation = false;
+    }
+
     setFilters(newFilters);
+
+    // URL sync
+    const newParams = new URLSearchParams();
+    if (searchQuery.trim()) newParams.set('search', searchQuery.trim());
+    if (newFilters.city) newParams.set('city', newFilters.city);
+    if (newFilters.profession) newParams.set('profession', newFilters.profession);
+    if (newFilters.latitude) newParams.set('latitude', newFilters.latitude);
+    if (newFilters.longitude) newParams.set('longitude', newFilters.longitude);
+    if (newFilters.radius) newParams.set('radius_km', newFilters.radius);
+    if (newFilters.category) newParams.set('category', newFilters.category);
+    if (newFilters.serviceType) newParams.set('type', newFilters.serviceType);
+    if (newFilters.verifiedOnly) newParams.set('verifiedOnly', 'true');
+    if (newFilters.recommendedOnly) newParams.set('recommendedOnly', 'true');
+    setSearchParams(newParams);
   };
 
   const handleGetLocation = () => {
@@ -261,18 +321,39 @@ const Services = () => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
 
+        let cityName = 'המיקום שלי';
         try {
           const response = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=he`
           );
           const data = await response.json();
-          const cityName = data.address?.city || data.address?.town || data.address?.village || 'המיקום שלי';
-          setLocationQuery(cityName);
-          setFilters({ ...filters, city: cityName, region: '' });
+          cityName = data.address?.city || data.address?.town || data.address?.village || 'המיקום שלי';
         } catch (error) {
-          setLocationQuery('המיקום שלי');
+          console.error('Reverse geocoding error:', error);
         }
+
+        const newFilters = {
+          ...filters,
+          latitude: lat,
+          longitude: lng,
+          useMyLocation: true,
+          city: '',
+          region: '',
+          radius: filters.radius || 10
+        };
+        setFilters(newFilters);
+        setLocationQuery(cityName);
         setIsLocating(false);
+
+        setSortBy('distance');
+
+        // URL sync
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('latitude', lat);
+        newParams.set('longitude', lng);
+        newParams.set('radius_km', newFilters.radius);
+        newParams.delete('city');
+        setSearchParams(newParams);
       },
       () => {
         alert('לא הצלחנו לאתר את המיקום שלך');
@@ -282,12 +363,24 @@ const Services = () => {
     );
   };
 
+  const handleRadiusChange = (radius) => {
+    const newFilters = { ...filters, radius };
+    setFilters(newFilters);
+
+    if (filters.useMyLocation || (filters.latitude && filters.longitude)) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set('radius_km', radius);
+      setSearchParams(newParams);
+    }
+  };
+
   const resetFilters = () => {
     setFilters({
       serviceType: '', category: '', priceMin: '', priceMax: '',
       city: '', region: '', profession: '', gender: '',
       languages: [], healthFunds: [],
-      minRating: null, verifiedOnly: false, recommendedOnly: false
+      minRating: null, verifiedOnly: false, recommendedOnly: false,
+      latitude: null, longitude: null, radius: null, useMyLocation: false
     });
     setSearchQuery('');
     setLocationQuery('');
@@ -329,7 +422,8 @@ const Services = () => {
     filters.serviceType, filters.category, filters.priceMin,
     filters.priceMax, filters.city, filters.region, filters.profession,
     filters.gender, filters.minRating, filters.verifiedOnly, filters.recommendedOnly,
-    filters.languages?.length > 0, filters.healthFunds?.length > 0
+    filters.languages?.length > 0, filters.healthFunds?.length > 0,
+    filters.useMyLocation
   ].filter(Boolean).length;
 
   return (
@@ -548,6 +642,29 @@ const Services = () => {
             <FaSearch />
             <span>חפש שירותים</span>
           </button>
+
+          {/* Radius selector (appears when using GPS or city with coordinates) */}
+          {(filters.useMyLocation || (filters.latitude && filters.longitude)) && (
+            <div className="flex items-center gap-3 pt-4 border-t border-carefd-teal-pale mt-4">
+              <span className="text-sm text-carefd-gray">רדיוס חיפוש:</span>
+              <div className="flex gap-2">
+                {radiusOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => handleRadiusChange(option.value)}
+                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                      filters.radius === option.value
+                        ? 'bg-carefd-teal text-white'
+                        : 'bg-carefd-teal-pale/50 text-carefd-navy hover:bg-carefd-teal-pale'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </form>
 
         <div className="flex flex-col lg:flex-row gap-6">
@@ -601,6 +718,9 @@ const Services = () => {
                   <option value="price_low">מחיר: נמוך לגבוה</option>
                   <option value="price_high">מחיר: גבוה לנמוך</option>
                   <option value="newest">חדשים</option>
+                  {(filters.latitude && filters.longitude) && (
+                    <option value="distance">מרחק</option>
+                  )}
                 </select>
 
                 <div className="hidden sm:flex items-center gap-1 bg-gray-100 rounded-lg p-1" role="group" aria-label="מצב תצוגה">
