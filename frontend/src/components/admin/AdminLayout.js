@@ -15,18 +15,20 @@ const AdminLayout = ({ children }) => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [expandedMenus, setExpandedMenus] = useState(['content', 'management']);
-  const [badgeCounts, setBadgeCounts] = useState({ pendingReviews: 0, pendingVerifications: 0 });
+  const [badgeCounts, setBadgeCounts] = useState({ pendingReviews: 0, pendingVerifications: 0, unreadNotifications: 0 });
 
   React.useEffect(() => {
     const fetchBadgeCounts = async () => {
       try {
-        const [reviewsRes, providersRes] = await Promise.all([
+        const [reviewsRes, providersRes, notifRes] = await Promise.all([
           api.get('/admin/reviews?status=pending'),
-          api.get('/admin/providers/pending')
+          api.get('/admin/providers/pending'),
+          api.get('/notifications?limit=50').catch(() => ({ data: { notifications: [] } }))
         ]);
         setBadgeCounts({
           pendingReviews: reviewsRes.data.reviews?.length || 0,
-          pendingVerifications: providersRes.data.total || 0
+          pendingVerifications: providersRes.data.total || 0,
+          unreadNotifications: (notifRes.data.notifications || []).filter(n => !n.is_read).length
         });
       } catch (e) {
         console.warn('Failed to fetch badge counts:', e);
@@ -272,7 +274,9 @@ const AdminLayout = ({ children }) => {
               title="הודעות מערכת"
             >
               <FiBell size={20} />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              {badgeCounts.unreadNotifications > 0 && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              )}
             </Link>
             <Link 
               to="/admin/messages"
