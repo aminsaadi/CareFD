@@ -261,7 +261,7 @@ const AdminLayout = ({ children }) => {
       </aside>
 
       {/* Main Content */}
-      <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'me-64' : 'me-20'}`}>
+      <main className={`flex-1 min-w-0 overflow-x-hidden transition-all duration-300 ${sidebarOpen ? 'me-64' : 'me-20'}`}>
         {/* Top Bar */}
         <header className="h-16 bg-white/80 backdrop-blur-sm border-b border-gray-100 flex items-center justify-between px-6 sticky top-0 z-40">
           <div>
