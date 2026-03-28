@@ -129,8 +129,6 @@ const ProviderDashboard = () => {
     }
   };
 
-  };
-
   useEffect(() => {
     if (provider) {
       // Profile editing is handled in /provider/edit
@@ -182,8 +180,12 @@ const ProviderDashboard = () => {
 
       // Fetch reviews
       if (providerRes.data?.provider_id) {
-        const reviewsRes = await api.get(`/providers/${providerRes.data.provider_id}/reviews`);
-        setReviews(reviewsRes.data.reviews || []);
+        try {
+          const reviewsRes = await api.get(`/providers/${providerRes.data.provider_id}/reviews`);
+          setReviews(reviewsRes.data.reviews || []);
+        } catch (reviewErr) {
+          console.error('Failed to fetch reviews:', reviewErr);
+        }
       }
 
       // Fetch chats
@@ -1062,7 +1064,7 @@ const ProviderDashboard = () => {
                       ) : (
                         <div className="space-y-6">
                           {groupBookingsByDate().map(([date, dayBookings]) => (
-                            <div key={date} className="border-r-4 border-carefd-teal pr-4">
+                            <div key={date} className="border-s-4 border-carefd-teal ps-4">
                               <div className="flex items-center gap-3 mb-3">
                                 <div className="bg-carefd-teal text-white px-4 py-2 rounded-xl text-sm font-bold">
                                   {new Date(date).toLocaleDateString('he-IL', {
@@ -1910,42 +1912,7 @@ const ProviderDashboard = () => {
                       {/* Push Notification Settings */}
                       <NotificationSettings />
                       
-                      {/* Provider-specific Settings */}
-                      <div className="bg-white p-6 rounded-2xl shadow-lg">
-                        <h3 className="text-xl font-bold text-carefd-navy mb-6">הגדרות ספק</h3>
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                            <div>
-                              <p className="font-medium text-carefd-navy">פרופיל פעיל</p>
-                              <p className="text-sm text-carefd-gray">הצג את הפרופיל שלי בחיפוש</p>
-                            </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                              <input type="checkbox" className="sr-only peer" defaultChecked />
-                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carefd-teal"></div>
-                            </label>
-                          </div>
-                          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                            <div>
-                              <p className="font-medium text-carefd-navy">קבלת הזמנות אורחים</p>
-                              <p className="text-sm text-carefd-gray">אפשר הזמנות ממשתמשים לא רשומים</p>
-                            </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                              <input type="checkbox" className="sr-only peer" defaultChecked />
-                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carefd-teal"></div>
-                            </label>
-                          </div>
-                          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                            <div>
-                              <p className="font-medium text-carefd-navy">אישור אוטומטי</p>
-                              <p className="text-sm text-carefd-gray">אשר הזמנות אוטומטית (ללא אישור ידני)</p>
-                            </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                              <input type="checkbox" className="sr-only peer" />
-                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-carefd-teal"></div>
-                            </label>
-                          </div>
-                        </div>
-                      </div>
+                      {/* Provider-specific settings managed in /provider/edit */}
 
                       {/* Account Settings */}
                       <div className="bg-white p-6 rounded-2xl shadow-lg">

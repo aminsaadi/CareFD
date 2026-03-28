@@ -74,39 +74,47 @@ const AdminUsers = () => {
   const updateUserRole = async (userId, newRole) => {
     try {
       await api.put(`/admin/users/${userId}/role`, { role: newRole });
+      toast.success('תפקיד המשתמש עודכן');
       fetchUsers();
     } catch (error) {
       console.error('Failed to update user role:', error);
+      toast.error(error.response?.data?.detail || 'שגיאה בעדכון תפקיד');
     }
   };
 
   const deleteUser = async (userId) => {
     try {
       await api.delete(`/admin/users/${userId}`);
+      toast.success('המשתמש נמחק');
       setShowDeleteModal(null);
       fetchUsers();
     } catch (error) {
       console.error('Failed to delete user:', error);
+      toast.error(error.response?.data?.detail || 'שגיאה במחיקת משתמש');
     }
   };
 
   const handleEditUser = async (userData) => {
     try {
       await api.put(`/admin/users/${showEditModal.user_id}`, userData);
+      toast.success('פרטי המשתמש עודכנו');
       setShowEditModal(null);
       fetchUsers();
     } catch (error) {
       console.error('Failed to update user:', error);
+      toast.error(error.response?.data?.detail || 'שגיאה בעדכון משתמש');
     }
   };
 
   const handleSuspendUser = async (suspendData) => {
     try {
       await api.put(`/admin/users/${showSuspendModal.user_id}/suspend`, suspendData);
+      toast.success('המשתמש הושעה');
       setShowSuspendModal(null);
       fetchUsers();
     } catch (error) {
       console.error('Failed to suspend user:', error);
+      toast.error(error.response?.data?.detail || 'שגיאה בהשעיית משתמש');
     }
   };
 
