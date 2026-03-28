@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../utils/api';
+import { toast } from 'sonner';
 import {
   FiSearch, FiFilter, FiCalendar, FiUser, FiClock,
   FiCheck, FiX, FiEye, FiDollarSign
@@ -32,6 +33,7 @@ const AdminBookings = () => {
       setPagination(prev => ({ ...prev, total: response.data.total || 0 }));
     } catch (error) {
       console.error('Failed to fetch bookings:', error);
+      toast.error('שגיאה בטעינת ההזמנות');
     } finally {
       setLoading(false);
     }
@@ -40,9 +42,11 @@ const AdminBookings = () => {
   const updateBookingStatus = async (bookingId, status) => {
     try {
       await api.put(`/admin/bookings/${bookingId}/status`, { status });
+      toast.success('סטטוס ההזמנה עודכן בהצלחה');
       fetchBookings();
     } catch (error) {
       console.error('Failed to update booking status:', error);
+      toast.error(error.response?.data?.detail || 'שגיאה בעדכון סטטוס ההזמנה');
     }
   };
 

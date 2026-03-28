@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../utils/api';
+import { toast } from 'sonner';
 import {
   FiCalendar, FiTrendingUp, FiUsers, FiBriefcase,
   FiStar, FiDollarSign, FiBarChart2, FiPieChart
@@ -27,6 +28,7 @@ const AdminReports = () => {
       setReports(response.data);
     } catch (error) {
       console.error('Failed to fetch reports:', error);
+      toast.error('שגיאה בטעינת הדוחות');
     } finally {
       setLoading(false);
     }
@@ -302,21 +304,21 @@ const AdminReports = () => {
                   <td className="py-3 px-4 text-carefd-navy">סה"כ הזמנות</td>
                   <td className="py-3 px-4 font-semibold text-carefd-navy">{reports?.summary?.total_bookings || 0}</td>
                   <td className="py-3 px-4">
-                    <span className="text-emerald-500 text-sm">+{Math.floor(Math.random() * 20)}%</span>
+                    <span className="text-carefd-gray text-sm">—</span>
                   </td>
                 </tr>
                 <tr className="border-b border-gray-50">
                   <td className="py-3 px-4 text-carefd-navy">הכנסות</td>
                   <td className="py-3 px-4 font-semibold text-emerald-500">₪{reports?.summary?.total_revenue?.toLocaleString() || 0}</td>
                   <td className="py-3 px-4">
-                    <span className="text-emerald-500 text-sm">+{Math.floor(Math.random() * 15)}%</span>
+                    <span className="text-carefd-gray text-sm">—</span>
                   </td>
                 </tr>
                 <tr className="border-b border-gray-50">
                   <td className="py-3 px-4 text-carefd-navy">משתמשים חדשים</td>
                   <td className="py-3 px-4 font-semibold text-carefd-navy">{reports?.summary?.new_users || 0}</td>
                   <td className="py-3 px-4">
-                    <span className="text-emerald-500 text-sm">+{Math.floor(Math.random() * 25)}%</span>
+                    <span className="text-carefd-gray text-sm">—</span>
                   </td>
                 </tr>
                 <tr>

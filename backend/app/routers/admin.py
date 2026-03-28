@@ -1301,7 +1301,32 @@ async def admin_get_stats(
     stats["new_bookings_week"] = await db.bookings.count_documents({
         "created_at": {"$gte": week_ago}
     })
-    
+
+    # Views today - sum of all provider view increments today
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+    try:
+        views_pipeline = [
+            {"$match": {"timestamp": {"$gte": today_start}, "event_type": "profile_view"}},
+            {"$count": "total"}
+        ]
+        views_result = await db.analytics.aggregate(views_pipeline).to_list(1)
+        stats["views_today"] = views_result[0]["total"] if views_result else 0
+    except Exception:
+        # Analytics collection may not exist yet
+        stats["views_today"] = 0
+
+    # Revenue this month - sum of final_price from completed bookings
+    month_start = datetime.now(timezone.utc).replace(day=1, hour=0, minute=0, second=0, microsecond=0).isoformat()
+    try:
+        revenue_pipeline = [
+            {"$match": {"status": "completed", "created_at": {"$gte": month_start}}},
+            {"$group": {"_id": None, "total": {"$sum": {"$ifNull": ["$final_price", "$base_price"]}}}}
+        ]
+        revenue_result = await db.bookings.aggregate(revenue_pipeline).to_list(1)
+        stats["revenue_month"] = revenue_result[0]["total"] if revenue_result else 0
+    except Exception:
+        stats["revenue_month"] = 0
+
     return stats
 
 
@@ -1478,113 +1503,14 @@ async def admin_update_settings(
 
 @router.get("/service-types")
 async def get_service_types():
-    """Get all service types for public use"""
+    """Get all service types for public use (defaults initialized on startup)"""
     service_types = await db.service_types.find({}, {"_id": 0}).to_list(100)
-    
-    if not service_types:
-        # Initialize default service types
-        default_types = [
-            {
-                "type_id": "visit",
-                "name": "שירות ביקור",
-                "name_en": "Visit Service",
-                "description": "שירות הניתן בביקור אחד",
-                "icon": "home",
-                "requires_location": True,
-                "is_active": True
-            },
-            {
-                "type_id": "hourly",
-                "name": "שירות שעתי",
-                "name_en": "Hourly Service",
-                "description": "שירות המחושב לפי שעות",
-                "icon": "clock",
-                "requires_location": True,
-                "has_minimum_hours": True,
-                "is_active": True
-            },
-            {
-                "type_id": "consultation",
-                "name": "שירות ייעוץ",
-                "name_en": "Consultation Service",
-                "description": "שירות ייעוץ מקצועי",
-                "icon": "message-circle",
-                "requires_location": False,
-                "is_active": True
-            },
-            {
-                "type_id": "product",
-                "name": "מוצר",
-                "name_en": "Product",
-                "description": "מוצר למכירה",
-                "icon": "package",
-                "requires_location": False,
-                "has_shipping": True,
-                "is_active": True
-            }
-        ]
-        await db.service_types.insert_many(default_types)
-        # Remove _id from response
-        for t in default_types:
-            if "_id" in t:
-                del t["_id"]
-        return {"service_types": default_types}
-    
     return {"service_types": service_types}
 
 @router.get("/delivery-types")
 async def get_delivery_types():
-    """Get all delivery types for public use"""
+    """Get all delivery types for public use (defaults initialized on startup)"""
     delivery_types = await db.delivery_types.find({}, {"_id": 0}).to_list(100)
-    
-    if not delivery_types:
-        # Initialize default delivery types
-        default_types = [
-            {
-                "type_id": "home_visit",
-                "name": "בבית",
-                "name_en": "At Home",
-                "description": "השירות יינתן בבית הלקוח",
-                "icon": "home",
-                "requires_address": True,
-                "is_active": True
-            },
-            {
-                "type_id": "hospital",
-                "name": "בבית חולים / מוסד",
-                "name_en": "Hospital / Institution",
-                "description": "השירות יינתן בבית חולים או מוסד רפואי",
-                "icon": "building",
-                "requires_address": True,
-                "is_active": True
-            },
-            {
-                "type_id": "clinic",
-                "name": "בקליניקה",
-                "name_en": "At Clinic",
-                "description": "השירות יינתן בקליניקה של הספק",
-                "icon": "building-2",
-                "requires_address": False,
-                "is_active": True
-            },
-            {
-                "type_id": "virtual",
-                "name": "וירטואלי",
-                "name_en": "Virtual",
-                "description": "השירות יינתן בטלפון או וידאו",
-                "icon": "video",
-                "requires_address": False,
-                "sub_types": ["phone", "video"],
-                "is_active": True
-            }
-        ]
-        await db.delivery_types.insert_many(default_types)
-        # Remove _id from response
-        for t in default_types:
-            if "_id" in t:
-                del t["_id"]
-        return {"delivery_types": default_types}
-    
     return {"delivery_types": delivery_types}
 
 @router.get("/admin/service-types")
@@ -2954,9 +2880,12 @@ async def admin_get_reports(
     # Reviews in period
     reviews_in_period = await db.reviews.count_documents({"created_at": {"$gte": start_date_str}})
     
-    # Average rating
-    all_reviews = await db.reviews.find({}, {"_id": 0, "rating": 1}).to_list(10000)
-    avg_rating = sum(r.get("rating", 0) for r in all_reviews) / len(all_reviews) if all_reviews else 0
+    # Average rating (use aggregation to avoid loading all reviews into memory)
+    avg_pipeline = [
+        {"$group": {"_id": None, "avg_rating": {"$avg": "$rating"}}}
+    ]
+    avg_result = await db.reviews.aggregate(avg_pipeline).to_list(1)
+    avg_rating = avg_result[0]["avg_rating"] if avg_result and avg_result[0].get("avg_rating") else 0
     
     return {
         "period": period,

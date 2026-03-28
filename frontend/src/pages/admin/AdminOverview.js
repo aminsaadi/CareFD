@@ -11,6 +11,7 @@ import {
 const AdminOverview = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [recentActivity, setRecentActivity] = useState([]);
 
   useEffect(() => {
@@ -20,6 +21,7 @@ const AdminOverview = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
+      setError(null);
       const [statsRes, bookingsRes, reviewsRes] = await Promise.all([
         api.get('/admin/stats'),
         api.get('/admin/bookings?limit=5'),
@@ -47,8 +49,9 @@ const AdminOverview = () => {
       setRecentActivity(activities.length > 0 ? activities : [
         { id: 'empty', type: 'user', message: 'אין פעילות אחרונה', time: '' }
       ]);
-    } catch (error) {
-      console.error('Failed to fetch stats:', error);
+    } catch (err) {
+      console.error('Failed to fetch stats:', err);
+      setError('שגיאה בטעינת נתוני המערכת');
     } finally {
       setLoading(false);
     }
@@ -118,6 +121,23 @@ const AdminOverview = () => {
           <h1 className="text-2xl font-bold text-carefd-navy">סקירה כללית</h1>
           <p className="text-carefd-slate mt-1">ברוך הבא לפאנל הניהול</p>
         </div>
+
+        {/* Error Alert */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-4">
+            <FiAlertCircle className="text-red-600 shrink-0" size={24} />
+            <div className="flex-1">
+              <p className="text-red-800 font-medium">{error}</p>
+              <p className="text-red-600 text-sm">ייתכן שיש בעיה בחיבור לשרת</p>
+            </div>
+            <button
+              onClick={fetchData}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-md"
+            >
+              נסה שוב
+            </button>
+          </div>
+        )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

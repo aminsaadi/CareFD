@@ -246,6 +246,37 @@ async def get_filter_options():
         "days_of_week": days_of_week
     }
 
+@router.get("/providers/{provider_id}/available-slots")
+async def get_available_slots(provider_id: str, date: Optional[str] = None):
+    """Public endpoint: Get provider availability and booked time slots without exposing sensitive data"""
+    provider = await db.providers.find_one({"provider_id": provider_id}, {"_id": 0, "availability": 1})
+    if not provider:
+        raise HTTPException(status_code=404, detail="Provider not found")
+
+    availability = provider.get("availability", [])
+
+    # Get booked slots - only return date/time, no sensitive info
+    booking_query = {"provider_id": provider_id, "status": {"$nin": ["cancelled", "rejected"]}}
+    if date:
+        booking_query["booking_date"] = {"$regex": f"^{date}"}
+
+    bookings = await db.bookings.find(
+        booking_query,
+        {"_id": 0, "booking_date": 1}
+    ).to_list(500)
+
+    booked_slots = []
+    for b in bookings:
+        if b.get("booking_date"):
+            try:
+                bd = datetime.fromisoformat(b["booking_date"].replace("Z", "+00:00"))
+                booked_slots.append(bd.strftime("%Y-%m-%d %H:%M"))
+            except (ValueError, AttributeError):
+                pass
+
+    return {"availability": availability, "booked_slots": booked_slots}
+
+
 @router.get("/providers/{provider_id}")
 async def get_provider(provider_id: str):
     """Get provider details"""

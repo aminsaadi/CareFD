@@ -49,6 +49,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [showCompletionDialog, setShowCompletionDialog] = useState(null);
   const [showBookingDetails, setShowBookingDetails] = useState(null);
+  const [cancelRequestId, setCancelRequestId] = useState(null);
   const [expandedBookings, setExpandedBookings] = useState({});
   const [bookingSortBy, setBookingSortBy] = useState('date_desc');
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -248,7 +249,7 @@ const Dashboard = () => {
         const order = { pending: 0, confirmed: 1, in_progress: 2, provider_completed: 3, on_hold: 4, completed: 5, cancelled: 6, rejected: 7 };
         return sorted.sort((a, b) => (order[a.status] ?? 99) - (order[b.status] ?? 99));
       }
-      case 'price_desc': return sorted.sort((a, b) => (b.price || b.final_price || 0) - (a.price || a.final_price || 0));
+      case 'price_desc': return sorted.sort((a, b) => (b.final_price || b.base_price || 0) - (a.final_price || a.base_price || 0));
       default: return sorted;
     }
   };
@@ -440,13 +441,19 @@ const Dashboard = () => {
   };
 
   const handleCancelRequest = async (requestId) => {
-    if (!window.confirm('האם אתה בטוח שברצונך לבטל את הבקשה?')) return;
+    setCancelRequestId(requestId);
+  };
+
+  const confirmCancelRequest = async () => {
+    if (!cancelRequestId) return;
     try {
-      await api.put(`/requests/${requestId}/cancel`, { reason: '' });
+      await api.put(`/requests/${cancelRequestId}/cancel`, { reason: '' });
       toast.success('הבקשה בוטלה');
       fetchDashboardData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'שגיאה בביטול הבקשה');
+    } finally {
+      setCancelRequestId(null);
     }
   };
 
@@ -822,7 +829,7 @@ const Dashboard = () => {
                                       </div>
                                       <div className="bg-gray-50 rounded-lg p-3 text-center">
                                         <p className="text-xs text-carefd-gray">מחיר</p>
-                                        <p className="font-medium text-sm text-green-600">{booking.price || booking.final_price ? `₪${booking.price || booking.final_price}` : 'יתואם'}</p>
+                                        <p className="font-medium text-sm text-green-600">{booking.final_price || booking.base_price ? `₪${booking.final_price || booking.base_price}` : 'יתואם'}</p>
                                       </div>
                                       <div className="bg-gray-50 rounded-lg p-3 text-center">
                                         <p className="text-xs text-carefd-gray">סוג שירות</p>
@@ -1794,6 +1801,24 @@ const Dashboard = () => {
       </div>
 
       <Footer />
+
+      {/* Cancel Request Confirmation Dialog */}
+      {cancelRequestId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-label="אישור ביטול בקשה">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-lg font-bold text-carefd-navy mb-2">ביטול בקשה</h3>
+            <p className="text-carefd-gray mb-6">האם אתה בטוח שברצונך לבטל את הבקשה?</p>
+            <div className="flex gap-3 justify-end">
+              <button onClick={() => setCancelRequestId(null)} className="px-4 py-2 rounded-lg border border-gray-200 text-carefd-gray hover:bg-gray-50 transition">
+                ביטול
+              </button>
+              <button onClick={confirmCancelRequest} className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition">
+                כן, בטל
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Completion Confirmation Dialog */}
       {showCompletionDialog && (
