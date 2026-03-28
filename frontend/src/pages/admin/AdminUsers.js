@@ -45,6 +45,7 @@ const AdminUsers = () => {
       setPagination(prev => ({ ...prev, total: response.data.total || 0 }));
     } catch (error) {
       console.error('Failed to fetch users:', error);
+      toast.error('שגיאה בטעינת משתמשים');
     } finally {
       setLoading(false);
     }

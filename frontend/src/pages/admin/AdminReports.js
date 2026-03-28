@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../utils/api';
+import { toast } from 'sonner';
 import {
   FiCalendar, FiTrendingUp, FiUsers, FiBriefcase,
   FiStar, FiDollarSign, FiBarChart2, FiPieChart
@@ -27,6 +28,7 @@ const AdminReports = () => {
       setReports(response.data);
     } catch (error) {
       console.error('Failed to fetch reports:', error);
+      toast.error('שגיאה בטעינת הדוחות');
     } finally {
       setLoading(false);
     }

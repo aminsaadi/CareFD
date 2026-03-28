@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../utils/api';
+import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { he } from 'date-fns/locale';
 import { 
@@ -54,6 +55,7 @@ const AdminNotifications = () => {
       setNotifications(response.data.notifications || []);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
+      toast.error('שגיאה בטעינת ההתראות');
     } finally {
       setLoading(false);
     }
@@ -62,11 +64,12 @@ const AdminNotifications = () => {
   const markAsRead = async (id) => {
     try {
       await api.put(`/notifications/${id}/read`);
-      setNotifications(prev => prev.map(n => 
+      setNotifications(prev => prev.map(n =>
         n.notification_id === id ? { ...n, is_read: true } : n
       ));
     } catch (error) {
       console.error('Failed to mark as read:', error);
+      toast.error('שגיאה בסימון התראה כנקראה');
     }
   };
 
@@ -74,8 +77,10 @@ const AdminNotifications = () => {
     try {
       await api.put('/notifications/read-all');
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      toast.success('כל ההתראות סומנו כנקראו');
     } catch (error) {
       console.error('Failed to mark all as read:', error);
+      toast.error('שגיאה בסימון התראות');
     }
   };
 
@@ -85,6 +90,7 @@ const AdminNotifications = () => {
       setNotifications(prev => prev.filter(n => n.notification_id !== id));
     } catch (error) {
       console.error('Failed to delete notification:', error);
+      toast.error('שגיאה במחיקת התראה');
     }
   };
 

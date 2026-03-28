@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../utils/api';
+import { toast } from 'sonner';
 import {
   FiShield, FiCheck, FiX, FiEye, FiFile, FiUser,
   FiCalendar, FiMapPin, FiMail, FiPhone, FiDownload
@@ -25,6 +26,7 @@ const AdminVerification = () => {
       setPendingProviders(response.data.providers || []);
     } catch (error) {
       console.error('Failed to fetch pending providers:', error);
+      toast.error('שגיאה בטעינת ספקים ממתינים');
     } finally {
       setLoading(false);
     }
@@ -33,22 +35,26 @@ const AdminVerification = () => {
   const verifyProvider = async (providerId) => {
     try {
       await api.put(`/admin/providers/${providerId}/verify`);
+      toast.success('הספק אומת בהצלחה');
       fetchPendingProviders();
     } catch (error) {
       console.error('Failed to verify provider:', error);
+      toast.error(error.response?.data?.detail || 'שגיאה באימות הספק');
     }
   };
 
   const rejectProvider = async () => {
     if (!showRejectModal || !rejectReason.trim()) return;
-    
+
     try {
       await api.put(`/admin/providers/${showRejectModal}/reject`, { reason: rejectReason });
+      toast.success('הבקשה נדחתה');
       setShowRejectModal(null);
       setRejectReason('');
       fetchPendingProviders();
     } catch (error) {
       console.error('Failed to reject provider:', error);
+      toast.error(error.response?.data?.detail || 'שגיאה בדחיית הבקשה');
     }
   };
 

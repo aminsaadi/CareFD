@@ -41,6 +41,7 @@ const AdminProviders = () => {
       setPagination(prev => ({ ...prev, total: response.data.total || 0 }));
     } catch (error) {
       console.error('Failed to fetch providers:', error);
+      toast.error('שגיאה בטעינת ספקים');
     } finally {
       setLoading(false);
     }

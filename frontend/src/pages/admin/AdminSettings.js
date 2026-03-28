@@ -104,6 +104,7 @@ const AdminSettings = () => {
       }
     } catch (error) {
       console.error('Failed to fetch settings:', error);
+      toast.error('שגיאה בטעינת ההגדרות');
     } finally {
       setLoading(false);
     }
