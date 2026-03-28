@@ -257,11 +257,7 @@ const Login = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="w-4 h-4 text-carefd-teal rounded border-gray-300" />
-                  <span className="text-carefd-gray">זכור אותי</span>
-                </label>
+              <div className="flex items-center justify-end text-sm">
                 <button
                   type="button"
                   onClick={() => {

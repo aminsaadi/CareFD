@@ -128,11 +128,8 @@ const BookService = () => {
       setProvider(provRes.data);
       
       try {
-        const bookingsRes = await api.get(`/bookings?provider_id=${found.provider_id}`);
-        const booked = (bookingsRes.data.bookings || [])
-          .filter(b => b.status !== 'cancelled' && b.booking_date)
-          .map(b => format(new Date(b.booking_date), 'yyyy-MM-dd HH:mm'));
-        setBookedSlots(booked);
+        const slotsRes = await api.get(`/providers/${found.provider_id}/available-slots`);
+        setBookedSlots(slotsRes.data.booked_slots || []);
       } catch { setBookedSlots([]); }
     } catch (error) {
       console.error('Failed to fetch service:', error);
