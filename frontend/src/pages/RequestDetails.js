@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import api from '../utils/api';
 import { format } from 'date-fns';
-import { FaStar, FaCheckCircle, FaTimesCircle, FaExclamationTriangle, FaCalendar, FaComments, FaEnvelope } from 'react-icons/fa';
+import { FaStar, FaCheckCircle, FaTimesCircle, FaExclamationTriangle, FaCalendar, FaComments, FaEnvelope, FaSpinner } from 'react-icons/fa';
 import { toast } from 'sonner';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { useConfirm } from '../hooks/useConfirm';
@@ -21,6 +21,7 @@ const RequestDetails = () => {
   const [showOfferForm, setShowOfferForm] = useState(false);
   const [showCancelForm, setShowCancelForm] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
+  const [actionLoading, setActionLoading] = useState(null);
   const [offerData, setOfferData] = useState({
     price: '',
     pricing_type: 'fixed',
@@ -58,6 +59,13 @@ const RequestDetails = () => {
       setOffers(offersResponse.data.offers || []);
     } catch (error) {
       console.error('Failed to fetch request:', error);
+      if (error.response?.status === 404) {
+        toast.error('הבקשה לא נמצאה');
+      } else if (error.response?.status === 403) {
+        toast.error('אין לך הרשאה לצפות בבקשה זו');
+      } else {
+        toast.error('שגיאה בטעינת פרטי הבקשה');
+      }
     } finally {
       setLoading(false);
     }
@@ -95,8 +103,9 @@ const RequestDetails = () => {
     }
 
     try {
+      setActionLoading(offerId);
       const response = await api.post(`/offers/${offerId}/accept`);
-      const { booking_id, room_id } = response.data;
+      const { booking_id } = response.data;
       toast.success('ההצעה התקבלה! נוצרה הזמנה חדשה.');
       fetchRequestDetails();
       if (booking_id) {
@@ -104,6 +113,8 @@ const RequestDetails = () => {
       }
     } catch (error) {
       toast.error(error.response?.data?.detail || t('errorOccurred'));
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -121,11 +132,14 @@ const RequestDetails = () => {
     }
 
     try {
+      setActionLoading(offerId);
       await api.post(`/offers/${offerId}/reject`);
       toast.success('ההצעה נדחתה');
       fetchRequestDetails();
     } catch (error) {
       toast.error(error.response?.data?.detail || t('errorOccurred'));
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -202,6 +216,8 @@ const RequestDetails = () => {
 
   const isOwner = user?.user_id === request.user_id;
   const isProvider = user?.role === 'provider';
+  const myProviderOffer = isProvider ? offers.find(o => o.provider_id === user?.provider_id || o.provider?.provider_id === user?.provider_id) : null;
+  const visibleOffers = isOwner ? offers : (myProviderOffer ? [myProviderOffer] : []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale">
@@ -382,18 +398,18 @@ const RequestDetails = () => {
               )}
             </div>
 
-            {/* Offers Section - visible to owner and the provider who made the offer */}
-            {(isOwner || (isProvider && offers.some(o => o.provider_id === user?.provider_id || o.provider?.provider_id === user?.provider_id))) && (
+            {/* Offers Section - owner sees all offers, provider sees only their own */}
+            {visibleOffers.length > 0 || isOwner ? (
             <div className="bg-white p-6 rounded-xl shadow-lg border-2 border-carefd-teal-pale">
               <h2 className="text-2xl font-bold mb-4 text-carefd-navy">
                 {isOwner ? `${t('offersReceived')} (${offers.length})` : 'ההצעה שלי'}
               </h2>
 
-              {offers.length === 0 ? (
+              {visibleOffers.length === 0 ? (
                 <p className="text-carefd-gray text-center py-8">{t('noOffers')}</p>
               ) : (
                 <div className="space-y-4">
-                  {offers.map((offer) => (
+                  {visibleOffers.map((offer) => (
                     <div
                       key={offer.offer_id}
                       className={`border-2 p-4 rounded-lg transition ${
@@ -462,21 +478,28 @@ const RequestDetails = () => {
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleContactProvider(offer.provider_id || offer.provider?.provider_id)}
-                            className="px-4 bg-blue-100 text-blue-700 py-2 rounded-lg hover:bg-blue-200 transition flex items-center gap-2"
+                            disabled={!!actionLoading}
+                            className="px-4 bg-blue-100 text-blue-700 py-2 rounded-lg hover:bg-blue-200 transition flex items-center gap-2 disabled:opacity-50"
                             data-testid={`contact-provider-${offer.offer_id}`}
                           >
                             <FaEnvelope /> צור קשר
                           </button>
                           <button
                             onClick={() => handleAcceptOffer(offer.offer_id)}
-                            className="flex-1 bg-carefd-teal text-white py-2 rounded-lg hover:bg-carefd-teal-medium transition flex items-center justify-center gap-2"
+                            disabled={!!actionLoading}
+                            className="flex-1 bg-carefd-teal text-white py-2 rounded-lg hover:bg-carefd-teal-medium transition flex items-center justify-center gap-2 disabled:opacity-50"
                             data-testid={`accept-offer-${offer.offer_id}`}
                           >
-                            <FaCheckCircle /> {t('acceptOffer')}
+                            {actionLoading === offer.offer_id ? (
+                              <FaSpinner className="animate-spin" />
+                            ) : (
+                              <><FaCheckCircle /> {t('acceptOffer')}</>
+                            )}
                           </button>
                           <button
                             onClick={() => handleRejectOffer(offer.offer_id)}
-                            className="px-4 bg-red-100 text-red-700 py-2 rounded-lg hover:bg-red-200 transition flex items-center gap-2"
+                            disabled={!!actionLoading}
+                            className="px-4 bg-red-100 text-red-700 py-2 rounded-lg hover:bg-red-200 transition flex items-center gap-2 disabled:opacity-50"
                             data-testid={`reject-offer-${offer.offer_id}`}
                           >
                             <FaTimesCircle /> {t('rejectOffer')}
@@ -494,7 +517,7 @@ const RequestDetails = () => {
                 </div>
               )}
             </div>
-            )}
+            ) : null}
           </div>
 
           {/* Actions Sidebar */}

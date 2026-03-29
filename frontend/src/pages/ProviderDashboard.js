@@ -1764,7 +1764,10 @@ const ProviderDashboard = () => {
                                 <div className="mt-3 flex gap-2">
                                   {offer.status === 'pending' && (
                                     <button
-                                      onClick={async () => {
+                                      onClick={async (e) => {
+                                        const btn = e.currentTarget;
+                                        if (btn.disabled) return;
+                                        btn.disabled = true;
                                         try {
                                           await api.post(`/offers/${offer.offer_id}/withdraw`);
                                           toast.success('ההצעה נמשכה');
@@ -1772,9 +1775,10 @@ const ProviderDashboard = () => {
                                           setMyOffers(res.data.offers || []);
                                         } catch (err) {
                                           toast.error(err.response?.data?.detail || 'שגיאה');
+                                          btn.disabled = false;
                                         }
                                       }}
-                                      className="text-sm text-red-600 hover:text-red-800 transition px-3 py-1 rounded border border-red-200 hover:bg-red-50"
+                                      className="text-sm text-red-600 hover:text-red-800 transition px-3 py-1 rounded border border-red-200 hover:bg-red-50 disabled:opacity-50"
                                     >
                                       משוך הצעה
                                     </button>
