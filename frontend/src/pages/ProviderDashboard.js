@@ -2067,7 +2067,7 @@ const ProviderDashboard = () => {
                                 className="w-full px-4 py-3 pl-12 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                 placeholder="הזן סיסמה נוכחית"
                               />
-                              <button type="button" onClick={() => setShowPw(p => ({...p, current: !p.current}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
+                              <button type="button" onClick={() => setShowPw(p => ({...p, current: !p.current}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" aria-label="הצג/הסתר סיסמה">
                                 {showPw.current ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                               </button>
                             </div>
@@ -2082,7 +2082,7 @@ const ProviderDashboard = () => {
                                 className="w-full px-4 py-3 pl-12 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                 placeholder="הזן סיסמה חדשה (לפחות 6 תווים)"
                               />
-                              <button type="button" onClick={() => setShowPw(p => ({...p, new_pw: !p.new_pw}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
+                              <button type="button" onClick={() => setShowPw(p => ({...p, new_pw: !p.new_pw}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" aria-label="הצג/הסתר סיסמה">
                                 {showPw.new_pw ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                               </button>
                             </div>
@@ -2097,7 +2097,7 @@ const ProviderDashboard = () => {
                                 className="w-full px-4 py-3 pl-12 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal focus:outline-none"
                                 placeholder="הזן שוב את הסיסמה החדשה"
                               />
-                              <button type="button" onClick={() => setShowPw(p => ({...p, confirm: !p.confirm}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
+                              <button type="button" onClick={() => setShowPw(p => ({...p, confirm: !p.confirm}))} className="absolute left-4 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" aria-label="הצג/הסתר סיסמה">
                                 {showPw.confirm ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                               </button>
                             </div>

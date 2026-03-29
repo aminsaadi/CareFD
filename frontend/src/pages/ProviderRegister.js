@@ -236,7 +236,7 @@ const ProviderRegister = () => {
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-12 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition"
-                        tabIndex={-1}
+                        aria-label="הצג/הסתר סיסמה"
                       >
                         {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                       </button>

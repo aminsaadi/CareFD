@@ -144,7 +144,7 @@ const ResetPassword = () => {
                       required
                       minLength={8}
                     />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-12 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-12 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" aria-label="הצג/הסתר סיסמה">
                       {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                     </button>
                   </div>
@@ -162,7 +162,7 @@ const ResetPassword = () => {
                       placeholder="הזן שוב את הסיסמה"
                       required
                     />
-                    <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-12 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
+                    <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-12 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" aria-label="הצג/הסתר סיסמה">
                       {showConfirm ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
                     </button>
                   </div>
