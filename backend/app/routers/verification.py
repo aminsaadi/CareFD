@@ -107,7 +107,7 @@ async def submit_verification_request(
             return None
 
         # Generate unique filename
-        filename = f"{user['user_id']}_{doc_type}_{uuid.uuid4().hex[:8]}.{ext}"
+        filename = f"vdoc_{uuid.uuid4().hex}.{ext}"
         file_path = UPLOAD_DIR / filename
 
         # Save file

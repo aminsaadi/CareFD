@@ -641,7 +641,7 @@ const AdminUsers = () => {
                   placeholder="הזן סיסמה חדשה (מינימום 6 תווים)"
                   className="w-full px-4 py-3 pl-12 border border-gray-200 rounded-lg focus:border-carefd-teal focus:ring-1 focus:ring-carefd-teal outline-none"
                 />
-                <button type="button" onClick={() => setShowAdminPw(!showAdminPw)} className="absolute left-4 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" tabIndex={-1}>
+                <button type="button" onClick={() => setShowAdminPw(!showAdminPw)} className="absolute left-4 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition" aria-label="הצג/הסתר סיסמה">
                   {showAdminPw ? <FiEyeOff size={16} /> : <FiEye size={16} />}
                 </button>
               </div>
