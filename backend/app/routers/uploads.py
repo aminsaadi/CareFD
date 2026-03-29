@@ -9,7 +9,7 @@ import base64
 from pathlib import Path
 
 from app.database import db, UPLOAD_DIR
-from app.utils import get_current_user, get_site_url
+from app.utils import get_current_user
 from app.rate_limiter import rate_limiter, get_client_ip
 
 router = APIRouter()
@@ -102,9 +102,8 @@ async def upload_file(
         upsert=True
     )
 
-    # Generate URL
-    base_url = await get_site_url()
-    file_url = f"{base_url}/api/files/{unique_filename}"
+    # Generate URL - use relative path so it works with any domain
+    file_url = f"/api/files/{unique_filename}"
 
     return {
         "url": file_url,
@@ -183,9 +182,8 @@ async def upload_image(
         upsert=True
     )
 
-    # Generate URL
-    base_url = await get_site_url()
-    file_url = f"{base_url}/api/files/{unique_filename}"
+    # Generate URL - use relative path so it works with any domain
+    file_url = f"/api/files/{unique_filename}"
 
     return {
         "url": file_url,
