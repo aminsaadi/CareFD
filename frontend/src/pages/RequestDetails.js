@@ -399,7 +399,7 @@ const RequestDetails = () => {
             </div>
 
             {/* Offers Section - owner sees all offers, provider sees only their own */}
-            {visibleOffers.length > 0 || isOwner ? (
+            {(visibleOffers.length > 0 || isOwner) && (
             <div className="bg-white p-6 rounded-xl shadow-lg border-2 border-carefd-teal-pale">
               <h2 className="text-2xl font-bold mb-4 text-carefd-navy">
                 {isOwner ? `${t('offersReceived')} (${offers.length})` : 'ההצעה שלי'}
@@ -517,7 +517,7 @@ const RequestDetails = () => {
                 </div>
               )}
             </div>
-            ) : null}
+            )}
           </div>
 
           {/* Actions Sidebar */}
