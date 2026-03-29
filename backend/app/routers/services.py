@@ -6,7 +6,7 @@ import re
 
 from app.database import db
 from app.models import Service, ServiceCreate, ServiceCategory
-from app.utils import get_current_user, send_email_async, create_notification
+from app.utils import get_current_user, send_email_async, create_notification, calculate_distance
 from app.routers.subscriptions import DEFAULT_PLANS
 
 router = APIRouter()
@@ -200,6 +200,9 @@ async def search_services(
     min_rating: Optional[float] = None,
     verified_only: Optional[bool] = None,
     recommended_only: Optional[bool] = None,
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    radius_km: Optional[float] = None,
     sort_by: Optional[str] = None,
     skip: int = 0,
     limit: int = 20
@@ -240,6 +243,7 @@ async def search_services(
     has_provider_filters = any([
         city, region, profession, gender, languages, health_funds,
         min_rating, verified_only, recommended_only,
+        latitude, longitude,
         search,  # search also checks provider business_name post-fetch
     ])
 
@@ -377,6 +381,23 @@ async def search_services(
             if s.get("provider", {}).get("is_recommended") is True
         ]
 
+    # --- Distance calculation & radius filter ---
+    if latitude is not None and longitude is not None:
+        filtered_services = []
+        for s in services:
+            loc = s.get("provider", {}).get("location") or {}
+            plat = loc.get("latitude")
+            plng = loc.get("longitude")
+            if plat and plng:
+                distance = calculate_distance(latitude, longitude, plat, plng)
+                s["distance_km"] = round(distance, 1)
+                if radius_km is None or distance <= radius_km:
+                    filtered_services.append(s)
+            elif not radius_km:
+                s["distance_km"] = None
+                filtered_services.append(s)
+        services = filtered_services
+
     # --- Sorting ---
     if sort_by == "price_low":
         services.sort(key=lambda s: s.get("price") or 0)
@@ -390,6 +411,8 @@ async def search_services(
         services.sort(
             key=lambda s: s.get("provider", {}).get("total_reviews", 0), reverse=True
         )
+    elif sort_by == "distance":
+        services.sort(key=lambda s: s.get("distance_km") if s.get("distance_km") is not None else 99999)
 
     # Total after all filtering (accurate count)
     filtered_total = len(services)
