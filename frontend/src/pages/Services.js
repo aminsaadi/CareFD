@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ServiceCard from '../components/ServiceCard';
@@ -428,6 +429,11 @@ const Services = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale flex flex-col">
+      <SEO
+        title="שירותי בריאות וסיעוד"
+        description="חפש שירותי בריאות וסיעוד בישראל - טיפול סיעודי בבית, אחות פרטית, השגחה, ליווי רפואי ועוד. השוואת מחירים ותיאום מיידי."
+        canonical="/services"
+      />
       <Navbar />
 
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">

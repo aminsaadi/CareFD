@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import SEO, { serviceSchema, breadcrumbSchema } from '../components/SEO';
 import BookingCalendar from '../components/BookingCalendar';
 import TimeSlotPicker from '../components/TimeSlotPicker';
 import api from '../utils/api';
@@ -378,8 +379,23 @@ const BookService = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale">
+      {service && (
+        <SEO
+          title={`הזמנת ${service.name} - ${provider?.business_name || 'ספק שירותים'}`}
+          description={`הזמן ${service.name} מאת ${provider?.business_name || 'ספק שירותים'}${provider?.city ? ` ב${provider.city}` : ''}. ${service.price ? `מחיר: ₪${service.price}` : ''} הזמן עכשיו דרך CareFD.`}
+          canonical={`/book/${serviceId}`}
+          jsonLd={[
+            serviceSchema(service, provider),
+            breadcrumbSchema([
+              { name: 'דף הבית', url: '/' },
+              { name: 'שירותים', url: '/services' },
+              { name: service.name, url: `/book/${serviceId}` }
+            ])
+          ]}
+        />
+      )}
       <Navbar />
-      
+
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-3 gap-6">
 

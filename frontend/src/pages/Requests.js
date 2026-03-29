@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Link, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import SEO from '../components/SEO';
 import RequestCard from '../components/RequestCard';
 import CitySelect from '../components/CitySelect';
 import api from '../utils/api';
@@ -195,6 +196,11 @@ const Requests = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale flex flex-col">
+      <SEO
+        title="בקשות לשירותי בריאות וסיעוד"
+        description="צפה בבקשות לשירותי בריאות וסיעוד או פרסם בקשה חדשה. מצא מטפלים סיעודיים, אחיות ושירותי בריאות בישראל."
+        canonical="/requests"
+      />
       <Navbar />
 
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">

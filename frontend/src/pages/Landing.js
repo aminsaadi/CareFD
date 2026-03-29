@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import SEO, { organizationSchema, medicalBusinessSchema, faqSchema } from '../components/SEO';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ProviderCard from '../components/ProviderCard';
@@ -362,10 +363,29 @@ const Landing = () => {
     navigate(`${targetPage}${queryString ? `?${queryString}` : ''}`);
   };
 
+  const homepageFaqs = [
+    { question: 'איך מוצאים מטפל סיעודי דרך CareFD?', answer: 'ניתן לחפש מטפלים לפי מקצוע, אזור גיאוגרפי ודירוג. כל הספקים עוברים תהליך אימות.' },
+    { question: 'כמה עולה שירות סיעודי דרך הפלטפורמה?', answer: 'המחירים משתנים לפי סוג השירות והספק. ניתן לראות מחירים ולהשוות בין ספקים באתר.' },
+    { question: 'האם המטפלים באתר מאומתים?', answer: 'כן, כל ספק עובר תהליך אימות מסמכים ותעודות לפני שמאושר להציע שירותים.' },
+    { question: 'באילו אזורים בישראל השירות זמין?', answer: 'CareFD פועלת בכל רחבי ישראל - מרכז, צפון, דרום, ירושלים והסביבה.' }
+  ];
+
+  const homepageJsonLd = [
+    organizationSchema(),
+    medicalBusinessSchema(),
+    faqSchema(homepageFaqs)
+  ];
+
   return (
     <div className="min-h-screen bg-white">
+      <SEO
+        title="שירותי בריאות וסיעוד בישראל - מטפלים, אחיות, טיפול בבית"
+        description="מצא מטפל סיעודי, אחות פרטית או שירות סיעוד מוסמך בקרבתך. CareFD מחברת בין מטופלים לספקי בריאות מובילים בישראל. חיפוש חינם."
+        canonical="/"
+        jsonLd={homepageJsonLd}
+      />
       <Navbar />
-      
+
       {/* ==================== HERO SECTION ==================== */}
       <section className="relative bg-gradient-to-br from-carefd-navy via-carefd-slate to-carefd-teal overflow-hidden" data-testid="hero-section">
         {/* Background Elements */}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import SEO from '../components/SEO';
 import { FaHeart, FaShieldAlt, FaHandshake, FaLightbulb, FaStar } from 'react-icons/fa';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import api from '../utils/api';
@@ -74,6 +75,11 @@ const About = () => {
   // Fallback: hardcoded content
   return (
     <div className="min-h-screen bg-white" dir="rtl">
+      <SEO
+        title="אודות CareFD"
+        description="CareFD מחברת בין מטופלים לספקי שירותי בריאות וסיעוד מוסמכים בישראל. למד עוד על החזון, הצוות והמשימה שלנו."
+        canonical="/about"
+      />
       <Navbar />
 
       {/* Hero Section */}

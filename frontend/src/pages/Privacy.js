@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import SEO from '../components/SEO';
 import { FaShieldAlt, FaLock, FaEye, FaUserShield, FaDatabase, FaCookie } from 'react-icons/fa';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import api from '../utils/api';
@@ -67,6 +68,11 @@ const Privacy = () => {
   // Fallback: hardcoded content
   return (
     <div className="min-h-screen bg-white" dir="rtl">
+      <SEO
+        title="מדיניות פרטיות"
+        description="מדיניות הפרטיות של CareFD - כיצד אנו אוספים, משתמשים ומגנים על המידע האישי שלך."
+        canonical="/privacy"
+      />
       <Navbar />
 
       {/* Hero */}

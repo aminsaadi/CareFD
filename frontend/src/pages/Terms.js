@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import SEO from '../components/SEO';
 import { FaFileContract, FaUserCheck, FaExclamationTriangle, FaBan, FaGavel } from 'react-icons/fa';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import api from '../utils/api';
@@ -67,6 +68,11 @@ const Terms = () => {
   // Fallback: hardcoded content
   return (
     <div className="min-h-screen bg-white" dir="rtl">
+      <SEO
+        title="תנאי שימוש"
+        description="תנאי השימוש של CareFD - הכללים וההנחיות לשימוש בפלטפורמה לשירותי בריאות וסיעוד."
+        canonical="/terms"
+      />
       <Navbar />
 
       {/* Hero */}

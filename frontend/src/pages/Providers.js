@@ -1,6 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import SEO from '../components/SEO';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ProviderCard from '../components/ProviderCard';
@@ -381,8 +382,17 @@ const Providers = () => {
     setSearchParams({});
   };
 
+  const seoCity = filters.city || '';
+  const seoTitle = seoCity
+    ? `מטפלים וספקי בריאות ב${seoCity}`
+    : 'מטפלים סיעודיים ואחיות פרטיות בישראל';
+  const seoDesc = seoCity
+    ? `מצא מטפל סיעודי, אחות פרטית וספקי בריאות מובילים ב${seoCity}. השוואת מחירים, דירוגים וביקורות.`
+    : 'חפש והשווה בין מטפלים סיעודיים, אחיות פרטיות וספקי שירותי בריאות בכל רחבי ישראל. דירוגים, ביקורות ותיאום ישיר.';
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale/30 flex flex-col">
+      <SEO title={seoTitle} description={seoDesc} canonical="/providers" />
       <Navbar />
       
       <div className="flex-1">

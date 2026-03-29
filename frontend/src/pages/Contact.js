@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import SEO from '../components/SEO';
 import api from '../utils/api';
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock, FaPaperPlane, FaCheckCircle } from 'react-icons/fa';
 import { toast } from 'sonner';
@@ -60,8 +61,13 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-white" dir="rtl">
+      <SEO
+        title="צור קשר"
+        description="צור קשר עם CareFD - נשמח לעזור לך למצוא את שירותי הבריאות והסיעוד המתאימים. טלפון, דוא״ל או טופס יצירת קשר."
+        canonical="/contact"
+      />
       <Navbar />
-      
+
       {/* Hero */}
       <section className="bg-gradient-to-br from-carefd-navy to-carefd-teal py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">

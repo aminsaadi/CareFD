@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSiteSettings } from '../context/SiteSettingsContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import SEO, { providerSchema, breadcrumbSchema } from '../components/SEO';
 import api from '../utils/api';
 import { 
   FaStar, FaMapMarkerAlt, FaClock, FaEdit, FaPhone, FaEnvelope,
@@ -254,8 +255,21 @@ const ProviderProfile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale flex flex-col">
+      <SEO
+        title={`${provider.business_name || 'ספק שירותים'} - ${provider.profession_name || getProfessionLabel(provider.profession_title) || 'ספק בריאות'}`}
+        description={`${provider.business_name || 'ספק שירותים'} - ${provider.profession_name || getProfessionLabel(provider.profession_title) || ''} ${provider.location?.city ? `ב${provider.location.city}` : 'בישראל'}. ${provider.total_reviews ? `${provider.total_reviews} ביקורות, דירוג ${provider.rating?.toFixed(1)}` : ''} הזמן תור עכשיו דרך CareFD.`}
+        canonical={`/providers/${providerId}`}
+        jsonLd={[
+          providerSchema(provider),
+          breadcrumbSchema([
+            { name: 'דף הבית', url: '/' },
+            { name: 'מטפלים', url: '/providers' },
+            { name: provider.business_name || 'ספק שירותים', url: `/providers/${providerId}` }
+          ])
+        ]}
+      />
       <Navbar />
-      
+
       {/* Hero Header */}
       <div className="bg-gradient-to-r from-carefd-navy via-carefd-slate to-carefd-teal text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
