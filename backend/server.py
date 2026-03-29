@@ -212,6 +212,166 @@ async def dynamic_manifest():
 
     return JSONResponse(content=manifest, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
 
+
+@app.get("/robots.txt")
+async def robots_txt():
+    """Serve robots.txt for search engines."""
+    content = """User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /provider/dashboard
+Disallow: /api/
+Disallow: /chat/
+Disallow: /chats
+
+Sitemap: https://carefd.com/sitemap.xml
+"""
+    return StarletteResponse(content=content.strip(), media_type="text/plain")
+
+
+@app.get("/sitemap.xml")
+async def sitemap_xml():
+    """Generate dynamic sitemap.xml with static pages and database content."""
+    from datetime import datetime, timezone
+    from app.database import db as sitemap_db
+
+    base_url = "https://carefd.com"
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    urls = []
+
+    # Static pages
+    static_pages = [
+        {"loc": "/", "priority": "1.0", "changefreq": "daily"},
+        {"loc": "/providers", "priority": "0.9", "changefreq": "daily"},
+        {"loc": "/services", "priority": "0.9", "changefreq": "daily"},
+        {"loc": "/requests", "priority": "0.8", "changefreq": "daily"},
+        {"loc": "/about", "priority": "0.7", "changefreq": "monthly"},
+        {"loc": "/contact", "priority": "0.6", "changefreq": "monthly"},
+        {"loc": "/privacy", "priority": "0.4", "changefreq": "yearly"},
+        {"loc": "/terms", "priority": "0.4", "changefreq": "yearly"},
+        {"loc": "/login", "priority": "0.5", "changefreq": "monthly"},
+        {"loc": "/register", "priority": "0.5", "changefreq": "monthly"},
+        {"loc": "/register/provider", "priority": "0.6", "changefreq": "monthly"},
+    ]
+
+    for page in static_pages:
+        urls.append(
+            f'  <url>\n'
+            f'    <loc>{base_url}{page["loc"]}</loc>\n'
+            f'    <lastmod>{today}</lastmod>\n'
+            f'    <changefreq>{page["changefreq"]}</changefreq>\n'
+            f'    <priority>{page["priority"]}</priority>\n'
+            f'  </url>'
+        )
+
+    # Dynamic: Provider profiles
+    try:
+        providers = await sitemap_db.providers.find(
+            {"is_verified": True},
+            {"_id": 0, "provider_id": 1, "updated_at": 1}
+        ).to_list(5000)
+        for p in providers:
+            lastmod = p.get("updated_at", today)
+            if isinstance(lastmod, str) and "T" in lastmod:
+                lastmod = lastmod.split("T")[0]
+            elif not isinstance(lastmod, str):
+                lastmod = today
+            urls.append(
+                f'  <url>\n'
+                f'    <loc>{base_url}/providers/{p["provider_id"]}</loc>\n'
+                f'    <lastmod>{lastmod}</lastmod>\n'
+                f'    <changefreq>weekly</changefreq>\n'
+                f'    <priority>0.8</priority>\n'
+                f'  </url>'
+            )
+    except Exception:
+        pass
+
+    # Dynamic: Services (booking pages)
+    try:
+        services = await sitemap_db.services.find(
+            {"is_active": {"$ne": False}},
+            {"_id": 0, "service_id": 1, "updated_at": 1}
+        ).to_list(5000)
+        for s in services:
+            lastmod = s.get("updated_at", today)
+            if isinstance(lastmod, str) and "T" in lastmod:
+                lastmod = lastmod.split("T")[0]
+            elif not isinstance(lastmod, str):
+                lastmod = today
+            urls.append(
+                f'  <url>\n'
+                f'    <loc>{base_url}/book/{s["service_id"]}</loc>\n'
+                f'    <lastmod>{lastmod}</lastmod>\n'
+                f'    <changefreq>weekly</changefreq>\n'
+                f'    <priority>0.7</priority>\n'
+                f'  </url>'
+            )
+    except Exception:
+        pass
+
+    # Dynamic: CMS static pages
+    try:
+        pages = await sitemap_db.static_pages.find(
+            {"is_published": True},
+            {"_id": 0, "slug": 1, "updated_at": 1}
+        ).to_list(100)
+        for pg in pages:
+            lastmod = pg.get("updated_at", today)
+            if isinstance(lastmod, str) and "T" in lastmod:
+                lastmod = lastmod.split("T")[0]
+            elif not isinstance(lastmod, str):
+                lastmod = today
+            urls.append(
+                f'  <url>\n'
+                f'    <loc>{base_url}/page/{pg["slug"]}</loc>\n'
+                f'    <lastmod>{lastmod}</lastmod>\n'
+                f'    <changefreq>monthly</changefreq>\n'
+                f'    <priority>0.6</priority>\n'
+                f'  </url>'
+            )
+    except Exception:
+        pass
+
+    # Dynamic: Blog posts
+    try:
+        posts = await sitemap_db.blog_posts.find(
+            {"status": "published"},
+            {"_id": 0, "slug": 1, "updated_at": 1}
+        ).to_list(500)
+        for post in posts:
+            lastmod = post.get("updated_at", today)
+            if isinstance(lastmod, str) and "T" in lastmod:
+                lastmod = lastmod.split("T")[0]
+            elif not isinstance(lastmod, str):
+                lastmod = today
+            urls.append(
+                f'  <url>\n'
+                f'    <loc>{base_url}/blog/{post["slug"]}</loc>\n'
+                f'    <lastmod>{lastmod}</lastmod>\n'
+                f'    <changefreq>weekly</changefreq>\n'
+                f'    <priority>0.7</priority>\n'
+                f'  </url>'
+            )
+    except Exception:
+        pass
+
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        + "\n".join(urls) + "\n"
+        '</urlset>'
+    )
+
+    return StarletteResponse(
+        content=xml,
+        media_type="application/xml",
+        headers={"Cache-Control": "public, max-age=3600"}
+    )
+
+
 # Serve frontend static files if available
 STATIC_DIR = Path(__file__).parent / "static"
 if STATIC_DIR.exists():
