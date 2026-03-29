@@ -313,6 +313,51 @@ async def startup_db_client():
     if missing:
         logger.warning(f"Missing optional env vars: {', '.join(missing)}")
 
+    # Migrate file URLs from absolute railway/domain URLs to relative paths
+    try:
+        from app.database import db as _db
+        railway_patterns = [
+            "https://carefd.up.railway.app/api/files/",
+            "https://carefdproduction.up.railway.app/api/files/",
+            "https://carefd.com/api/files/",
+            "https://www.carefd.com/api/files/",
+        ]
+        total_fixed = 0
+        for pattern in railway_patterns:
+            # Fix profile_image in providers
+            result = await _db.providers.update_many(
+                {"profile_image": {"$regex": f"^{pattern.replace('.', '[.]')}"}},
+                [{"$set": {"profile_image": {"$replaceAll": {"input": "$profile_image", "find": pattern, "replacement": "/api/files/"}}}}]
+            )
+            total_fixed += result.modified_count
+
+            # Fix profile_image in users
+            result = await _db.users.update_many(
+                {"profile_image": {"$regex": f"^{pattern.replace('.', '[.]')}"}},
+                [{"$set": {"profile_image": {"$replaceAll": {"input": "$profile_image", "find": pattern, "replacement": "/api/files/"}}}}]
+            )
+            total_fixed += result.modified_count
+
+            # Fix file_url in uploaded_files
+            result = await _db.uploaded_files.update_many(
+                {"file_url": {"$regex": f"^{pattern.replace('.', '[.]')}"}},
+                [{"$set": {"file_url": {"$replaceAll": {"input": "$file_url", "find": pattern, "replacement": "/api/files/"}}}}]
+            )
+            total_fixed += result.modified_count
+
+            # Fix logo/images in site_settings
+            for field in ["logo", "favicon", "og_image"]:
+                result = await _db.site_settings.update_many(
+                    {field: {"$regex": f"^{pattern.replace('.', '[.]')}"}},
+                    [{"$set": {field: {"$replaceAll": {"input": f"${field}", "find": pattern, "replacement": "/api/files/"}}}}]
+                )
+                total_fixed += result.modified_count
+
+        if total_fixed > 0:
+            logger.info(f"Migrated {total_fixed} file URLs from absolute to relative paths")
+    except Exception as e:
+        logger.warning(f"File URL migration failed: {e}")
+
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
