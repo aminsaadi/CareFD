@@ -1,101 +1,86 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import api from "@/lib/api-client";
+import type { Profession } from "@/lib/types";
+
+export default function Landing() {
+  const [professions, setProfessions] = useState<Profession[]>([]);
+
+  useEffect(() => {
+    api.get<{ professions: Profession[] }>("/professions").then((d) => setProfessions(d.professions)).catch(() => {});
+  }, []);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div dir="rtl">
+      {/* Hero */}
+      <section className="bg-gradient-to-bl from-teal-600 to-teal-800 text-white py-20">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">מצאו את המטפל המושלם</h1>
+          <p className="text-xl md:text-2xl text-teal-100 mb-10 max-w-3xl mx-auto">
+            פלטפורמת שירותי בריאות מובילה בישראל. אלפי מטפלים מקצועיים במרחק קליק.
+          </p>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          {/* Search Box */}
+          <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-4 flex gap-3">
+            <input type="text" placeholder="חפשו מקצוע, שירות או שם מטפל..." className="flex-1 px-4 py-3 text-gray-700 rounded-xl border-2 border-teal-100 focus:border-teal-500 focus:outline-none text-right" />
+            <Link href="/providers" className="bg-teal-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-teal-700 transition-colors whitespace-nowrap">
+              חיפוש
+            </Link>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </section>
+
+      {/* Professions */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-10">מצאו לפי מקצוע</h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {professions.map((prof) => (
+              <Link key={prof.profession_id} href={`/providers?category=${prof.profession_id}`}
+                className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow border border-gray-100 hover:border-teal-200">
+                <div className="text-3xl mb-3">🏥</div>
+                <h3 className="font-semibold text-gray-800">{prof.name}</h3>
+                <p className="text-sm text-gray-500 mt-1">{prof.specializations?.length || 0} התמחויות</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">איך זה עובד?</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { step: "1", title: "חפשו", desc: "מצאו את המטפל המתאים לפי מקצוע, מיקום ודירוג" },
+              { step: "2", title: "הזמינו", desc: "קבעו תור ישירות דרך האתר בלחיצה אחת" },
+              { step: "3", title: "קבלו טיפול", desc: "קבלו שירות מקצועי בבית, במרפאה או אונליין" },
+            ].map((item) => (
+              <div key={item.step} className="text-center">
+                <div className="w-16 h-16 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                  {item.step}
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">{item.title}</h3>
+                <p className="text-gray-600">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-16 bg-teal-600 text-white">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4">אתם מטפלים? הצטרפו אלינו!</h2>
+          <p className="text-xl text-teal-100 mb-8">הרשמו בחינם וקבלו חשיפה לאלפי מטופלים פוטנציאליים</p>
+          <Link href="/register?role=provider" className="bg-white text-teal-700 px-10 py-4 rounded-xl font-bold text-lg hover:bg-teal-50 transition-colors inline-block">
+            הרשמה כספק שירות
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }
