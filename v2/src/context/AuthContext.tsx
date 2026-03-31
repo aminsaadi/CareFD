@@ -10,8 +10,8 @@ interface AuthState {
   token: string | null;
   loading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (data: { email: string; password: string; name: string; role?: string }) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
+  register: (data: { email: string; password: string; name: string; role?: string; language_preference?: string }) => Promise<{ email_verification_required?: boolean }>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -49,19 +49,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshUser();
   }, [refreshUser]);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<User> => {
     const data = await api.post<{ user: User; provider: any; token: string }>("/auth/login", { email, password });
     localStorage.setItem("token", data.token);
     setToken(data.token);
     setUser(data.user);
     setProvider(data.provider);
+    return data.user;
   };
 
-  const register = async (regData: { email: string; password: string; name: string; role?: string }) => {
-    const data = await api.post<{ user: User; token: string }>("/auth/register", regData);
-    localStorage.setItem("token", data.token);
-    setToken(data.token);
-    setUser(data.user);
+  const register = async (regData: { email: string; password: string; name: string; role?: string; language_preference?: string }): Promise<{ email_verification_required?: boolean }> => {
+    const data = await api.post<{ user?: User; token?: string; email_verification_required?: boolean }>("/auth/register", regData);
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      setToken(data.token);
+    }
+    if (data.user) {
+      setUser(data.user);
+    }
+    return { email_verification_required: data.email_verification_required };
   };
 
   const logout = () => {

@@ -4,6 +4,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { NotificationProvider } from "@/context/NotificationContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "CareFD - שירותי בריאות בישראל",
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer />
+            <Toaster position="top-center" richColors />
           </NotificationProvider>
         </AuthProvider>
       </body>
