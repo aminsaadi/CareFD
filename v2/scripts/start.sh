@@ -2,7 +2,7 @@
 set -e
 
 echo "=== Running Prisma DB Push (create/sync tables) ==="
-npx prisma db push --skip-generate
+npx prisma db push --accept-data-loss
 
 echo "=== Running PostGIS migration (extensions, triggers, indexes) ==="
 psql "$DATABASE_URL" -f ./prisma/migrations/00_postgis_search/migration.sql || echo "PostGIS migration warning (may already exist)"
