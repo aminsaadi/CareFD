@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { NotificationProvider } from "@/context/NotificationContext";
-
-const geistSans = localFont({ src: "./fonts/GeistVF.woff", variable: "--font-geist-sans", weight: "100 900" });
-const geistMono = localFont({ src: "./fonts/GeistMonoVF.woff", variable: "--font-geist-mono", weight: "100 900" });
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "CareFD - שירותי בריאות בישראל",
@@ -15,10 +13,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="he" dir="rtl">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className="font-sans antialiased min-h-screen flex flex-col">
         <AuthProvider>
           <NotificationProvider>
-            {children}
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
           </NotificationProvider>
         </AuthProvider>
       </body>

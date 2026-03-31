@@ -9,6 +9,7 @@ interface AuthState {
   provider: any | null;
   token: string | null;
   loading: boolean;
+  isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (data: { email: string; password: string; name: string; role?: string }) => Promise<void>;
   logout: () => void;
@@ -71,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, provider, token, loading, login, register, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, provider, token, loading, isAuthenticated: !!user, login, register, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
