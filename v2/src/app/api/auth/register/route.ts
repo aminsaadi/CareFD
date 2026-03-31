@@ -3,9 +3,12 @@ import prisma from "@/lib/db";
 import { hashPassword, createToken } from "@/lib/auth";
 import { json, errorResponse, withErrorHandler, parseBody } from "@/lib/api-utils";
 import { registerSchema } from "@/lib/validations/auth";
+import { sendVerificationEmail } from "@/lib/email";
+import { rateLimit } from "@/lib/rate-limiter";
 import { v4 as uuid } from "uuid";
 
 export const POST = withErrorHandler(async (req: NextRequest) => {
+  rateLimit(req, "register", 10, 900); // 10 per 15 min per IP
   const body = await parseBody<unknown>(req);
   const data = registerSchema.parse(body);
 
@@ -62,7 +65,8 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
     },
   });
 
-  // TODO: Send verification email via Resend/SMTP
+  // Send verification email (non-blocking)
+  sendVerificationEmail(user.email, data.name, verificationToken).catch(() => {});
 
   return json({
     user: {

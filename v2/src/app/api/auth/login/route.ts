@@ -3,8 +3,10 @@ import prisma from "@/lib/db";
 import { verifyPassword, createToken } from "@/lib/auth";
 import { json, errorResponse, withErrorHandler, parseBody } from "@/lib/api-utils";
 import { loginSchema } from "@/lib/validations/auth";
+import { rateLimit } from "@/lib/rate-limiter";
 
 export const POST = withErrorHandler(async (req: NextRequest) => {
+  rateLimit(req, "login", 10, 900); // 10 per 15 min per IP
   const body = await parseBody<unknown>(req);
   const data = loginSchema.parse(body);
 

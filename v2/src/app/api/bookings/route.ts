@@ -3,11 +3,16 @@ import prisma from "@/lib/db";
 import { getCurrentUser, requireAuth } from "@/lib/auth";
 import { json, errorResponse, withErrorHandler, parseBody, getSearchParams } from "@/lib/api-utils";
 import { createNotification } from "@/lib/notifications";
+import { rateLimit } from "@/lib/rate-limiter";
 
 // POST /api/bookings - Create booking
 export const POST = withErrorHandler(async (req: NextRequest) => {
+  rateLimit(req, "create-booking", 10, 900); // 10 per 15 min per IP
   const body = await parseBody<any>(req);
   const isGuest = body.guest_booking && body.guest_name && body.guest_phone;
+
+  // Stricter limit for guest bookings
+  if (isGuest) rateLimit(req, "guest-booking", 3, 900);
 
   let userId: string;
   let userName: string;

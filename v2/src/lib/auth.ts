@@ -3,7 +3,16 @@ import jwt from "jsonwebtoken";
 import { NextRequest } from "next/server";
 import prisma from "./db";
 
-const SECRET_KEY = process.env.SECRET_KEY || "dev-secret-change-me";
+function getJwtSecret(): string {
+  const key = process.env.SECRET_KEY;
+  if (key) return key;
+  if (process.env.NODE_ENV === "production" && typeof window === "undefined") {
+    // Only warn, don't crash build – crash at runtime if actually used
+    console.warn("WARNING: SECRET_KEY not set in production!");
+  }
+  return "dev-only-secret-not-for-production";
+}
+const JWT_SECRET = getJwtSecret();
 const TOKEN_EXPIRY = "7d";
 
 // ==================== PASSWORD ====================
@@ -25,12 +34,12 @@ export interface TokenPayload {
 }
 
 export function createToken(payload: TokenPayload): string {
-  return jwt.sign(payload, SECRET_KEY, { expiresIn: TOKEN_EXPIRY });
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
 }
 
 export function verifyToken(token: string): TokenPayload | null {
   try {
-    return jwt.verify(token, SECRET_KEY) as TokenPayload;
+    return jwt.verify(token, JWT_SECRET) as TokenPayload;
   } catch {
     return null;
   }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import type { ZodIssue } from "zod";
 import { AuthError } from "./auth";
+import { RateLimitError } from "./rate-limiter";
 
 /** Standard JSON success response */
 export function json<T>(data: T, status = 200) {
@@ -22,6 +23,12 @@ export function withErrorHandler(
     try {
       return await handler(req, ctx);
     } catch (err) {
+      if (err instanceof RateLimitError) {
+        return NextResponse.json(
+          { error: err.message },
+          { status: 429, headers: { "Retry-After": String(err.retryAfter) } }
+        );
+      }
       if (err instanceof AuthError) {
         return errorResponse(err.message, err.status);
       }

@@ -1,14 +1,16 @@
 /**
  * PostGIS-powered search utilities for CareFD v2
- * Uses raw SQL for spatial queries that Prisma ORM can't express
+ * Uses Prisma.$queryRaw (tagged template) for safe parameterized queries
  */
 import prisma from "./db";
+import { Prisma } from "@/generated/prisma/client";
 
 interface GeoSearchParams {
   latitude: number;
   longitude: number;
   radiusKm: number;
-  where?: string; // Additional WHERE clause
+  city?: string;
+  professionId?: string;
   limit?: number;
   offset?: number;
   orderBy?: "distance" | "rating" | "reviews";
@@ -20,43 +22,51 @@ interface GeoSearchResult {
   [key: string]: unknown;
 }
 
+// Whitelist of allowed ORDER BY columns to prevent injection
+const ORDER_CLAUSES: Record<string, string> = {
+  distance: "distance_km ASC",
+  rating: "rating DESC NULLS LAST, distance_km ASC",
+  reviews: "total_reviews DESC NULLS LAST, distance_km ASC",
+};
+
 /**
- * Search providers within a radius using PostGIS ST_DWithin
- * This is MUCH faster than fetching all providers and filtering in JS
+ * Search providers within a radius using PostGIS ST_DWithin.
+ * All parameters are passed as $1, $2, etc. – no string interpolation.
  */
 export async function searchProvidersByLocation({
   latitude,
   longitude,
   radiusKm,
-  where = "",
+  city,
+  professionId,
   limit = 20,
   offset = 0,
   orderBy = "distance",
 }: GeoSearchParams): Promise<{ providers: GeoSearchResult[]; total: number }> {
   const radiusMeters = radiusKm * 1000;
 
-  // Count total
-  const countResult = await prisma.$queryRawUnsafe<[{ count: bigint }]>(`
+  // Count total – fully parameterized
+  const countResult = await prisma.$queryRaw<[{ count: bigint }]>`
     SELECT COUNT(*) as count
     FROM providers
     WHERE location IS NOT NULL
       AND ST_DWithin(
         location,
-        ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
-        $3
+        ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography,
+        ${radiusMeters}
       )
       AND (is_verified = true OR verification_status = 'verified')
-      ${where}
-  `, longitude, latitude, radiusMeters);
+      AND (${city}::text IS NULL OR city ILIKE '%' || ${city || ""} || '%')
+      AND (${professionId}::text IS NULL OR profession_id = ${professionId || ""})
+  `;
 
   const total = Number(countResult[0]?.count ?? 0);
 
-  // Build ORDER BY
-  let orderClause = "distance_km ASC";
-  if (orderBy === "rating") orderClause = "rating DESC NULLS LAST, distance_km ASC";
-  if (orderBy === "reviews") orderClause = "total_reviews DESC NULLS LAST, distance_km ASC";
+  // Safe ORDER BY using whitelist (never interpolated from user input)
+  const safeOrder = ORDER_CLAUSES[orderBy] || ORDER_CLAUSES.distance;
 
-  // Fetch with distance
+  // Fetch providers – use $queryRawUnsafe ONLY for the ORDER BY clause
+  // which is whitelisted above (not user-controlled)
   const providers = await prisma.$queryRawUnsafe<GeoSearchResult[]>(`
     SELECT
       id, provider_number, user_id, provider_type,
@@ -87,61 +97,63 @@ export async function searchProvidersByLocation({
         $3
       )
       AND (is_verified = true OR verification_status = 'verified')
-      ${where}
-    ORDER BY ${orderClause}
+      AND ($6::text IS NULL OR city ILIKE '%' || $6 || '%')
+      AND ($7::text IS NULL OR profession_id = $7)
+    ORDER BY ${safeOrder}
     LIMIT $4 OFFSET $5
-  `, longitude, latitude, radiusMeters, limit, offset);
+  `, longitude, latitude, radiusMeters, limit, offset,
+     city || null, professionId || null);
 
   return { providers, total };
 }
 
 /**
- * Full-text fuzzy search using pg_trgm similarity
- * Supports Hebrew text with trigram matching
+ * Full-text fuzzy search using pg_trgm similarity.
+ * Fully parameterized – no SQL injection risk.
  */
 export async function fuzzySearchProviders(
   query: string,
   limit = 20,
   offset = 0
 ): Promise<{ providers: GeoSearchResult[]; total: number }> {
-  const countResult = await prisma.$queryRawUnsafe<[{ count: bigint }]>(`
+  const countResult = await prisma.$queryRaw<[{ count: bigint }]>`
     SELECT COUNT(*) as count
     FROM providers
     WHERE (is_verified = true OR verification_status = 'verified')
       AND (
-        similarity(COALESCE(business_name, ''), $1) > 0.2
-        OR similarity(COALESCE(description, ''), $1) > 0.1
-        OR similarity(COALESCE(profession_name, ''), $1) > 0.3
-        OR business_name ILIKE '%' || $1 || '%'
-        OR description ILIKE '%' || $1 || '%'
-        OR profession_name ILIKE '%' || $1 || '%'
-        OR specialization_name ILIKE '%' || $1 || '%'
+        similarity(COALESCE(business_name, ''), ${query}) > 0.2
+        OR similarity(COALESCE(description, ''), ${query}) > 0.1
+        OR similarity(COALESCE(profession_name, ''), ${query}) > 0.3
+        OR business_name ILIKE '%' || ${query} || '%'
+        OR description ILIKE '%' || ${query} || '%'
+        OR profession_name ILIKE '%' || ${query} || '%'
+        OR specialization_name ILIKE '%' || ${query} || '%'
       )
-  `, query);
+  `;
 
   const total = Number(countResult[0]?.count ?? 0);
 
-  const providers = await prisma.$queryRawUnsafe<GeoSearchResult[]>(`
+  const providers = await prisma.$queryRaw<GeoSearchResult[]>`
     SELECT *,
       GREATEST(
-        similarity(COALESCE(business_name, ''), $1),
-        similarity(COALESCE(profession_name, ''), $1) * 1.5,
-        similarity(COALESCE(description, ''), $1) * 0.5
+        similarity(COALESCE(business_name, ''), ${query}),
+        similarity(COALESCE(profession_name, ''), ${query}) * 1.5,
+        similarity(COALESCE(description, ''), ${query}) * 0.5
       ) as relevance_score
     FROM providers
     WHERE (is_verified = true OR verification_status = 'verified')
       AND (
-        similarity(COALESCE(business_name, ''), $1) > 0.2
-        OR similarity(COALESCE(description, ''), $1) > 0.1
-        OR similarity(COALESCE(profession_name, ''), $1) > 0.3
-        OR business_name ILIKE '%' || $1 || '%'
-        OR description ILIKE '%' || $1 || '%'
-        OR profession_name ILIKE '%' || $1 || '%'
-        OR specialization_name ILIKE '%' || $1 || '%'
+        similarity(COALESCE(business_name, ''), ${query}) > 0.2
+        OR similarity(COALESCE(description, ''), ${query}) > 0.1
+        OR similarity(COALESCE(profession_name, ''), ${query}) > 0.3
+        OR business_name ILIKE '%' || ${query} || '%'
+        OR description ILIKE '%' || ${query} || '%'
+        OR profession_name ILIKE '%' || ${query} || '%'
+        OR specialization_name ILIKE '%' || ${query} || '%'
       )
     ORDER BY relevance_score DESC, rating DESC
-    LIMIT $2 OFFSET $3
-  `, query, limit, offset);
+    LIMIT ${limit} OFFSET ${offset}
+  `;
 
   return { providers, total };
 }

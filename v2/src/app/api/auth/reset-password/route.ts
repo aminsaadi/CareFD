@@ -3,10 +3,13 @@ import prisma from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
 import { json, errorResponse, withErrorHandler, parseBody } from "@/lib/api-utils";
 import { resetPasswordRequestSchema, resetPasswordSchema } from "@/lib/validations/auth";
+import { sendPasswordResetEmail } from "@/lib/email";
+import { rateLimit } from "@/lib/rate-limiter";
 import { v4 as uuid } from "uuid";
 
 // POST /api/auth/reset-password - Request password reset
 export const POST = withErrorHandler(async (req: NextRequest) => {
+  rateLimit(req, "reset-password", 3, 3600); // 3 per hour per IP
   const body = await parseBody<unknown>(req);
   const data = resetPasswordRequestSchema.parse(body);
 
@@ -33,7 +36,8 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
     },
   });
 
-  // TODO: Send reset email via Resend/SMTP
+  // Send reset email (non-blocking)
+  sendPasswordResetEmail(user.email, token).catch(() => {});
 
   return json({ message: "אם הכתובת רשומה, נשלח אליה קישור לאיפוס סיסמה" });
 });
