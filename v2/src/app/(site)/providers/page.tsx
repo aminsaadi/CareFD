@@ -1,126 +1,1005 @@
 "use client";
 
-import { useEffect, useState, useCallback, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
-import api from "@/lib/api-client";
-import type { Provider } from "@/lib/types";
+import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
+import { useSearchParams, Link } from 'next/link';
+import { useTranslation } from 'react-i18next';
+import Navbar // Navbar in layout;
+import Footer // Footer in layout;
+import ProviderCard from '@/components/ProviderCard';
+import AdvancedFilters from '@/components/AdvancedFilters' // TODO;
+import api from '@/lib/api-client';
+import { toast } from 'sonner';
+import { israeliLocalities } from '@/lib/data/localities';
+import { israeliRegions, healthcareProfessions, popularSearches as searchData } from '@/lib/data/searchData';
+import { 
+  FaSearch, FaFilter, FaTimes, FaSortAmountDown, FaMapMarkerAlt,
+  FaThLarge, FaList, FaCrosshairs, FaSpinner, FaMap, FaBriefcase, FaChevronLeft
+} from 'react-icons/fa';
 
-export default function ProvidersPage() {
-  return <Suspense><ProvidersContent /></Suspense>;
-}
+// Lazy load map component
+const ProvidersMap = lazy(() => import('../components/ProvidersMap'));
 
-function ProvidersContent() {
-  const searchParams = useSearchParams();
-  const [providers, setProviders] = useState<Provider[]>([]);
-  const [total, setTotal] = useState(0);
+// Fallback popular searches - used until backend professions load
+const fallbackPopularSearches = searchData.providers;
+
+const Providers = () => {
+  const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [providers, setProviders] = useState([]);
+  const [totalProviders, setTotalProviders] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState(searchParams.get("search") || "");
-  const [city, setCity] = useState(searchParams.get("city") || "");
-  const [category, setCategory] = useState(searchParams.get("category") || "");
+  const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState('grid'); // grid or list
+  const [sortBy, setSortBy] = useState('rating');
   const [page, setPage] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [locationQuery, setLocationQuery] = useState(searchParams.get('city') || '');
+  const [isLocating, setIsLocating] = useState(false);
+  const [popularSearches, setPopularSearches] = useState(fallbackPopularSearches);
+  
+  // Dropdown states
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
+  const [cities, setCities] = useState([]);
+  const searchInputRef = useRef(null);
+  const locationInputRef = useRef(null);
+  const searchDropdownRef = useRef(null);
+  const locationDropdownRef = useRef(null);
+  
+  // Israeli regions for quick selection - fetched from backend with fallback
+  const [regions, setRegions] = useState(israeliRegions);
 
-  const fetchProviders = useCallback(async (pageNum = 0) => {
-    setLoading(true);
-    try {
-      const params: Record<string, string> = { skip: String(pageNum * 20), limit: "20", sort_by: "rating" };
-      if (search) params.search = search;
-      if (city) params.city = city;
-      if (category) params.category = category;
+  const radiusOptions = [
+    { value: 5, label: '5 ק"מ' },
+    { value: 10, label: '10 ק"מ' },
+    { value: 25, label: '25 ק"מ' },
+    { value: 50, label: '50 ק"מ' },
+    { value: 100, label: '100 ק"מ' }
+  ];
 
-      const data = await api.get<{ providers: Provider[]; total: number }>("/providers", params);
-      if (pageNum === 0) setProviders(data.providers);
-      else setProviders((prev) => [...prev, ...data.providers]);
-      setTotal(data.total);
-    } catch {
-      if (pageNum === 0) setProviders([]);
-    } finally {
-      setLoading(false);
+  const [filters, setFilters] = useState({
+    search: searchParams.get('search') || '',
+    city: searchParams.get('city') || null,
+    category: searchParams.get('category') || null,
+    specialization: searchParams.get('specialization') || null,
+    serviceType: searchParams.get('serviceType') || null,
+    providerType: searchParams.get('providerType') || null,
+    minRating: searchParams.get('minRating') ? parseFloat(searchParams.get('minRating')) : null,
+    minExperience: searchParams.get('minExperience') ? parseInt(searchParams.get('minExperience')) : null,
+    verifiedOnly: searchParams.get('verifiedOnly') === 'true',
+    recommendedOnly: searchParams.get('recommendedOnly') === 'true',
+    latitude: searchParams.get('latitude') ? parseFloat(searchParams.get('latitude')) : null,
+    longitude: searchParams.get('longitude') ? parseFloat(searchParams.get('longitude')) : null,
+    radius: searchParams.get('radius_km') ? parseFloat(searchParams.get('radius_km')) : null,
+    useMyLocation: searchParams.has('latitude') && searchParams.has('longitude'),
+    gender: searchParams.get('gender') || null,
+    languages: searchParams.get('languages') ? searchParams.get('languages').split(',') : [],
+    healthFunds: searchParams.get('health_funds') ? searchParams.get('health_funds').split(',') : []
+  });
+
+  // Initialize location if provided via URL
+  useEffect(() => {
+    if (searchParams.has('latitude') && searchParams.has('longitude')) {
+      setLocationQuery('המיקום שלי');
     }
-  }, [search, city, category]);
+    // Fetch cities from backend (includes coordinates)
+    const fetchCities = async () => {
+      try {
+        const res = await api.get('/localities?limit=500');
+        setCities(res.data.localities || []);
+      } catch {
+        // Fallback to static list
+        setCities(israeliLocalities.map(c => ({ name: c.name, region: c.region })));
+      }
+    };
+    fetchCities();
 
-  useEffect(() => { setPage(0); fetchProviders(0); }, [fetchProviders]);
+    // Fetch professions from backend for popular searches
+    const fetchProfessions = async () => {
+      try {
+        const res = await api.get('/professions');
+        const profs = res.data?.professions || res.data || [];
+        if (Array.isArray(profs) && profs.length > 0) {
+          const profNames = profs.map(p => p.name || p.name_he || p.label).filter(Boolean);
+          if (profNames.length > 0) {
+            setPopularSearches(profNames);
+          }
+        }
+      } catch {
+        // Keep fallback popular searches
+      }
+    };
+    fetchProfessions();
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+    // Fetch regions from backend
+    const fetchRegions = async () => {
+      try {
+        const res = await api.get('/regions');
+        const backendRegions = res.data?.regions || [];
+        if (backendRegions.length > 0) {
+          setRegions(backendRegions);
+        }
+      } catch {
+        // Keep fallback regions
+      }
+    };
+    fetchRegions();
+  }, []);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchDropdownRef.current && !searchDropdownRef.current.contains(event.target) &&
+          searchInputRef.current && !searchInputRef.current.contains(event.target)) {
+        setShowSearchDropdown(false);
+      }
+      if (locationDropdownRef.current && !locationDropdownRef.current.contains(event.target) &&
+          locationInputRef.current && !locationInputRef.current.contains(event.target)) {
+        setShowLocationDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Filter cities based on input
+  const filteredCities = cities.filter(city => 
+    city.name?.includes(locationQuery)
+  ).slice(0, 10);
+
+  // Filter popular searches based on input
+  const filteredSearches = searchQuery.trim() 
+    ? popularSearches.filter(s => s.includes(searchQuery))
+    : popularSearches;
+
+  const [activeFiltersCount, setActiveFiltersCount] = useState(0);
+
+  useEffect(() => {
+    // Count active filters
+    let count = 0;
+    if (filters.city) count++;
+    if (filters.category) count++;
+    if (filters.specialization) count++;
+    if (filters.serviceType) count++;
+    if (filters.providerType) count++;
+    if (filters.minRating) count++;
+    if (filters.minExperience) count++;
+    if (filters.verifiedOnly) count++;
+    if (filters.recommendedOnly) count++;
+    if (filters.gender) count++;
+    if (filters.languages?.length > 0) count++;
+    if (filters.healthFunds?.length > 0) count++;
+    if (filters.useMyLocation) count++;
+    setActiveFiltersCount(count);
+  }, [filters]);
+
+  useEffect(() => {
     setPage(0);
     fetchProviders(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters, sortBy]);
+
+  const PAGE_SIZE = 20;
+
+  const fetchProviders = async (pageNum = 0) => {
+    try {
+      if (pageNum === 0) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+      const params = new URLSearchParams();
+
+      if (filters.search) params.append('search', filters.search);
+      if (filters.city) params.append('city', filters.city);
+      if (filters.category) params.append('category', filters.category);
+      if (filters.specialization) params.append('specialization', filters.specialization);
+      if (filters.serviceType) params.append('service_type', filters.serviceType);
+      if (filters.providerType) params.append('provider_type', filters.providerType);
+      if (filters.minRating) params.append('min_rating', filters.minRating.toString());
+      if (filters.minExperience) params.append('min_experience', filters.minExperience.toString());
+      if (filters.verifiedOnly) params.append('verified_only', 'true');
+      if (filters.recommendedOnly) params.append('recommended_only', 'true');
+      if (filters.gender) params.append('gender', filters.gender);
+      if (filters.languages?.length > 0) params.append('languages', filters.languages.join(','));
+      if (filters.healthFunds?.length > 0) params.append('health_funds', filters.healthFunds.join(','));
+      if (filters.latitude && filters.longitude) {
+        params.append('latitude', filters.latitude.toString());
+        params.append('longitude', filters.longitude.toString());
+        if (filters.radius) params.append('radius_km', filters.radius.toString());
+      }
+      params.append('sort_by', sortBy);
+      params.append('sort_order', 'desc');
+      params.append('skip', (pageNum * PAGE_SIZE).toString());
+      params.append('limit', PAGE_SIZE.toString());
+
+      const response = await api.get(`/providers?${params.toString()}`);
+      let apiProviders = data.providers || [];
+
+      if (pageNum === 0) {
+        setProviders(apiProviders);
+      } else {
+        setProviders(prev => [...prev, ...apiProviders]);
+      }
+      setTotalProviders(data.total || 0);
+    } catch (error) {
+      console.error('Failed to fetch providers:', error);
+      toast.error('שגיאה בטעינת ספקים. נסו שוב.');
+      if (pageNum === 0) {
+        setProviders([]);
+        setTotalProviders(0);
+      }
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
   };
 
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchProviders(nextPage);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const newFilters = { ...filters, search: searchQuery };
+    
+    // Handle location
+    if (locationQuery && locationQuery !== 'המיקום שלי') {
+      newFilters.city = locationQuery;
+      newFilters.useMyLocation = false;
+      // Preserve coordinates if they were set by city selection (from dropdown with coords)
+      // Only clear if the user typed a new value that doesn't match the current filter city
+      if (locationQuery !== filters.city) {
+        // User typed a new city manually - try to find coords
+        const matchedCity = cities.find(c => c.name === locationQuery);
+        if (matchedCity && matchedCity.lat && matchedCity.lng) {
+          newFilters.latitude = matchedCity.lat;
+          newFilters.longitude = matchedCity.lng;
+          newFilters.radius = newFilters.radius || 25;
+        } else {
+          newFilters.latitude = null;
+          newFilters.longitude = null;
+          newFilters.radius = null;
+        }
+      }
+    } else if (locationQuery === '' || !locationQuery) {
+      newFilters.city = null;
+      newFilters.latitude = null;
+      newFilters.longitude = null;
+      newFilters.radius = null;
+    }
+    
+    setFilters(newFilters);
+    
+    // Update URL
+    const newParams = new URLSearchParams();
+    if (searchQuery) newParams.set('search', searchQuery);
+    if (newFilters.city) newParams.set('city', newFilters.city);
+    if (newFilters.latitude) newParams.set('latitude', newFilters.latitude);
+    if (newFilters.longitude) newParams.set('longitude', newFilters.longitude);
+    if (newFilters.radius) newParams.set('radius_km', newFilters.radius);
+    setSearchParams(newParams);
+  };
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      alert('הדפדפן שלך לא תומך באיתור מיקום');
+      return;
+    }
+
+    setIsLocating(true);
+    setShowLocationDropdown(false);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        
+        // Reverse geocoding to get city name
+        let cityName = 'המיקום שלי';
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=he`
+          );
+          const data = await response.json();
+          cityName = data.address?.city || data.address?.town || data.address?.village || data.address?.municipality || 'המיקום שלי';
+        } catch (error) {
+          console.error('Reverse geocoding error:', error);
+        }
+        
+        const newFilters = {
+          ...filters,
+          latitude: lat,
+          longitude: lng,
+          useMyLocation: true,
+          city: null,
+          radius: filters.radius || 10
+        };
+        setFilters(newFilters);
+        setLocationQuery(cityName);
+        setIsLocating(false);
+        
+        // Update sort to distance
+        setSortBy('distance');
+        
+        // Update URL
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set('latitude', lat);
+        newParams.set('longitude', lng);
+        newParams.set('radius_km', newFilters.radius);
+        newParams.delete('city');
+        setSearchParams(newParams);
+      },
+      (error) => {
+        console.error('Location error:', error);
+        alert('לא הצלחנו לאתר את המיקום שלך');
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  const handleRadiusChange = (radius) => {
+    const newFilters = { ...filters, radius };
+    setFilters(newFilters);
+    
+    if (filters.useMyLocation || (filters.latitude && filters.longitude)) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set('radius_km', radius);
+      setSearchParams(newParams);
+    }
+  };
+
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
+
+  const handleApplyFilters = () => {
+    setShowFilters(false);
+    fetchProviders();
+  };
+
+  const handleResetFilters = () => {
+    setFilters({
+      search: '',
+      city: null,
+      category: null,
+      specialization: null,
+      serviceType: null,
+      providerType: null,
+      minRating: null,
+      minExperience: null,
+      verifiedOnly: false,
+      recommendedOnly: false,
+      latitude: null,
+      longitude: null,
+      radius: null,
+      useMyLocation: false
+    });
+    setSearchQuery('');
+    setLocationQuery('');
+    setSearchParams({});
+  };
+
+  const seoCity = filters.city || '';
+  const seoTitle = seoCity
+    ? `מטפלים וספקי בריאות ב${seoCity}`
+    : 'מטפלים סיעודיים ואחיות פרטיות בישראל';
+  const seoDesc = seoCity
+    ? `מצא מטפל סיעודי, אחות פרטית וספקי בריאות מובילים ב${seoCity}. השוואת מחירים, דירוגים וביקורות.`
+    : 'חפש והשווה בין מטפלים סיעודיים, אחיות פרטיות וספקי שירותי בריאות בכל רחבי ישראל. דירוגים, ביקורות ותיאום ישיר.';
+
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8" dir="rtl">
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">מטפלים וספקי שירות</h1>
-      <p className="text-gray-600 mb-6">מצאו את נותני השירות המתאימים לכם</p>
+    <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale/30 flex flex-col">
+      
+      
+      <div className="flex-1">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-carefd-navy font-heading mb-2" data-testid="providers-title">
+              {t('providers')}
+            </h1>
+            <p className="text-carefd-gray">מצאו את נותני השירות המתאימים לכם</p>
+          </div>
 
-      {/* Search Bar */}
-      <form onSubmit={handleSearch} className="bg-white rounded-2xl shadow-lg p-4 mb-6">
-        <div className="grid md:grid-cols-3 gap-3">
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="מקצוע, התמחות, שם ספק..."
-            className="px-4 py-3 border-2 border-gray-100 rounded-xl focus:border-teal-500 focus:outline-none" />
-          <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="עיר או אזור"
-            className="px-4 py-3 border-2 border-gray-100 rounded-xl focus:border-teal-500 focus:outline-none" />
-          <button type="submit" className="bg-teal-600 text-white py-3 rounded-xl font-bold hover:bg-teal-700 transition-colors">
-            חיפוש
-          </button>
-        </div>
-      </form>
-
-      {/* Results */}
-      <p className="text-gray-500 mb-4">{total} תוצאות</p>
-      {loading && page === 0 ? (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="bg-white rounded-xl shadow p-6 animate-pulse">
-              <div className="h-12 w-12 bg-gray-200 rounded-full mb-4" />
-              <div className="h-5 bg-gray-200 rounded w-3/4 mb-3" />
-              <div className="h-4 bg-gray-200 rounded w-1/2" />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {providers.map((p) => (
-              <Link key={p.provider_id} href={`/providers/${p.provider_id}`}
-                className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-gray-100">
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-bold text-xl flex-shrink-0">
-                    {p.business_name?.[0] || "?"}
+          {/* Search and Filter Bar */}
+          <div className="bg-white rounded-2xl shadow-lg p-4 mb-6">
+            <form onSubmit={handleSearch} className="space-y-4">
+              {/* Two Column Search */}
+              <div className="grid md:grid-cols-2 gap-3">
+                {/* Column 1: Profession/Category with Dropdown */}
+                <div className="relative">
+                  <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-carefd-gray z-10" />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => setShowSearchDropdown(true)}
+                    placeholder="מקצוע, התמחות, שם ספק..."
+                    className="w-full px-4 py-3 pr-12 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal"
+                    aria-label="חיפוש לפי מקצוע, התמחות או שם ספק"
+                    data-testid="search-input"
+                  />
+                  
+                  {/* Search Dropdown */}
+                  {showSearchDropdown && (
+                    <div 
+                      ref={searchDropdownRef}
+                      className="absolute top-full right-0 left-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 z-50 max-h-64 overflow-y-auto"
+                      data-testid="search-dropdown"
+                    >
+                      <div className="p-3 border-b border-gray-100">
+                        <span className="text-xs font-semibold text-carefd-gray">חיפושים נפוצים</span>
+                      </div>
+                      <div className="p-2">
+                        {filteredSearches.map((search, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => {
+                              setSearchQuery(search);
+                              setShowSearchDropdown(false);
+                            }}
+                            className="w-full text-right px-3 py-2.5 hover:bg-carefd-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carefd-navy"
+                          >
+                            <FaSearch className="text-carefd-gray text-sm" />
+                            <span>{search}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Column 2: Location with Dropdown */}
+                <div className="flex gap-2">
+                  <div className="flex-1 relative">
+                    <FaMapMarkerAlt className="absolute right-4 top-1/2 -translate-y-1/2 text-carefd-gray z-10" />
+                    <input
+                      ref={locationInputRef}
+                      type="text"
+                      value={locationQuery}
+                      onChange={(e) => {
+                        setLocationQuery(e.target.value);
+                        if (e.target.value !== 'המיקום שלי') {
+                          setFilters(prev => ({ ...prev, useMyLocation: false, latitude: null, longitude: null }));
+                        }
+                        setShowLocationDropdown(true);
+                      }}
+                      onFocus={() => setShowLocationDropdown(true)}
+                      placeholder="עיר או אזור"
+                      className="w-full px-4 py-3 pr-12 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal"
+                      aria-label="חיפוש לפי עיר או אזור"
+                      data-testid="location-input"
+                    />
+                    
+                    {/* Location Dropdown */}
+                    {showLocationDropdown && (
+                      <div 
+                        ref={locationDropdownRef}
+                        className="absolute top-full right-0 left-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 z-50 max-h-64 overflow-y-auto"
+                        data-testid="location-dropdown"
+                      >
+                        {/* GPS Option */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleGetLocation();
+                          }}
+                          className="w-full text-right px-4 py-3 hover:bg-carefd-teal-pale/30 transition-colors flex items-center gap-3 text-carefd-teal border-b border-gray-100"
+                        >
+                          <FaCrosshairs className="text-lg" />
+                          <span className="font-medium">השתמש במיקום שלי</span>
+                          {isLocating && <FaSpinner className="animate-spin me-auto" />}
+                        </button>
+                        
+                        {/* Regions */}
+                        {!locationQuery && (
+                          <>
+                            <div className="p-3 border-b border-gray-100">
+                              <span className="text-xs font-semibold text-carefd-gray">אזורים</span>
+                            </div>
+                            <div className="p-2">
+                              {regions.map((region) => (
+                                <button
+                                  key={region.region_id || region.id}
+                                  type="button"
+                                  onClick={() => {
+                                    setLocationQuery(region.name);
+                                    setFilters(prev => ({
+                                      ...prev,
+                                      city: region.name,
+                                      useMyLocation: false,
+                                      latitude: region.lat || null,
+                                      longitude: region.lng || null,
+                                      radius: null
+                                    }));
+                                    setShowLocationDropdown(false);
+                                  }}
+                                  className="w-full text-right px-3 py-2.5 hover:bg-carefd-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carefd-navy"
+                                >
+                                  <FaMapMarkerAlt className="text-carefd-gray text-sm" />
+                                  <span>{region.name}</span>
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                        
+                        {/* Cities (filtered) */}
+                        {locationQuery && filteredCities.length > 0 && (
+                          <>
+                            <div className="p-3 border-b border-gray-100">
+                              <span className="text-xs font-semibold text-carefd-gray">ערים</span>
+                            </div>
+                            <div className="p-2">
+                              {filteredCities.map((city) => (
+                                <button
+                                  key={city.city_id || city.name}
+                                  type="button"
+                                  onClick={() => {
+                                    const cityName = city.name || city.name_he;
+                                    setLocationQuery(cityName);
+                                    // Use coordinates from localities for radius search
+                                    const hasCoords = city.lat && city.lng;
+                                    setFilters(prev => ({
+                                      ...prev,
+                                      city: cityName,
+                                      useMyLocation: false,
+                                      latitude: hasCoords ? city.lat : null,
+                                      longitude: hasCoords ? city.lng : null,
+                                      radius: hasCoords ? (prev.radius || 25) : null
+                                    }));
+                                    setShowLocationDropdown(false);
+                                  }}
+                                  className="w-full text-right px-3 py-2.5 hover:bg-carefd-teal-pale/30 rounded-lg transition-colors flex items-center gap-3 text-carefd-navy"
+                                >
+                                  <FaMapMarkerAlt className="text-carefd-gray text-sm" />
+                                  <span>{city.name || city.name_he}</span>
+                                  {city.region && <span className="text-xs text-carefd-gray me-auto">{city.region}</span>}
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-gray-900 truncate">{p.business_name || "ספק"}</h3>
-                    <p className="text-sm text-teal-600">{p.profession_name || p.profession_title}</p>
-                    <p className="text-sm text-gray-500 mt-1">{p.location?.city}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-yellow-500">⭐</span>
-                      <span className="font-medium">{p.rating.toFixed(1)}</span>
-                      <span className="text-gray-400">({p.total_reviews})</span>
-                      {p.is_verified && <span className="bg-teal-100 text-teal-700 text-xs px-2 py-0.5 rounded-full">מאומת</span>}
-                      {p.distance_km != null && <span className="text-gray-400 text-sm">{p.distance_km} ק&quot;מ</span>}
+                  
+                  {/* GPS Button */}
+                  <button
+                    type="button"
+                    onClick={handleGetLocation}
+                    disabled={isLocating}
+                    className="px-4 border-2 border-carefd-teal-pale rounded-xl hover:bg-carefd-teal-pale/30 transition-colors disabled:opacity-50 flex items-center justify-center text-carefd-teal"
+                    title="השתמש במיקום שלי"
+                    data-testid="gps-btn"
+                  >
+                    {isLocating ? (
+                      <FaSpinner className="animate-spin" />
+                    ) : (
+                      <FaCrosshairs className="text-lg" />
+                    )}
+                  </button>
+                  
+                  {/* Search Button */}
+                  <button
+                    type="submit"
+                    className="px-6 py-3 bg-carefd-teal text-white rounded-xl font-semibold hover:bg-carefd-teal-medium transition-colors flex items-center gap-2"
+                    data-testid="search-btn"
+                  >
+                    <FaSearch />
+                    <span className="hidden sm:inline">חפש</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Radius selector (appears when using GPS or city with coordinates) */}
+              {(filters.useMyLocation || (filters.latitude && filters.longitude)) && (
+                <div className="flex items-center gap-3 pt-2 border-t border-carefd-teal-pale">
+                  <span className="text-sm text-carefd-gray">רדיוס חיפוש:</span>
+                  <div className="flex gap-2">
+                    {radiusOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => handleRadiusChange(option.value)}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                          filters.radius === option.value
+                            ? 'bg-carefd-teal text-white'
+                            : 'bg-carefd-teal-pale/50 text-carefd-navy hover:bg-carefd-teal-pale'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Quick Region Tags */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm text-carefd-gray">אזורים:</span>
+                {regions.map((region) => (
+                  <button
+                    key={region.region_id || region.id}
+                    type="button"
+                    onClick={() => {
+                      setLocationQuery(region.name);
+                      setFilters(prev => ({
+                        ...prev,
+                        city: region.name,
+                        useMyLocation: false,
+                        latitude: region.lat || null,
+                        longitude: region.lng || null,
+                        radius: null
+                      }));
+                    }}
+                    className={`text-sm px-3 py-1 rounded-full transition-colors ${
+                      locationQuery === region.name
+                        ? 'bg-carefd-teal text-white'
+                        : 'bg-carefd-teal-pale/50 text-carefd-navy hover:bg-carefd-teal-pale'
+                    }`}
+                    data-testid={`region-${region.id}`}
+                  >
+                    {region.name}
+                  </button>
+                ))}
+              </div>
+            </form>
+
+            {/* Action Buttons Row */}
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-carefd-teal-pale">
+              <div className="flex gap-3">
+                {/* Filter Toggle (Mobile) */}
+                <button
+                  onClick={() => setShowFilters(true)}
+                  className="lg:hidden flex items-center gap-2 px-4 py-2 bg-carefd-navy text-white rounded-xl font-medium"
+                >
+                  <FaFilter />
+                  סינון מתקדם
+                  {activeFiltersCount > 0 && (
+                    <span className="bg-carefd-teal px-2 py-0.5 rounded-full text-xs">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* Sort */}
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-4 py-2 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal bg-white text-sm"
+                >
+                  <option value="rating">מיון: דירוג</option>
+                  <option value="reviews">מיון: ביקורות</option>
+                  <option value="price">מיון: מחיר</option>
+                  {(filters.useMyLocation || (filters.latitude && filters.longitude)) && <option value="distance">מיון: מרחק</option>}
+                </select>
+              </div>
+
+              {/* View Mode */}
+              <div className="hidden md:flex border-2 border-carefd-teal-pale rounded-xl overflow-hidden">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`px-3 py-2 ${viewMode === 'grid' ? 'bg-carefd-teal text-white' : 'bg-white text-carefd-gray'}`}
+                  title="תצוגת רשת"
+                  aria-label="תצוגת רשת"
+                  aria-pressed={viewMode === 'grid'}
+                >
+                  <FaThLarge />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-3 py-2 ${viewMode === 'list' ? 'bg-carefd-teal text-white' : 'bg-white text-carefd-gray'}`}
+                  title="תצוגת רשימה"
+                  aria-label="תצוגת רשימה"
+                  aria-pressed={viewMode === 'list'}
+                >
+                  <FaList />
+                </button>
+                <button
+                  onClick={() => setViewMode('map')}
+                  className={`px-3 py-2 ${viewMode === 'map' ? 'bg-carefd-teal text-white' : 'bg-white text-carefd-gray'}`}
+                  title="תצוגת מפה"
+                  aria-label="תצוגת מפה"
+                  aria-pressed={viewMode === 'map'}
+                  data-testid="map-view-btn"
+                >
+                  <FaMap />
+                </button>
+              </div>
+            </div>
+
+            {/* Active Filters Tags */}
+            {activeFiltersCount > 0 && (
+              <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-carefd-teal-pale">
+                {filters.useMyLocation && (
+                  <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+                    <FaMapMarkerAlt /> המיקום שלי
+                    {filters.radius && ` (${filters.radius} ק"מ)`}
+                    <button onClick={() => {
+                      setFilters(prev => ({ ...prev, useMyLocation: false, latitude: null, longitude: null }));
+                      setLocationQuery('');
+                    }}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.city && !filters.useMyLocation && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
+                    <FaMapMarkerAlt /> {filters.city}
+                    {filters.radius && filters.latitude && ` (${filters.radius} ק"מ)`}
+                    <button onClick={() => {
+                      setFilters(prev => ({ ...prev, city: null, latitude: null, longitude: null, radius: null }));
+                      setLocationQuery('');
+                    }}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.search && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
+                    חיפוש: {filters.search}
+                    <button onClick={() => {
+                      setFilters(prev => ({ ...prev, search: '' }));
+                      setSearchQuery('');
+                    }}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.category && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
+                    קטגוריה: {filters.category}
+                    <button onClick={() => setFilters(prev => ({ ...prev, category: null }))}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.verifiedOnly && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal text-white px-3 py-1 rounded-full text-sm">
+                    מאומתים בלבד
+                  </span>
+                )}
+                {filters.recommendedOnly && (
+                  <span className="inline-flex items-center gap-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1 rounded-full text-sm">
+                    מומלצים בלבד
+                    <button onClick={() => setFilters(prev => ({ ...prev, recommendedOnly: false }))}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.serviceType && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
+                    סוג שירות: {filters.serviceType === 'home_visit' ? 'ביקור בית' : filters.serviceType === 'clinic_visit' ? 'מרפאה' : filters.serviceType === 'video_call' ? 'טלרפואה' : 'שיחה טלפונית'}
+                    <button onClick={() => setFilters(prev => ({ ...prev, serviceType: null }))}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.providerType && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
+                    סוג ספק: {filters.providerType === 'individual' ? 'עצמאי' : filters.providerType === 'clinic' ? 'מרפאה' : 'חברה'}
+                    <button onClick={() => setFilters(prev => ({ ...prev, providerType: null }))}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.minRating && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
+                    דירוג: {filters.minRating}+
+                    <button onClick={() => setFilters(prev => ({ ...prev, minRating: null }))}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                {filters.minExperience && (
+                  <span className="inline-flex items-center gap-1 bg-carefd-teal-pale text-carefd-navy px-3 py-1 rounded-full text-sm">
+                    ניסיון: {filters.minExperience}+ שנים
+                    <button onClick={() => setFilters(prev => ({ ...prev, minExperience: null }))}><FaTimes className="text-xs" /></button>
+                  </span>
+                )}
+                <button
+                  onClick={handleResetFilters}
+                  className="text-sm text-carefd-teal hover:underline"
+                >
+                  נקה הכל
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Main Content */}
+          <div className="flex gap-6">
+            {/* Filters Sidebar (Desktop) */}
+            <div className="hidden lg:block w-80 flex-shrink-0">
+              <div className="sticky top-24">
+                <AdvancedFilters
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  onApply={handleApplyFilters}
+                  onReset={handleResetFilters}
+                />
+              </div>
+            </div>
+
+            {/* Results */}
+            <div className="flex-1">
+              {/* Results Count */}
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-carefd-gray">
+                  נמצאו <span className="font-bold text-carefd-navy">{totalProviders}</span> ספקים
+                </p>
+              </div>
+
+              {loading ? (
+                <div className="grid md:grid-cols-2 gap-6" aria-label="טוען ספקים">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="bg-white p-6 rounded-2xl shadow-md border-2 border-carefd-teal-pale animate-pulse">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="h-6 bg-gray-200 rounded-lg w-3/4 mb-2"></div>
+                          <div className="h-4 bg-gray-200 rounded-lg w-1/2 mb-1"></div>
+                          <div className="h-4 bg-gray-200 rounded-lg w-1/3"></div>
+                        </div>
+                        <div className="h-8 w-20 bg-gray-200 rounded-full"></div>
+                      </div>
+                      <div className="h-10 bg-gray-200 rounded-lg mb-4"></div>
+                      <div className="flex gap-2 mb-4">
+                        <div className="h-6 w-20 bg-gray-200 rounded-lg"></div>
+                        <div className="h-6 w-20 bg-gray-200 rounded-lg"></div>
+                      </div>
+                      <div className="flex gap-2">
+                        <div className="h-10 flex-1 bg-gray-200 rounded-xl"></div>
+                        <div className="h-10 w-10 bg-gray-200 rounded-xl"></div>
+                        <div className="h-10 w-10 bg-gray-200 rounded-xl"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : providers.length === 0 ? (
+                <div className="text-center py-12 bg-white rounded-2xl shadow-lg">
+                  <FaSearch className="text-5xl text-carefd-teal-pale mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-carefd-navy mb-2">לא נמצאו ספקים</h3>
+                  <p className="text-carefd-gray mb-4">נסו לשנות את הסינון או מילות החיפוש</p>
+                  <div className="space-y-3 max-w-md mx-auto text-sm text-carefd-slate mb-6">
+                    <p>הנה כמה טיפים לשיפור החיפוש:</p>
+                    <ul className="text-right list-disc list-inside space-y-1">
+                      <li>נסו להרחיב את אזור החיפוש</li>
+                      <li>שנו את מילות החיפוש</li>
+                      <li>הסירו חלק מהפילטרים</li>
+                    </ul>
+                  </div>
+                  <button
+                    onClick={handleResetFilters}
+                    className="px-6 py-2 bg-carefd-teal text-white rounded-lg font-medium hover:bg-carefd-teal-medium transition"
+                  >
+                    נקה סינון והצג הכל
+                  </button>
+                </div>
+              ) : viewMode === 'map' ? (
+                /* Map View - split layout */
+                <div className="flex flex-col lg:flex-row gap-4" style={{ height: '650px' }}>
+                  {/* Map */}
+                  <div className="flex-1 min-h-[350px] lg:min-h-0">
+                    <Suspense fallback={
+                      <div className="h-full bg-gray-100 rounded-xl flex items-center justify-center">
+                        <div className="w-8 h-8 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    }>
+                      <ProvidersMap
+                        providers={providers}
+                        userLocation={filters.latitude && filters.longitude ? { lat: filters.latitude, lng: filters.longitude } : null}
+                        radiusKm={filters.radius}
+                        height="100%"
+                        className="h-full"
+                      />
+                    </Suspense>
+                  </div>
+
+                  {/* Provider list sidebar */}
+                  <div className="lg:w-80 xl:w-96 bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col overflow-hidden">
+                    <div className="p-4 border-b border-gray-100 bg-gray-50/50">
+                      <h3 className="font-bold text-carefd-navy flex items-center gap-2">
+                        <FaMapMarkerAlt className="text-carefd-teal" />
+                        ספקים באזור
+                        <span className="text-sm font-normal text-carefd-gray">({providers.length})</span>
+                      </h3>
+                    </div>
+                    <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
+                      {providers.length === 0 ? (
+                        <div className="p-8 text-center text-carefd-gray">
+                          <FaSearch className="mx-auto text-3xl text-gray-300 mb-3" />
+                          <p className="font-medium">לא נמצאו ספקים</p>
+                          <p className="text-sm mt-1">נסו לשנות את הסינון</p>
+                        </div>
+                      ) : (
+                        providers.map((provider) => (
+                          <Link
+                            key={provider.provider_id}
+                            href={`/providers/${provider.provider_id}`}
+                            className="flex items-center gap-3 p-3 hover:bg-carefd-teal/5 transition group"
+                          >
+                            {provider.profile_image ? (
+                              <img src={provider.profile_image} alt={provider.business_name || ''} className="w-11 h-11 rounded-full object-cover flex-shrink-0 ring-2 ring-gray-100 group-hover:ring-carefd-teal/30" />
+                            ) : (
+                              <div className="w-11 h-11 rounded-full bg-gradient-to-br from-carefd-teal/20 to-carefd-navy/10 flex items-center justify-center text-carefd-teal font-bold flex-shrink-0">
+                                {(provider.business_name || '?').charAt(0)}
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-carefd-navy text-sm truncate group-hover:text-carefd-teal transition">{provider.business_name}</p>
+                              <p className="text-xs text-carefd-gray truncate">{provider.profession_name || provider.profession_title} • {provider.location?.city}</p>
+                              <div className="flex items-center gap-3 mt-0.5">
+                                {provider.rating != null && provider.rating > 0 && (
+                                  <span className="text-xs text-amber-500">⭐ {Number(provider.rating).toFixed(1)}</span>
+                                )}
+                                {provider.distance_km != null && (
+                                  <span className="text-xs text-blue-500">{provider.distance_km} ק״מ</span>
+                                )}
+                              </div>
+                            </div>
+                            <FaChevronLeft className="text-gray-300 group-hover:text-carefd-teal text-xs flex-shrink-0" />
+                          </Link>
+                        ))
+                      )}
                     </div>
                   </div>
                 </div>
-              </Link>
-            ))}
+              ) : (
+                <div className={viewMode === 'grid' 
+                  ? 'grid md:grid-cols-2 gap-6' 
+                  : 'space-y-4'
+                }>
+                  {providers.map((provider) => (
+                    <div key={provider.provider_id} className="relative">
+                      {provider.distance_km !== undefined && provider.distance_km !== null && (
+                        <div className="absolute -top-2 left-4 z-10 bg-blue-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                          <FaMapMarkerAlt />
+                          {provider.distance_km} ק"מ
+                        </div>
+                      )}
+                      <ProviderCard provider={provider} />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Load More */}
+              {providers.length < totalProviders && !loading && (
+                <div className="mt-8 text-center">
+                  <button
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                    className="inline-flex items-center gap-2 px-8 py-3 bg-carefd-teal text-white font-medium rounded-xl hover:bg-carefd-teal/90 transition disabled:opacity-50"
+                  >
+                    {loadingMore ? (
+                      <>
+                        <FaSpinner className="animate-spin" />
+                        טוען...
+                      </>
+                    ) : (
+                      <>
+                        טען עוד ({providers.length} מתוך {totalProviders})
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
+        </div>
+      </div>
 
-          {providers.length < total && (
-            <div className="text-center mt-8">
-              <button onClick={() => { const next = page + 1; setPage(next); fetchProviders(next); }}
-                className="bg-white border-2 border-teal-600 text-teal-600 px-8 py-3 rounded-xl font-medium hover:bg-teal-50 transition-colors">
-                {loading ? "טוען..." : "הצג עוד"}
-              </button>
-            </div>
-          )}
-
-          {!loading && providers.length === 0 && (
-            <div className="text-center py-16 text-gray-500">
-              <p className="text-xl mb-2">לא נמצאו תוצאות</p>
-              <p>נסו לשנות את מילות החיפוש או הפילטרים</p>
-            </div>
-          )}
-        </>
+      {/* Mobile Filters Modal */}
+      {showFilters && (
+        <div className="lg:hidden fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowFilters(false)}></div>
+          <div className="absolute inset-y-0 right-0 w-full max-w-md">
+            <AdvancedFilters
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onApply={handleApplyFilters}
+              onReset={handleResetFilters}
+              showMobile={true}
+              onClose={() => setShowFilters(false)}
+            />
+          </div>
+        </div>
       )}
+
+      
     </div>
   );
-}
+};
+
+export default Providers;
