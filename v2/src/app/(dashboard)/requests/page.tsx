@@ -183,7 +183,7 @@ function RequestsContent() {
       fetchRequests();
     } catch (error: any) {
       const err = error as ApiError;
-      toast.error(err.data?.detail || "שגיאה ביצירת הבקשה");
+      toast.error(err.?.detail || "שגיאה ביצירת הבקשה");
     }
   };
 

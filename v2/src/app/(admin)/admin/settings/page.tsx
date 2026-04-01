@@ -826,11 +826,11 @@ export default function AdminSettings() {
                         setSendingTestEmail(true);
                         try {
                           const res = await api.post('/admin/test-email', { email: testEmail });
-                          if (res.data.success) {
-                            const providerName = res.data.provider === 'zeptomail' ? 'ZeptoMail' : res.data.provider === 'resend' ? 'Resend' : 'SMTP';
+                          if (res.success) {
+                            const providerName = res.provider === 'zeptomail' ? 'ZeptoMail' : res.provider === 'resend' ? 'Resend' : 'SMTP';
                             toast.success(`מייל בדיקה נשלח בהצלחה דרך ${providerName}! בדוק את תיבת הדואר`);
                           } else {
-                            toast.error('שליחת מייל נכשלה: ' + (res.data.error || 'שגיאה'));
+                            toast.error('שליחת מייל נכשלה: ' + (res.error || 'שגיאה'));
                           }
                         } catch (err: any) {
                           toast.error('שגיאה בשליחת מייל: ' + (err?.data?.detail || err?.message || err.message));

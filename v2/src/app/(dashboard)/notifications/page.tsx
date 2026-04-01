@@ -97,7 +97,7 @@ const Notifications = () => {
   };
 
   const getNotificationLink = (notification) => {
-    const data = notification.data || {};
+    const data = notification|| {};
     const isProvider = user?.role?.toLowerCase() === 'provider';
     const isAdmin = user?.role?.toLowerCase() === 'admin';
     
@@ -169,7 +169,7 @@ const Notifications = () => {
     if (typeFilter === 'messages' && !['message_new', 'chat_message'].includes(n.type)) return false;
     if (typeFilter === 'reviews' && !['review_new', 'system'].includes(n.type)) {
       // For system type, check if it's review-related
-      if (n.type === 'system' && n.data?.review_id) return true;
+      if (n.type === 'system' && n?.review_id) return true;
       return false;
     }
     if (typeFilter === 'verification' && !['provider_verified', 'provider_rejected', 'provider_documents_submitted', 'provider_new_registration'].includes(n.type)) return false;

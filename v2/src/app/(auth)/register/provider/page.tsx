@@ -71,7 +71,7 @@ const ProviderRegister = () => {
       });
       router.push('/provider/setup');
     } catch (err: any) {
-      if (err.response?.data?.detail) {
+      if (err.response?.detail) {
         setError(err.data.detail);
       } else if (err.response?.status) {
         setError(`שגיאת שרת (${err.response.status}). נסה שוב מאוחר יותר.`);

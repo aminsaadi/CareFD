@@ -88,7 +88,7 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
     const fetchCities = async () => {
       try {
         const res = await api.get('/localities?limit=500');
-        setCities(res.data.localities || []);
+        setCities(res.localities || []);
       } catch { /* ignore */ }
     };
     fetchCities();

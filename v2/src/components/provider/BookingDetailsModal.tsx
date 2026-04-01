@@ -81,7 +81,7 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
       setChangeForm({ new_date: '', new_time: '', reason: '' });
       if (onRefresh) onRefresh();
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'שגיאה בשליחת הבקשה');
+      toast.error(error.data?.data?.detail || 'שגיאה בשליחת הבקשה');
     } finally {
       setSubmitting(false);
     }
@@ -94,7 +94,7 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
         provider_id: provider.provider_id,
         booking_id: fullBooking.booking_id
       });
-      const roomId = res.data.room_id;
+      const roomId = res.room_id;
       onClose();
       router.push(`/chat/${roomId}`);
     } catch (error: any) {

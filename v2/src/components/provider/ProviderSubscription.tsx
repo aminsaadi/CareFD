@@ -27,17 +27,17 @@ const ProviderSubscription = ({ provider, onRefresh }) => {
         api.get('/subscription-plans'),
         api.get('/subscriptions/my')
       ]);
-      setPlans(plansRes.data.plans || []);
-      setCurrentSub(subRes.data.subscription);
-      setCurrentPlan(subRes.data.plan);
+      setPlans(plansRes.plans || []);
+      setCurrentSub(subRes.subscription);
+      setCurrentPlan(subRes.plan);
       // Check if user already used trial
-      if (subRes.data.subscription?.is_trial || subRes.data.subscription?.has_used_trial) {
+      if (subRes.subscription?.is_trial || subRes.subscription?.has_used_trial) {
         setHasUsedTrial(true);
       }
       // Also check by looking for past trial subscriptions
       try {
         const historyRes = await api.get('/subscriptions/history');
-        const history = historyRes.data.subscriptions || [];
+        const history = historyRes.subscriptions || [];
         if (history.some(s => s.is_trial)) {
           setHasUsedTrial(true);
         }
@@ -59,11 +59,11 @@ const ProviderSubscription = ({ provider, onRefresh }) => {
         billing_cycle: billingCycle,
         use_trial: useTrial
       });
-      toast.success(res.data.message || 'המנוי שודרג בהצלחה!');
+      toast.success(res.message || 'המנוי שודרג בהצלחה!');
       fetchData();
       onRefresh?.();
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'שגיאה בשדרוג המנוי');
+      toast.error(error.data?.data?.detail || 'שגיאה בשדרוג המנוי');
     } finally {
       setUpgrading(false);
     }

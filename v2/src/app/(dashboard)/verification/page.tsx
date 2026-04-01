@@ -102,7 +102,7 @@ const VerificationRequest = () => {
       toast.success('בקשת האימות נשלחה בהצלחה!');
       fetchVerificationStatus();
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'שגיאה בשליחת הבקשה');
+      toast.error(error.data?.detail || 'שגיאה בשליחת הבקשה');
     } finally {
       setSubmitting(false);
     }

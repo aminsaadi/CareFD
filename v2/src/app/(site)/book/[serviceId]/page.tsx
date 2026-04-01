@@ -130,7 +130,7 @@ const BookService = () => {
       
       try {
         const slotsRes = await api.get(`/providers/${found.provider_id}/available-slots`);
-        setBookedSlots(slotsRes.data.booked_slots || []);
+        setBookedSlots(slotsRes.booked_slots || []);
       } catch { setBookedSlots([]); }
     } catch (error: any) {
       console.error('Failed to fetch service:', error);
@@ -294,11 +294,11 @@ const BookService = () => {
       }
 
       const res = await api.post('/bookings', data);
-      setBookingId(res.data.booking_id);
+      setBookingId(res.booking_id);
       setBookingSuccess(true);
     } catch (error: any) {
       console.error('Booking failed:', error);
-      const detail = error.response?.data?.detail;
+      const detail = error.data?.detail;
       toast.error(typeof detail === 'string' ? detail : 'שגיאה בשליחת ההזמנה');
     } finally {
       setBooking(false);

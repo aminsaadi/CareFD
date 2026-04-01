@@ -28,7 +28,7 @@ const ProviderClinics = ({ provider }) => {
       setClinics(data.clinics || []);
       setHasAccess(true);
     } catch (error: any) {
-      if (error.response?.status === 403) {
+      if (error.data?.status === 403) {
         setHasAccess(false);
       }
     } finally {
@@ -55,7 +55,7 @@ const ProviderClinics = ({ provider }) => {
       resetForm();
       fetchClinics();
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'שגיאה');
+      toast.error(error.data?.data?.detail || 'שגיאה');
     }
   };
 

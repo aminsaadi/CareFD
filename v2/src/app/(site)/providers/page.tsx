@@ -90,7 +90,7 @@ const Providers = () => {
     const fetchCities = async () => {
       try {
         const res = await api.get('/localities?limit=500');
-        setCities(res.data.localities || []);
+        setCities(res.localities || []);
       } catch {
         // Fallback to static list
         setCities(israeliLocalities.map(c => ({ name: c.name, region: c.region })));
@@ -102,7 +102,7 @@ const Providers = () => {
     const fetchProfessions = async () => {
       try {
         const res = await api.get('/professions');
-        const profs = res.data?.professions || res.data || [];
+        const profs = res.?.professions || res|| [];
         if (Array.isArray(profs) && profs.length > 0) {
           const profNames = profs.map(p => p.name || p.name_he || p.label).filter(Boolean);
           if (profNames.length > 0) {
@@ -119,7 +119,7 @@ const Providers = () => {
     const fetchRegions = async () => {
       try {
         const res = await api.get('/regions');
-        const backendRegions = res.data?.regions || [];
+        const backendRegions = res.?.regions || [];
         if (backendRegions.length > 0) {
           setRegions(backendRegions);
         }

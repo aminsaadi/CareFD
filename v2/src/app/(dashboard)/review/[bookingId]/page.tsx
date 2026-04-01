@@ -123,7 +123,7 @@ const WriteReview = () => {
       
     } catch (error: any) {
       console.error('Failed to submit review:', error);
-      toast.error(error.response?.data?.detail || 'שגיאה בשליחת חוות הדעת');
+      toast.error(error.data?.detail || 'שגיאה בשליחת חוות הדעת');
     } finally {
       setSubmitting(false);
     }

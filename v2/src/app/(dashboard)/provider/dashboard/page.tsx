@@ -159,31 +159,31 @@ const ProviderDashboard = () => {
 
       // Fetch bookings
       const bookingsRes = await api.get('/bookings/provider');
-      const providerBookings = bookingsRes.data.bookings || [];
+      const providerBookings = bookingsRes.bookings || [];
       setBookings(providerBookings);
 
       // Fetch services
       const servicesRes = await api.get('/services/my');
-      setServices(servicesRes.data.services || []);
+      setServices(servicesRes.services || []);
 
       // Fetch open requests (for offers)
       const requestsRes = await api.get('/requests?status=open&limit=10');
-      setRequests(requestsRes.data.requests || []);
+      setRequests(requestsRes.requests || []);
 
       // Fetch my offers
       try {
         const myOffersRes = await api.get('/offers/my');
-        setMyOffers(myOffersRes.data.offers || []);
+        setMyOffers(myOffersRes.offers || []);
       } catch (e) {
         console.error('Failed to fetch offers:', e);
         toast.error('שגיאה בטעינת ההצעות');
       }
 
       // Fetch reviews
-      if (providerRes.data?.provider_id) {
+      if (providerRes?.provider_id) {
         try {
-          const reviewsRes = await api.get(`/providers/${providerRes.data.provider_id}/reviews`);
-          setReviews(reviewsRes.data.reviews || []);
+          const reviewsRes = await api.get(`/providers/${providerRes.provider_id}/reviews`);
+          setReviews(reviewsRes.reviews || []);
         } catch (reviewErr) {
           console.error('Failed to fetch reviews:', reviewErr);
         }
@@ -192,7 +192,7 @@ const ProviderDashboard = () => {
       // Fetch chats
       try {
         const chatsRes = await api.get('/chat/rooms');
-        setChats(chatsRes.data.rooms || []);
+        setChats(chatsRes.rooms || []);
       } catch (chatError) {
         console.error('Failed to fetch chats:', chatError);
         toast.error('שגיאה בטעינת הודעות');
@@ -205,9 +205,9 @@ const ProviderDashboard = () => {
         pendingBookings: providerBookings.filter(b => b.status === 'pending').length,
         completedBookings: completed.length,
         totalEarnings: completed.reduce((acc, b) => acc + (parseFloat(b.final_price || b.base_price) || 0), 0),
-        averageRating: providerRes.data?.rating || 0,
-        totalReviews: providerRes.data?.total_reviews || 0,
-        profileViews: providerRes.data?.views_count || 0
+        averageRating: providerRes?.rating || 0,
+        totalReviews: providerRes?.total_reviews || 0,
+        profileViews: providerRes?.views_count || 0
       });
     } catch (error: any) {
       console.error('Failed to fetch dashboard data:', error);
@@ -242,7 +242,7 @@ const ProviderDashboard = () => {
       fetchDashboardData();
     } catch (error: any) {
       console.error('Failed to update booking:', error);
-      toast.error(error.response?.data?.detail || 'שגיאה בעדכון ההזמנה');
+      toast.error(error.data?.detail || 'שגיאה בעדכון ההזמנה');
     }
   };
 
@@ -252,7 +252,7 @@ const ProviderDashboard = () => {
       toast.success(action === 'approve' ? 'בקשת הביטול אושרה' : 'בקשת הביטול נדחתה');
       fetchDashboardData();
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'שגיאה בעדכון');
+      toast.error(error.data?.detail || 'שגיאה בעדכון');
     }
   };
 
@@ -431,7 +431,7 @@ const ProviderDashboard = () => {
       }));
     } catch (error: any) {
       console.error('Failed to change password:', error);
-      toast.error(error.response?.data?.detail || 'שגיאה בשינוי הסיסמה');
+      toast.error(error.data?.detail || 'שגיאה בשינוי הסיסמה');
     } finally {
       setSaving(false);
     }
@@ -877,8 +877,8 @@ const ProviderDashboard = () => {
                                             provider_id: provider.provider_id,
                                             booking_id: booking.booking_id
                                           });
-                                          if (res.data?.room_id) {
-                                            router.push(`/chat/${res.data.room_id}`);
+                                          if (res?.room_id) {
+                                            router.push(`/chat/${res.room_id}`);
                                           } else {
                                             toast.error('שגיאה בקבלת מזהה הצ\'אט');
                                           }
@@ -1773,9 +1773,9 @@ const ProviderDashboard = () => {
                                           await api.post(`/offers/${offer.offer_id}/withdraw`);
                                           toast.success('ההצעה נמשכה');
                                           const res = await api.get('/offers/my');
-                                          setMyOffers(res.data.offers || []);
+                                          setMyOffers(res.offers || []);
                                         } catch (err: any) {
-                                          toast.error(err.response?.data?.detail || 'שגיאה');
+                                          toast.error(err.response?.detail || 'שגיאה');
                                           btn.disabled = false;
                                         }
                                       }}

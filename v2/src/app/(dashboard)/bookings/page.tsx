@@ -56,7 +56,7 @@ const MyBookings = () => {
       toast.success('ההזמנה בוטלה בהצלחה');
       fetchBookings();
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'שגיאה בביטול ההזמנה');
+      toast.error(error.data?.detail || 'שגיאה בביטול ההזמנה');
     }
   };
 
@@ -71,7 +71,7 @@ const MyBookings = () => {
       fetchBookings();
     } catch (error: any) {
       if (error?.response) {
-        toast.error(error.response?.data?.detail || 'שגיאה באישור ההשלמה');
+        toast.error(error.data?.detail || 'שגיאה באישור ההשלמה');
       }
     }
   };

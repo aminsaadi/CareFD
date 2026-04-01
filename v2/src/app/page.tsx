@@ -204,13 +204,13 @@ const Landing = () => {
   const fetchHomeData = async () => {
     try {
       const providersRes = await api.get('/providers?recommended=true&limit=6');
-      setFeaturedProviders(providersRes.data.providers || []);
+      setFeaturedProviders(providersRes.providers || []);
 
       const servicesRes = await api.get('/services?limit=6');
-      setPopularServices(servicesRes.data.services || []);
+      setPopularServices(servicesRes.services || []);
 
       const regionsRes = await api.get('/regions');
-      setRegions(regionsRes.data.regions || []);
+      setRegions(regionsRes.regions || []);
 
       // Use comprehensive localities list
       setCities(israeliLocalities);
@@ -218,7 +218,7 @@ const Landing = () => {
       // Fetch professions from backend - update professions, categories, and popular searches
       try {
         const professionsRes = await api.get('/professions');
-        const profs = professionsRes.data?.professions || professionsRes.data || [];
+        const profs = professionsRes.?.professions || professionsRes|| [];
         if (Array.isArray(profs) && profs.length > 0) {
           // Update professions bar
           const mappedProfs = profs.map((p, idx) => ({
@@ -258,10 +258,10 @@ const Landing = () => {
       try {
         const statsRes = await api.get('/stats/public');
         setStatistics({
-          providers: statsRes.data.total_providers || 50,
-          services: statsRes.data.total_services || 100,
-          happyClients: statsRes.data.total_users || 500,
-          cities: statsRes.data.total_cities || 20
+          providers: statsRes.total_providers || 50,
+          services: statsRes.total_services || 100,
+          happyClients: statsRes.total_users || 500,
+          cities: statsRes.total_cities || 20
         });
       } catch {
         setStatistics({ providers: 50, services: 100, happyClients: 500, cities: 20 });

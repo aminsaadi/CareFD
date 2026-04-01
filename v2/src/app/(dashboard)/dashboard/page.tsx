@@ -112,18 +112,18 @@ const Dashboard = () => {
   const fetchRequestFormOptions = async () => {
     try {
       const [professionsRes, serviceTypesRes, deliveryTypesRes, regionsRes] = await Promise.all([
-        api.get('/professions').catch(() => ({ data: { professions: [] } })),
-        api.get('/service-types').catch(() => ({ data: { service_types: [] } })),
-        api.get('/delivery-types').catch(() => ({ data: { delivery_types: [] } })),
-        api.get('/regions').catch(() => ({ data: { regions: [] } })),
+        api.get('/professions').catch(() => ({ professions: [] })),
+        api.get('/service-types').catch(() => ({ service_types: [] })),
+        api.get('/delivery-types').catch(() => ({ delivery_types: [] })),
+        api.get('/regions').catch(() => ({ regions: [] })),
       ]);
-      const profs = professionsRes.data?.professions || professionsRes.data || [];
+      const profs = professionsRes?.professions || professionsRes || [];
       setProfessionOptions(Array.isArray(profs) ? profs : []);
-      const sTypes = serviceTypesRes.data?.service_types || serviceTypesRes.data || [];
+      const sTypes = serviceTypesRes?.service_types || serviceTypesRes || [];
       setServiceTypeOptions(Array.isArray(sTypes) ? sTypes : []);
-      const dTypes = deliveryTypesRes.data?.delivery_types || deliveryTypesRes.data || [];
+      const dTypes = deliveryTypesRes?.delivery_types || deliveryTypesRes || [];
       setDeliveryTypeOptions(Array.isArray(dTypes) ? dTypes : []);
-      const regions = regionsRes.data?.regions || regionsRes.data || [];
+      const regions = regionsRes?.regions || regionsRes || [];
       setRegionOptions(Array.isArray(regions) ? regions : []);
     } catch (error: any) {
       console.error('Failed to fetch form options:', error);
@@ -152,19 +152,19 @@ const Dashboard = () => {
       
       // Fetch all data in parallel
       const [bookingsRes, requestsRes, chatsRes, reviewsRes, favoritesRes] = await Promise.all([
-        api.get('/bookings/my').catch(() => ({ data: { bookings: [] } })),
-        api.get('/requests/my').catch(() => ({ data: { requests: [] } })),
-        api.get('/chat/rooms').catch(() => ({ data: { rooms: [] } })),
-        api.get('/reviews/my').catch(() => ({ data: { reviews: [] } })),
-        api.get('/favorites').catch(() => ({ data: { favorites: [] } }))
+        api.get('/bookings/my').catch(() => ({ bookings: [] })),
+        api.get('/requests/my').catch(() => ({ requests: [] })),
+        api.get('/chat/rooms').catch(() => ({ rooms: [] })),
+        api.get('/reviews/my').catch(() => ({ reviews: [] })),
+        api.get('/favorites').catch(() => ({ favorites: [] }))
       ]);
 
-      const userBookings = bookingsRes.data.bookings || [];
+      const userBookings = bookingsRes.bookings || [];
       setBookings(userBookings);
-      setRequests(requestsRes.data.requests || []);
-      setChats(chatsRes.data.rooms || []);
-      setMyReviews(reviewsRes.data.reviews || []);
-      setFavorites(favoritesRes.data.favorites || []);
+      setRequests(requestsRes.requests || []);
+      setChats(chatsRes.rooms || []);
+      setMyReviews(reviewsRes.reviews || []);
+      setFavorites(favoritesRes.favorites || []);
 
       // Calculate stats
       setStats({
@@ -172,9 +172,9 @@ const Dashboard = () => {
         pendingBookings: userBookings.filter(b => b.status === 'pending').length,
         completedBookings: userBookings.filter(b => b.status === 'completed').length,
         awaitingConfirmation: userBookings.filter(b => b.status === 'provider_completed').length,
-        totalRequests: (requestsRes.data.requests || []).length,
-        unreadMessages: (chatsRes.data.rooms || []).reduce((acc, r) => acc + (r.unread_count || 0), 0),
-        totalReviews: (reviewsRes.data.reviews || []).length
+        totalRequests: (requestsRes.requests || []).length,
+        unreadMessages: (chatsRes.rooms || []).reduce((acc, r) => acc + (r.unread_count || 0), 0),
+        totalReviews: (reviewsRes.reviews || []).length
       });
     } catch (error: any) {
       console.error('Failed to fetch dashboard data:', error);
@@ -270,7 +270,7 @@ const Dashboard = () => {
       }
       toast.success('הפרטים נשמרו בהצלחה!');
     } catch (err: any) {
-      toast.error(err.response?.data?.detail || 'שגיאה בשמירת הפרטים');
+      toast.error(err.response?.detail || 'שגיאה בשמירת הפרטים');
     } finally {
       setSavingSettings(false);
     }
@@ -300,7 +300,7 @@ const Dashboard = () => {
       setPasswordForm({ current_password: '', new_password: '', confirm_password: '' });
       toast.success('הסיסמה שונתה בהצלחה!');
     } catch (err: any) {
-      toast.error(err.response?.data?.detail || 'שגיאה בשינוי הסיסמה');
+      toast.error(err.response?.detail || 'שגיאה בשינוי הסיסמה');
     } finally {
       setChangingPassword(false);
     }
@@ -397,7 +397,7 @@ const Dashboard = () => {
       resetRequestForm();
       fetchDashboardData();
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'שגיאה ביצירת הבקשה');
+      toast.error(error.data?.detail || 'שגיאה ביצירת הבקשה');
     }
   };
 
@@ -434,7 +434,7 @@ const Dashboard = () => {
       resetRequestForm();
       fetchDashboardData();
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'שגיאה בעדכון הבקשה');
+      toast.error(error.data?.detail || 'שגיאה בעדכון הבקשה');
     }
   };
 
@@ -449,7 +449,7 @@ const Dashboard = () => {
       toast.success('הבקשה בוטלה');
       fetchDashboardData();
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || 'שגיאה בביטול הבקשה');
+      toast.error(error.data?.detail || 'שגיאה בביטול הבקשה');
     } finally {
       setCancelRequestId(null);
     }

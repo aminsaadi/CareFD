@@ -57,7 +57,7 @@ const ChatRoom = () => {
       // Also check archived
       if (!room) {
         const archivedRes = await api.get('/chat/rooms?archived=true');
-        const archivedRoom = archivedRes.data.rooms?.find(r => r.room_id === roomId);
+        const archivedRoom = archivedRes.rooms?.find(r => r.room_id === roomId);
         if (archivedRoom) setRoomInfo(archivedRoom);
       } else {
         setRoomInfo(room);
@@ -130,8 +130,8 @@ const ChatRoom = () => {
         const formData = new FormData();
         formData.append('file', imageFile);
         const uploadRes = await api.post('/upload/image', formData);
-        attachmentUrl = uploadRes?.url || uploadRes?.data?.url;
-        attachmentName = uploadRes?.original_name || uploadRes?.data?.original_name;
+        attachmentUrl = uploadRes?.url || uploadRes?.url;
+        attachmentName = uploadRes?.original_name || uploadRes?.original_name;
         setUploading(false);
         clearImagePreview();
       }

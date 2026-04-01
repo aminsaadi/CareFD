@@ -198,7 +198,7 @@ const Services = () => {
     fetchServices(false);
     // Fetch professions from API
     api.get('/professions').then(res => {
-      const profs = res.data.professions || [];
+      const profs = res.professions || [];
       // Flatten: main professions + their sub_professions as individual entries
       const flatList: any[] = [];
       profs.forEach(prof => {
