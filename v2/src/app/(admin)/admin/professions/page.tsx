@@ -179,6 +179,7 @@ export default function AdminProfessions() {
   }, 0);
 
   return (
+    <>
     
       <div className="space-y-6">
         {/* Header */}
@@ -648,6 +649,7 @@ export default function AdminProfessions() {
 
       
     
+    </>
   );
 };
 

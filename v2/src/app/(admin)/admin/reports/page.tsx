@@ -4,10 +4,10 @@ import {  useState, useEffect  } from "react";
 import api from "@/lib/api-client";
 import { toast } from "sonner";
 import {
-import {
   FiCalendar, FiTrendingUp, FiUsers, FiBriefcase,
   FiStar, FiDollarSign, FiBarChart2, FiPieChart
 } from 'react-icons/fi';
+import {
   LineChart, Line, AreaChart, Area, BarChart, Bar,
   PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer
@@ -61,7 +61,6 @@ export default function AdminReports() {
 
   if (loading) {
     return (
-      
         <div className="flex items-center justify-center h-96">
           <div className="w-12 h-12 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
         </div>
@@ -70,6 +69,7 @@ export default function AdminReports() {
   }
 
   return (
+    <>
     
       <div className="space-y-6">
         {/* Header */}
@@ -335,6 +335,7 @@ export default function AdminReports() {
         </div>
       </div>
     
+    </>
   );
 };
 

@@ -120,6 +120,7 @@ export default function AdminMessages() {
   };
 
   return (
+    <>
     
       <div className="h-[calc(100vh-120px)] flex bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {/* Conversations List */}
@@ -273,6 +274,7 @@ export default function AdminMessages() {
         </div>
       </div>
     
+    </>
   );
 };
 

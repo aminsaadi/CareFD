@@ -262,7 +262,6 @@ export default function AdminSettings() {
 
   if (loading) {
     return (
-      
         <div className="flex items-center justify-center h-96">
           <div className="w-12 h-12 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin"></div>
         </div>
@@ -271,6 +270,7 @@ export default function AdminSettings() {
   }
 
   return (
+    <>
     
       <div className="space-y-6">
         {/* Header */}
@@ -891,6 +891,7 @@ export default function AdminSettings() {
       
       
     
+    </>
   );
 };
 

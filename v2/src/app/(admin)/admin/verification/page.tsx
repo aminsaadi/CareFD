@@ -70,6 +70,7 @@ export default function AdminVerification() {
   };
 
   return (
+    <>
     
       <div className="space-y-6">
         {/* Header */}
@@ -276,6 +277,7 @@ export default function AdminVerification() {
         </div>
       )}
     
+    </>
   );
 };
 

@@ -172,6 +172,7 @@ export default function AdminAds() {
   };
 
   return (
+    <>
     
       <div className="space-y-6">
         {/* Header */}
@@ -449,6 +450,7 @@ export default function AdminAds() {
       
       
     
+    </>
   );
 };
 

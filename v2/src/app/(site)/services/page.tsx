@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/link';
 import ServiceCard from '@/components/ServiceCard';
 import UnifiedAdvancedFilters from '@/components/UnifiedAdvancedFilters';
 import api from '@/lib/api-client';
-import { israeliLocalities } from '@/lib/data/israeliLocalities';
+import { israeliLocalities } from '@/lib/data/localities';
 import { israeliRegions, healthcareProfessions, popularSearches as searchData, serviceTypes, serviceCategories } from '@/lib/data/searchData';
 import {
   FaFilter, FaTimes, FaSearch, FaMapMarkerAlt, FaCrosshairs,

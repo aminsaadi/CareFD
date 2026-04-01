@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useSearchParams } from 'next/link';
-import { useTranslation } from 'react-i18next';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import Navbar // Navbar in layout;
-import Footer // Footer in layout;
 import CompletionConfirmDialog from '@/components/CompletionConfirmDialog' // TODO;
 import NotificationSettings from '@/components/NotificationSettings' // TODO;
 import CitySelect from '@/components/CitySelect' // TODO;
@@ -31,7 +29,7 @@ const PROFILE_COLORS = [
 ];
 
 const Dashboard = () => {
-  const { t } = useTranslation();
+  
   const { user, setUser } = useAuth();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');

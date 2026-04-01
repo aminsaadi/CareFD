@@ -152,6 +152,7 @@ export default function AdminProviders() {
   const prov = providerDetails || showProviderModal;
 
   return (
+    <>
     
       <div className="space-y-6">
         {/* Header */}
@@ -667,6 +668,7 @@ export default function AdminProviders() {
         </div>
       )}
     
+    </>
   );
 };
 

@@ -206,7 +206,7 @@ export default function AdminUsers() {
   };
 
   return (
-    
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -694,7 +694,7 @@ export default function AdminUsers() {
           </div>
         </div>
       )}
-    
+    </>
   );
 };
 
@@ -848,6 +848,7 @@ const SendMessageModal = ({ user, onClose, onSend }) => {
   };
 
   return (
+    <>
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl w-full max-w-md p-6 border border-gray-200 shadow-xl">
         <h3 className="text-lg font-bold text-carefd-navy mb-4">שליחת הודעה ל-{user.name}</h3>
@@ -891,6 +892,7 @@ const SendMessageModal = ({ user, onClose, onSend }) => {
         </form>
       </div>
     </div>
+      </>
   );
 };
 

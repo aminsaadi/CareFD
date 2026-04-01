@@ -176,6 +176,7 @@ export default function AdminRegions() {
   const totalCities = regions.reduce((acc, r) => acc + (r.cities?.length || 0), 0);
 
   return (
+    <>
     
       <div className="space-y-6">
         {/* Header */}
@@ -465,6 +466,7 @@ export default function AdminRegions() {
       
       
     
+    </>
   );
 };
 

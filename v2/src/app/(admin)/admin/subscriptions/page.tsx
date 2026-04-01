@@ -85,7 +85,6 @@ export default function AdminSubscriptions() {
 
   if (loading) {
     return (
-      
         <div className="flex justify-center py-20">
           <div className="w-10 h-10 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
         </div>
@@ -140,6 +139,7 @@ export default function AdminSubscriptions() {
             const isEditing = editingPlan === plan.plan_id;
 
             return (
+    <>
               <div key={plan.plan_id} className="bg-white rounded-xl shadow-sm border overflow-hidden" data-testid={`plan-${plan.tier}`}>
                 <div className={`bg-gradient-to-l ${tierColors[plan.tier] || 'from-gray-500 to-gray-600'} p-4 flex items-center justify-between`}>
                   <div className="flex items-center gap-3 text-white">
@@ -244,6 +244,7 @@ export default function AdminSubscriptions() {
                   )}
                 </div>
               </div>
+    </>
             );
           })}
         </div>

@@ -85,7 +85,7 @@ export default function AdminServices() {
   };
 
   return (
-    
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -283,7 +283,7 @@ export default function AdminServices() {
           </div>
         </div>
       )}
-    
+    </>
   );
 };
 
@@ -307,6 +307,7 @@ const EditServiceModal = ({ service, onClose, onSave }) => {
   };
 
   return (
+    <>
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl w-full max-w-lg p-6 border border-gray-200 shadow-xl">
         <h3 className="text-lg font-bold text-carefd-navy mb-4">עריכת שירות</h3>
@@ -377,6 +378,7 @@ const EditServiceModal = ({ service, onClose, onSave }) => {
         </form>
       </div>
     </div>
+      </>
   );
 };
 

@@ -64,7 +64,7 @@ export default function AdminPushNotifications() {
   };
 
   return (
-    
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -197,7 +197,7 @@ export default function AdminPushNotifications() {
           sending={sending}
         />
       )}
-    
+    </>
   );
 };
 
@@ -219,6 +219,7 @@ const SendNotificationModal = ({ onClose, onSend, sending }) => {
   };
 
   return (
+    <>
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl w-full max-w-lg p-6 border border-gray-200 shadow-xl">
         <h3 className="text-lg font-bold text-carefd-navy mb-4 flex items-center gap-2">
@@ -325,6 +326,7 @@ const SendNotificationModal = ({ onClose, onSend, sending }) => {
         </form>
       </div>
     </div>
+      </>
   );
 };
 

@@ -81,6 +81,7 @@ export default function AdminFeatured() {
   );
 
   return (
+    <>
     
       <div className="space-y-6">
         {/* Header */}
@@ -276,6 +277,7 @@ export default function AdminFeatured() {
 
       
     
+    </>
   );
 };
 

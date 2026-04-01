@@ -162,6 +162,7 @@ export default function AdminPages() {
   };
 
   return (
+    <>
     
       <div className="space-y-6">
         {/* Header */}
@@ -430,6 +431,7 @@ export default function AdminPages() {
         }
       `}</style>
     
+    </>
   );
 };
 
