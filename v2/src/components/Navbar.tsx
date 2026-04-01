@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { FaSearch, FaBars, FaTimes, FaComments, FaUser, FaCog, FaSignOutAlt, FaTachometerAlt, FaChevronDown } from 'react-icons/fa';
+import NotificationBell from '@/components/NotificationBell';
 import api from '@/lib/api-client';
 
 const Navbar = () => {
@@ -116,6 +117,9 @@ const Navbar = () => {
                 )}
               </Link>
             )}
+
+            {/* Notifications */}
+            {isAuthenticated && <NotificationBell />}
 
             {/* Desktop Auth */}
             <div className="hidden md:flex items-center me-2">
