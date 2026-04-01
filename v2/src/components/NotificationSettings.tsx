@@ -36,7 +36,7 @@ const NotificationSettings = () => {
     try {
       const { data } = await api.get('/push/preferences');
       setPreferences(prev => ({ ...prev, ...data }));
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch preferences:', err);
     }
   };
@@ -48,7 +48,7 @@ const NotificationSettings = () => {
       await api.put('/push/preferences', newPrefs);
       setPrefsSaved(true);
       setTimeout(() => setPrefsSaved(false), 2000);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to save preferences:', err);
     } finally {
       setSavingPrefs(false);

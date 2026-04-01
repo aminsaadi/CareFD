@@ -10,8 +10,8 @@ import {
   FaUsers, FaCalendarCheck, FaChartLine, FaEye, FaEyeSlash
 } from 'react-icons/fa';
 import CitySelect from '@/components/CitySelect';
+import { useRouter } from 'next/navigation';
 const ProviderRegister = () => {
-  const { t } = useTranslation();
   const { register } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState(1);
@@ -26,7 +26,7 @@ const ProviderRegister = () => {
     provider_type: 'individual',
     phone: '',
     city: '',
-    specializations: []
+    specializations: [] as string[]
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -70,7 +70,7 @@ const ProviderRegister = () => {
         language_preference: formData.language_preference
       });
       router.push('/provider/setup');
-    } catch (err) {
+    } catch (err: any) {
       if (err.response?.data?.detail) {
         setError(err.data.detail);
       } else if (err.response?.status) {
@@ -227,7 +227,7 @@ const ProviderRegister = () => {
                         name="password"
                         type={showPassword ? 'text' : 'password'}
                         required
-                        minLength="8"
+                        minLength={8}
                         value={formData.password}
                         onChange={handleChange}
                         className="w-full px-12 py-3 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal"

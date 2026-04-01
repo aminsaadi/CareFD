@@ -61,7 +61,7 @@ const FitBounds = ({ providers, userLocation }) => {
   useEffect(() => {
     if (providers.length === 0 && !userLocation) return;
 
-    const bounds = [];
+    const bounds: any[] = [];
 
     if (userLocation) {
       bounds.push([userLocation.lat, userLocation.lng]);
@@ -88,9 +88,9 @@ const ProvidersMap = ({
   onProviderClick = null,
   height = '400px',
   className = ''
-}) => {
+}: any) => {
   // Default center - Israel
-  const defaultCenter = [31.7683, 35.2137]; // Jerusalem
+  const defaultCenter: [number, number] = [31.7683, 35.2137]; // Jerusalem
 
   // Filter providers with valid coordinates
   const validProviders = providers.filter(

@@ -38,19 +38,19 @@ const ProviderDashboard = () => {
 
   const { user } = useAuth();
   const router = useRouter();
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
-  const [provider, setProvider] = useState(null);
-  const [professions, setProfessions] = useState([]); // Admin hierarchy for service categories
-  const [bookings, setBookings] = useState([]);
-  const [services, setServices] = useState([]);
-  const [requests, setRequests] = useState([]);
-  const [myOffers, setMyOffers] = useState([]);
-  const [reviews, setReviews] = useState([]);
-  const [chats, setChats] = useState([]);
+  const [provider, setProvider] = useState<any>(null);
+  const [professions, setProfessions] = useState<any[]>([]); // Admin hierarchy for service categories
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [services, setServices] = useState<any[]>([]);
+  const [requests, setRequests] = useState<any[]>([]);
+  const [myOffers, setMyOffers] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [chats, setChats] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [expandedBookings, setExpandedBookings] = useState({});
   const [bookingSortBy, setBookingSortBy] = useState('date_desc');
   const [showPw, setShowPw] = useState({ current: false, new_pw: false, confirm: false });
@@ -66,8 +66,8 @@ const ProviderDashboard = () => {
   
   // Service form states
   const [showServiceForm, setShowServiceForm] = useState(false);
-  const [editingService, setEditingService] = useState(null);
-  const [serviceForm, setServiceForm] = useState({
+  const [editingService, setEditingService] = useState<any>(null);
+  const [serviceForm, setServiceForm] = useState<any>({
     name: '',
     description: '',
     price: '',
@@ -123,9 +123,9 @@ const ProviderDashboard = () => {
 
   const fetchProfessions = async () => {
     try {
-      const response = await api.get('/professions');
+      const data = await api.get('/professions');
       setProfessions(data.professions || []);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch professions:', err);
     }
   };
@@ -209,7 +209,7 @@ const ProviderDashboard = () => {
         totalReviews: providerRes.data?.total_reviews || 0,
         profileViews: providerRes.data?.views_count || 0
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch dashboard data:', error);
       toast.error('שגיאה בטעינת נתוני הדשבורד');
     } finally {
@@ -240,7 +240,7 @@ const ProviderDashboard = () => {
       };
       toast.success(statusLabels[status] || 'הסטטוס עודכן');
       fetchDashboardData();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update booking:', error);
       toast.error(error.response?.data?.detail || 'שגיאה בעדכון ההזמנה');
     }
@@ -251,7 +251,7 @@ const ProviderDashboard = () => {
       await api.put(`/bookings/${bookingId}/${action}-cancellation`);
       toast.success(action === 'approve' ? 'בקשת הביטול אושרה' : 'בקשת הביטול נדחתה');
       fetchDashboardData();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.detail || 'שגיאה בעדכון');
     }
   };
@@ -354,7 +354,7 @@ const ProviderDashboard = () => {
       
       await fetchDashboardData();
       resetServiceForm();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save service:', error);
       toast.error('שגיאה בשמירת השירות');
     } finally {
@@ -373,7 +373,7 @@ const ProviderDashboard = () => {
           await api.delete(`/services/${serviceId}`);
           await fetchDashboardData();
           toast.success('השירות נמחק בהצלחה');
-        } catch (error) {
+        } catch (error: any) {
           console.error('Failed to delete service:', error);
           toast.error('שגיאה במחיקת השירות');
         }
@@ -394,7 +394,7 @@ const ProviderDashboard = () => {
 
       await api.put('/users/me', userData);
       toast.success('פרטי המשתמש נשמרו בהצלחה!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save user info:', error);
       toast.error('שגיאה בשמירת פרטי המשתמש');
     } finally {
@@ -429,7 +429,7 @@ const ProviderDashboard = () => {
         new_password: '',
         confirm_password: ''
       }));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to change password:', error);
       toast.error(error.response?.data?.detail || 'שגיאה בשינוי הסיסמה');
     } finally {
@@ -492,8 +492,8 @@ const ProviderDashboard = () => {
   const getSortedBookings = () => {
     const sorted = [...bookings];
     switch (bookingSortBy) {
-      case 'date_desc': return sorted.sort((a, b) => new Date(b.created_at || b.booking_date) - new Date(a.created_at || a.booking_date));
-      case 'date_asc': return sorted.sort((a, b) => new Date(a.created_at || a.booking_date) - new Date(b.created_at || b.booking_date));
+      case 'date_desc': return sorted.sort((a, b) => new Date(b.created_at || b.booking_date).getTime() - new Date(a.created_at || a.booking_date).getTime());
+      case 'date_asc': return sorted.sort((a, b) => new Date(a.created_at || a.booking_date).getTime() - new Date(b.created_at || b.booking_date).getTime());
       case 'status': {
         const order = { cancellation_requested: 0, pending: 1, confirmed: 2, in_progress: 3, provider_completed: 4, on_hold: 5, completed: 6, cancelled: 7, rejected: 8 };
         return sorted.sort((a, b) => (order[a.status] ?? 99) - (order[b.status] ?? 99));
@@ -508,15 +508,15 @@ const ProviderDashboard = () => {
     return bookings.filter(b => ['confirmed', 'in_progress'].includes(b.status));
   };
 
-  const groupBookingsByDate = () => {
-    const grouped = {};
+  const groupBookingsByDate = (): [string, any[]][] => {
+    const grouped: any = {};
     getCalendarBookings().forEach(booking => {
       const date = booking.booking_date?.split('T')[0] || '';
       if (!grouped[date]) grouped[date] = [];
       grouped[date].push(booking);
     });
     // Sort by date
-    return Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
+    return Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)) as [string, any[]][];
   };
 
   return (
@@ -581,7 +581,7 @@ const ProviderDashboard = () => {
                     tab.link ? (
                       <Link
                         key={tab.id}
-                        to={tab.link}
+                        href={tab.link}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right transition text-carefd-gray hover:bg-carefd-teal-pale/30"
                       >
                         <tab.icon />
@@ -706,7 +706,7 @@ const ProviderDashboard = () => {
                           </div>
                         ) : (
                           <div className="space-y-3">
-                            {bookings.filter(b => b.status === 'pending').sort((a, b) => new Date(b.created_at || b.booking_date) - new Date(a.created_at || a.booking_date)).slice(0, 3).map((booking) => (
+                            {bookings.filter(b => b.status === 'pending').sort((a, b) => new Date(b.created_at || b.booking_date).getTime() - new Date(a.created_at || a.booking_date).getTime()).slice(0, 3).map((booking) => (
                               <div key={booking.booking_id} className="flex items-center justify-between p-4 bg-yellow-50 rounded-xl border border-yellow-200">
                                 <div>
                                   <p className="font-medium text-carefd-navy">{booking.user_name || 'לקוח'}</p>
@@ -1193,7 +1193,7 @@ const ProviderDashboard = () => {
 
                               {/* Categories from admin hierarchy (1-3) */}
                               {professions.length > 0 && (() => {
-                                const allCategories = [];
+                                const allCategories: any[] = [];
                                 professions.forEach(prof => {
                                   (prof.sub_professions || []).forEach(sub => {
                                     (sub.categories || []).forEach(cat => {
@@ -1231,7 +1231,7 @@ const ProviderDashboard = () => {
                                 };
 
                                 // Group by profession
-                                const grouped = {};
+                                const grouped: any = {};
                                 allCategories.forEach(cat => {
                                   if (!grouped[cat.profession_name]) grouped[cat.profession_name] = [];
                                   grouped[cat.profession_name].push(cat);
@@ -1254,7 +1254,7 @@ const ProviderDashboard = () => {
                                       </div>
                                     )}
                                     <div className="space-y-2">
-                                      {Object.entries(grouped).map(([profName, cats]) => (
+                                      {(Object.entries(grouped) as [string, any[]][]).map(([profName, cats]) => (
                                         <div key={profName}>
                                           <p className="text-xs font-medium text-carefd-gray mb-1">{profName}</p>
                                           <div className="flex flex-wrap gap-1.5">
@@ -1774,7 +1774,7 @@ const ProviderDashboard = () => {
                                           toast.success('ההצעה נמשכה');
                                           const res = await api.get('/offers/my');
                                           setMyOffers(res.data.offers || []);
-                                        } catch (err) {
+                                        } catch (err: any) {
                                           toast.error(err.response?.data?.detail || 'שגיאה');
                                           btn.disabled = false;
                                         }

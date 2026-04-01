@@ -9,13 +9,13 @@ import {
 } from 'react-icons/fa';
 
 export default function AdminSubscriptions() {
-  const [plans, setPlans] = useState([]);
-  const [subscriptions, setSubscriptions] = useState([]);
-  const [stats, setStats] = useState({});
+  const [plans, setPlans] = useState<any[]>([]);
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const [stats, setStats] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('plans');
-  const [editingPlan, setEditingPlan] = useState(null);
-  const [editForm, setEditForm] = useState({});
+  const [editingPlan, setEditingPlan] = useState<any>(null);
+  const [editForm, setEditForm] = useState<any>({});
 
   useEffect(() => {
     fetchData();
@@ -28,7 +28,7 @@ export default function AdminSubscriptions() {
       setPlans(plansData.plans || []);
       setSubscriptions(subsData.subscriptions || []);
       setStats(subsData.stats || {});
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
     } finally {
       setLoading(false);
@@ -71,7 +71,7 @@ export default function AdminSubscriptions() {
       toast.success('המנוי עודכן בהצלחה');
       setEditingPlan(null);
       fetchData();
-    } catch (error) {
+    } catch (error: any) {
       toast.error('שגיאה בעדכון');
     }
   };

@@ -122,7 +122,7 @@ function RequestsContent() {
       setDeliveryTypeOptions(Array.isArray(dTypes) ? dTypes : []);
       const regions = (regionsRes as any)?.regions || regionsRes || [];
       setRegionOptions(Array.isArray(regions) ? regions : []);
-    } catch (error) { console.error("Failed to fetch form options:", error); }
+    } catch (error: any) { console.error("Failed to fetch form options:", error); }
   };
 
   const fetchRequests = async () => {
@@ -131,7 +131,7 @@ function RequestsContent() {
       const endpoint = activeTab === "my" ? "/requests/my" : "/requests";
       const data = await api.get<{ requests: RequestData[] }>(endpoint);
       setRequests(data.requests || []);
-    } catch (error) { console.error("Failed to fetch requests:", error); }
+    } catch (error: any) { console.error("Failed to fetch requests:", error); }
     finally { setLoading(false); }
   };
 
@@ -181,7 +181,7 @@ function RequestsContent() {
         preferences: "", city: "", address: "", address_notes: "", region: "",
       });
       fetchRequests();
-    } catch (error) {
+    } catch (error: any) {
       const err = error as ApiError;
       toast.error(err.data?.detail || "שגיאה ביצירת הבקשה");
     }

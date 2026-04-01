@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { israeliLocalities } from '@/lib/data/localities';
 
-const sortedCities = [...new Set(israeliLocalities.map(l => l.name))].sort((a, b) => a.localeCompare(b, 'he'));
+const sortedCities = Array.from(new Set(israeliLocalities.map(l => l.name))).sort((a, b) => a.localeCompare(b, 'he'));
 
 const CitySelect = ({
   value,
@@ -14,12 +14,12 @@ const CitySelect = ({
   className = '',
   inputClassName = '',
   disabled = false,
-  'data-testid': dataTestId
-}) => {
+  'data-testid': dataTestId = undefined
+}: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const containerRef = useRef(null);
-  const inputRef = useRef(null);
+  const containerRef = useRef<any>(null);
+  const inputRef = useRef<any>(null);
 
   const filtered = search
     ? sortedCities.filter(city => city.includes(search))

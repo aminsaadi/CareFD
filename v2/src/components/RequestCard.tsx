@@ -27,7 +27,13 @@ const LANGUAGE_LABELS = {
   amharic: 'אמהרית',
 };
 
-const RequestCard = ({ request, showActions = false, onMakeOffer, professionMap = {} }) => {
+const t = (key: string) => ({
+  specialization: 'התמחות', budget: 'תקציב', preferredDate: 'תאריך מועדף',
+  offerCount: 'הצעות', makeOffer: 'הגש הצעה', viewOffers: 'צפה בהצעות',
+  one_time: 'חד פעמי', recurring: 'חוזר', low: 'נמוכה', medium: 'בינונית', high: 'גבוהה', urgent: 'דחוף'
+}[key] || key);
+
+const RequestCard = ({ request, showActions = false, onMakeOffer, professionMap = {} }: any) => {
   
 
   const getStatusColor = (status) => {

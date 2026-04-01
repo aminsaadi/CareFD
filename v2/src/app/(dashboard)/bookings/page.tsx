@@ -11,18 +11,18 @@ import { useConfirm } from '@/hooks/useConfirm';
 import { FaStar, FaSpinner, FaCheckCircle } from 'react-icons/fa';
 
 const MyBookings = () => {
-  const { t } = useTranslation();
+  const t = (key: string) => ({ loading: 'טוען...', myBookings: 'ההזמנות שלי' }[key] || key);
   const { user } = useAuth();
-  const [bookings, setBookings] = useState([]);
+  const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const { confirmState, confirm, closeConfirm } = useConfirm();
-  const [showReviewModal, setShowReviewModal] = useState(null);
+  const [showReviewModal, setShowReviewModal] = useState<any>(null);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewHoverRating, setReviewHoverRating] = useState(0);
   const [reviewComment, setReviewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
-  const [reviewedBookings, setReviewedBookings] = useState([]);
+  const [reviewedBookings, setReviewedBookings] = useState<any[]>([]);
 
   useEffect(() => {
     fetchBookings();
@@ -32,10 +32,10 @@ const MyBookings = () => {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/bookings/my');
+      const data = await api.get('/bookings/my');
       const bookingsData = data.bookings || [];
       setBookings(bookingsData);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch bookings:', error);
       toast.error('שגיאה בטעינת ההזמנות');
     } finally {
@@ -45,13 +45,8 @@ const MyBookings = () => {
 
   const handleCancelBooking = async (bookingId) => {
     try {
-      await confirm({
-        title: 'בקשת ביטול הזמנה',
-        message: 'בקשת הביטול תישלח לספק לאישור. האם להמשיך?',
-        type: 'warning',
-        confirmText: 'שלח בקשת ביטול',
-        cancelText: 'השאר'
-      });
+      const confirmed = window.confirm('בקשת הביטול תישלח לספק לאישור. האם להמשיך?');
+      if (!confirmed) return;
     } catch {
       return; // User cancelled
     }
@@ -60,26 +55,21 @@ const MyBookings = () => {
       await api.put(`/bookings/${bookingId}/cancel`);
       toast.success('ההזמנה בוטלה בהצלחה');
       fetchBookings();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.detail || 'שגיאה בביטול ההזמנה');
     }
   };
 
   const handleConfirmCompletion = async (booking) => {
     try {
-      await confirm({
-        title: 'אישור השלמת שירות',
-        message: `האם השירות "${booking.service_name || 'שירות'}" הושלם לשביעות רצונך?`,
-        type: 'success',
-        confirmText: 'אשר השלמה',
-        cancelText: 'עדיין לא'
-      });
+      const confirmed = window.confirm(`האם השירות "${booking.service_name || 'שירות'}" הושלם לשביעות רצונך?`);
+      if (!confirmed) return;
       await api.put(`/bookings/${booking.booking_id}/client-confirm`, {
         final_price: booking.final_price || booking.base_price
       });
       toast.success('השירות אושר כהושלם! תוכל לכתוב ביקורת.');
       fetchBookings();
-    } catch (error) {
+    } catch (error: any) {
       if (error?.response) {
         toast.error(error.response?.data?.detail || 'שגיאה באישור ההשלמה');
       }
@@ -112,7 +102,7 @@ const MyBookings = () => {
       setShowReviewModal(null);
       setReviewRating(0);
       setReviewComment('');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to submit review:', err);
       toast.error('שגיאה בשליחת הביקורת. נסה שוב.');
     } finally {

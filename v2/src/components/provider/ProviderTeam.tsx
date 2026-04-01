@@ -9,10 +9,10 @@ import {
 } from 'react-icons/fa';
 
 const ProviderTeam = ({ provider }) => {
-  const [members, setMembers] = useState([]);
+  const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [editingMember, setEditingMember] = useState(null);
+  const [editingMember, setEditingMember] = useState<any>(null);
   const [hasAccess, setHasAccess] = useState(false);
   const [form, setForm] = useState({
     name: '', role: '', phone: '', email: '', specialization: ''
@@ -24,10 +24,10 @@ const ProviderTeam = ({ provider }) => {
 
   const fetchTeam = async () => {
     try {
-      const response = await api.get('/team');
+      const data = await api.get('/team');
       setMembers(data.members || []);
       setHasAccess(true);
-    } catch (error) {
+    } catch (error: any) {
       if (error.response?.status === 403) {
         setHasAccess(false);
       }
@@ -54,7 +54,7 @@ const ProviderTeam = ({ provider }) => {
       }
       resetForm();
       fetchTeam();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.detail || 'שגיאה');
     }
   };
@@ -75,7 +75,7 @@ const ProviderTeam = ({ provider }) => {
       await api.delete(`/team/${memberId}`);
       toast.success('חבר הצוות הוסר');
       fetchTeam();
-    } catch (error) {
+    } catch (error: any) {
       toast.error('שגיאה במחיקה');
     }
   };

@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'next/link';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import BookingCalendar from '@/components/BookingCalendar';
 import TimeSlotPicker from '@/components/TimeSlotPicker';
@@ -72,19 +73,19 @@ const BookService = () => {
   
   const [loading, setLoading] = useState(true);
   const [booking, setBooking] = useState(false);
-  const [service, setService] = useState(null);
-  const [provider, setProvider] = useState(null);
-  const [bookedSlots, setBookedSlots] = useState([]);
+  const [service, setService] = useState<any>(null);
+  const [provider, setProvider] = useState<any>(null);
+  const [bookedSlots, setBookedSlots] = useState<any[]>([]);
   const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [bookingId, setBookingId] = useState(null);
+  const [bookingId, setBookingId] = useState<any>(null);
   
   // Form states
   const [selectedDeliveryType, setSelectedDeliveryType] = useState('');
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState<any>(null);
   const [selectedTime, setSelectedTime] = useState('');
   const [skipTimeSelection, setSkipTimeSelection] = useState(false);
-  const [selectedShift, setSelectedShift] = useState(null);
-  const [customHours, setCustomHours] = useState(null);
+  const [selectedShift, setSelectedShift] = useState<any>(null);
+  const [customHours, setCustomHours] = useState<any>(null);
   const [selectedPlatform, setSelectedPlatform] = useState('');
   const [notes, setNotes] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
@@ -131,7 +132,7 @@ const BookService = () => {
         const slotsRes = await api.get(`/providers/${found.provider_id}/available-slots`);
         setBookedSlots(slotsRes.data.booked_slots || []);
       } catch { setBookedSlots([]); }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch service:', error);
       if (error?.response?.status === 404) {
         toast.error('השירות לא נמצא או שהוסר');
@@ -240,7 +241,7 @@ const BookService = () => {
     try {
       setBooking(true);
       setShowConfirmation(false);
-      let bookingDate, bookingTime = null;
+      let bookingDate: string | undefined, bookingTime: string | null = null;
 
       if (skipTimeSelection) {
         bookingDate = new Date().toISOString();
@@ -255,7 +256,7 @@ const BookService = () => {
         bookingDate = new Date(`${format(selectedDate, 'yyyy-MM-dd')}T00:00:00`).toISOString();
       }
 
-      const data = {
+      const data: any = {
         service_id: serviceId,
         booking_date: bookingDate,
         booking_time: bookingTime,
@@ -295,7 +296,7 @@ const BookService = () => {
       const res = await api.post('/bookings', data);
       setBookingId(res.data.booking_id);
       setBookingSuccess(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Booking failed:', error);
       const detail = error.response?.data?.detail;
       toast.error(typeof detail === 'string' ? detail : 'שגיאה בשליחת ההזמנה');
@@ -378,20 +379,7 @@ const BookService = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale">
-      {service && (
-          title={`הזמנת ${service.name} - ${provider?.business_name || 'ספק שירותים'}`}
-          description={`הזמן ${service.name} מאת ${provider?.business_name || 'ספק שירותים'}${provider?.city ? ` ב${provider.city}` : ''}. ${service.price ? `מחיר: ₪${service.price}` : ''} הזמן עכשיו דרך CareFD.`}
-          canonical={`/book/${serviceId}`}
-          jsonLd={[
-            serviceSchema(service, provider),
-            breadcrumbSchema([
-              { name: 'דף הבית', url: '/' },
-              { name: 'שירותים', url: '/services' },
-              { name: service.name, url: `/book/${serviceId}` }
-            ])
-          ]}
-        />
-      )}
+      {/* SEO component removed - handled by layout */}
       
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -692,7 +680,7 @@ const BookService = () => {
                     <div className="sm:col-span-2">
                       <textarea value={serviceAddress.specialInstructions} placeholder="הנחיות הגעה (קוד כניסה, חניה...)"
                         onChange={(e) => setServiceAddress({...serviceAddress, specialInstructions: e.target.value})}
-                        className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none resize-none text-sm" rows="2" />
+                        className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none resize-none text-sm" rows={2} />
                     </div>
                   </div>
                 </div>
@@ -740,7 +728,7 @@ const BookService = () => {
                     <div className="sm:col-span-2">
                       <textarea value={serviceAddress.specialInstructions} placeholder="הערות (כניסה, חניה, הנחיות מיוחדות...)"
                         onChange={(e) => setServiceAddress({...serviceAddress, specialInstructions: e.target.value})}
-                        className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none resize-none text-sm" rows="2" />
+                        className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none resize-none text-sm" rows={2} />
                     </div>
                   </div>
                 </div>
@@ -802,7 +790,7 @@ const BookService = () => {
 
             {/* 6. NOTES */}
             <FormSection icon={FaStickyNote} title="הערות" testId="notes-section">
-              <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows="3"
+              <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3}
                 className="w-full px-4 py-3 border-2 border-carefd-teal-pale rounded-xl focus:border-carefd-teal outline-none resize-none text-sm"
                 placeholder="הערות מיוחדות, בקשות, מידע רפואי רלוונטי..."
                 data-testid="booking-notes" />

@@ -11,7 +11,7 @@ const SHIFT_TIMES = {
   night: { start: '22:00', end: '23:59' }
 };
 
-const TimeSlotPicker = ({ selectedDate, availability = [], onTimeSelect, bookedTimes = [] }) => {
+const TimeSlotPicker = ({ selectedDate, availability = [], onTimeSelect, bookedTimes = [] }: any) => {
   const [selectedTime, setSelectedTime] = useState('');
 
   // Default availability if provider hasn't set one
@@ -50,8 +50,8 @@ const TimeSlotPicker = ({ selectedDate, availability = [], onTimeSelect, bookedT
     });
 
     // Convert to time-based format
-    const timeBasedAvailability = [];
-    Object.entries(dayShifts).forEach(([day, shifts]) => {
+    const timeBasedAvailability: any[] = [];
+    (Object.entries(dayShifts) as [string, any[]][]).forEach(([day, shifts]) => {
       // Sort shifts by start time
       shifts.sort((a, b) => {
         const aStart = parseInt(SHIFT_TIMES[a]?.start?.split(':')[0] || '0');
@@ -101,7 +101,7 @@ const TimeSlotPicker = ({ selectedDate, availability = [], onTimeSelect, bookedT
       return [];
     }
 
-    const slots = [];
+    const slots: any[] = [];
     const addedTimes = new Set(); // Prevent duplicates
 
     dayAvailabilitySlots.forEach(dayAvailability => {

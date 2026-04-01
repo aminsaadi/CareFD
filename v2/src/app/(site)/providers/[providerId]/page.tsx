@@ -4,8 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import Navbar // Navbar in layout;
-import Footer // Footer in layout;
 import api from '@/lib/api-client';
 import { 
   FaStar, FaMapMarkerAlt, FaClock, FaEdit, FaPhone, FaEnvelope,
@@ -77,9 +75,9 @@ const ProviderProfile = () => {
   const { user, isAuthenticated } = useAuth();
   const siteName = 'CareFD';
   const router = useRouter();
-  const [provider, setProvider] = useState(null);
+  const [provider, setProvider] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('services');
   const [showContactModal, setShowContactModal] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -98,9 +96,9 @@ const ProviderProfile = () => {
 
   const fetchProvider = async () => {
     try {
-      const response = await api.get(`/providers/${providerId}`);
+      const data = await api.get(`/providers/${providerId}`);
       setProvider(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch provider:', error);
       setProvider(null);
     } finally {
@@ -110,9 +108,9 @@ const ProviderProfile = () => {
 
   const fetchReviews = async () => {
     try {
-      const response = await api.get(`/providers/${providerId}/reviews`);
+      const data = await api.get(`/providers/${providerId}/reviews`);
       setReviews(data.reviews || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch reviews:', error);
       setReviews([]);
     }
@@ -120,9 +118,9 @@ const ProviderProfile = () => {
 
   const checkFavorite = async () => {
     try {
-      const response = await api.get(`/favorites/check/${providerId}`);
+      const data = await api.get(`/favorites/check/${providerId}`);
       setIsFavorite(data.is_favorite);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to check favorite:', error);
     }
   };
@@ -141,7 +139,7 @@ const ProviderProfile = () => {
         await api.post(`/favorites/${providerId}`);
         setIsFavorite(true);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to toggle favorite:', error);
     }
   };
@@ -201,12 +199,12 @@ const ProviderProfile = () => {
 
     try {
       // Create or get existing chat room
-      const response = await api.post('/chat/rooms', {
-        user_id: user.user_id,
+      const data = await api.post('/chat/rooms', {
+        user_id: user?.user_id,
         provider_id: providerId
       });
       router.push(`/chat/${data.room_id}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create chat room:', error);
     }
   };
@@ -255,17 +253,7 @@ const ProviderProfile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale flex flex-col">
-        title={`${provider.business_name || 'ספק שירותים'} - ${provider.profession_name || getProfessionLabel(provider.profession_title) || 'ספק בריאות'}`}
-        description={`${provider.business_name || 'ספק שירותים'} - ${provider.profession_name || getProfessionLabel(provider.profession_title) || ''} ${provider.location?.city ? `ב${provider.location.city}` : 'בישראל'}. ${provider.total_reviews ? `${provider.total_reviews} ביקורות, דירוג ${provider.rating?.toFixed(1)}` : ''} הזמן תור עכשיו דרך CareFD.`}
-        canonical={`/providers/${providerId}`}
-          providerSchema(provider),
-          breadcrumbSchema([
-            { name: 'דף הבית', url: '/' },
-            { name: 'מטפלים', url: '/providers' },
-            { name: provider.business_name || 'ספק שירותים', url: `/providers/${providerId}` }
-          ])
-        ]}
-      />
+      {/* SEO component removed - handled by layout */}
       
 
       {/* Hero Header */}

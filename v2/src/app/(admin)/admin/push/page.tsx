@@ -8,7 +8,7 @@ import {
 } from 'react-icons/fi';
 
 export default function AdminPushNotifications() {
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showSendModal, setShowSendModal] = useState(false);
   const [sending, setSending] = useState(false);
@@ -22,7 +22,7 @@ export default function AdminPushNotifications() {
       setLoading(true);
       const data = await api.get('/admin/push/history');
       setHistory(data.history || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch push history:', error);
     } finally {
       setLoading(false);
@@ -36,7 +36,7 @@ export default function AdminPushNotifications() {
       setShowSendModal(false);
       fetchHistory();
       alert('ההתראה נשלחה בהצלחה!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to send notification:', error);
       alert('שגיאה בשליחת ההתראה');
     } finally {

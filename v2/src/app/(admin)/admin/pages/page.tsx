@@ -11,10 +11,10 @@ import {
 } from 'react-icons/fi';
 
 export default function AdminPages() {
-  const [pages, setPages] = useState([]);
+  const [pages, setPages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [editingPage, setEditingPage] = useState(null);
+  const [editingPage, setEditingPage] = useState<any>(null);
   const [showEditor, setShowEditor] = useState(false);
   const [currentPage, setCurrentPage] = useState({
     title: '',
@@ -58,7 +58,7 @@ export default function AdminPages() {
       setLoading(true);
       const data = await api.get('/admin/pages');
       setPages(data.pages || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch pages:', error);
       toast.error('שגיאה בטעינת הדפים');
     } finally {
@@ -74,7 +74,7 @@ export default function AdminPages() {
     try {
       const data = await api.get(`/pages/${pageId}`);
       return data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch page content:', error);
       return null;
     }
@@ -99,7 +99,7 @@ export default function AdminPages() {
       setEditingPage(null);
       setCurrentPage({ title: '', slug: '', content: '', meta_description: '', is_published: true });
       fetchPages();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save page:', error);
       toast.error('שגיאה בשמירת הדף');
     } finally {
@@ -116,7 +116,7 @@ export default function AdminPages() {
       await api.delete(`/admin/pages/${pageId}`);
       toast.success('הדף נמחק בהצלחה');
       fetchPages();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete page:', error);
       toast.error('שגיאה במחיקת הדף');
     }
@@ -127,13 +127,13 @@ export default function AdminPages() {
       await api.put(`/admin/pages/${page.page_id}`, { is_published: !page.is_published });
       toast.success(page.is_published ? 'הדף הועבר לטיוטה' : 'הדף פורסם');
       fetchPages();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to toggle publish:', error);
       toast.error('שגיאה בעדכון סטטוס');
     }
   };
 
-  const openEditor = async (page = null) => {
+  const openEditor = async (page: any = null) => {
     if (page) {
       setEditingPage(page.page_id);
       // Fetch full page content

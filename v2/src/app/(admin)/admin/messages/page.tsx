@@ -9,14 +9,14 @@ import { FiMessageSquare, FiSearch, FiSend, FiUser, FiExternalLink } from "react
 
 export default function AdminMessages() {
   const router = useRouter();
-  const [conversations, setConversations] = useState([]);
-  const [selectedConversation, setSelectedConversation] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [conversations, setConversations] = useState<any[]>([]);
+  const [selectedConversation, setSelectedConversation] = useState<any>(null);
+  const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchConversations();
@@ -40,14 +40,14 @@ export default function AdminMessages() {
         let userName = 'משתמש';
         
         try {
-          const providerRes = await api.get(`/providers/${room.provider_id}`);
+          const providerData = await api.get(`/providers/${room.provider_id}`);
           providerName = providerData.business_name || 'ספק';
         } catch (e) {
           console.warn('Failed to fetch provider info:', e);
         }
 
         try {
-          const userRes = await api.get(`/users/${room.user_id}`);
+          const userData = await api.get(`/users/${room.user_id}`);
           userName = userData.name || 'משתמש';
         } catch (e) {
           console.warn('Failed to fetch user info:', e);
@@ -62,7 +62,7 @@ export default function AdminMessages() {
       }));
       
       setConversations(enrichedRooms);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch conversations:', error);
     } finally {
       setLoading(false);
@@ -76,7 +76,7 @@ export default function AdminMessages() {
     try {
       const data = await api.get(`/chat/messages/${conversation.room_id}?limit=100`);
       setMessages(data.messages || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch messages:', error);
       setMessages([]);
     } finally {
@@ -95,7 +95,7 @@ export default function AdminMessages() {
       
       setMessages(prev => [...prev, data]);
       setNewMessage('');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to send message:', error);
     }
   };

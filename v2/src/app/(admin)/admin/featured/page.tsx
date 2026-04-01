@@ -10,11 +10,11 @@ import {
 } from 'react-icons/fi';
 
 export default function AdminFeatured() {
-  const [featuredProviders, setFeaturedProviders] = useState([]);
-  const [allProviders, setAllProviders] = useState([]);
+  const [featuredProviders, setFeaturedProviders] = useState<any[]>([]);
+  const [allProviders, setAllProviders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedProvider, setSelectedProvider] = useState(null);
+  const [selectedProvider, setSelectedProvider] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   
@@ -29,7 +29,7 @@ export default function AdminFeatured() {
       const [featuredData, providersData] = await Promise.all([api.get('/admin/featured'), api.get('/providers?limit=200')]);
       setFeaturedProviders(featuredData.providers || []);
       setAllProviders(providersData.providers || []);
-    } catch (error) {
+    } catch (error: any) {
       toast.error('שגיאה בטעינת נתונים');
     } finally {
       setLoading(false);
@@ -46,7 +46,7 @@ export default function AdminFeatured() {
       setSelectedProvider(null);
       setSearchQuery('');
       fetchData();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error?.data?.detail || error?.message || 'שגיאה בהבלטת ספק');
     } finally {
       setActionLoading(false);
@@ -55,13 +55,8 @@ export default function AdminFeatured() {
 
   const removeFeatured = async (provider) => {
     try {
-      await confirm({
-        title: 'הסרת הבלטה',
-        message: `האם אתה בטוח שברצונך להסיר את ההבלטה של ${provider.business_name || 'הספק'}?`,
-        type: 'warning',
-        confirmText: 'הסר',
-        cancelText: 'ביטול'
-      });
+      const confirmed = window.confirm(`האם אתה בטוח שברצונך להסיר את ההבלטה של ${provider.business_name || 'הספק'}?`);
+      if (!confirmed) return;
     } catch {
       return;
     }
@@ -70,7 +65,7 @@ export default function AdminFeatured() {
       await api.put(`/admin/providers/${provider.provider_id}/unrecommend`);
       toast.success('ההבלטה הוסרה');
       fetchData();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error?.data?.detail || error?.message || 'שגיאה בהסרת הבלטה');
     }
   };

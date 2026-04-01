@@ -21,6 +21,7 @@ const pricingLabels: Record<string, string> = { per_hour: 'לשעה', per_visit:
 interface ServiceCardProps {
   service: any;
   showProvider?: boolean;
+  viewMode?: string;
 }
 
 const ServiceCard = ({ service, showProvider = true }: ServiceCardProps) => {

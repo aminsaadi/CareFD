@@ -38,8 +38,8 @@ const AccessibilityWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [settings, setSettings] = useState(getInitialSettings);
   const [isLoaded, setIsLoaded] = useState(false);
-  const guideRef = useRef(null);
-  const panelRef = useRef(null);
+  const guideRef = useRef<any>(null);
+  const panelRef = useRef<any>(null);
 
   // Mark component as loaded after initial render
   useEffect(() => {

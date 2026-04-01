@@ -50,6 +50,19 @@ export const serviceTypes = [
   { id: 'product', name: 'מוצר' },
 ];
 
+export const healthcareProfessions = [
+  { id: 'prof_medicine', name: 'רפואה' },
+  { id: 'prof_nursing', name: 'אחיות/סיעוד' },
+  { id: 'prof_dental', name: 'רפואת שיניים' },
+  { id: 'prof_therapy', name: 'טיפולי שיקום' },
+  { id: 'prof_mental', name: 'בריאות הנפש' },
+  { id: 'prof_nutrition', name: 'תזונה ודיאטה' },
+  { id: 'prof_alternative', name: 'רפואה משלימה' },
+  { id: 'prof_optometry', name: 'אופטומטריה' },
+  { id: 'prof_midwifery', name: 'מיילדות' },
+  { id: 'prof_caregiving', name: 'טיפול וסיוע' },
+];
+
 export const serviceCategories = [
   { id: 'prof_medicine', name: 'רפואה' },
   { id: 'prof_nursing', name: 'אחיות/סיעוד' },

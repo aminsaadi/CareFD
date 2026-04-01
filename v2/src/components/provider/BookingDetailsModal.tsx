@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import api from '@/lib/api-client';
 import { toast } from 'sonner';
 import {
@@ -79,7 +80,7 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
       setShowChangeForm(false);
       setChangeForm({ new_date: '', new_time: '', reason: '' });
       if (onRefresh) onRefresh();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.detail || 'שגיאה בשליחת הבקשה');
     } finally {
       setSubmitting(false);
@@ -96,7 +97,7 @@ const BookingDetailsModal = ({ booking, provider, onClose, onRefresh }) => {
       const roomId = res.data.room_id;
       onClose();
       router.push(`/chat/${roomId}`);
-    } catch (error) {
+    } catch (error: any) {
       toast.error('שגיאה ביצירת צ\'אט');
     }
   };

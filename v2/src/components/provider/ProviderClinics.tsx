@@ -9,10 +9,10 @@ import {
 } from 'react-icons/fa';
 
 const ProviderClinics = ({ provider }) => {
-  const [clinics, setClinics] = useState([]);
+  const [clinics, setClinics] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [editingClinic, setEditingClinic] = useState(null);
+  const [editingClinic, setEditingClinic] = useState<any>(null);
   const [hasAccess, setHasAccess] = useState(false);
   const [form, setForm] = useState({
     name: '', address: '', city: '', phone: '', working_hours: '', notes: ''
@@ -24,10 +24,10 @@ const ProviderClinics = ({ provider }) => {
 
   const fetchClinics = async () => {
     try {
-      const response = await api.get('/clinics');
+      const data = await api.get('/clinics');
       setClinics(data.clinics || []);
       setHasAccess(true);
-    } catch (error) {
+    } catch (error: any) {
       if (error.response?.status === 403) {
         setHasAccess(false);
       }
@@ -54,7 +54,7 @@ const ProviderClinics = ({ provider }) => {
       }
       resetForm();
       fetchClinics();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.detail || 'שגיאה');
     }
   };
@@ -74,7 +74,7 @@ const ProviderClinics = ({ provider }) => {
       await api.delete(`/clinics/${clinicId}`);
       toast.success('הקליניקה נמחקה');
       fetchClinics();
-    } catch (error) {
+    } catch (error: any) {
       toast.error('שגיאה במחיקה');
     }
   };

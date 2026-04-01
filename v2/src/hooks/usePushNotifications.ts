@@ -22,10 +22,10 @@ function urlBase64ToUint8Array(base64String) {
 export const usePushNotifications = () => {
   const [isSupported, setIsSupported] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [subscription, setSubscription] = useState(null);
+  const [subscription, setSubscription] = useState<any>(null);
   const [permission, setPermission] = useState('default');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Check if push notifications are supported
   useEffect(() => {
@@ -42,7 +42,7 @@ export const usePushNotifications = () => {
       // iOS Safari specific: check if running as PWA
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
       const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                          window.navigator.standalone === true;
+                          (window.navigator as any).standalone === true;
       
       if (isIOS && !isStandalone && !supported) {
         setError('ב-Safari באייפון, יש להוסיף את האתר למסך הבית כדי לקבל התראות Push');
@@ -68,7 +68,7 @@ export const usePushNotifications = () => {
           setSubscription(existingSub);
           setIsSubscribed(true);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error checking subscription:', err);
       } finally {
         setLoading(false);
@@ -87,7 +87,7 @@ export const usePushNotifications = () => {
     try {
       const registration = await navigator.serviceWorker.register('/sw-push.js');
       return registration;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Service Worker registration failed:', err);
       throw err;
     }
@@ -131,8 +131,8 @@ export const usePushNotifications = () => {
       await api.post('/push/subscribe', {
         endpoint: sub.endpoint,
         keys: {
-          p256dh: btoa(String.fromCharCode.apply(null, new Uint8Array(sub.getKey('p256dh')))),
-          auth: btoa(String.fromCharCode.apply(null, new Uint8Array(sub.getKey('auth'))))
+          p256dh: btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(sub.getKey('p256dh')!)))),
+          auth: btoa(String.fromCharCode.apply(null, Array.from(new Uint8Array(sub.getKey('auth')!))))
         }
       });
       
@@ -140,7 +140,7 @@ export const usePushNotifications = () => {
       setIsSubscribed(true);
       setLoading(false);
       return true;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Push subscription error:', err);
       setError(err.message || 'Failed to subscribe');
       setLoading(false);
@@ -165,7 +165,7 @@ export const usePushNotifications = () => {
       setIsSubscribed(false);
       setLoading(false);
       return true;
-    } catch (err) {
+    } catch (err: any) {
       console.error('Push unsubscribe error:', err);
       setError(err.message || 'Failed to unsubscribe');
       setLoading(false);

@@ -9,11 +9,11 @@ import {
 } from 'react-icons/fi';
 
 export default function AdminBlog() {
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showEditor, setShowEditor] = useState(false);
-  const [editingPost, setEditingPost] = useState(null);
-  const [currentPost, setCurrentPost] = useState({
+  const [editingPost, setEditingPost] = useState<any>(null);
+  const [currentPost, setCurrentPost] = useState<any>({
     title: '',
     slug: '',
     excerpt: '',
@@ -34,7 +34,7 @@ export default function AdminBlog() {
       setLoading(true);
       const data = await api.get('/admin/blog');
       setPosts(data.posts || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch posts:', error);
       // Demo data
       setPosts([
@@ -85,7 +85,7 @@ export default function AdminBlog() {
       setEditingPost(null);
       resetForm();
       fetchPosts();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save post:', error);
       // Demo - add locally
       setPosts(prev => [...prev, { 
@@ -104,7 +104,7 @@ export default function AdminBlog() {
     try {
       await api.delete(`/admin/blog/${postId}`);
       fetchPosts();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete post:', error);
       setPosts(prev => prev.filter(p => p.post_id !== postId));
     }
@@ -122,7 +122,7 @@ export default function AdminBlog() {
     });
   };
 
-  const openEditor = (post = null) => {
+  const openEditor = (post: any = null) => {
     if (post) {
       setEditingPost(post.post_id);
       setCurrentPost({

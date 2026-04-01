@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api-client';
 import { formatDistanceToNow } from 'date-fns';
@@ -45,7 +46,7 @@ const notificationColors = {
 const Notifications = () => {
   const { user } = useAuth();
   const router = useRouter();
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, unread, read
   const [typeFilter, setTypeFilter] = useState('all'); // all, bookings, messages, reviews
@@ -57,9 +58,9 @@ const Notifications = () => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/notifications?limit=100');
+      const data = await api.get('/notifications?limit=100');
       setNotifications(data.notifications || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch notifications:', error);
     } finally {
       setLoading(false);
@@ -72,7 +73,7 @@ const Notifications = () => {
       setNotifications(prev => 
         prev.map(n => n.notification_id === notificationId ? { ...n, is_read: true } : n)
       );
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to mark notification as read:', error);
     }
   };
@@ -81,7 +82,7 @@ const Notifications = () => {
     try {
       await api.put('/notifications/read-all');
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to mark all as read:', error);
     }
   };
@@ -90,15 +91,15 @@ const Notifications = () => {
     try {
       await api.delete(`/notifications/${notificationId}`);
       setNotifications(prev => prev.filter(n => n.notification_id !== notificationId));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete notification:', error);
     }
   };
 
   const getNotificationLink = (notification) => {
     const data = notification.data || {};
-    const isProvider = user?.role === 'PROVIDER';
-    const isAdmin = user?.role === 'ADMIN';
+    const isProvider = user?.role?.toLowerCase() === 'provider';
+    const isAdmin = user?.role?.toLowerCase() === 'admin';
     
     switch (notification.type) {
       // Bookings - navigate to bookings tab in dashboard

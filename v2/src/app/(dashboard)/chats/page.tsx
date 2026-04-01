@@ -13,14 +13,14 @@ import {
 
 const ChatList = () => {
   const { user } = useAuth();
-  const [rooms, setRooms] = useState([]);
-  const [archivedRooms, setArchivedRooms] = useState([]);
+  const [rooms, setRooms] = useState<any[]>([]);
+  const [archivedRooms, setArchivedRooms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('active');
-  const [openMenuId, setOpenMenuId] = useState(null);
-  const [confirmDelete, setConfirmDelete] = useState(null);
-  const menuRef = useRef(null);
+  const [openMenuId, setOpenMenuId] = useState<any>(null);
+  const [confirmDelete, setConfirmDelete] = useState<any>(null);
+  const menuRef = useRef<any>(null);
 
   useEffect(() => {
     fetchRooms();
@@ -45,9 +45,9 @@ const ChatList = () => {
 
   const fetchRooms = async () => {
     try {
-      const response = await api.get('/chat/rooms');
+      const data = await api.get('/chat/rooms');
       setRooms(data.rooms || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch chat rooms:', error);
     } finally {
       setLoading(false);
@@ -56,9 +56,9 @@ const ChatList = () => {
 
   const fetchArchivedRooms = async () => {
     try {
-      const response = await api.get('/chat/rooms?archived=true');
+      const data = await api.get('/chat/rooms?archived=true');
       setArchivedRooms(data.rooms || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch archived rooms:', error);
     }
   };

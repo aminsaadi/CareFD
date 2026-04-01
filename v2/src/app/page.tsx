@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import Navbar // Navbar in layout;
-import Footer // Footer in layout;
+import { useRouter } from 'next/navigation';
 import ProviderCard from '@/components/ProviderCard';
 import ServiceCard from '@/components/ServiceCard';
 import api from '@/lib/api-client';
@@ -20,7 +19,7 @@ import {
 
 // Custom hook for scroll animation
 const useScrollAnimation = () => {
-  const ref = useRef(null);
+  const ref = useRef<any>(null);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -40,7 +39,7 @@ const useScrollAnimation = () => {
     return () => observer.disconnect();
   }, []);
 
-  return [ref, isVisible];
+  return [ref, isVisible] as const;
 };
 
 // Animated Section Component
@@ -154,7 +153,7 @@ const Landing = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [locationQuery, setLocationQuery] = useState('');
   const [isLocating, setIsLocating] = useState(false);
-  const [userLocation, setUserLocation] = useState(null);
+  const [userLocation, setUserLocation] = useState<any>(null);
   const [selectedRadius, setSelectedRadius] = useState('');
   const [searchTab, setSearchTab] = useState('providers'); // 'providers' or 'services'
   const [dynamicPopularSearches, setDynamicPopularSearches] = useState(fallbackPopularSearches);
@@ -164,22 +163,22 @@ const Landing = () => {
   // Dropdown states
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
-  const [cities, setCities] = useState([]);
-  const searchInputRef = useRef(null);
-  const locationInputRef = useRef(null);
-  const searchDropdownRef = useRef(null);
-  const locationDropdownRef = useRef(null);
+  const [cities, setCities] = useState<any[]>([]);
+  const searchInputRef = useRef<any>(null);
+  const locationInputRef = useRef<any>(null);
+  const searchDropdownRef = useRef<any>(null);
+  const locationDropdownRef = useRef<any>(null);
   
   // Real data from API
-  const [featuredProviders, setFeaturedProviders] = useState([]);
-  const [popularServices, setPopularServices] = useState([]);
+  const [featuredProviders, setFeaturedProviders] = useState<any[]>([]);
+  const [popularServices, setPopularServices] = useState<any[]>([]);
   const [statistics, setStatistics] = useState({
     providers: 0,
     services: 0,
     happyClients: 0,
     cities: 0
   });
-  const [regions, setRegions] = useState([]);
+  const [regions, setRegions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -267,7 +266,7 @@ const Landing = () => {
       } catch {
         setStatistics({ providers: 50, services: 100, happyClients: 500, cities: 20 });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch home data:', error);
     } finally {
       setLoading(false);
@@ -310,7 +309,7 @@ const Landing = () => {
           const data = await response.json();
           const cityName = data.address?.city || data.address?.town || data.address?.village || data.address?.municipality || 'המיקום שלי';
           setLocationQuery(cityName);
-        } catch (error) {
+        } catch (error: any) {
           console.error('Reverse geocoding error:', error);
           setLocationQuery('המיקום שלי');
         }
@@ -370,18 +369,11 @@ const Landing = () => {
     { question: 'באילו אזורים בישראל השירות זמין?', answer: 'CareFD פועלת בכל רחבי ישראל - מרכז, צפון, דרום, ירושלים והסביבה.' }
   ];
 
-  const homepageJsonLd = [
-    organizationSchema(),
-    medicalBusinessSchema(),
-    faqSchema(homepageFaqs)
-  ];
+  // SEO JSON-LD schemas removed - handled by layout
 
   return (
     <div className="min-h-screen bg-white">
-        title="שירותי בריאות וסיעוד בישראל - מטפלים, אחיות, טיפול בבית"
-        description="מצא מטפל סיעודי, אחות פרטית או שירות סיעוד מוסמך בקרבתך. CareFD מחברת בין מטופלים לספקי בריאות מובילים בישראל. חיפוש חינם."
-        canonical="/"
-      />
+      {/* SEO component removed - handled by layout */}
       
 
       {/* ==================== HERO SECTION ==================== */}

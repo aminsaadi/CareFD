@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { FaSearch, FaFilter } from 'react-icons/fa';
 
-const SearchBar = ({ onSearch, placeholder = 'חפש...', showFilters = false, filters = [], onFilterChange }) => {
+const SearchBar = ({ onSearch, placeholder = 'חפש...', showFilters = false, filters = [], onFilterChange }: any) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilterMenu, setShowFilterMenu] = useState(false);
 

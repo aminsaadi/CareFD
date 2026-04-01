@@ -52,7 +52,7 @@ export default function ProviderSetupPage() {
       try {
         const data = await api.get<{ professions: Profession[] }>("/professions");
         setProfessions(data.professions || []);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Failed to fetch professions:", err);
       }
     };

@@ -46,7 +46,7 @@ const radiusOptions = [
 
 import CitySelect from './CitySelect';
 
-const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile = false, onClose }) => {
+const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile = false, onClose = undefined }: any) => {
   const [expandedSections, setExpandedSections] = useState({
     location: true,
     category: true,
@@ -60,19 +60,19 @@ const AdvancedFilters = ({ filters, onFilterChange, onApply, onReset, showMobile
     badges: false
   });
   const [gettingLocation, setGettingLocation] = useState(false);
-  const [categories, setCategories] = useState([]);
-  const [cities, setCities] = useState([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [cities, setCities] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await api.get('/professions');
+        const data = await api.get('/professions');
         const profs = data.professions || [];
         setCategories(profs.map(p => ({
           id: p.profession_id,
           name: p.name
         })));
-      } catch (err) {
+      } catch (err: any) {
         // Fallback to defaults if API fails
         setCategories([
           { id: 'nursing', name: 'סיעוד' },

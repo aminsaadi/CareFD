@@ -75,7 +75,7 @@ export default function RequestDetailPage() {
         user_id: user?.user_id, provider_id: providerId, request_id: requestId,
       });
       router.push(`/chats/${data.room_id}`);
-    } catch (error) {
+    } catch (error: any) {
       const err = error as ApiError;
       toast.error(err.data?.detail || "שגיאה ביצירת צ'אט");
     }
@@ -90,7 +90,7 @@ export default function RequestDetailPage() {
       setRequest(requestData);
       const offersData = await api.get<{ offers: OfferData[] }>(`/requests/${requestId}/offers`);
       setOffers(offersData.offers || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to fetch request:", error);
       const err = error as ApiError;
       if (err.status === 404) toast.error("הבקשה לא נמצאה");
@@ -111,7 +111,7 @@ export default function RequestDetailPage() {
       setShowOfferForm(false);
       setOfferData({ price: "", pricing_type: "fixed", duration_days: "", message: "" });
       fetchRequestDetails();
-    } catch (error) {
+    } catch (error: any) {
       const err = error as ApiError;
       toast.error(err.data?.detail || "שגיאה בשליחת ההצעה");
     }
@@ -125,7 +125,7 @@ export default function RequestDetailPage() {
       toast.success("ההצעה התקבלה! נוצרה הזמנה חדשה.");
       fetchRequestDetails();
       if (data.booking_id) setTimeout(() => router.push("/bookings"), 1500);
-    } catch (error) {
+    } catch (error: any) {
       const err = error as ApiError;
       toast.error(err.data?.detail || "שגיאה בקבלת ההצעה");
     } finally { setActionLoading(null); }
@@ -138,7 +138,7 @@ export default function RequestDetailPage() {
       await api.post(`/offers/${offerId}/reject`);
       toast.success("ההצעה נדחתה");
       fetchRequestDetails();
-    } catch (error) {
+    } catch (error: any) {
       const err = error as ApiError;
       toast.error(err.data?.detail || "שגיאה בדחיית ההצעה");
     } finally { setActionLoading(null); }
@@ -151,7 +151,7 @@ export default function RequestDetailPage() {
       toast.success("הבקשה בוטלה");
       setShowCancelForm(false);
       fetchRequestDetails();
-    } catch (error) {
+    } catch (error: any) {
       const err = error as ApiError;
       toast.error(err.data?.detail || "שגיאה בביטול הבקשה");
     }

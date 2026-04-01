@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'next/link';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api-client';
 import { format, isToday, isYesterday } from 'date-fns';
@@ -17,20 +18,20 @@ const ChatRoom = () => {
   const { roomId } = useParams();
   const router = useRouter();
   const { user } = useAuth();
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const [roomInfo, setRoomInfo] = useState(null);
+  const [roomInfo, setRoomInfo] = useState<any>(null);
   const [showOptions, setShowOptions] = useState(false);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState<any>(null);
+  const [imageFile, setImageFile] = useState<any>(null);
   const [uploading, setUploading] = useState(false);
-  const messagesEndRef = useRef(null);
-  const messagesContainerRef = useRef(null);
-  const pollIntervalRef = useRef(null);
-  const inputRef = useRef(null);
-  const fileInputRef = useRef(null);
+  const messagesEndRef = useRef<any>(null);
+  const messagesContainerRef = useRef<any>(null);
+  const pollIntervalRef = useRef<any>(null);
+  const inputRef = useRef<any>(null);
+  const fileInputRef = useRef<any>(null);
 
   useEffect(() => {
     fetchRoomInfo();
@@ -51,8 +52,8 @@ const ChatRoom = () => {
 
   const fetchRoomInfo = async () => {
     try {
-      const response = await api.get('/chat/rooms');
-      const room = data.rooms?.find(r => r.room_id === roomId);
+      const data = await api.get('/chat/rooms');
+      const room = data.rooms?.find((r: any) => r.room_id === roomId);
       // Also check archived
       if (!room) {
         const archivedRes = await api.get('/chat/rooms?archived=true');
@@ -61,7 +62,7 @@ const ChatRoom = () => {
       } else {
         setRoomInfo(room);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch room info:', error);
     }
   };
@@ -69,9 +70,9 @@ const ChatRoom = () => {
   const fetchMessages = async (silent = false) => {
     try {
       if (!silent) setLoading(true);
-      const response = await api.get(`/chat/messages/${roomId}`);
+      const data = await api.get(`/chat/messages/${roomId}`);
       setMessages(data.messages || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch messages:', error);
     } finally {
       if (!silent) setLoading(false);
@@ -128,11 +129,9 @@ const ChatRoom = () => {
         setUploading(true);
         const formData = new FormData();
         formData.append('file', imageFile);
-        const uploadRes = await api.post('/upload/image', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        attachmentUrl = uploadRes.data.url;
-        attachmentName = uploadRes.data.original_name;
+        const uploadRes = await api.post('/upload/image', formData);
+        attachmentUrl = uploadRes?.url || uploadRes?.data?.url;
+        attachmentName = uploadRes?.original_name || uploadRes?.data?.original_name;
         setUploading(false);
         clearImagePreview();
       }
@@ -145,7 +144,7 @@ const ChatRoom = () => {
         attachment_name: attachmentName
       });
       fetchMessages(true);
-    } catch (error) {
+    } catch (error: any) {
       setMessages(prev => prev.filter(m => m.message_id !== tempMessage.message_id));
       setNewMessage(messageContent);
       clearImagePreview();

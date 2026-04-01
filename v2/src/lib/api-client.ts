@@ -33,19 +33,19 @@ class ApiClient {
     return data;
   }
 
-  get<T>(path: string, params?: Record<string, string>) {
+  get<T = any>(path: string, params?: Record<string, string>) {
     return this.request<T>("GET", path, undefined, params);
   }
 
-  post<T>(path: string, body?: any) {
+  post<T = any>(path: string, body?: any) {
     return this.request<T>("POST", path, body);
   }
 
-  put<T>(path: string, body?: any) {
+  put<T = any>(path: string, body?: any) {
     return this.request<T>("PUT", path, body);
   }
 
-  delete<T>(path: string) {
+  delete<T = any>(path: string) {
     return this.request<T>("DELETE", path);
   }
 }

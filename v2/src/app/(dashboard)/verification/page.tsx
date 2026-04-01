@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-// removed useNavigate from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api-client';
 import { 
@@ -16,14 +16,14 @@ const VerificationRequest = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [verificationStatus, setVerificationStatus] = useState(null);
-  const [documents, setDocuments] = useState({
+  const [verificationStatus, setVerificationStatus] = useState<any>(null);
+  const [documents, setDocuments] = useState<any>({
     id_card: null,
     id_card_back: null,
     professional_license: null, // Only for providers
     additional_doc: null
   });
-  const [previews, setPreviews] = useState({});
+  const [previews, setPreviews] = useState<any>({});
   const [notes, setNotes] = useState('');
 
   const isProvider = user?.role === 'provider';
@@ -34,9 +34,9 @@ const VerificationRequest = () => {
 
   const fetchVerificationStatus = async () => {
     try {
-      const response = await api.get('/verification/status');
+      const data = await api.get('/verification/status');
       setVerificationStatus(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching verification status:', error);
     } finally {
       setLoading(false);
@@ -87,7 +87,7 @@ const VerificationRequest = () => {
       const formData = new FormData();
       
       // Add documents
-      Object.entries(documents).forEach(([key, file]) => {
+      Object.entries(documents).forEach(([key, file]: [string, any]) => {
         if (file) {
           formData.append(key, file);
         }
@@ -97,13 +97,11 @@ const VerificationRequest = () => {
       formData.append('notes', notes);
       formData.append('user_type', isProvider ? 'provider' : 'user');
 
-      await api.post('/verification/request', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      await api.post('/verification/request', formData);
 
       toast.success('בקשת האימות נשלחה בהצלחה!');
       fetchVerificationStatus();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.detail || 'שגיאה בשליחת הבקשה');
     } finally {
       setSubmitting(false);
@@ -259,14 +257,14 @@ const VerificationRequest = () => {
               <div 
                 className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all
                   ${documents.id_card ? 'border-carefd-teal bg-carefd-teal/5' : 'border-gray-300 hover:border-carefd-teal'}`}
-                onClick={() => document.getElementById('id_card').click()}
+                onClick={() => document.getElementById('id_card')?.click()}
               >
                 <input
                   type="file"
                   id="id_card"
                   accept="image/*,.pdf"
                   className="hidden"
-                  onChange={(e) => handleFileChange('id_card', e.target.files[0])}
+                  onChange={(e) => handleFileChange('id_card', e.target.files?.[0])}
                 />
                 {previews.id_card ? (
                   previews.id_card === 'pdf' ? (
@@ -295,14 +293,14 @@ const VerificationRequest = () => {
               <div 
                 className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all
                   ${documents.id_card_back ? 'border-carefd-teal bg-carefd-teal/5' : 'border-gray-300 hover:border-carefd-teal'}`}
-                onClick={() => document.getElementById('id_card_back').click()}
+                onClick={() => document.getElementById('id_card_back')?.click()}
               >
                 <input
                   type="file"
                   id="id_card_back"
                   accept="image/*,.pdf"
                   className="hidden"
-                  onChange={(e) => handleFileChange('id_card_back', e.target.files[0])}
+                  onChange={(e) => handleFileChange('id_card_back', e.target.files?.[0])}
                 />
                 {previews.id_card_back ? (
                   previews.id_card_back === 'pdf' ? (
@@ -331,14 +329,14 @@ const VerificationRequest = () => {
                 <div 
                   className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all
                     ${documents.professional_license ? 'border-carefd-teal bg-carefd-teal/5' : 'border-gray-300 hover:border-carefd-teal'}`}
-                  onClick={() => document.getElementById('professional_license').click()}
+                  onClick={() => document.getElementById('professional_license')?.click()}
                 >
                   <input
                     type="file"
                     id="professional_license"
                     accept="image/*,.pdf"
                     className="hidden"
-                    onChange={(e) => handleFileChange('professional_license', e.target.files[0])}
+                    onChange={(e) => handleFileChange('professional_license', e.target.files?.[0])}
                   />
                   {previews.professional_license ? (
                     previews.professional_license === 'pdf' ? (
@@ -367,14 +365,14 @@ const VerificationRequest = () => {
               <div 
                 className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all
                   ${documents.additional_doc ? 'border-carefd-teal bg-carefd-teal/5' : 'border-gray-300 hover:border-carefd-teal'}`}
-                onClick={() => document.getElementById('additional_doc').click()}
+                onClick={() => document.getElementById('additional_doc')?.click()}
               >
                 <input
                   type="file"
                   id="additional_doc"
                   accept="image/*,.pdf"
                   className="hidden"
-                  onChange={(e) => handleFileChange('additional_doc', e.target.files[0])}
+                  onChange={(e) => handleFileChange('additional_doc', e.target.files?.[0])}
                 />
                 {previews.additional_doc ? (
                   previews.additional_doc === 'pdf' ? (

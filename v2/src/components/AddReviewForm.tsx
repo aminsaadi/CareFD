@@ -9,7 +9,7 @@ const AddReviewForm = ({ providerId, onReviewAdded }) => {
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<any>(null);
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -44,7 +44,7 @@ const AddReviewForm = ({ providerId, onReviewAdded }) => {
       }
       
       setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to submit review:', err);
       setError('שגיאה בשליחת הביקורת. נסה שוב.');
     } finally {

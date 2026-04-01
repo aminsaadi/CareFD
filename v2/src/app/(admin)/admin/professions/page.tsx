@@ -10,18 +10,18 @@ import {
 } from 'react-icons/fi';
 
 export default function AdminProfessions() {
-  const [professions, setProfessions] = useState([]);
+  const [professions, setProfessions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('professions'); // 'professions' or 'categories'
-  const [expandedProfession, setExpandedProfession] = useState(null);
-  const [expandedSubProfession, setExpandedSubProfession] = useState(null);
-  const [showAddModal, setShowAddModal] = useState(null); // 'profession', 'sub', 'category'
-  const [showEditModal, setShowEditModal] = useState(null);
+  const [expandedProfession, setExpandedProfession] = useState<any>(null);
+  const [expandedSubProfession, setExpandedSubProfession] = useState<any>(null);
+  const [showAddModal, setShowAddModal] = useState<any>(null); // 'profession', 'sub', 'category'
+  const [showEditModal, setShowEditModal] = useState<any>(null);
   const [newItemName, setNewItemName] = useState('');
   const [newItemNameEn, setNewItemNameEn] = useState('');
   const [newSpecializations, setNewSpecializations] = useState('');
-  const [selectedParent, setSelectedParent] = useState(null);
+  const [selectedParent, setSelectedParent] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
   
 
@@ -30,7 +30,7 @@ export default function AdminProfessions() {
       setLoading(true);
       const data = await api.get('/admin/professions');
       setProfessions(data.professions || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch professions:', error);
       toast.error('שגיאה בטעינת המקצועות');
     } finally {
@@ -78,7 +78,7 @@ export default function AdminProfessions() {
 
       fetchProfessions();
       closeAddModal();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to add item:', error);
       toast.error('שגיאה בהוספה');
     } finally {
@@ -113,7 +113,7 @@ export default function AdminProfessions() {
 
       fetchProfessions();
       closeEditModal();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update item:', error);
       toast.error('שגיאה בעדכון');
     } finally {
@@ -122,13 +122,7 @@ export default function AdminProfessions() {
   };
 
   const deleteItem = async (type, id, name) => {
-    const confirmed = await confirm({
-      title: 'מחיקה',
-      message: `האם אתה בטוח שברצונך למחוק את "${name}"?`,
-      type: 'danger',
-      confirmText: 'מחק',
-      cancelText: 'ביטול'
-    });
+    const confirmed = window.confirm(`האם אתה בטוח שברצונך למחוק את "${name}"?`);
 
     if (!confirmed) return;
 
@@ -136,7 +130,7 @@ export default function AdminProfessions() {
       await api.delete(`/admin/${type}/${id}`);
       toast.success('נמחק בהצלחה');
       fetchProfessions();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete:', error);
       toast.error('שגיאה במחיקה');
     }

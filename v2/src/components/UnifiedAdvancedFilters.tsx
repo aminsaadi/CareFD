@@ -68,7 +68,7 @@ const UnifiedAdvancedFilters = ({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await api.get('/professions');
+        const data = await api.get('/professions');
         const profs = data.professions || [];
         if (profs.length > 0) {
           setServiceCategories(profs.map(p => ({
@@ -76,7 +76,7 @@ const UnifiedAdvancedFilters = ({
             name: p.name
           })));
         }
-      } catch (err) {
+      } catch (err: any) {
         // Keep defaults on error
       }
     };
@@ -87,8 +87,8 @@ const UnifiedAdvancedFilters = ({
   const [locationSearch, setLocationSearch] = useState('');
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
-  const locationInputRef = useRef(null);
-  const locationDropdownRef = useRef(null);
+  const locationInputRef = useRef<any>(null);
+  const locationDropdownRef = useRef<any>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -126,7 +126,7 @@ const UnifiedAdvancedFilters = ({
           const cityName = data.address?.city || data.address?.town || data.address?.village || 'המיקום שלי';
           setLocationSearch(cityName);
           onFilterChange({ ...filters, city: cityName, region: '' });
-        } catch (error) {
+        } catch (error: any) {
           setLocationSearch('המיקום שלי');
           onFilterChange({ ...filters, city: 'המיקום שלי', region: '' });
         }
@@ -152,7 +152,7 @@ const UnifiedAdvancedFilters = ({
     }
     
     // Fallback to region cities
-    const allCities = [];
+    const allCities: any[] = [];
     israeliRegions.forEach(region => {
       region.cities.forEach(city => {
         if (city.includes(locationSearch)) {

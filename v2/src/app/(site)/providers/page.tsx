@@ -1,12 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, lazy, Suspense, useRef } from 'react';
-import { useSearchParams, Link } from 'next/link';
-import { useTranslation } from 'react-i18next';
-import Navbar // Navbar in layout;
-import Footer // Footer in layout;
+import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import ProviderCard from '@/components/ProviderCard';
-import AdvancedFilters from '@/components/AdvancedFilters' // TODO;
+import AdvancedFilters from '@/components/AdvancedFilters';
 import api from '@/lib/api-client';
 import { toast } from 'sonner';
 import { israeliLocalities } from '@/lib/data/localities';
@@ -17,15 +15,20 @@ import {
 } from 'react-icons/fa';
 
 // Lazy load map component
-const ProvidersMap = lazy(() => import('../components/ProvidersMap'));
+const ProvidersMap = lazy(() => import('@/components/ProvidersMap'));
 
 // Fallback popular searches - used until backend professions load
 const fallbackPopularSearches = searchData.providers;
 
 const Providers = () => {
-  const { t } = useTranslation();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [providers, setProviders] = useState([]);
+  const t = (key: string) => ({ providers: 'מטפלים' }[key] || key);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const setSearchParams = (params: URLSearchParams | Record<string, string>) => {
+    const p = params instanceof URLSearchParams ? params : new URLSearchParams(params);
+    router.push(`?${p.toString()}`);
+  };
+  const [providers, setProviders] = useState<any[]>([]);
   const [totalProviders, setTotalProviders] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
@@ -41,14 +44,14 @@ const Providers = () => {
   // Dropdown states
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
-  const [cities, setCities] = useState([]);
-  const searchInputRef = useRef(null);
-  const locationInputRef = useRef(null);
-  const searchDropdownRef = useRef(null);
-  const locationDropdownRef = useRef(null);
+  const [cities, setCities] = useState<any[]>([]);
+  const searchInputRef = useRef<any>(null);
+  const locationInputRef = useRef<any>(null);
+  const searchDropdownRef = useRef<any>(null);
+  const locationDropdownRef = useRef<any>(null);
   
   // Israeli regions for quick selection - fetched from backend with fallback
-  const [regions, setRegions] = useState(israeliRegions);
+  const [regions, setRegions] = useState<any[]>(israeliRegions);
 
   const radiusOptions = [
     { value: 5, label: '5 ק"מ' },
@@ -65,17 +68,17 @@ const Providers = () => {
     specialization: searchParams.get('specialization') || null,
     serviceType: searchParams.get('serviceType') || null,
     providerType: searchParams.get('providerType') || null,
-    minRating: searchParams.get('minRating') ? parseFloat(searchParams.get('minRating')) : null,
-    minExperience: searchParams.get('minExperience') ? parseInt(searchParams.get('minExperience')) : null,
+    minRating: searchParams.get('minRating') ? parseFloat(searchParams.get('minRating')!) : null,
+    minExperience: searchParams.get('minExperience') ? parseInt(searchParams.get('minExperience')!) : null,
     verifiedOnly: searchParams.get('verifiedOnly') === 'true',
     recommendedOnly: searchParams.get('recommendedOnly') === 'true',
-    latitude: searchParams.get('latitude') ? parseFloat(searchParams.get('latitude')) : null,
-    longitude: searchParams.get('longitude') ? parseFloat(searchParams.get('longitude')) : null,
-    radius: searchParams.get('radius_km') ? parseFloat(searchParams.get('radius_km')) : null,
+    latitude: searchParams.get('latitude') ? parseFloat(searchParams.get('latitude')!) : null,
+    longitude: searchParams.get('longitude') ? parseFloat(searchParams.get('longitude')!) : null,
+    radius: searchParams.get('radius_km') ? parseFloat(searchParams.get('radius_km')!) : null,
     useMyLocation: searchParams.has('latitude') && searchParams.has('longitude'),
     gender: searchParams.get('gender') || null,
-    languages: searchParams.get('languages') ? searchParams.get('languages').split(',') : [],
-    healthFunds: searchParams.get('health_funds') ? searchParams.get('health_funds').split(',') : []
+    languages: searchParams.get('languages') ? searchParams.get('languages')!.split(',') : [],
+    healthFunds: searchParams.get('health_funds') ? searchParams.get('health_funds')!.split(',') : []
   });
 
   // Initialize location if provided via URL
@@ -214,8 +217,8 @@ const Providers = () => {
       params.append('skip', (pageNum * PAGE_SIZE).toString());
       params.append('limit', PAGE_SIZE.toString());
 
-      const response = await api.get(`/providers?${params.toString()}`);
-      let apiProviders = data.providers || [];
+      const data = await api.get(`/providers?${params.toString()}`);
+      const apiProviders = data.providers || [];
 
       if (pageNum === 0) {
         setProviders(apiProviders);
@@ -223,7 +226,7 @@ const Providers = () => {
         setProviders(prev => [...prev, ...apiProviders]);
       }
       setTotalProviders(data.total || 0);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch providers:', error);
       toast.error('שגיאה בטעינת ספקים. נסו שוב.');
       if (pageNum === 0) {
@@ -278,9 +281,9 @@ const Providers = () => {
     const newParams = new URLSearchParams();
     if (searchQuery) newParams.set('search', searchQuery);
     if (newFilters.city) newParams.set('city', newFilters.city);
-    if (newFilters.latitude) newParams.set('latitude', newFilters.latitude);
-    if (newFilters.longitude) newParams.set('longitude', newFilters.longitude);
-    if (newFilters.radius) newParams.set('radius_km', newFilters.radius);
+    if (newFilters.latitude) newParams.set('latitude', String(newFilters.latitude));
+    if (newFilters.longitude) newParams.set('longitude', String(newFilters.longitude));
+    if (newFilters.radius) newParams.set('radius_km', String(newFilters.radius));
     setSearchParams(newParams);
   };
 
@@ -305,7 +308,7 @@ const Providers = () => {
           );
           const data = await response.json();
           cityName = data.address?.city || data.address?.town || data.address?.village || data.address?.municipality || 'המיקום שלי';
-        } catch (error) {
+        } catch (error: any) {
           console.error('Reverse geocoding error:', error);
         }
         
@@ -326,9 +329,9 @@ const Providers = () => {
         
         // Update URL
         const newParams = new URLSearchParams(searchParams);
-        newParams.set('latitude', lat);
-        newParams.set('longitude', lng);
-        newParams.set('radius_km', newFilters.radius);
+        newParams.set('latitude', String(lat));
+        newParams.set('longitude', String(lng));
+        newParams.set('radius_km', String(newFilters.radius));
         newParams.delete('city');
         setSearchParams(newParams);
       },
@@ -376,7 +379,10 @@ const Providers = () => {
       latitude: null,
       longitude: null,
       radius: null,
-      useMyLocation: false
+      useMyLocation: false,
+      gender: null,
+      languages: [],
+      healthFunds: []
     });
     setSearchQuery('');
     setLocationQuery('');

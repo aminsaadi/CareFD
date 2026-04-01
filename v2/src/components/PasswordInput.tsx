@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 
-const PasswordInput = React.forwardRef(({ className = '', ...props }, ref) => {
+const PasswordInput = React.forwardRef(({ className = '', ...props }: any, ref: any) => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (

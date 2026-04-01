@@ -9,12 +9,12 @@ import {
 } from 'react-icons/fi';
 
 export default function AdminReviews() {
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('pending');
-  const [selectedReview, setSelectedReview] = useState(null);
+  const [selectedReview, setSelectedReview] = useState<any>(null);
   const [rejectReason, setRejectReason] = useState('');
-  const [showRejectModal, setShowRejectModal] = useState(null);
+  const [showRejectModal, setShowRejectModal] = useState<any>(null);
 
   useEffect(() => {
     fetchReviews();
@@ -26,7 +26,7 @@ export default function AdminReviews() {
       const params = filterStatus ? `?status=${filterStatus}` : '';
       const data = await api.get(`/admin/reviews${params}`);
       setReviews(data.reviews || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch reviews:', error);
       toast.error('שגיאה בטעינת ביקורות');
     } finally {
@@ -39,7 +39,7 @@ export default function AdminReviews() {
       await api.put(`/admin/reviews/${reviewId}/approve`, {});
       toast.success('הביקורת אושרה בהצלחה');
       fetchReviews();
-    } catch (error) {
+    } catch (error: any) {
       toast.error('שגיאה באישור הביקורת');
     }
   };
@@ -53,7 +53,7 @@ export default function AdminReviews() {
       setShowRejectModal(null);
       setRejectReason('');
       fetchReviews();
-    } catch (error) {
+    } catch (error: any) {
       toast.error('שגיאה בדחיית הביקורת');
     }
   };
@@ -64,7 +64,7 @@ export default function AdminReviews() {
       await api.delete(`/admin/reviews/${reviewId}`);
       toast.success('חוות הדעת נמחקה בהצלחה');
       fetchReviews();
-    } catch (error) {
+    } catch (error: any) {
       toast.error('שגיאה במחיקת חוות הדעת');
     }
   };

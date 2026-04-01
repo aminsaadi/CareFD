@@ -12,6 +12,13 @@ export interface User {
   language_preference: string;
   is_verified: boolean;
   email_verified: boolean;
+  first_name?: string;
+  last_name?: string;
+  city?: string;
+  address?: string;
+  profile_image?: string;
+  profile_color?: string;
+  [key: string]: any;
 }
 
 export interface Provider {
@@ -182,13 +189,17 @@ export interface ChatMessage {
 
 export interface Notification {
   id: string;
+  notification_id?: string;
   userId: string;
   type: string;
   title: string;
   message: string;
   data?: any;
   isRead: boolean;
+  is_read?: boolean;
   createdAt: string;
+  created_at?: string;
+  [key: string]: any;
 }
 
 export interface Review {

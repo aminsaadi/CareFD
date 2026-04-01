@@ -12,7 +12,7 @@ export const useConfirm = () => {
     cancelText: 'ביטול',
     onConfirm: () => {}
   });
-  const rejectRef = useRef(null);
+  const rejectRef = useRef<any>(null);
 
   const confirm = useCallback(({
     title = 'אישור',

@@ -10,14 +10,14 @@ const languages = [
 ];
 
 const LanguageSwitcher = () => {
-  const { i18n } = useTranslation();
+  const [currentLanguage, setCurrentLanguage] = useState('he');
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const currentLang = languages.find(l => l.code === i18n.language) || languages[0];
+  const currentLang = languages.find(l => l.code === currentLanguage) || languages[0];
 
-  const changeLanguage = (lng) => {
-    i18n.changeLanguage(lng);
+  const changeLanguage = (lng: string) => {
+    setCurrentLanguage(lng);
     const rtlLanguages = ['he', 'ar'];
     const dir = rtlLanguages.includes(lng) ? 'rtl' : 'ltr';
     document.documentElement.dir = dir;
@@ -55,7 +55,7 @@ const LanguageSwitcher = () => {
               key={lang.code}
               onClick={() => changeLanguage(lang.code)}
               className={`w-full flex items-center justify-between px-4 py-3 text-sm hover:bg-carefd-teal-pale/30 transition-colors ${
-                i18n.language === lang.code ? 'bg-carefd-teal-pale/20 text-carefd-teal' : 'text-carefd-navy'
+                currentLanguage === lang.code ? 'bg-carefd-teal-pale/20 text-carefd-teal' : 'text-carefd-navy'
               }`}
               data-testid={`lang-${lang.code}-btn`}
             >
@@ -63,7 +63,7 @@ const LanguageSwitcher = () => {
                 <span>{lang.flag}</span>
                 <span className="font-medium">{lang.name}</span>
               </span>
-              {i18n.language === lang.code && <FaCheck className="text-carefd-teal" />}
+              {currentLanguage === lang.code && <FaCheck className="text-carefd-teal" />}
             </button>
           ))}
         </div>

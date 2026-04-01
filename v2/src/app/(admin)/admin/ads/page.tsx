@@ -9,10 +9,10 @@ import {
 } from 'react-icons/fi';
 
 export default function AdminAds() {
-  const [ads, setAds] = useState([]);
+  const [ads, setAds] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showEditor, setShowEditor] = useState(false);
-  const [editingAd, setEditingAd] = useState(null);
+  const [editingAd, setEditingAd] = useState<any>(null);
   const [currentAd, setCurrentAd] = useState({
     title: '',
     image_url: '',
@@ -40,9 +40,9 @@ export default function AdminAds() {
   const fetchAds = async () => {
     try {
       setLoading(true);
-      const data = await api.get('/admin/ads');
+      const data = await api.get<any>('/admin/ads');
       setAds(data.ads || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch ads:', error);
       // Demo data
       setAds([
@@ -99,7 +99,7 @@ export default function AdminAds() {
       setEditingAd(null);
       resetForm();
       fetchAds();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save ad:', error);
       // Demo
       setAds(prev => [...prev, {
@@ -118,7 +118,7 @@ export default function AdminAds() {
     try {
       await api.delete(`/admin/ads/${adId}`);
       fetchAds();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete ad:', error);
       setAds(prev => prev.filter(a => a.ad_id !== adId));
     }
@@ -128,7 +128,7 @@ export default function AdminAds() {
     try {
       await api.put(`/admin/ads/${ad.ad_id}`, { is_active: !ad.is_active });
       fetchAds();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to toggle ad status:', error);
       setAds(prev => prev.map(a => 
         a.ad_id === ad.ad_id ? { ...a, is_active: !a.is_active } : a
@@ -148,7 +148,7 @@ export default function AdminAds() {
     });
   };
 
-  const openEditor = (ad = null) => {
+  const openEditor = (ad: any = null) => {
     if (ad) {
       setEditingAd(ad.ad_id);
       setCurrentAd({

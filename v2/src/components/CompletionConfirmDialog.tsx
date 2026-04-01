@@ -36,7 +36,7 @@ const CompletionConfirmDialog = ({ booking, onClose, onSuccess }) => {
       });
       toast.success('ההזמנה אושרה כהושלמה!');
       setStep(2); // success step
-    } catch (err) {
+    } catch (err: any) {
       setError(err.response?.data?.detail || 'שגיאה באישור ההשלמה');
     } finally {
       setLoading(false);
@@ -61,7 +61,7 @@ const CompletionConfirmDialog = ({ booking, onClose, onSuccess }) => {
       });
       toast.success('הביקורת נשלחה בהצלחה!');
       onSuccess?.();
-    } catch (err) {
+    } catch (err: any) {
       setError(err.response?.data?.detail || 'שגיאה בשליחת הביקורת');
     } finally {
       setLoading(false);

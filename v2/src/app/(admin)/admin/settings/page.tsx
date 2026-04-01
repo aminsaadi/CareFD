@@ -1,6 +1,6 @@
 "use client";
 
-import {  useState, useEffect  } from "react";
+import React, {  useState, useEffect, useRef  } from "react";
 import api from "@/lib/api-client";
 import { toast } from "sonner";
 import {
@@ -51,9 +51,9 @@ export default function AdminSettings() {
     zeptomail_api_key: '', zeptomail_sender_email: ''
   });
   const [smtpLoading, setSmtpLoading] = useState(false);
-  const [smtpStatus, setSmtpStatus] = useState(null);
-  const logoInputRef = React.useRef(null);
-  const faviconInputRef = React.useRef(null);
+  const [smtpStatus, setSmtpStatus] = useState<any>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const faviconInputRef = useRef<HTMLInputElement>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingFavicon, setUploadingFavicon] = useState(false);
   
@@ -76,12 +76,10 @@ export default function AdminSettings() {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      const res = await api.post('/upload/image', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      updateSetting(settingKey, res.data.url);
+      const res = await api.post('/upload/image', formData);
+      updateSetting(settingKey, res?.url || res?.data?.url);
       toast.success(type === 'logo' ? 'הלוגו הועלה בהצלחה!' : 'הפאביקון הועלה בהצלחה!');
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to upload ${type}:`, error);
       toast.error(`שגיאה בהעלאת ${type === 'logo' ? 'הלוגו' : 'הפאביקון'}`);
     } finally {
@@ -101,7 +99,7 @@ export default function AdminSettings() {
       if (data) {
         setSettings(prev => ({ ...prev, ...data }));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch settings:', error);
       toast.error('שגיאה בטעינת ההגדרות');
     } finally {
@@ -114,7 +112,7 @@ export default function AdminSettings() {
       setSaving(true);
       await api.put('/admin/settings', settings);
       toast.success('ההגדרות נשמרו בהצלחה!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save settings:', error);
       toast.error('שגיאה בשמירת ההגדרות');
     } finally {
@@ -156,13 +154,13 @@ export default function AdminSettings() {
         window.location.href = window.location.href.split('?')[0] + '?cleared=' + Date.now();
       }, 1500);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to clear cache:', error);
       // Still clear local cache even if API fails
       localStorage.clear();
       sessionStorage.clear();
       toast.success('המטמון המקומי נוקה!');
-      setTimeout(() => window.location.reload(true), 1000);
+      setTimeout(() => window.location.reload(), 1000);
     }
   };
 
@@ -171,7 +169,7 @@ export default function AdminSettings() {
     try {
       const data = await api.delete('/admin/providers/clear-all');
       toast.success(`נמחקו ${data.providers_deleted} ספקים ו-${data.services_deleted} שירותים`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to clear providers:', error);
       toast.error('שגיאה במחיקת הספקים');
     }
@@ -205,7 +203,7 @@ export default function AdminSettings() {
   const saveSmtpSettings = async () => {
     setSmtpLoading(true);
     try {
-      const payload = {
+      const payload: any = {
         email_provider: emailProvider,
         ...smtpSettings,
         zeptomail_sender_email: zeptomailSettings.zeptomail_sender_email,
@@ -394,7 +392,7 @@ export default function AdminSettings() {
                       accept="image/*"
                       className="hidden"
                       onChange={(e) => {
-                        if (e.target.files[0]) handleFileUpload(e.target.files[0], 'logo');
+                        if (e.target.files?.[0]) handleFileUpload(e.target.files[0], 'logo');
                         e.target.value = '';
                       }}
                     />
@@ -442,7 +440,7 @@ export default function AdminSettings() {
                       accept="image/*,.ico"
                       className="hidden"
                       onChange={(e) => {
-                        if (e.target.files[0]) handleFileUpload(e.target.files[0], 'favicon');
+                        if (e.target.files?.[0]) handleFileUpload(e.target.files[0], 'favicon');
                         e.target.value = '';
                       }}
                     />
@@ -834,7 +832,7 @@ export default function AdminSettings() {
                           } else {
                             toast.error('שליחת מייל נכשלה: ' + (res.data.error || 'שגיאה'));
                           }
-                        } catch (err) {
+                        } catch (err: any) {
                           toast.error('שגיאה בשליחת מייל: ' + (err?.data?.detail || err?.message || err.message));
                         } finally {
                           setSendingTestEmail(false);

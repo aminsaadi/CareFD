@@ -31,7 +31,7 @@ const PROFILE_COLORS = [
 const Dashboard = () => {
   
   const { user, setUser } = useAuth();
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'overview');
 
   // Sync active tab when URL search params change (e.g. navigating from Navbar)
@@ -41,32 +41,32 @@ const Dashboard = () => {
       setActiveTab(tabFromUrl);
     }
   }, [searchParams]);
-  const [bookings, setBookings] = useState([]);
-  const [requests, setRequests] = useState([]);
-  const [chats, setChats] = useState([]);
-  const [favorites, setFavorites] = useState([]);
-  const [myReviews, setMyReviews] = useState([]);
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [requests, setRequests] = useState<any[]>([]);
+  const [chats, setChats] = useState<any[]>([]);
+  const [favorites, setFavorites] = useState<any[]>([]);
+  const [myReviews, setMyReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showCompletionDialog, setShowCompletionDialog] = useState(null);
-  const [showBookingDetails, setShowBookingDetails] = useState(null);
-  const [cancelRequestId, setCancelRequestId] = useState(null);
+  const [showCompletionDialog, setShowCompletionDialog] = useState<any>(null);
+  const [showBookingDetails, setShowBookingDetails] = useState<any>(null);
+  const [cancelRequestId, setCancelRequestId] = useState<any>(null);
   const [expandedBookings, setExpandedBookings] = useState({});
   const [bookingSortBy, setBookingSortBy] = useState('date_desc');
   const [uploadingImage, setUploadingImage] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
   const [showPw, setShowPw] = useState({ current: false, new_pw: false, confirm: false });
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<any>(null);
 
   // Request management state
   const [showRequestForm, setShowRequestForm] = useState(false);
-  const [editingRequest, setEditingRequest] = useState(null);
+  const [editingRequest, setEditingRequest] = useState<any>(null);
   const [requestFilter, setRequestFilter] = useState('all');
-  const [professionOptions, setProfessionOptions] = useState([]);
-  const [serviceTypeOptions, setServiceTypeOptions] = useState([]);
-  const [deliveryTypeOptions, setDeliveryTypeOptions] = useState([]);
-  const [regionOptions, setRegionOptions] = useState([]);
-  const [requestFormData, setRequestFormData] = useState({
+  const [professionOptions, setProfessionOptions] = useState<any[]>([]);
+  const [serviceTypeOptions, setServiceTypeOptions] = useState<any[]>([]);
+  const [deliveryTypeOptions, setDeliveryTypeOptions] = useState<any[]>([]);
+  const [regionOptions, setRegionOptions] = useState<any[]>([]);
+  const [requestFormData, setRequestFormData] = useState<any>({
     title: '', description: '', professions: [], specialization: '',
     service_type: '', delivery_type: '', budget: '', budget_type: '',
     hours_needed: '', request_type: 'one_time', urgency: 'medium',
@@ -125,7 +125,7 @@ const Dashboard = () => {
       setDeliveryTypeOptions(Array.isArray(dTypes) ? dTypes : []);
       const regions = regionsRes.data?.regions || regionsRes.data || [];
       setRegionOptions(Array.isArray(regions) ? regions : []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch form options:', error);
     }
   };
@@ -176,7 +176,7 @@ const Dashboard = () => {
         unreadMessages: (chatsRes.data.rooms || []).reduce((acc, r) => acc + (r.unread_count || 0), 0),
         totalReviews: (reviewsRes.data.reviews || []).length
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch dashboard data:', error);
       toast.error('שגיאה בטעינת נתוני הדשבורד');
     } finally {
@@ -202,13 +202,11 @@ const Dashboard = () => {
       const formData = new FormData();
       formData.append('file', file);
       
-      const response = await api.post('/upload/image', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      
-      setUserForm({ ...userForm, profile_image: data.url });
+      const data = await api.post('/upload/image', formData);
+
+      setUserForm({ ...userForm, profile_image: data?.url });
       toast.success('התמונה הועלתה בהצלחה!');
-    } catch (err) {
+    } catch (err: any) {
       toast.error('שגיאה בהעלאת התמונה');
     } finally {
       setUploadingImage(false);
@@ -243,8 +241,8 @@ const Dashboard = () => {
   const getSortedBookings = () => {
     const sorted = [...bookings];
     switch (bookingSortBy) {
-      case 'date_desc': return sorted.sort((a, b) => new Date(b.created_at || b.booking_date) - new Date(a.created_at || a.booking_date));
-      case 'date_asc': return sorted.sort((a, b) => new Date(a.created_at || a.booking_date) - new Date(b.created_at || b.booking_date));
+      case 'date_desc': return sorted.sort((a, b) => new Date(b.created_at || b.booking_date).getTime() - new Date(a.created_at || a.booking_date).getTime());
+      case 'date_asc': return sorted.sort((a, b) => new Date(a.created_at || a.booking_date).getTime() - new Date(b.created_at || b.booking_date).getTime());
       case 'status': {
         const order = { pending: 0, confirmed: 1, in_progress: 2, provider_completed: 3, on_hold: 4, completed: 5, cancelled: 6, rejected: 7 };
         return sorted.sort((a, b) => (order[a.status] ?? 99) - (order[b.status] ?? 99));
@@ -257,7 +255,7 @@ const Dashboard = () => {
   const handleSaveSettings = async () => {
     setSavingSettings(true);
     try {
-      const response = await api.put('/users/me', {
+      const data = await api.put('/users/me', {
         first_name: userForm.first_name,
         last_name: userForm.last_name,
         phone: userForm.phone,
@@ -266,12 +264,12 @@ const Dashboard = () => {
         profile_image: userForm.profile_image,
         profile_color: userForm.profile_color
       });
-      
+
       if (data.user && setUser) {
         setUser(data.user);
       }
       toast.success('הפרטים נשמרו בהצלחה!');
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.response?.data?.detail || 'שגיאה בשמירת הפרטים');
     } finally {
       setSavingSettings(false);
@@ -301,7 +299,7 @@ const Dashboard = () => {
       
       setPasswordForm({ current_password: '', new_password: '', confirm_password: '' });
       toast.success('הסיסמה שונתה בהצלחה!');
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err.response?.data?.detail || 'שגיאה בשינוי הסיסמה');
     } finally {
       setChangingPassword(false);
@@ -398,7 +396,7 @@ const Dashboard = () => {
       toast.success('הבקשה נוצרה בהצלחה!');
       resetRequestForm();
       fetchDashboardData();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.detail || 'שגיאה ביצירת הבקשה');
     }
   };
@@ -407,7 +405,7 @@ const Dashboard = () => {
     e.preventDefault();
     if (!editingRequest) return;
     try {
-      const payload = {};
+      const payload: any = {};
       if (requestFormData.title) payload.title = requestFormData.title;
       if (requestFormData.description) payload.description = requestFormData.description;
       if (requestFormData.professions?.length > 0) payload.professions = requestFormData.professions;
@@ -435,7 +433,7 @@ const Dashboard = () => {
       toast.success('הבקשה עודכנה בהצלחה!');
       resetRequestForm();
       fetchDashboardData();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.detail || 'שגיאה בעדכון הבקשה');
     }
   };
@@ -450,7 +448,7 @@ const Dashboard = () => {
       await api.put(`/requests/${cancelRequestId}/cancel`, { reason: '' });
       toast.success('הבקשה בוטלה');
       fetchDashboardData();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.detail || 'שגיאה בביטול הבקשה');
     } finally {
       setCancelRequestId(null);
@@ -571,7 +569,7 @@ const Dashboard = () => {
                     tab.link ? (
                       <Link
                         key={tab.id}
-                        to={tab.link}
+                        href={tab.link}
                         data-testid={`tab-${tab.id}`}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right transition text-carefd-gray hover:bg-carefd-teal-pale/30"
                       >
@@ -707,7 +705,7 @@ const Dashboard = () => {
                           </div>
                         ) : (
                           <div className="space-y-3">
-                            {[...bookings].sort((a, b) => new Date(b.created_at || b.booking_date) - new Date(a.created_at || a.booking_date)).slice(0, 3).map((booking) => {
+                            {[...bookings].sort((a, b) => new Date(b.created_at || b.booking_date).getTime() - new Date(a.created_at || a.booking_date).getTime()).slice(0, 3).map((booking) => {
                               const StatusIcon = getStatusIcon(booking.status);
                               return (
                                 <div 
@@ -1073,7 +1071,7 @@ const Dashboard = () => {
                                 value={requestFormData.description}
                                 onChange={(e) => setRequestFormData({ ...requestFormData, description: e.target.value })}
                                 className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
-                                rows="3"
+                                rows={3}
                                 placeholder="פרטו על הצורך, מצב רפואי רלוונטי, דרישות מיוחדות..."
                               />
                             </div>
@@ -1352,7 +1350,7 @@ const Dashboard = () => {
                                 value={requestFormData.preferences}
                                 onChange={(e) => setRequestFormData({ ...requestFormData, preferences: e.target.value })}
                                 className="w-full px-3 py-2 border border-carefd-light-gray rounded-lg focus:ring-carefd-teal focus:border-carefd-teal"
-                                rows="2"
+                                rows={2}
                                 placeholder="העדפות נוספות..."
                               />
                             </div>

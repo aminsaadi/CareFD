@@ -6,7 +6,7 @@ import 'react-calendar/dist/Calendar.css';
 import { format } from 'date-fns';
 import '../styles/calendar.css';
 
-const BookingCalendar = ({ onDateSelect, availability = [], bookedSlots = [] }) => {
+const BookingCalendar = ({ onDateSelect, availability = [], bookedSlots = [] }: any) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const handleDateChange = (date) => {

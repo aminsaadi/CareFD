@@ -10,11 +10,11 @@ import {
 } from 'react-icons/fi';
 
 export default function AdminVerification() {
-  const [pendingProviders, setPendingProviders] = useState([]);
+  const [pendingProviders, setPendingProviders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showRejectModal, setShowRejectModal] = useState(null);
+  const [showRejectModal, setShowRejectModal] = useState<any>(null);
   const [rejectReason, setRejectReason] = useState('');
-  const [selectedProvider, setSelectedProvider] = useState(null);
+  const [selectedProvider, setSelectedProvider] = useState<any>(null);
 
   useEffect(() => {
     fetchPendingProviders();
@@ -25,7 +25,7 @@ export default function AdminVerification() {
       setLoading(true);
       const data = await api.get('/admin/providers/pending');
       setPendingProviders(data.providers || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch pending providers:', error);
       toast.error('שגיאה בטעינת ספקים ממתינים');
     } finally {
@@ -38,7 +38,7 @@ export default function AdminVerification() {
       await api.put(`/admin/providers/${providerId}/verify`);
       toast.success('הספק אומת בהצלחה');
       fetchPendingProviders();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to verify provider:', error);
       toast.error(error?.data?.detail || error?.message || 'שגיאה באימות הספק');
     }
@@ -53,7 +53,7 @@ export default function AdminVerification() {
       setShowRejectModal(null);
       setRejectReason('');
       fetchPendingProviders();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to reject provider:', error);
       toast.error(error?.data?.detail || error?.message || 'שגיאה בדחיית הבקשה');
     }

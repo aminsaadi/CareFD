@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'next/link';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api-client';
 import { toast } from 'sonner';
@@ -16,8 +17,8 @@ const WriteReview = () => {
   
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [booking, setBooking] = useState(null);
-  const [provider, setProvider] = useState(null);
+  const [booking, setBooking] = useState<any>(null);
+  const [provider, setProvider] = useState<any>(null);
   const [submitted, setSubmitted] = useState(false);
   
   // Review form
@@ -80,7 +81,7 @@ const WriteReview = () => {
       const providerResponse = await api.get(`/providers/${foundBooking.provider_id}`);
       setProvider(providerResponse.data);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch booking:', error);
       toast.error('שגיאה בטעינת פרטי ההזמנה');
       router.push('/dashboard');
@@ -120,7 +121,7 @@ const WriteReview = () => {
       setSubmitted(true);
       toast.success('חוות הדעת נשלחה בהצלחה!');
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to submit review:', error);
       toast.error(error.response?.data?.detail || 'שגיאה בשליחת חוות הדעת');
     } finally {

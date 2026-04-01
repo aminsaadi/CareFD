@@ -11,20 +11,20 @@ import {
 } from 'react-icons/fi';
 
 export default function AdminUsers() {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
-  const [selectedUsers, setSelectedUsers] = useState([]);
-  const [showDeleteModal, setShowDeleteModal] = useState(null);
-  const [showUserModal, setShowUserModal] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(null);
-  const [showSuspendModal, setShowSuspendModal] = useState(null);
-  const [showMessageModal, setShowMessageModal] = useState(null);
-  const [showResetPasswordModal, setShowResetPasswordModal] = useState(null);
+  const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
+  const [showDeleteModal, setShowDeleteModal] = useState<any>(null);
+  const [showUserModal, setShowUserModal] = useState<any>(null);
+  const [showEditModal, setShowEditModal] = useState<any>(null);
+  const [showSuspendModal, setShowSuspendModal] = useState<any>(null);
+  const [showMessageModal, setShowMessageModal] = useState<any>(null);
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState<any>(null);
   const [newPassword, setNewPassword] = useState('');
   const [showAdminPw, setShowAdminPw] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
+  const [userDetails, setUserDetails] = useState<any>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0 });
 
@@ -38,13 +38,13 @@ export default function AdminUsers() {
       const params = new URLSearchParams();
       if (searchQuery) params.append('search', searchQuery);
       if (selectedRole) params.append('role', selectedRole);
-      params.append('skip', (pagination.page - 1) * pagination.limit);
-      params.append('limit', pagination.limit);
+      params.append('skip', String((pagination.page - 1) * pagination.limit));
+      params.append('limit', String(pagination.limit));
       
       const data = await api.get(`/admin/users?${params.toString()}`);
       setUsers(data.users || []);
       setPagination(prev => ({ ...prev, total: data.total || 0 }));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch users:', error);
       toast.error('שגיאה בטעינת משתמשים');
     } finally {
@@ -61,7 +61,7 @@ export default function AdminUsers() {
       // Also fetch verification documents
       const docsResponse = await api.get(`/admin/users/${userId}/verification-documents`);
       setUserDetails(prev => ({ ...prev, verification: docsResponse.data }));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch user details:', error);
     } finally {
       setLoadingDetails(false);
@@ -78,7 +78,7 @@ export default function AdminUsers() {
       await api.put(`/admin/users/${userId}/role`, { role: newRole });
       toast.success('תפקיד המשתמש עודכן');
       fetchUsers();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update user role:', error);
       toast.error(error?.data?.detail || error?.message || 'שגיאה בעדכון תפקיד');
     }
@@ -90,7 +90,7 @@ export default function AdminUsers() {
       toast.success('המשתמש נמחק');
       setShowDeleteModal(null);
       fetchUsers();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete user:', error);
       toast.error(error?.data?.detail || error?.message || 'שגיאה במחיקת משתמש');
     }
@@ -102,7 +102,7 @@ export default function AdminUsers() {
       toast.success('פרטי המשתמש עודכנו');
       setShowEditModal(null);
       fetchUsers();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update user:', error);
       toast.error(error?.data?.detail || error?.message || 'שגיאה בעדכון משתמש');
     }
@@ -114,7 +114,7 @@ export default function AdminUsers() {
       toast.success('המשתמש הושעה');
       setShowSuspendModal(null);
       fetchUsers();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to suspend user:', error);
       toast.error(error?.data?.detail || error?.message || 'שגיאה בהשעיית משתמש');
     }
@@ -125,7 +125,7 @@ export default function AdminUsers() {
       await api.post(`/admin/users/${showMessageModal.user_id}/message`, messageData);
       setShowMessageModal(null);
       toast.success('ההודעה נשלחה בהצלחה!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to send message:', error);
       toast.error('שגיאה בשליחת ההודעה');
     }
@@ -143,7 +143,7 @@ export default function AdminUsers() {
       setShowResetPasswordModal(null);
       setNewPassword('');
       toast.success('הסיסמה עודכנה בהצלחה!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to reset password:', error);
       toast.error('שגיאה בעדכון הסיסמה');
     }

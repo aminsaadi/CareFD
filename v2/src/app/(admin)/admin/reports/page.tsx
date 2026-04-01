@@ -14,7 +14,7 @@ import {
 } from 'recharts';
 
 export default function AdminReports() {
-  const [reports, setReports] = useState(null);
+  const [reports, setReports] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('month');
 
@@ -27,7 +27,7 @@ export default function AdminReports() {
       setLoading(true);
       const data = await api.get(`/admin/reports?period=${period}`);
       setReports(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch reports:', error);
       toast.error('שגיאה בטעינת הדוחות');
     } finally {
@@ -43,7 +43,7 @@ export default function AdminReports() {
 
   const COLORS = ['#f59e0b', '#10b981', '#3b82f6', '#ef4444'];
 
-  const CustomTooltip = ({ active, payload, label }) => {
+  const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-100">
@@ -201,7 +201,7 @@ export default function AdminReports() {
                     outerRadius={100}
                     paddingAngle={2}
                     dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }: any) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                   >
                     {(reports?.status_distribution || []).map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />

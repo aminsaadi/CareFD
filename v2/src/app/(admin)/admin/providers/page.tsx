@@ -12,16 +12,16 @@ import {
 } from 'react-icons/fi';
 
 export default function AdminProviders() {
-  const [providers, setProviders] = useState([]);
+  const [providers, setProviders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0 });
-  const [creatingProfile, setCreatingProfile] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(null);
-  const [showToggleModal, setShowToggleModal] = useState(null);
-  const [showProviderModal, setShowProviderModal] = useState(null);
-  const [providerDetails, setProviderDetails] = useState(null);
+  const [creatingProfile, setCreatingProfile] = useState<any>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState<any>(null);
+  const [showToggleModal, setShowToggleModal] = useState<any>(null);
+  const [showProviderModal, setShowProviderModal] = useState<any>(null);
+  const [providerDetails, setProviderDetails] = useState<any>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
   useEffect(() => {
@@ -34,13 +34,13 @@ export default function AdminProviders() {
       const params = new URLSearchParams();
       if (searchQuery) params.append('search', searchQuery);
       if (filterStatus) params.append('status', filterStatus);
-      params.append('limit', pagination.limit);
-      params.append('skip', (pagination.page - 1) * pagination.limit);
+      params.append('limit', String(pagination.limit));
+      params.append('skip', String((pagination.page - 1) * pagination.limit));
       
       const data = await api.get(`/admin/providers?${params.toString()}`);
       setProviders(data.providers || []);
       setPagination(prev => ({ ...prev, total: data.total || 0 }));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch providers:', error);
       toast.error('שגיאה בטעינת ספקים');
     } finally {
@@ -68,7 +68,7 @@ export default function AdminProviders() {
       fetchProviders();
       toast.success('הספק אומת בהצלחה!');
       setShowProviderModal(null);
-    } catch (error) {
+    } catch (error: any) {
       toast.error('שגיאה באימות הספק');
     }
   };
@@ -82,7 +82,7 @@ export default function AdminProviders() {
       }
       fetchProviders();
       toast.success(isRecommended ? 'ההמלצה הוסרה' : 'הספק סומן כמומלץ!');
-    } catch (error) {
+    } catch (error: any) {
       toast.error('שגיאה בשינוי המלצה');
     }
   };
@@ -93,7 +93,7 @@ export default function AdminProviders() {
       await api.post(`/admin/providers/create-from-user/${userId}`, { business_name: userName });
       fetchProviders();
       toast.success('פרופיל ספק נוצר בהצלחה!');
-    } catch (error) {
+    } catch (error: any) {
       toast.error('שגיאה ביצירת פרופיל ספק: ' + (error?.data?.detail || error?.message || ''));
     } finally {
       setCreatingProfile(null);
@@ -107,7 +107,7 @@ export default function AdminProviders() {
       setShowProviderModal(null);
       fetchProviders();
       toast.success('הספק נמחק בהצלחה!');
-    } catch (error) {
+    } catch (error: any) {
       toast.error('שגיאה במחיקת הספק');
     }
   };
@@ -119,7 +119,7 @@ export default function AdminProviders() {
       setShowProviderModal(null);
       fetchProviders();
       toast.success(isActive ? 'הספק הושבת' : 'הספק הופעל');
-    } catch (error) {
+    } catch (error: any) {
       toast.error('שגיאה בשינוי סטטוס הספק');
     }
   };

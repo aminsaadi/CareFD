@@ -9,9 +9,9 @@ import {
 } from 'react-icons/fa';
 
 const ProviderSubscription = ({ provider, onRefresh }) => {
-  const [plans, setPlans] = useState([]);
-  const [currentSub, setCurrentSub] = useState(null);
-  const [currentPlan, setCurrentPlan] = useState(null);
+  const [plans, setPlans] = useState<any[]>([]);
+  const [currentSub, setCurrentSub] = useState<any>(null);
+  const [currentPlan, setCurrentPlan] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [upgrading, setUpgrading] = useState(false);
@@ -44,7 +44,7 @@ const ProviderSubscription = ({ provider, onRefresh }) => {
       } catch (e) {
         // History endpoint might not exist, ignore
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
     } finally {
       setLoading(false);
@@ -62,7 +62,7 @@ const ProviderSubscription = ({ provider, onRefresh }) => {
       toast.success(res.data.message || 'המנוי שודרג בהצלחה!');
       fetchData();
       onRefresh?.();
-    } catch (error) {
+    } catch (error: any) {
       toast.error(error.response?.data?.detail || 'שגיאה בשדרוג המנוי');
     } finally {
       setUpgrading(false);
@@ -76,7 +76,7 @@ const ProviderSubscription = ({ provider, onRefresh }) => {
       toast.success('המנוי בוטל. חזרת למנוי חינם.');
       fetchData();
       onRefresh?.();
-    } catch (error) {
+    } catch (error: any) {
       toast.error('שגיאה בביטול');
     }
   };

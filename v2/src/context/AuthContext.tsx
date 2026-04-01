@@ -14,6 +14,7 @@ interface AuthState {
   register: (data: { email: string; password: string; name: string; role?: string; language_preference?: string }) => Promise<{ email_verification_required?: boolean }>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  setUser: (user: User | null) => void;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -78,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, provider, token, loading, isAuthenticated: !!user, login, register, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, provider, token, loading, isAuthenticated: !!user, login, register, logout, refreshUser, setUser }}>
       {children}
     </AuthContext.Provider>
   );

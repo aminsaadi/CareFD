@@ -5,13 +5,13 @@ import { Upload, FileText, CheckCircle, XCircle, Clock, AlertCircle, Trash2 } fr
 import api from '@/lib/api-client';
 
 const VerificationDocuments = () => {
-  const [documents, setDocuments] = useState([]);
+  const [documents, setDocuments] = useState<any[]>([]);
   const [verificationStatus, setVerificationStatus] = useState('pending');
   const [verificationNotes, setVerificationNotes] = useState('');
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<any>(null);
 
   const documentTypes = [
     { value: 'id_card', label: 'תעודת זהות', icon: FileText },
@@ -29,11 +29,11 @@ const VerificationDocuments = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await api.get('/providers/documents');
+      const data = await api.get('/providers/documents');
       setDocuments(data.documents || []);
       setVerificationStatus(data.verification_status || 'pending');
       setVerificationNotes(data.verification_notes || '');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching documents:', err);
     } finally {
       setLoading(false);
@@ -65,9 +65,7 @@ const VerificationDocuments = () => {
       const formData = new FormData();
       formData.append('file', file);
       
-      const uploadResponse = await api.post('/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const uploadResponse = await api.post('/upload', formData);
 
       // Then register the document
       await api.post('/providers/documents', {
@@ -83,7 +81,7 @@ const VerificationDocuments = () => {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err.response?.data?.detail || 'שגיאה בהעלאת המסמך');
     } finally {
       setUploading(false);

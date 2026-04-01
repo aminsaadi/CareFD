@@ -79,8 +79,8 @@ const MapPicker = ({
   providers = [],
   showProviders = false,
   height = 'h-64'
-}) => {
-  const [position, setPosition] = useState(null);
+}: any) => {
+  const [position, setPosition] = useState<any>(null);
 
   useEffect(() => {
     if (location?.latitude && location?.longitude) {

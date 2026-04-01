@@ -9,12 +9,12 @@ import {
 } from 'react-icons/fi';
 
 export default function AdminServices() {
-  const [services, setServices] = useState([]);
+  const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [showDeleteModal, setShowDeleteModal] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState<any>(null);
+  const [showEditModal, setShowEditModal] = useState<any>(null);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0 });
 
   useEffect(() => {
@@ -27,13 +27,13 @@ export default function AdminServices() {
       const params = new URLSearchParams();
       if (searchQuery) params.append('search', searchQuery);
       if (selectedCategory) params.append('category', selectedCategory);
-      params.append('skip', (pagination.page - 1) * pagination.limit);
-      params.append('limit', pagination.limit);
+      params.append('skip', String((pagination.page - 1) * pagination.limit));
+      params.append('limit', String(pagination.limit));
       
       const data = await api.get(`/admin/services?${params.toString()}`);
       setServices(data.services || []);
       setPagination(prev => ({ ...prev, total: data.total || 0 }));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch services:', error);
     } finally {
       setLoading(false);
@@ -45,7 +45,7 @@ export default function AdminServices() {
       await api.delete(`/admin/services/${serviceId}`);
       setShowDeleteModal(null);
       fetchServices();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete service:', error);
     }
   };
@@ -55,7 +55,7 @@ export default function AdminServices() {
       await api.put(`/admin/services/${showEditModal.service_id}`, serviceData);
       setShowEditModal(null);
       fetchServices();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update service:', error);
     }
   };

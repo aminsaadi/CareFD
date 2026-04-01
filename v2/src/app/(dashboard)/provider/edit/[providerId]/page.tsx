@@ -12,7 +12,7 @@ import {
   FaWhatsapp, FaEnvelope, FaFileAlt, FaUpload, FaEye, FaEyeSlash
 } from "react-icons/fa";
 import CitySelect, { sortedCities } from "@/components/CitySelect";
-import { israeliRegions } from "@/data/searchData";
+import { israeliRegions } from "@/lib/data/searchData";
 
 // Options data - professions loaded from API (admin-managed)
 
@@ -117,8 +117,8 @@ export default function ProviderEdit() {
   const providerId = params.providerId as string;
   const { user } = useAuth();
   const router = useRouter();
-  const fileInputRef = useRef(null);
-  const certificateInputRef = useRef(null);
+  const fileInputRef = useRef<any>(null);
+  const certificateInputRef = useRef<any>(null);
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -127,10 +127,10 @@ export default function ProviderEdit() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('basic');
-  const [professions, setProfessions] = useState([]); // From admin hierarchy
+  const [professions, setProfessions] = useState<any[]>([]); // From admin hierarchy
 
   // Form state
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<any>({
     business_name: '',
     profession_title: '',
     // Profession hierarchy (from admin)
@@ -191,7 +191,7 @@ export default function ProviderEdit() {
     coverage_radius_km: 10
   });
 
-  const [availability, setAvailability] = useState([]);
+  const [availability, setAvailability] = useState<any[]>([]);
 
   useEffect(() => {
     fetchProfessions();
@@ -202,7 +202,7 @@ export default function ProviderEdit() {
     try {
       const data = await api.get('/professions');
       setProfessions(data.professions || []);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch professions:', err);
     }
   };
@@ -210,7 +210,6 @@ export default function ProviderEdit() {
   const fetchProvider = async () => {
     try {
       const data = await api.get(`/providers/${providerId}`);
-      const data = data;
 
       if (data.user_id !== user?.user_id && user?.role !== 'admin') {
         router.push('/dashboard');
@@ -267,7 +266,7 @@ export default function ProviderEdit() {
       
       setLocation(data.location || location);
       setAvailability(data.availability || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch provider:', error);
       setError('שגיאה בטעינת הפרופיל');
     } finally {
@@ -297,7 +296,7 @@ export default function ProviderEdit() {
       await api.put(`/providers/${providerId}`, dataToSave);
       setSuccess('הפרופיל נשמר בהצלחה!');
       setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
+    } catch (err: any) {
       setError(err?.data?.detail || err?.message || 'שגיאה בשמירת הפרופיל');
     } finally {
       setSaving(false);
@@ -318,15 +317,13 @@ export default function ProviderEdit() {
       const formDataUpload = new FormData();
       formDataUpload.append('file', file);
       
-      const data = await api.post('/upload/image', formDataUpload, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const data = await api.post('/upload/image', formDataUpload);
       
       const newCertifications = [...formData.certifications];
       newCertifications[index] = { ...newCertifications[index], document_url: data.url };
       setFormData({ ...formData, certifications: newCertifications });
       setSuccess('התעודה הועלתה בהצלחה!');
-    } catch (err) {
+    } catch (err: any) {
       setError('שגיאה בהעלאת התעודה');
     } finally {
       setUploadingCertificate(false);
@@ -390,13 +387,11 @@ export default function ProviderEdit() {
       const formDataUpload = new FormData();
       formDataUpload.append('file', file);
       
-      const data = await api.post('/upload/image', formDataUpload, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const data = await api.post('/upload/image', formDataUpload);
       
       setFormData({ ...formData, profile_image: data.url });
       setSuccess('התמונה הועלתה בהצלחה!');
-    } catch (err) {
+    } catch (err: any) {
       setError('שגיאה בהעלאת התמונה');
     } finally {
       setUploadingImage(false);
@@ -899,7 +894,7 @@ export default function ProviderEdit() {
                 {/* Service Categories - multi-select from all professions hierarchy */}
                 {formData.profession_id && (() => {
                   // Collect all categories from all professions
-                  const allCategories = [];
+                  const allCategories: any[] = [];
                   professions.forEach(prof => {
                     (prof.sub_professions || []).forEach(sub => {
                       (sub.categories || []).forEach(cat => {
@@ -936,7 +931,7 @@ export default function ProviderEdit() {
                   };
 
                   // Group categories by profession
-                  const categoriesByProfession = {};
+                  const categoriesByProfession: Record<string, any[]> = {};
                   allCategories.forEach(cat => {
                     const key = cat.profession_name;
                     if (!categoriesByProfession[key]) categoriesByProfession[key] = [];
@@ -1095,7 +1090,7 @@ export default function ProviderEdit() {
                             } else {
                               // Add region tag and all its cities (avoid duplicates)
                               const regionCities = region.cities || [];
-                              const merged = [...new Set([...current, regionTag, ...regionCities])];
+                              const merged = Array.from(new Set([...current, regionTag, ...regionCities]));
                               setFormData({ ...formData, service_areas: merged });
                             }
                           }}

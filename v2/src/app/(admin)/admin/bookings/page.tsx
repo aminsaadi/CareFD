@@ -10,7 +10,7 @@ import {
 } from 'react-icons/fi';
 
 export default function AdminBookings() {
-  const [bookings, setBookings] = useState([]);
+  const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
@@ -26,13 +26,13 @@ export default function AdminBookings() {
       const params = new URLSearchParams();
       if (searchQuery) params.append('search', searchQuery);
       if (filterStatus) params.append('status', filterStatus);
-      params.append('limit', pagination.limit);
-      params.append('skip', (pagination.page - 1) * pagination.limit);
+      params.append('limit', String(pagination.limit));
+      params.append('skip', String((pagination.page - 1) * pagination.limit));
       
       const data = await api.get(`/admin/bookings?${params.toString()}`);
       setBookings(data.bookings || []);
       setPagination(prev => ({ ...prev, total: data.total || 0 }));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch bookings:', error);
       toast.error('שגיאה בטעינת ההזמנות');
     } finally {
@@ -45,7 +45,7 @@ export default function AdminBookings() {
       await api.put(`/admin/bookings/${bookingId}/status`, { status });
       toast.success('סטטוס ההזמנה עודכן בהצלחה');
       fetchBookings();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update booking status:', error);
       toast.error(error?.data?.detail || error?.message || 'שגיאה בעדכון סטטוס ההזמנה');
     }

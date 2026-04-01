@@ -90,7 +90,7 @@ const NotificationBell = () => {
     }
   };
 
-  const formatTimeAgo = (dateStr: string) => {
+  const formatTimeAgo = (dateStr: any) => {
     const diff = Date.now() - new Date(dateStr).getTime();
     const mins = Math.floor(diff / 60000);
     if (mins < 1) return 'עכשיו';
@@ -131,25 +131,25 @@ const NotificationBell = () => {
           </div>
 
           <div className="max-h-[60vh] md:max-h-96 overflow-y-auto">
-            {notifications.filter(n => !deletedIds.has(n.notification_id)).length === 0 ? (
+            {notifications.filter(n => !deletedIds.has(n.notification_id!)).length === 0 ? (
               <div className="p-8 text-center text-carefd-gray">
                 <FaBell className="text-4xl mx-auto mb-2 text-carefd-teal-pale" />
                 <p>אין התראות חדשות</p>
               </div>
             ) : (
-              notifications.filter(n => !deletedIds.has(n.notification_id)).map((notification) => {
+              notifications.filter(n => !deletedIds.has(n.notification_id!)).map((notification) => {
                 const Icon = notificationIcons[notification.type] || FaBell;
                 const colorClass = notificationColors[notification.type] || notificationColors.system;
                 return (
-                  <Link key={notification.notification_id} href={getNotificationLink(notification)}
-                    onClick={() => { if (!notification.is_read) markAsRead(notification.notification_id); setIsOpen(false); }}
+                  <Link key={notification.notification_id!} href={getNotificationLink(notification)}
+                    onClick={() => { if (!notification.is_read) markAsRead(notification.notification_id!); setIsOpen(false); }}
                     className={`block p-3 md:p-4 border-b border-carefd-teal-pale/50 hover:bg-carefd-teal-pale/10 transition ${!notification.is_read ? 'bg-carefd-teal-pale/20' : ''}`}>
                     <div className="flex gap-3">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${colorClass}`}><Icon /></div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <p className={`text-sm ${!notification.is_read ? 'font-bold' : ''} text-carefd-navy truncate`}>{notification.title}</p>
-                          <button onClick={(e) => deleteNotification(notification.notification_id, e)}
+                          <button onClick={(e) => deleteNotification(notification.notification_id!, e)}
                             className="text-carefd-gray hover:text-red-500 p-1 flex-shrink-0"><FaTrash className="text-xs" /></button>
                         </div>
                         <p className="text-sm text-carefd-gray line-clamp-2">{notification.message}</p>

@@ -10,10 +10,10 @@ import {
 } from 'react-icons/fi';
 
 export default function AdminOverview() {
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [recentActivity, setRecentActivity] = useState([]);
+  const [error, setError] = useState<any>(null);
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
 
   useEffect(() => {
     fetchData();
@@ -26,7 +26,7 @@ export default function AdminOverview() {
       const [statsData, bookingsData, reviewsData] = await Promise.all([api.get('/admin/stats'), api.get('/admin/bookings?limit=5'), api.get('/admin/reviews?status=pending')]);
       setStats(statsData);
       
-      const activities = [];
+      const activities: any[] = [];
       (bookingsData.bookings || []).slice(0, 3).forEach(b => {
         activities.push({
           id: b.booking_id,
@@ -46,7 +46,7 @@ export default function AdminOverview() {
       setRecentActivity(activities.length > 0 ? activities : [
         { id: 'empty', type: 'user', message: 'אין פעילות אחרונה', time: '' }
       ]);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch stats:', err);
       setError('שגיאה בטעינת נתוני המערכת');
     } finally {

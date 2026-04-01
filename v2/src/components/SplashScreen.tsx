@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-// removed useNavigate from 'next/link';
-import { useSiteSettings } // removed;
+import { useRouter } from 'next/navigation';
 import { FaMapMarkerAlt, FaUserMd, FaCalendarCheck, FaArrowLeft, FaChevronLeft } from 'react-icons/fa';
 
 const SPLASH_KEY = 'carefd_onboarding_seen';
@@ -31,7 +30,7 @@ const slides = [
 export const shouldShowSplash = () => {
   // Show splash only in standalone (PWA installed) mode on first launch
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-    || window.navigator.standalone === true;
+    || (window.navigator as any).standalone === true;
   const hasSeen = localStorage.getItem(SPLASH_KEY);
   return isStandalone && !hasSeen;
 };
@@ -39,7 +38,7 @@ export const shouldShowSplash = () => {
 const SplashScreen = ({ onComplete }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  const { settings: siteSettings } = useSiteSettings();
+  const siteSettings = { logo_url: '', site_name: 'CareFD' };
   const router = useRouter();
 
   const handleNext = () => {

@@ -9,13 +9,13 @@ import {
 } from 'react-icons/fi';
 
 export default function AdminRegions() {
-  const [regions, setRegions] = useState([]);
+  const [regions, setRegions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [expandedRegion, setExpandedRegion] = useState(null);
+  const [expandedRegion, setExpandedRegion] = useState<any>(null);
   const [showAddRegion, setShowAddRegion] = useState(false);
-  const [editingRegion, setEditingRegion] = useState(null);
-  const [showAddCity, setShowAddCity] = useState(null);
+  const [editingRegion, setEditingRegion] = useState<any>(null);
+  const [showAddCity, setShowAddCity] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
   
   // Form states
@@ -29,7 +29,7 @@ export default function AdminRegions() {
       setLoading(true);
       const data = await api.get('/regions');
       setRegions(data.regions || []);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch regions:', error);
       toast.error('שגיאה בטעינת האזורים');
     } finally {
@@ -58,7 +58,7 @@ export default function AdminRegions() {
       setRegionForm({ name: '', name_en: '' });
       setShowAddRegion(false);
       fetchRegions();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to add region:', error);
       toast.error('שגיאה בהוספת אזור');
     } finally {
@@ -79,7 +79,7 @@ export default function AdminRegions() {
       setEditingRegion(null);
       setRegionForm({ name: '', name_en: '' });
       fetchRegions();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update region:', error);
       toast.error('שגיאה בעדכון אזור');
     } finally {
@@ -88,13 +88,7 @@ export default function AdminRegions() {
   };
 
   const deleteRegion = async (regionId, regionName) => {
-    const confirmed = await confirm({
-      title: 'מחיקת אזור',
-      message: `האם אתה בטוח שברצונך למחוק את האזור "${regionName}"?`,
-      type: 'danger',
-      confirmText: 'מחק',
-      cancelText: 'ביטול'
-    });
+    const confirmed = window.confirm(`האם אתה בטוח שברצונך למחוק את האזור "${regionName}"?`);
     
     if (!confirmed) return;
     
@@ -102,7 +96,7 @@ export default function AdminRegions() {
       await api.delete(`/admin/regions/${regionId}`);
       toast.success('האזור נמחק בהצלחה');
       fetchRegions();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete region:', error);
       toast.error('שגיאה במחיקת אזור');
     }
@@ -126,7 +120,7 @@ export default function AdminRegions() {
       setCityForm({ name: '', name_en: '', lat: '', lng: '' });
       setShowAddCity(null);
       fetchRegions();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to add city:', error);
       toast.error('שגיאה בהוספת עיר');
     } finally {
@@ -137,13 +131,7 @@ export default function AdminRegions() {
   const removeCity = async (regionId, city) => {
     const cityName = typeof city === 'string' ? city : city.name;
     
-    const confirmed = await confirm({
-      title: 'הסרת עיר',
-      message: `האם אתה בטוח שברצונך להסיר את "${cityName}"?`,
-      type: 'danger',
-      confirmText: 'הסר',
-      cancelText: 'ביטול'
-    });
+    const confirmed = window.confirm(`האם אתה בטוח שברצונך להסיר את "${cityName}"?`);
     
     if (!confirmed) return;
     
@@ -151,7 +139,7 @@ export default function AdminRegions() {
       await api.delete(`/admin/regions/${regionId}/cities/${encodeURIComponent(cityName)}`);
       toast.success('העיר הוסרה בהצלחה');
       fetchRegions();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to remove city:', error);
       toast.error('שגיאה בהסרת עיר');
     }

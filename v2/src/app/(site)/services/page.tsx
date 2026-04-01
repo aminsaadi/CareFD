@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useSearchParams } from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import ServiceCard from '@/components/ServiceCard';
 import UnifiedAdvancedFilters from '@/components/UnifiedAdvancedFilters';
 import api from '@/lib/api-client';
@@ -68,9 +68,14 @@ const SkeletonCard = () => (
 );
 
 const Services = () => {
-  const { t } = useTranslation();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [services, setServices] = useState([]);
+  const t = (key: string) => ({ services: 'שירותים' }[key] || key);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const setSearchParams = (params: URLSearchParams | Record<string, string>) => {
+    const p = params instanceof URLSearchParams ? params : new URLSearchParams(params);
+    router.push(`?${p.toString()}`);
+  };
+  const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
@@ -83,7 +88,7 @@ const Services = () => {
   const [locationQuery, setLocationQuery] = useState(searchParams.get('city') || '');
   const [professionQuery, setProfessionQuery] = useState(searchParams.get('profession') || '');
   const [isLocating, setIsLocating] = useState(false);
-  const [apiProfessions, setApiProfessions] = useState([]);
+  const [apiProfessions, setApiProfessions] = useState<any[]>([]);
 
   // Dropdown states
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
@@ -91,13 +96,13 @@ const Services = () => {
   const [showProfessionDropdown, setShowProfessionDropdown] = useState(false);
 
   // Refs
-  const searchInputRef = useRef(null);
-  const locationInputRef = useRef(null);
-  const professionInputRef = useRef(null);
-  const searchDropdownRef = useRef(null);
-  const locationDropdownRef = useRef(null);
-  const professionDropdownRef = useRef(null);
-  const abortControllerRef = useRef(null);
+  const searchInputRef = useRef<any>(null);
+  const locationInputRef = useRef<any>(null);
+  const professionInputRef = useRef<any>(null);
+  const searchDropdownRef = useRef<any>(null);
+  const locationDropdownRef = useRef<any>(null);
+  const professionDropdownRef = useRef<any>(null);
+  const abortControllerRef = useRef<any>(null);
 
   const [filters, setFilters] = useState(() => loadFiltersFromSession(searchParams));
 
@@ -119,7 +124,7 @@ const Services = () => {
 
   // Build query params from current filter state
   const buildQueryParams = useCallback((skip = 0) => {
-    const params = {};
+    const params: any = {};
     if (searchQuery.trim()) params.search = searchQuery.trim();
     if (filters.serviceType) params.service_type = filters.serviceType;
     if (filters.category) params.service_category = filters.category;
@@ -164,7 +169,8 @@ const Services = () => {
 
       const skip = append ? services.length : 0;
       const params = buildQueryParams(skip);
-      const response = await api.get('/services', { params, signal: controller.signal });
+      const queryString = new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)])).toString();
+      const data = await api.get(`/services?${queryString}`);
       const apiServices = data.services || [];
 
       if (append) {
@@ -173,7 +179,7 @@ const Services = () => {
         setServices(apiServices);
       }
       setHasMore(apiServices.length === PAGE_LIMIT);
-    } catch (error) {
+    } catch (error: any) {
       if (error.name === 'AbortError' || error.name === 'CanceledError') return;
       console.error('Failed to fetch services:', error);
       if (!append) {
@@ -194,7 +200,7 @@ const Services = () => {
     api.get('/professions').then(res => {
       const profs = res.data.professions || [];
       // Flatten: main professions + their sub_professions as individual entries
-      const flatList = [];
+      const flatList: any[] = [];
       profs.forEach(prof => {
         flatList.push({
           id: prof.profession_id,
@@ -327,7 +333,7 @@ const Services = () => {
           );
           const data = await response.json();
           cityName = data.address?.city || data.address?.town || data.address?.village || 'המיקום שלי';
-        } catch (error) {
+        } catch (error: any) {
           console.error('Reverse geocoding error:', error);
         }
 
@@ -348,9 +354,9 @@ const Services = () => {
 
         // URL sync
         const newParams = new URLSearchParams(searchParams);
-        newParams.set('latitude', lat);
-        newParams.set('longitude', lng);
-        newParams.set('radius_km', newFilters.radius);
+        newParams.set('latitude', String(lat));
+        newParams.set('longitude', String(lng));
+        newParams.set('radius_km', String(newFilters.radius));
         newParams.delete('city');
         setSearchParams(newParams);
       },
@@ -427,10 +433,7 @@ const Services = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale flex flex-col">
-        title="שירותי בריאות וסיעוד"
-        description="חפש שירותי בריאות וסיעוד בישראל - טיפול סיעודי בבית, אחות פרטית, השגחה, ליווי רפואי ועוד. השוואת מחירים ותיאום מיידי."
-        canonical="/services"
-      />
+      {/* SEO component removed - handled by layout */}
       
 
       <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
