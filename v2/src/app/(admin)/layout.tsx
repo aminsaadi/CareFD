@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import Navbar from "@/components/Navbar";
 
 const adminLinks = [
   { href: "/admin/overview", label: "סקירה", icon: "📊" },
@@ -27,9 +26,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <ProtectedRoute requiredRole="admin">
-      <div className="min-h-screen bg-gray-100 flex flex-col">
-        <Navbar />
-        <div className="flex flex-1">
+      <div className="bg-gray-100">
+        <div className="flex min-h-[calc(100vh-5rem)]">
           {/* Sidebar */}
           <aside className="w-56 bg-white shadow-sm hidden md:block flex-shrink-0" dir="rtl">
             <nav className="p-4 space-y-1">
