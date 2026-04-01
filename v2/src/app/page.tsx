@@ -218,7 +218,7 @@ const Landing = () => {
       // Fetch professions from backend - update professions, categories, and popular searches
       try {
         const professionsRes = await api.get('/professions');
-        const profs = professionsRes.?.professions || professionsRes|| [];
+        const profs = professionsRes.professions || professionsRes || [];
         if (Array.isArray(profs) && profs.length > 0) {
           // Update professions bar
           const mappedProfs = profs.map((p, idx) => ({

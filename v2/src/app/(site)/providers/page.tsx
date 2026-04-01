@@ -102,7 +102,7 @@ const Providers = () => {
     const fetchProfessions = async () => {
       try {
         const res = await api.get('/professions');
-        const profs = res.?.professions || res|| [];
+        const profs = res.professions || res || [];
         if (Array.isArray(profs) && profs.length > 0) {
           const profNames = profs.map(p => p.name || p.name_he || p.label).filter(Boolean);
           if (profNames.length > 0) {
@@ -119,7 +119,7 @@ const Providers = () => {
     const fetchRegions = async () => {
       try {
         const res = await api.get('/regions');
-        const backendRegions = res.?.regions || [];
+        const backendRegions = res.regions || [];
         if (backendRegions.length > 0) {
           setRegions(backendRegions);
         }
