@@ -1,37 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
-import api, { ApiError } from "@/lib/api-client";
-import { format } from "date-fns";
-import { toast } from "sonner";
-import { FaStar, FaSpinner, FaCheckCircle } from "react-icons/fa";
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import Link from 'next/link';
+import api from '@/lib/api-client';
+import { format } from 'date-fns';
+import { toast } from 'sonner';
+import ConfirmDialog from '@/components/ConfirmDialog';
+import { useConfirm } from '@/hooks/useConfirm';
+import { FaStar, FaSpinner, FaCheckCircle } from 'react-icons/fa';
 
-interface BookingData {
-  booking_id: string;
-  service_name?: string;
-  service?: { name?: string; price?: number };
-  provider_name?: string;
-  provider?: { business_name?: string; provider_id?: string };
-  provider_id?: string;
-  status: string;
-  booking_date?: string;
-  final_price?: number;
-  base_price?: number;
-}
-
-export default function MyBookingsPage() {
+const MyBookings = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
-  const [bookings, setBookings] = useState<BookingData[]>([]);
+  const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("all");
-  const [showReviewModal, setShowReviewModal] = useState<BookingData | null>(null);
+  const [filter, setFilter] = useState('all');
+  const { confirmState, confirm, closeConfirm } = useConfirm();
+  const [showReviewModal, setShowReviewModal] = useState(null);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewHoverRating, setReviewHoverRating] = useState(0);
-  const [reviewComment, setReviewComment] = useState("");
+  const [reviewComment, setReviewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
-  const [reviewedBookings, setReviewedBookings] = useState<string[]>([]);
+  const [reviewedBookings, setReviewedBookings] = useState([]);
 
   useEffect(() => {
     fetchBookings();
@@ -41,104 +32,151 @@ export default function MyBookingsPage() {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const data = await api.get<{ bookings: BookingData[] }>("/bookings/my");
-      setBookings(data.bookings || []);
+      const response = await api.get('/bookings/my');
+      const bookingsData = data.bookings || [];
+      setBookings(bookingsData);
     } catch (error) {
-      console.error("Failed to fetch bookings:", error);
-      toast.error("שגיאה בטעינת ההזמנות");
+      console.error('Failed to fetch bookings:', error);
+      toast.error('שגיאה בטעינת ההזמנות');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCancelBooking = async (bookingId: string) => {
-    if (!window.confirm("בקשת הביטול תישלח לספק לאישור. האם להמשיך?")) return;
+  const handleCancelBooking = async (bookingId) => {
+    try {
+      await confirm({
+        title: 'בקשת ביטול הזמנה',
+        message: 'בקשת הביטול תישלח לספק לאישור. האם להמשיך?',
+        type: 'warning',
+        confirmText: 'שלח בקשת ביטול',
+        cancelText: 'השאר'
+      });
+    } catch {
+      return; // User cancelled
+    }
+
     try {
       await api.put(`/bookings/${bookingId}/cancel`);
-      toast.success("ההזמנה בוטלה בהצלחה");
+      toast.success('ההזמנה בוטלה בהצלחה');
       fetchBookings();
     } catch (error) {
-      const err = error as ApiError;
-      toast.error(err.data?.detail || "שגיאה בביטול ההזמנה");
+      toast.error(error.response?.data?.detail || 'שגיאה בביטול ההזמנה');
     }
   };
 
-  const handleConfirmCompletion = async (booking: BookingData) => {
-    if (!window.confirm(`האם השירות "${booking.service_name || "שירות"}" הושלם לשביעות רצונך?`)) return;
+  const handleConfirmCompletion = async (booking) => {
     try {
-      await api.put(`/bookings/${booking.booking_id}/client-confirm`, {
-        final_price: booking.final_price || booking.base_price,
+      await confirm({
+        title: 'אישור השלמת שירות',
+        message: `האם השירות "${booking.service_name || 'שירות'}" הושלם לשביעות רצונך?`,
+        type: 'success',
+        confirmText: 'אשר השלמה',
+        cancelText: 'עדיין לא'
       });
-      toast.success("השירות אושר כהושלם! תוכל לכתוב ביקורת.");
+      await api.put(`/bookings/${booking.booking_id}/client-confirm`, {
+        final_price: booking.final_price || booking.base_price
+      });
+      toast.success('השירות אושר כהושלם! תוכל לכתוב ביקורת.');
       fetchBookings();
     } catch (error) {
-      const err = error as ApiError;
-      toast.error(err.data?.detail || "שגיאה באישור ההשלמה");
+      if (error?.response) {
+        toast.error(error.response?.data?.detail || 'שגיאה באישור ההשלמה');
+      }
     }
   };
 
-  const handleSubmitReview = async (booking: BookingData) => {
-    if (reviewRating === 0) { toast.error("נא לבחור דירוג"); return; }
-    if (reviewComment.trim().length < 10) { toast.error("נא לכתוב ביקורת של לפחות 10 תווים"); return; }
+  const handleSubmitReview = async (booking) => {
+    if (reviewRating === 0) {
+      toast.error('נא לבחור דירוג');
+      return;
+    }
+    
+    if (reviewComment.trim().length < 10) {
+      toast.error('נא לכתוב ביקורת של לפחות 10 תווים');
+      return;
+    }
+
     setIsSubmittingReview(true);
+
     try {
-      await api.post("/reviews", {
+      await api.post('/reviews', {
         provider_id: booking.provider_id || booking.provider?.provider_id,
         booking_id: booking.booking_id,
         rating: reviewRating,
-        comment: reviewComment.trim(),
+        comment: reviewComment.trim()
       });
-      toast.success("הביקורת נשלחה בהצלחה! תודה על המשוב.");
+      
+      toast.success('הביקורת נשלחה בהצלחה! תודה על המשוב.');
       setReviewedBookings([...reviewedBookings, booking.booking_id]);
       setShowReviewModal(null);
       setReviewRating(0);
-      setReviewComment("");
+      setReviewComment('');
     } catch (err) {
-      console.error("Failed to submit review:", err);
-      toast.error("שגיאה בשליחת הביקורת. נסה שוב.");
+      console.error('Failed to submit review:', err);
+      toast.error('שגיאה בשליחת הביקורת. נסה שוב.');
     } finally {
       setIsSubmittingReview(false);
     }
   };
 
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      pending: "bg-yellow-100 text-yellow-800 border-yellow-300",
-      confirmed: "bg-carefd-teal-pale text-carefd-teal border-carefd-teal",
-      in_progress: "bg-blue-100 text-blue-800 border-blue-300",
-      provider_completed: "bg-purple-100 text-purple-800 border-purple-300",
-      completed: "bg-green-100 text-green-800 border-green-300",
-      cancelled: "bg-red-100 text-red-800 border-red-300",
-      rejected: "bg-red-100 text-red-800 border-red-300",
-      cancellation_requested: "bg-orange-100 text-orange-800 border-orange-300",
-      on_hold: "bg-gray-100 text-gray-800 border-gray-300",
+  const getStatusColor = (status) => {
+    const colors = {
+      pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+      confirmed: 'bg-carefd-teal-pale text-carefd-teal border-carefd-teal',
+      in_progress: 'bg-blue-100 text-blue-800 border-blue-300',
+      provider_completed: 'bg-purple-100 text-purple-800 border-purple-300',
+      completed: 'bg-green-100 text-green-800 border-green-300',
+      cancelled: 'bg-red-100 text-red-800 border-red-300',
+      rejected: 'bg-red-100 text-red-800 border-red-300',
+      cancellation_requested: 'bg-orange-100 text-orange-800 border-orange-300',
+      on_hold: 'bg-gray-100 text-gray-800 border-gray-300'
     };
-    return colors[status] || "bg-gray-100 text-gray-800";
+    return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      pending: "ממתין לאישור", confirmed: "מאושר", in_progress: "בביצוע",
-      provider_completed: "הספק סיים - ממתין לאישורך", completed: "הושלם",
-      cancelled: "בוטל", rejected: "נדחה", cancellation_requested: "בקשת ביטול", on_hold: "בהמתנה",
+  const getStatusLabel = (status) => {
+    const labels = {
+      pending: 'ממתין לאישור',
+      confirmed: 'מאושר',
+      in_progress: 'בביצוע',
+      provider_completed: 'הספק סיים - ממתין לאישורך',
+      completed: 'הושלם',
+      cancelled: 'בוטל',
+      rejected: 'נדחה',
+      cancellation_requested: 'בקשת ביטול',
+      on_hold: 'בהמתנה'
     };
     return labels[status] || status;
   };
 
-  const filteredBookings = bookings.filter((b) => filter === "all" || b.status === filter);
+  const filteredBookings = bookings.filter(booking => {
+    if (filter === 'all') return true;
+    return booking.status === filter;
+  });
 
   if (loading) {
-    return <div className="text-center py-12">טוען...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50">
+        
+        <div className="text-center py-12">{t('loading')}</div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale">
+      
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-carefd-navy font-heading" data-testid="my-bookings-title">
-            ההזמנות שלי
+            {t('myBookings')}
           </h1>
-          <Link href="/services" className="bg-carefd-teal text-white px-6 py-2 rounded-lg hover:bg-carefd-teal-medium transition-colors">
+          <Link
+            href="/services"
+            className="bg-carefd-teal text-white px-6 py-2 rounded-lg hover:bg-carefd-teal-medium transition-colors"
+          >
             הזמן שירות חדש
           </Link>
         </div>
@@ -146,24 +184,46 @@ export default function MyBookingsPage() {
         {/* Filter Tabs */}
         <div className="bg-white rounded-lg shadow-md mb-6 p-4">
           <div className="flex gap-2 flex-wrap">
-            {([
-              { key: "all", label: `הכל (${bookings.length})` },
-              { key: "pending", label: `ממתינות (${bookings.filter((b) => b.status === "pending").length})` },
-              { key: "confirmed", label: `מאושרות (${bookings.filter((b) => b.status === "confirmed").length})` },
-              { key: "completed", label: `הושלמו (${bookings.filter((b) => b.status === "completed").length})` },
-            ] as const).map((f) => (
-              <button
-                key={f.key}
-                onClick={() => setFilter(f.key)}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  filter === f.key
-                    ? "bg-carefd-teal text-white"
-                    : "bg-carefd-light-gray text-carefd-navy hover:bg-carefd-teal-pale"
-                }`}
-              >
-                {f.label}
-              </button>
-            ))}
+            <button
+              onClick={() => setFilter('all')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                filter === 'all'
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-light-gray text-carefd-navy hover:bg-carefd-teal-pale'
+              }`}
+            >
+              הכל ({bookings.length})
+            </button>
+            <button
+              onClick={() => setFilter('pending')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                filter === 'pending'
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-light-gray text-carefd-navy hover:bg-carefd-teal-pale'
+              }`}
+            >
+              ממתינות ({bookings.filter(b => b.status === 'pending').length})
+            </button>
+            <button
+              onClick={() => setFilter('confirmed')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                filter === 'confirmed'
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-light-gray text-carefd-navy hover:bg-carefd-teal-pale'
+              }`}
+            >
+              מאושרות ({bookings.filter(b => b.status === 'confirmed').length})
+            </button>
+            <button
+              onClick={() => setFilter('completed')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                filter === 'completed'
+                  ? 'bg-carefd-teal text-white'
+                  : 'bg-carefd-light-gray text-carefd-navy hover:bg-carefd-teal-pale'
+              }`}
+            >
+              הושלמו ({bookings.filter(b => b.status === 'completed').length})
+            </button>
           </div>
         </div>
 
@@ -183,10 +243,10 @@ export default function MyBookingsPage() {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-xl font-bold text-carefd-navy">
-                      {booking.service_name || booking.service?.name || "שירות"}
+                      {booking.service_name || booking.service?.name || 'שירות'}
                     </h3>
                     <p className="text-carefd-gray">
-                      {booking.provider_name || booking.provider?.business_name || "ספק שירותים"}
+                      {booking.provider_name || booking.provider?.business_name || 'ספק שירותים'}
                     </p>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium border-2 ${getStatusColor(booking.status)}`}>
@@ -198,20 +258,18 @@ export default function MyBookingsPage() {
                   <div>
                     <span className="font-semibold text-carefd-navy">תאריך:</span>
                     <span className="me-2 text-carefd-slate">
-                      {booking.booking_date ? format(new Date(booking.booking_date), "dd/MM/yyyy HH:mm") : ""}
+                      {booking.booking_date ? format(new Date(booking.booking_date), 'dd/MM/yyyy HH:mm') : ''}
                     </span>
                   </div>
                   {(booking.final_price || booking.base_price || booking.service?.price) && (
                     <div>
                       <span className="font-semibold text-carefd-navy">מחיר:</span>
-                      <span className="text-carefd-teal font-bold me-2">
-                        ₪{booking.final_price || booking.base_price || booking.service?.price}
-                      </span>
+                      <span className="text-carefd-teal font-bold me-2">₪{booking.final_price || booking.base_price || booking.service?.price}</span>
                     </div>
                   )}
                 </div>
 
-                {booking.status !== "cancelled" && booking.status !== "completed" && booking.status !== "cancellation_requested" && (
+                {booking.status !== 'cancelled' && booking.status !== 'completed' && booking.status !== 'cancellation_requested' && (
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleCancelBooking(booking.booking_id)}
@@ -222,7 +280,7 @@ export default function MyBookingsPage() {
                     </button>
                   </div>
                 )}
-                {booking.status === "cancellation_requested" && (
+                {booking.status === 'cancellation_requested' && (
                   <div className="flex items-center gap-2 text-orange-600 text-sm mt-2">
                     <FaSpinner className="animate-spin" />
                     <span>בקשת ביטול נשלחה לספק - ממתין לאישור</span>
@@ -230,7 +288,7 @@ export default function MyBookingsPage() {
                 )}
 
                 {/* Confirm completion for provider_completed */}
-                {booking.status === "provider_completed" && (
+                {booking.status === 'provider_completed' && (
                   <div className="mt-4 pt-4 border-t border-purple-200 bg-purple-50 rounded-lg p-4">
                     <p className="text-purple-800 font-medium mb-3 flex items-center gap-2">
                       <FaCheckCircle />
@@ -255,7 +313,7 @@ export default function MyBookingsPage() {
                 )}
 
                 {/* Review button for completed bookings */}
-                {booking.status === "completed" && !reviewedBookings.includes(booking.booking_id) && (
+                {booking.status === 'completed' && !reviewedBookings.includes(booking.booking_id) && (
                   <div className="flex gap-2 mt-4 pt-4 border-t border-carefd-teal-pale">
                     <button
                       onClick={() => setShowReviewModal(booking)}
@@ -273,8 +331,8 @@ export default function MyBookingsPage() {
                     </Link>
                   </div>
                 )}
-
-                {booking.status === "completed" && reviewedBookings.includes(booking.booking_id) && (
+                
+                {booking.status === 'completed' && reviewedBookings.includes(booking.booking_id) && (
                   <div className="flex items-center gap-2 mt-4 pt-4 border-t border-carefd-teal-pale text-green-600">
                     <FaStar className="text-yellow-500" />
                     <span>ביקורת נשלחה - תודה!</span>
@@ -285,16 +343,27 @@ export default function MyBookingsPage() {
           </div>
         )}
       </div>
-
+      
+      <ConfirmDialog
+        isOpen={confirmState.isOpen}
+        onClose={closeConfirm}
+        onConfirm={confirmState.onConfirm}
+        title={confirmState.title}
+        message={confirmState.message}
+        type={confirmState.type}
+        confirmText={confirmState.confirmText}
+        cancelText={confirmState.cancelText}
+      />
+      
       {/* Review Modal */}
       {showReviewModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowReviewModal(null)}>
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" role="dialog" aria-modal="true" aria-label="כתוב ביקורת" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold text-carefd-navy mb-2">כתוב ביקורת</h3>
             <p className="text-carefd-gray mb-6">
-              ספר לנו על החוויה שלך עם {showReviewModal.provider?.business_name || "הספק"}
+              ספר לנו על החוויה שלך עם {showReviewModal.provider?.business_name || 'הספק'}
             </p>
-
+            
             {/* Star Rating */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-carefd-navy mb-2">דירוג</label>
@@ -309,7 +378,13 @@ export default function MyBookingsPage() {
                     className="text-3xl transition-transform hover:scale-110"
                     data-testid={`review-star-${star}`}
                   >
-                    <FaStar className={star <= (reviewHoverRating || reviewRating) ? "text-yellow-500" : "text-gray-300"} />
+                    <FaStar 
+                      className={`${
+                        star <= (reviewHoverRating || reviewRating) 
+                          ? 'text-yellow-500' 
+                          : 'text-gray-300'
+                      }`}
+                    />
                   </button>
                 ))}
                 <span className="me-3 text-sm text-carefd-gray self-center">
@@ -335,7 +410,11 @@ export default function MyBookingsPage() {
 
             <div className="flex gap-3">
               <button
-                onClick={() => { setShowReviewModal(null); setReviewRating(0); setReviewComment(""); }}
+                onClick={() => {
+                  setShowReviewModal(null);
+                  setReviewRating(0);
+                  setReviewComment('');
+                }}
                 className="flex-1 bg-gray-100 text-carefd-gray py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
               >
                 ביטול
@@ -346,7 +425,14 @@ export default function MyBookingsPage() {
                 className="flex-1 bg-carefd-teal text-white py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition disabled:opacity-50 flex items-center justify-center gap-2"
                 data-testid="submit-review-modal-btn"
               >
-                {isSubmittingReview ? (<><FaSpinner className="animate-spin" />שולח...</>) : "שלח ביקורת"}
+                {isSubmittingReview ? (
+                  <>
+                    <FaSpinner className="animate-spin" />
+                    שולח...
+                  </>
+                ) : (
+                  'שלח ביקורת'
+                )}
               </button>
             </div>
           </div>
@@ -354,4 +440,6 @@ export default function MyBookingsPage() {
       )}
     </div>
   );
-}
+};
+
+export default MyBookings;
