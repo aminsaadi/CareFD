@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
 import { Star, Check, X } from "lucide-react";
 
 const statusConfig: Record<string, { label: string; variant: "success" | "accent" | "outline" }> = {

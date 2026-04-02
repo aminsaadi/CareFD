@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import {
   Search, MapPin, Star, Shield, Clock, Users,
   Heart, Stethoscope, Brain, Baby, Eye, Leaf,
-  ArrowLeft, CheckCircle, ChevronLeft,
+  ArrowLeft, ChevronLeft,
 } from "lucide-react";
 import type { Profession } from "@/lib/types";
 
