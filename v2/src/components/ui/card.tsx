@@ -6,7 +6,7 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
     <div
       ref={ref}
       className={cn(
-        "rounded-2xl border border-slate-100 bg-white p-8 transition-all hover:shadow-floating",
+        "rounded-2xl bg-white shadow-soft transition-all duration-400 hover:shadow-soft-md",
         className
       )}
       {...props}
@@ -19,10 +19,7 @@ const GlassCard = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivE
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn(
-        "glass-card p-8 transition-all",
-        className
-      )}
+      className={cn("glass-card p-8 transition-all", className)}
       {...props}
     />
   )
