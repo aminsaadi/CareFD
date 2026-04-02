@@ -39,19 +39,6 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
     return errorResponse("Provider is not verified", 400);
   }
 
-  // Check conflicts via transaction
-  if (body.booking_date && body.booking_time) {
-    const existing = await prisma.booking.findFirst({
-      where: {
-        providerId: service.providerId,
-        bookingDate: new Date(body.booking_date),
-        bookingTime: body.booking_time,
-        status: { in: ["pending", "confirmed", "in_progress"] },
-      },
-    });
-    if (existing) return errorResponse("Time slot already booked", 400);
-  }
-
   // Calculate pricing
   let basePrice = service.price;
   const hoursBooked = body.hours_booked;
@@ -89,50 +76,70 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
   const bookingNumber = `B${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
   const clientName = body.client_name || body.guest_name || userName;
 
-  const booking = await prisma.booking.create({
-    data: {
-      bookingNumber,
-      userId: isGuest ? userId : userId,
-      providerId: service.providerId,
-      serviceId: service.id,
-      bookingDate: body.booking_date ? new Date(body.booking_date) : null,
-      bookingTime: body.booking_time,
-      serviceName: service.name,
-      serviceCategory: service.serviceCategory,
-      deliveryType: body.delivery_type,
-      clientName: clientName,
-      clientPhone: body.client_phone || body.guest_phone,
-      clientEmail: body.client_email || body.guest_email || userEmail,
-      contactPersonName: body.contact_person_name,
-      contactPersonPhone: body.contact_person_phone,
-      contactPersonRelation: body.contact_person_relationship,
-      isContactSameAsRequester: body.is_contact_same_as_requester ?? true,
-      serviceAddress: body.service_address || body.guest_address,
-      serviceCity: body.service_city,
-      serviceFloor: body.service_floor,
-      serviceApartment: body.service_apartment,
-      serviceEntryCode: body.service_entry_code,
-      serviceLocationNotes: body.service_notes,
-      serviceLatitude: body.service_latitude,
-      serviceLongitude: body.service_longitude,
-      shippingAddress: body.shipping_address,
-      shippingCity: body.shipping_city,
-      hoursBooked: hoursBooked,
-      selectedShift: body.selected_shift,
-      platform: body.platform,
-      numSessions: body.num_sessions,
-      notes: body.notes,
-      specialRequirements: body.special_requirements,
-      basePrice: service.price,
-      travelCost: travelCost > 0 ? travelCost : null,
-      weekendAddition: weekendAddition > 0 ? weekendAddition : null,
-      shippingCost: shippingCost > 0 ? shippingCost : null,
-      finalPrice,
-      providerName: service.provider.businessName,
-      userName: userName,
-      isGuestBooking: isGuest,
-    },
+  // Check conflicts and create booking inside a transaction to prevent race conditions
+  const booking = await prisma.$transaction(async (tx) => {
+    if (body.booking_date && body.booking_time) {
+      const existing = await tx.booking.findFirst({
+        where: {
+          providerId: service.providerId,
+          bookingDate: new Date(body.booking_date),
+          bookingTime: body.booking_time,
+          status: { in: ["pending", "confirmed", "in_progress"] },
+        },
+      });
+      if (existing) throw new Error("Time slot already booked");
+    }
+
+    return tx.booking.create({
+      data: {
+        bookingNumber,
+        userId: isGuest ? userId : userId,
+        providerId: service.providerId,
+        serviceId: service.id,
+        bookingDate: body.booking_date ? new Date(body.booking_date) : null,
+        bookingTime: body.booking_time,
+        serviceName: service.name,
+        serviceCategory: service.serviceCategory,
+        deliveryType: body.delivery_type,
+        clientName: clientName,
+        clientPhone: body.client_phone || body.guest_phone,
+        clientEmail: body.client_email || body.guest_email || userEmail,
+        contactPersonName: body.contact_person_name,
+        contactPersonPhone: body.contact_person_phone,
+        contactPersonRelation: body.contact_person_relationship,
+        isContactSameAsRequester: body.is_contact_same_as_requester ?? true,
+        serviceAddress: body.service_address || body.guest_address,
+        serviceCity: body.service_city,
+        serviceFloor: body.service_floor,
+        serviceApartment: body.service_apartment,
+        serviceEntryCode: body.service_entry_code,
+        serviceLocationNotes: body.service_notes,
+        serviceLatitude: body.service_latitude,
+        serviceLongitude: body.service_longitude,
+        shippingAddress: body.shipping_address,
+        shippingCity: body.shipping_city,
+        hoursBooked: hoursBooked,
+        selectedShift: body.selected_shift,
+        platform: body.platform,
+        numSessions: body.num_sessions,
+        notes: body.notes,
+        specialRequirements: body.special_requirements,
+        basePrice: service.price,
+        travelCost: travelCost > 0 ? travelCost : null,
+        weekendAddition: weekendAddition > 0 ? weekendAddition : null,
+        shippingCost: shippingCost > 0 ? shippingCost : null,
+        finalPrice,
+        providerName: service.provider.businessName,
+        userName: userName,
+        isGuestBooking: isGuest,
+      },
+    });
+  }).catch((e) => {
+    if (e.message === "Time slot already booked") return null;
+    throw e;
   });
+
+  if (!booking) return errorResponse("Time slot already booked", 400);
 
   // Notify provider
   const dateFormatted = body.booking_date ? new Date(body.booking_date).toLocaleDateString("he-IL") : "יתואם טלפונית";

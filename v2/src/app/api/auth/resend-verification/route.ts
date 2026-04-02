@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import prisma from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { json, errorResponse, withErrorHandler } from "@/lib/api-utils";
+import { sendVerificationEmail } from "@/lib/email";
 import { v4 as uuid } from "uuid";
 
 export const POST = withErrorHandler(async (req: NextRequest) => {
@@ -16,6 +17,6 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
     data: { userId: user.id, email: fullUser!.email, token, expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) },
   });
 
-  // TODO: Send email
+  await sendVerificationEmail(fullUser!.email, user.name, token);
   return json({ message: "נשלח מייל אימות חדש" });
 });
