@@ -59,7 +59,7 @@ export default function ProviderSetupPage() {
                 <button key={t.v} type="button" onClick={() => setForm({ ...form, provider_type: t.v })}
                   className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
                     form.provider_type === t.v
-                      ? "border-primary bg-primary/5 text-primary"
+                      ? "border-primary bg-carefd-navy/5 text-carefd-navy"
                       : "border-slate-200 text-slate-400 hover:border-slate-300"
                   }`}
                   data-testid={`type-${t.v}`}

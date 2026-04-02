@@ -47,8 +47,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     href={link.href}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
                       isActive
-                        ? "bg-primary text-primary-foreground font-medium shadow-sm"
-                        : "text-slate-600 hover:bg-secondary hover:text-primary"
+                        ? "bg-carefd-navy text-carefd-navy-foreground font-medium shadow-sm"
+                        : "text-slate-600 hover:bg-carefd-stone hover:text-carefd-navy"
                     }`}
                   >
                     <link.icon className={`w-4 h-4 ${isActive ? "" : "text-slate-400"}`} />

@@ -39,7 +39,7 @@ export default function AdminReviewsPage() {
       <div className="flex gap-2 mb-6">
         {filters.map((f) => (
           <button key={f.v} onClick={() => setFilter(f.v)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${filter === f.v ? "bg-primary text-primary-foreground shadow-sm" : "bg-white text-slate-600 hover:bg-secondary border border-slate-200"}`}>
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${filter === f.v ? "bg-carefd-navy text-carefd-navy-foreground shadow-sm" : "bg-white text-slate-600 hover:bg-carefd-stone border border-slate-200"}`}>
             {f.l}
           </button>
         ))}
@@ -56,7 +56,7 @@ export default function AdminReviewsPage() {
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-1">
                   {Array.from({ length: Math.round(r.rating) }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-accent fill-accent" />
+                    <Star key={i} className="w-4 h-4 text-carefd-teal fill-carefd-teal" />
                   ))}
                   <span className="text-sm text-slate-400 ms-2">{r.rating}/5</span>
                 </div>

@@ -51,8 +51,8 @@ export default function ChatRoomPage() {
             <div key={m.id} className={`flex ${isMine ? "justify-start" : "justify-end"}`}>
               <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl ${
                 isMine
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-secondary-foreground"
+                  ? "bg-carefd-navy text-carefd-navy-foreground"
+                  : "bg-carefd-stone text-secondary-foreground"
               }`}>
                 <p className="text-sm">{m.content}</p>
                 <span className={`text-[10px] block mt-1 ${isMine ? "text-white/60" : "text-slate-400"}`}>

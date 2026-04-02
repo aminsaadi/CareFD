@@ -78,8 +78,8 @@ export default function BookServicePage() {
           <CheckCircle className="w-8 h-8 text-emerald-500" />
         </div>
         <h2 className="mb-2">ההזמנה נשלחה בהצלחה!</h2>
-        <p className="text-slate-500 mb-1">מספר הזמנה: <span className="font-mono font-semibold text-primary">{success.booking_number}</span></p>
-        <p className="text-slate-500 mb-8">מחיר סופי: <span className="font-heading font-bold text-primary">{"\u20AA"}{success.final_price}</span></p>
+        <p className="text-slate-500 mb-1">מספר הזמנה: <span className="font-mono font-semibold text-carefd-navy">{success.booking_number}</span></p>
+        <p className="text-slate-500 mb-8">מחיר סופי: <span className="font-heading font-bold text-carefd-navy">{"\u20AA"}{success.final_price}</span></p>
         <Button asChild size="lg">
           <Link href="/bookings">
             לצפייה בהזמנות
@@ -95,10 +95,10 @@ export default function BookServicePage() {
       <h1 className="mb-2">הזמנת שירות</h1>
 
       {/* Service Info */}
-      <Card className="p-6 mb-8 bg-secondary/50 border-0">
-        <h3 className="font-heading font-semibold text-lg text-primary">{service.name}</h3>
+      <Card className="p-6 mb-8 bg-carefd-stone/50 border-0">
+        <h3 className="font-heading font-semibold text-lg text-carefd-navy">{service.name}</h3>
         {service.description && <p className="text-slate-500 text-sm mt-1">{service.description}</p>}
-        <p className="text-2xl font-heading font-bold text-primary mt-3">{"\u20AA"}{service.price}</p>
+        <p className="text-2xl font-heading font-bold text-carefd-navy mt-3">{"\u20AA"}{service.price}</p>
         {service.provider && <p className="text-sm text-slate-400 mt-1">{service.provider.businessName}</p>}
       </Card>
 

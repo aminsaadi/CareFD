@@ -40,7 +40,7 @@ export default function AdminVerificationPage() {
             <Card key={p.id} className="p-6">
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h3 className="font-semibold text-primary text-lg">{p.businessName || "ללא שם"}</h3>
+                  <h3 className="font-semibold text-carefd-navy text-lg">{p.businessName || "ללא שם"}</h3>
                   <p className="text-sm text-slate-400">{p.user?.email} &bull; {p.city || ""}</p>
                   <Badge variant="warning" className="mt-2">{p.verificationStatus}</Badge>
                 </div>

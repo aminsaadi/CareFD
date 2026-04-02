@@ -43,7 +43,7 @@ export default function WriteReviewPage() {
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((s) => (
           <button key={s} type="button" onClick={() => onChange(s)} className="p-0.5" data-testid={`star-${label}-${s}`}>
-            <Star className={`w-6 h-6 transition-colors ${s <= value ? "text-accent fill-accent" : "text-slate-200"}`} />
+            <Star className={`w-6 h-6 transition-colors ${s <= value ? "text-carefd-teal fill-carefd-teal" : "text-slate-200"}`} />
           </button>
         ))}
       </div>

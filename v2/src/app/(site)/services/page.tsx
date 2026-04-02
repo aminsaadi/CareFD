@@ -79,7 +79,7 @@ function ServicesContent() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((s) => (
               <Card key={s.service_id} className="p-6 hover-lift group" data-testid={`service-${s.service_id}`}>
-                <h3 className="font-heading font-semibold text-lg text-primary mb-2 group-hover:text-accent transition-colors">
+                <h3 className="font-heading font-semibold text-lg text-carefd-navy mb-2 group-hover:text-carefd-teal transition-colors">
                   {s.name}
                 </h3>
                 {s.description && (
@@ -87,7 +87,7 @@ function ServicesContent() {
                 )}
                 <div className="flex justify-between items-center">
                   <div>
-                    <span className="text-xl font-heading font-bold text-primary">{"\u20AA"}{s.price}</span>
+                    <span className="text-xl font-heading font-bold text-carefd-navy">{"\u20AA"}{s.price}</span>
                     {s.provider && (
                       <p className="text-xs text-slate-400 mt-0.5">{s.provider.business_name}</p>
                     )}

@@ -62,7 +62,7 @@ export default function ProviderProfilePage() {
       <Card className="p-8 md:p-10 mb-8 border-0 shadow-floating">
         <div className="flex flex-col md:flex-row items-start gap-6 md:gap-8">
           {/* Avatar */}
-          <div className="w-24 h-24 rounded-full bg-accent/10 flex items-center justify-center text-accent font-heading font-bold text-3xl flex-shrink-0 overflow-hidden">
+          <div className="w-24 h-24 rounded-full bg-carefd-teal/10 flex items-center justify-center text-carefd-teal font-heading font-bold text-3xl flex-shrink-0 overflow-hidden">
             {provider.profile_image ? (
               <img src={provider.profile_image} alt="" className="w-full h-full object-cover" />
             ) : (
@@ -87,7 +87,7 @@ export default function ProviderProfilePage() {
                 </Badge>
               )}
             </div>
-            <p className="text-accent text-lg font-medium">{provider.profession_name}</p>
+            <p className="text-carefd-teal text-lg font-medium">{provider.profession_name}</p>
             {provider.specialization_name && (
               <p className="text-slate-500">התמחות: {provider.specialization_name}</p>
             )}
@@ -106,7 +106,7 @@ export default function ProviderProfilePage() {
                 </span>
               )}
               <span className="flex items-center gap-1.5">
-                <Star className="w-4 h-4 text-accent fill-accent" />
+                <Star className="w-4 h-4 text-carefd-teal fill-carefd-teal" />
                 {provider.rating.toFixed(1)} ({provider.total_reviews} ביקורות)
               </span>
             </div>
@@ -154,14 +154,14 @@ export default function ProviderProfilePage() {
               <h2 className="text-xl font-heading font-semibold mb-6">שירותים</h2>
               <div className="space-y-3">
                 {provider.services_list.map((s) => (
-                  <div key={s.service_id} className="flex items-center justify-between p-4 bg-secondary/50 rounded-2xl group hover:bg-secondary transition-colors">
+                  <div key={s.service_id} className="flex items-center justify-between p-4 bg-carefd-stone/50 rounded-2xl group hover:bg-carefd-stone transition-colors">
                     <div>
-                      <h3 className="font-medium text-primary">{s.name}</h3>
+                      <h3 className="font-medium text-carefd-navy">{s.name}</h3>
                       {s.description && <p className="text-sm text-slate-400 mt-1">{s.description}</p>}
                     </div>
                     <div className="text-end flex-shrink-0 ms-4">
-                      <p className="font-heading font-bold text-lg text-primary">{"\u20AA"}{s.price}</p>
-                      <Button variant="ghost" size="sm" asChild className="text-accent text-xs">
+                      <p className="font-heading font-bold text-lg text-carefd-navy">{"\u20AA"}{s.price}</p>
+                      <Button variant="ghost" size="sm" asChild className="text-carefd-teal text-xs">
                         <Link href={`/book/${s.service_id}`}>
                           הזמינו
                           <ChevronLeft className="w-3 h-3 ms-1" />
@@ -186,13 +186,13 @@ export default function ProviderProfilePage() {
                 {reviews.map((r) => (
                   <div key={r.id} className="pb-5 border-b border-slate-100 last:border-0 last:pb-0">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center text-accent text-xs font-bold">
+                      <div className="w-8 h-8 bg-carefd-teal/10 rounded-full flex items-center justify-center text-carefd-teal text-xs font-bold">
                         {r.user?.name?.[0] || "?"}
                       </div>
-                      <span className="font-medium text-primary text-sm">{r.user?.name}</span>
+                      <span className="font-medium text-carefd-navy text-sm">{r.user?.name}</span>
                       <div className="flex items-center gap-0.5">
                         {Array.from({ length: Math.round(r.rating) }).map((_, i) => (
-                          <Star key={i} className="w-3 h-3 text-accent fill-accent" />
+                          <Star key={i} className="w-3 h-3 text-carefd-teal fill-carefd-teal" />
                         ))}
                       </div>
                       <span className="text-xs text-slate-400 ms-auto">
@@ -211,8 +211,8 @@ export default function ProviderProfilePage() {
         <div className="space-y-6">
           {provider.languages?.length > 0 && (
             <Card className="p-6">
-              <h3 className="font-heading font-semibold text-primary mb-3 flex items-center gap-2">
-                <Globe className="w-4 h-4 text-accent" />
+              <h3 className="font-heading font-semibold text-carefd-navy mb-3 flex items-center gap-2">
+                <Globe className="w-4 h-4 text-carefd-teal" />
                 שפות
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -225,8 +225,8 @@ export default function ProviderProfilePage() {
 
           {provider.health_funds?.length > 0 && (
             <Card className="p-6">
-              <h3 className="font-heading font-semibold text-primary mb-3 flex items-center gap-2">
-                <Heart className="w-4 h-4 text-accent" />
+              <h3 className="font-heading font-semibold text-carefd-navy mb-3 flex items-center gap-2">
+                <Heart className="w-4 h-4 text-carefd-teal" />
                 קופות חולים
               </h3>
               <div className="flex flex-wrap gap-2">

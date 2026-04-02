@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CreditCard, Crown, Gem, User } from "lucide-react";
 
 const tierIcons: Record<string, React.ElementType> = { free: User, pro: Crown, premium: Gem };
-const tierColors: Record<string, string> = { free: "bg-slate-50 text-slate-600", pro: "bg-blue-50 text-blue-600", premium: "bg-accent/10 text-accent" };
+const tierColors: Record<string, string> = { free: "bg-slate-50 text-slate-600", pro: "bg-blue-50 text-blue-600", premium: "bg-carefd-teal/10 text-carefd-teal" };
 
 export default function AdminSubscriptionsPage() {
   const [plans, setPlans] = useState<any[]>([]);

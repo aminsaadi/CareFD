@@ -27,14 +27,14 @@ export default function AdminReportsPage() {
 
   const cards = [
     { label: "סה\"כ משתמשים", value: stats?.total_users, icon: Users, color: "text-blue-600 bg-blue-50" },
-    { label: "סה\"כ ספקים", value: stats?.total_providers, icon: Stethoscope, color: "text-accent bg-accent/10" },
+    { label: "סה\"כ ספקים", value: stats?.total_providers, icon: Stethoscope, color: "text-carefd-teal bg-carefd-teal/10" },
     { label: "סה\"כ הזמנות", value: stats?.total_bookings, icon: CalendarDays, color: "text-purple-600 bg-purple-50" },
     { label: "שירותים פעילים", value: stats?.total_services, icon: Wrench, color: "text-emerald-600 bg-emerald-50" },
     { label: "סה\"כ בקשות", value: stats?.total_requests, icon: FileText, color: "text-orange-600 bg-orange-50" },
     { label: "ממתינים לאימות", value: stats?.pending_providers, icon: TrendingUp, color: "text-amber-600 bg-amber-50" },
     { label: "הזמנות היום", value: stats?.today_bookings, icon: CalendarDays, color: "text-pink-600 bg-pink-50" },
     { label: "הכנסות החודש", value: `\u20AA${stats?.monthly_revenue?.toLocaleString() || 0}`, icon: Wallet, color: "text-emerald-600 bg-emerald-50" },
-    { label: "דירוג ממוצע", value: `${stats?.average_rating?.toFixed(1) || "0"} (${stats?.total_reviews} ביקורות)`, icon: Star, color: "text-accent bg-accent/10" },
+    { label: "דירוג ממוצע", value: `${stats?.average_rating?.toFixed(1) || "0"} (${stats?.total_reviews} ביקורות)`, icon: Star, color: "text-carefd-teal bg-carefd-teal/10" },
   ];
 
   return (
@@ -47,7 +47,7 @@ export default function AdminReportsPage() {
               <c.icon className="w-5 h-5" />
             </div>
             <p className="text-sm text-slate-500 mb-1">{c.label}</p>
-            <p className="text-2xl font-heading font-bold text-primary">{c.value}</p>
+            <p className="text-2xl font-heading font-bold text-carefd-navy">{c.value}</p>
           </Card>
         ))}
       </div>

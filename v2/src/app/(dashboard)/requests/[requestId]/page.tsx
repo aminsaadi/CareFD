@@ -57,7 +57,7 @@ export default function RequestDetailPage() {
         </div>
         <p className="text-slate-600 whitespace-pre-wrap mb-6 leading-relaxed">{request.description}</p>
         <div className="flex gap-6 text-sm text-slate-400">
-          {request.budget && <span>תקציב: <span className="font-heading font-bold text-primary">{"\u20AA"}{request.budget}</span></span>}
+          {request.budget && <span>תקציב: <span className="font-heading font-bold text-carefd-navy">{"\u20AA"}{request.budget}</span></span>}
           <span>נוצר: {new Date(request.createdAt).toLocaleDateString("he-IL")}</span>
         </div>
       </Card>
@@ -73,21 +73,21 @@ export default function RequestDetailPage() {
               <div key={offer.id} className="border border-slate-100 rounded-2xl p-5">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent font-heading font-bold">
+                    <div className="w-10 h-10 rounded-full bg-carefd-teal/10 flex items-center justify-center text-carefd-teal font-heading font-bold">
                       {offer.provider?.businessName?.[0] || "?"}
                     </div>
                     <div>
-                      <p className="font-medium text-primary">{offer.providerName || offer.provider?.businessName}</p>
+                      <p className="font-medium text-carefd-navy">{offer.providerName || offer.provider?.businessName}</p>
                       {offer.provider?.rating > 0 && (
                         <p className="text-xs text-slate-400 flex items-center gap-0.5">
-                          <Star className="w-3 h-3 text-accent fill-accent" />
+                          <Star className="w-3 h-3 text-carefd-teal fill-carefd-teal" />
                           {offer.provider.rating.toFixed(1)}
                         </p>
                       )}
                     </div>
                   </div>
                   <div className="text-end">
-                    <p className="text-xl font-heading font-bold text-primary">{"\u20AA"}{offer.price}</p>
+                    <p className="text-xl font-heading font-bold text-carefd-navy">{"\u20AA"}{offer.price}</p>
                     <Badge variant={offer.status === "pending" ? "warning" : offer.status === "accepted" ? "success" : "outline"}>
                       {offer.status === "pending" ? "ממתין" : offer.status === "accepted" ? "התקבל" : offer.status === "rejected" ? "נדחה" : offer.status}
                     </Badge>

@@ -38,11 +38,11 @@ export default function AdminFeaturedPage() {
           {providers.map((p) => (
             <Card key={p.id} className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent font-heading font-bold">
+                <div className="w-10 h-10 rounded-full bg-carefd-teal/10 flex items-center justify-center text-carefd-teal font-heading font-bold">
                   {p.businessName?.[0] || "?"}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-primary text-sm">{p.businessName || "ללא שם"}</h3>
+                  <h3 className="font-semibold text-carefd-navy text-sm">{p.businessName || "ללא שם"}</h3>
                   <p className="text-xs text-slate-400">{p.city || ""} &bull; {p.verificationStatus}</p>
                 </div>
                 {p.isRecommended && <Badge variant="accent"><Star className="w-3 h-3 me-1 fill-current" /> מומלץ</Badge>}

@@ -49,8 +49,8 @@ export default function AdminSettingsPage() {
       )}
 
       <Card className="p-6 md:p-8 mb-6">
-        <h3 className="font-heading font-semibold text-lg text-primary mb-4 flex items-center gap-2">
-          <Settings className="w-5 h-5 text-accent" /> הגדרות כלליות
+        <h3 className="font-heading font-semibold text-lg text-carefd-navy mb-4 flex items-center gap-2">
+          <Settings className="w-5 h-5 text-carefd-teal" /> הגדרות כלליות
         </h3>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -67,8 +67,8 @@ export default function AdminSettingsPage() {
       </Card>
 
       <Card className="p-6 md:p-8">
-        <h3 className="font-heading font-semibold text-lg text-primary mb-4 flex items-center gap-2">
-          <Mail className="w-5 h-5 text-accent" /> הגדרות SMTP
+        <h3 className="font-heading font-semibold text-lg text-carefd-navy mb-4 flex items-center gap-2">
+          <Mail className="w-5 h-5 text-carefd-teal" /> הגדרות SMTP
         </h3>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">

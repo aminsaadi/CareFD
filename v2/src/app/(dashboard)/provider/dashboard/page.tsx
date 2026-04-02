@@ -79,8 +79,8 @@ export default function ProviderDashboardPage() {
         {quickLinks.map((item) => (
           <Link key={item.href} href={item.href}>
             <Card className="p-5 text-center hover-lift">
-              <item.icon className="w-6 h-6 mx-auto mb-2 text-accent" />
-              <p className="text-sm font-medium text-primary">{item.label}</p>
+              <item.icon className="w-6 h-6 mx-auto mb-2 text-carefd-teal" />
+              <p className="text-sm font-medium text-carefd-navy">{item.label}</p>
             </Card>
           </Link>
         ))}
@@ -107,9 +107,9 @@ export default function ProviderDashboardPage() {
         ) : (
           <div className="space-y-3">
             {bookings.slice(0, 5).map((b) => (
-              <div key={b.id} className="flex items-center justify-between p-4 bg-secondary/50 rounded-2xl">
+              <div key={b.id} className="flex items-center justify-between p-4 bg-carefd-stone/50 rounded-2xl">
                 <div>
-                  <p className="font-medium text-primary">{b.serviceName}</p>
+                  <p className="font-medium text-carefd-navy">{b.serviceName}</p>
                   <p className="text-sm text-slate-400">
                     {b.clientName} {b.bookingDate ? ` \u2022 ${new Date(b.bookingDate).toLocaleDateString("he-IL")}` : ""}
                   </p>

@@ -80,7 +80,7 @@ export default function ProviderEditPage() {
             </div>
           )}
 
-          <h3 className="font-heading font-semibold text-primary">פרטים בסיסיים</h3>
+          <h3 className="font-heading font-semibold text-carefd-navy">פרטים בסיסיים</h3>
           <Field label="שם העסק" name="business_name" />
           <Field label="תיאור קצר" name="description" rows={3} />
           <Field label="אודות" name="about" rows={4} />
@@ -92,7 +92,7 @@ export default function ProviderEditPage() {
 
           <Separator />
 
-          <h3 className="font-heading font-semibold text-primary">פרטי קשר</h3>
+          <h3 className="font-heading font-semibold text-carefd-navy">פרטי קשר</h3>
           <div className="grid grid-cols-2 gap-4">
             <Field label="טלפון" name="phone" dir="ltr" />
             <Field label="WhatsApp" name="whatsapp_number" dir="ltr" />

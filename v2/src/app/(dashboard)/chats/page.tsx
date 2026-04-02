@@ -31,12 +31,12 @@ export default function ChatsPage() {
         <div className="space-y-2">
           {rooms.map((r) => (
             <Link key={r.room_id} href={`/chats/${r.room_id}`}>
-              <Card className="p-4 flex items-center gap-4 hover:bg-secondary/50 transition-colors">
-                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent font-heading font-bold flex-shrink-0">
+              <Card className="p-4 flex items-center gap-4 hover:bg-carefd-stone/50 transition-colors">
+                <div className="w-12 h-12 rounded-full bg-carefd-teal/10 flex items-center justify-center text-carefd-teal font-heading font-bold flex-shrink-0">
                   {(r.provider_name || r.user_name)?.[0] || "?"}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-primary truncate">{r.provider_name || r.user_name}</h3>
+                  <h3 className="font-medium text-carefd-navy truncate">{r.provider_name || r.user_name}</h3>
                   <p className="text-sm text-slate-400 truncate">{r.last_message || "אין הודעות"}</p>
                 </div>
                 {r.last_message_at && (

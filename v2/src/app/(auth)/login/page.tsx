@@ -65,7 +65,7 @@ export default function LoginPage() {
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <label className="text-sm font-medium text-slate-700">סיסמה</label>
-            <Link href="/reset-password" className="text-xs text-accent hover:underline">
+            <Link href="/reset-password" className="text-xs text-carefd-teal hover:underline">
               שכחתם סיסמה?
             </Link>
           </div>
@@ -97,7 +97,7 @@ export default function LoginPage() {
 
       <p className="text-center text-sm text-slate-500 mt-6">
         אין לכם חשבון?{" "}
-        <Link href="/register" className="text-primary font-semibold hover:underline">
+        <Link href="/register" className="text-carefd-navy font-semibold hover:underline">
           הרשמו עכשיו
         </Link>
       </p>

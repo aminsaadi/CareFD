@@ -53,7 +53,7 @@ function RegisterContent() {
           onClick={() => setForm({ ...form, role: "patient" })}
           className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
             form.role === "patient"
-              ? "border-primary bg-primary/5 text-primary"
+              ? "border-primary bg-carefd-navy/5 text-carefd-navy"
               : "border-slate-200 text-slate-400 hover:border-slate-300"
           }`}
           data-testid="register-role-patient"
@@ -66,7 +66,7 @@ function RegisterContent() {
           onClick={() => setForm({ ...form, role: "provider" })}
           className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
             form.role === "provider"
-              ? "border-primary bg-primary/5 text-primary"
+              ? "border-primary bg-carefd-navy/5 text-carefd-navy"
               : "border-slate-200 text-slate-400 hover:border-slate-300"
           }`}
           data-testid="register-role-provider"
@@ -161,7 +161,7 @@ function RegisterContent() {
 
       <p className="text-center text-sm text-slate-500 mt-6">
         יש לכם חשבון?{" "}
-        <Link href="/login" className="text-primary font-semibold hover:underline">
+        <Link href="/login" className="text-carefd-navy font-semibold hover:underline">
           התחברו
         </Link>
       </p>

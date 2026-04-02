@@ -63,12 +63,12 @@ export default function AdminAdsPage() {
               <div className="flex items-center gap-4">
                 {a.imageUrl && <img src={a.imageUrl} alt="" className="w-16 h-12 rounded-lg object-cover" />}
                 <div>
-                  <h3 className="font-semibold text-primary">{a.title}</h3>
+                  <h3 className="font-semibold text-carefd-navy">{a.title}</h3>
                   {a.description && <p className="text-xs text-slate-400">{a.description}</p>}
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {a.linkUrl && <a href={a.linkUrl} target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80"><ExternalLink className="w-4 h-4" /></a>}
+                {a.linkUrl && <a href={a.linkUrl} target="_blank" rel="noopener noreferrer" className="text-carefd-teal hover:text-carefd-teal/80"><ExternalLink className="w-4 h-4" /></a>}
                 <Button variant="ghost" size="icon" onClick={() => deleteAd(a.id)} className="text-red-400 hover:text-red-600"><Trash2 className="w-4 h-4" /></Button>
               </div>
             </Card>

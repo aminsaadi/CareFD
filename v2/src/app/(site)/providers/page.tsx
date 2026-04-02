@@ -118,7 +118,7 @@ function ProvidersContent() {
               <Link key={p.provider_id} href={`/providers/${p.provider_id}`} data-testid={`provider-${p.provider_id}`}>
                 <Card className="p-6 hover-lift group">
                   <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center text-accent font-heading font-bold text-xl flex-shrink-0">
+                    <div className="w-14 h-14 rounded-full bg-carefd-teal/10 flex items-center justify-center text-carefd-teal font-heading font-bold text-xl flex-shrink-0">
                       {p.profile_image ? (
                         <img src={p.profile_image} alt="" className="w-full h-full rounded-full object-cover" />
                       ) : (
@@ -126,10 +126,10 @@ function ProvidersContent() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-primary truncate group-hover:text-accent transition-colors">
+                      <h3 className="font-semibold text-carefd-navy truncate group-hover:text-carefd-teal transition-colors">
                         {p.business_name || "ספק"}
                       </h3>
-                      <p className="text-sm text-accent font-medium">{p.profession_name || p.profession_title}</p>
+                      <p className="text-sm text-carefd-teal font-medium">{p.profession_name || p.profession_title}</p>
                       {p.location?.city && (
                         <p className="text-sm text-slate-400 flex items-center gap-1 mt-1">
                           <MapPin className="w-3 h-3" />
@@ -138,8 +138,8 @@ function ProvidersContent() {
                       )}
                       <div className="flex items-center gap-2 mt-3 flex-wrap">
                         <div className="flex items-center gap-1">
-                          <Star className="w-3.5 h-3.5 text-accent fill-accent" />
-                          <span className="text-sm font-medium text-primary">{p.rating.toFixed(1)}</span>
+                          <Star className="w-3.5 h-3.5 text-carefd-teal fill-carefd-teal" />
+                          <span className="text-sm font-medium text-carefd-navy">{p.rating.toFixed(1)}</span>
                           <span className="text-xs text-slate-400">({p.total_reviews})</span>
                         </div>
                         {p.is_verified && (
