@@ -1,6 +1,59 @@
-import PlaceholderPage from "@/components/admin/PlaceholderPage";
-import { Award } from "lucide-react";
+"use client";
+
+import { useEffect, useState } from "react";
+import api from "@/lib/api-client";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Award, Star, StarOff } from "lucide-react";
 
 export default function AdminFeaturedPage() {
-  return <PlaceholderPage title="מומלצים" icon={Award} />;
+  const [providers, setProviders] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = () => {
+    setLoading(true);
+    api.get<{ providers: any[]; total: number }>("/admin/providers", { limit: "50" })
+      .then((d) => setProviders(d.providers)).catch(() => {}).finally(() => setLoading(false));
+  };
+
+  useEffect(() => { fetchData(); }, []);
+
+  const toggleFeatured = async (id: string, current: boolean) => {
+    await api.put(`/admin/providers/${id}`, { is_recommended: !current });
+    fetchData();
+  };
+
+  return (
+    <div>
+      <h2 className="font-heading font-semibold text-2xl mb-6">ספקים מומלצים</h2>
+
+      {loading ? (
+        <div className="space-y-3">{[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full" />)}</div>
+      ) : providers.length === 0 ? (
+        <Card className="p-10 text-center"><Award className="w-12 h-12 text-slate-300 mx-auto mb-3" /><p className="text-slate-400">אין ספקים</p></Card>
+      ) : (
+        <div className="space-y-3">
+          {providers.map((p) => (
+            <Card key={p.id} className="p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent font-heading font-bold">
+                  {p.businessName?.[0] || "?"}
+                </div>
+                <div>
+                  <h3 className="font-semibold text-primary text-sm">{p.businessName || "ללא שם"}</h3>
+                  <p className="text-xs text-slate-400">{p.city || ""} &bull; {p.verificationStatus}</p>
+                </div>
+                {p.isRecommended && <Badge variant="accent"><Star className="w-3 h-3 me-1 fill-current" /> מומלץ</Badge>}
+              </div>
+              <Button variant={p.isRecommended ? "ghost" : "secondary"} size="sm" onClick={() => toggleFeatured(p.id, p.isRecommended)}>
+                {p.isRecommended ? <><StarOff className="w-4 h-4 me-1" /> הסר המלצה</> : <><Star className="w-4 h-4 me-1" /> המלץ</>}
+              </Button>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
