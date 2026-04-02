@@ -2,8 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import api from "@/lib/api-client";
 import { useAuth } from "@/context/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CheckCircle, Calendar, Clock, MapPin, User, Phone, FileText, ChevronLeft } from "lucide-react";
 
 export default function BookServicePage() {
   const { serviceId } = useParams();
@@ -18,6 +25,7 @@ export default function BookServicePage() {
     service_address: "", service_city: "",
   });
   const [success, setSuccess] = useState<any>(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!serviceId) return;
@@ -27,6 +35,7 @@ export default function BookServicePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setError("");
     try {
       const data = await api.post<any>("/bookings", {
         service_id: serviceId,
@@ -41,77 +50,151 @@ export default function BookServicePage() {
       });
       setSuccess(data);
     } catch (err: any) {
-      alert(err.message || "שגיאה ביצירת ההזמנה");
+      setError(err.message || "שגיאה ביצירת ההזמנה");
     } finally { setSubmitting(false); }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-teal-600 border-t-transparent rounded-full" /></div>;
-  if (!service) return <div className="text-center py-20 text-gray-500">השירות לא נמצא</div>;
+  if (loading) return (
+    <div className="container-main py-10 max-w-2xl">
+      <Skeleton className="h-10 w-48 mb-6" />
+      <Card className="p-8 mb-6"><Skeleton className="h-24 w-full" /></Card>
+      <Card className="p-8"><Skeleton className="h-64 w-full" /></Card>
+    </div>
+  );
+
+  if (!service) return (
+    <div className="text-center py-20">
+      <p className="text-xl font-heading text-slate-600 mb-2">השירות לא נמצא</p>
+      <Button variant="secondary" asChild>
+        <Link href="/services">חזרה לשירותים</Link>
+      </Button>
+    </div>
+  );
 
   if (success) return (
-    <div className="max-w-2xl mx-auto px-4 py-16 text-center" dir="rtl">
-      <div className="bg-white rounded-2xl shadow-xl p-8">
-        <h1 className="text-3xl font-bold text-teal-600 mb-4">✓ ההזמנה נשלחה!</h1>
-        <p className="text-gray-600 mb-2">מספר הזמנה: {success.booking_number}</p>
-        <p className="text-gray-600 mb-6">מחיר סופי: ₪{success.final_price}</p>
-        <button onClick={() => router.push("/bookings")} className="bg-teal-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-teal-700">
-          לצפייה בהזמנות
-        </button>
-      </div>
+    <div className="container-main py-16 max-w-2xl">
+      <Card className="p-10 text-center shadow-floating border-0">
+        <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <CheckCircle className="w-8 h-8 text-emerald-500" />
+        </div>
+        <h2 className="mb-2">ההזמנה נשלחה בהצלחה!</h2>
+        <p className="text-slate-500 mb-1">מספר הזמנה: <span className="font-mono font-semibold text-primary">{success.booking_number}</span></p>
+        <p className="text-slate-500 mb-8">מחיר סופי: <span className="font-heading font-bold text-primary">{"\u20AA"}{success.final_price}</span></p>
+        <Button asChild size="lg">
+          <Link href="/bookings">
+            לצפייה בהזמנות
+            <ChevronLeft className="w-4 h-4 ms-2" />
+          </Link>
+        </Button>
+      </Card>
     </div>
   );
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8" dir="rtl">
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">הזמנת שירות</h1>
+    <div className="container-main py-10 md:py-16 max-w-2xl">
+      <h1 className="mb-2">הזמנת שירות</h1>
 
       {/* Service Info */}
-      <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-        <h2 className="text-xl font-bold">{service.name}</h2>
-        <p className="text-gray-600 mt-1">{service.description}</p>
-        <p className="text-2xl font-bold text-teal-600 mt-3">₪{service.price}</p>
-        {service.provider && <p className="text-sm text-gray-500 mt-1">{service.provider.businessName}</p>}
-      </div>
+      <Card className="p-6 mb-8 bg-secondary/50 border-0">
+        <h3 className="font-heading font-semibold text-lg text-primary">{service.name}</h3>
+        {service.description && <p className="text-slate-500 text-sm mt-1">{service.description}</p>}
+        <p className="text-2xl font-heading font-bold text-primary mt-3">{"\u20AA"}{service.price}</p>
+        {service.provider && <p className="text-sm text-slate-400 mt-1">{service.provider.businessName}</p>}
+      </Card>
 
       {/* Booking Form */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">תאריך</label>
-            <input type="date" value={form.booking_date} onChange={(e) => setForm({ ...form, booking_date: e.target.value })}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:outline-none" />
+      <Card className="p-8">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {error && (
+            <div className="bg-red-50 text-red-600 text-sm rounded-xl p-4 border border-red-100">{error}</div>
+          )}
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                תאריך
+              </label>
+              <Input
+                type="date"
+                value={form.booking_date}
+                onChange={(e) => setForm({ ...form, booking_date: e.target.value })}
+                data-testid="book-date"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                שעה
+              </label>
+              <Input
+                type="time"
+                value={form.booking_time}
+                onChange={(e) => setForm({ ...form, booking_time: e.target.value })}
+                data-testid="book-time"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">שעה</label>
-            <input type="time" value={form.booking_time} onChange={(e) => setForm({ ...form, booking_time: e.target.value })}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:outline-none" />
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+              <User className="w-3.5 h-3.5 text-slate-400" />
+              שם
+            </label>
+            <Input
+              value={form.client_name || user?.name || ""}
+              onChange={(e) => setForm({ ...form, client_name: e.target.value })}
+              data-testid="book-name"
+            />
           </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">שם</label>
-          <input value={form.client_name || user?.name || ""} onChange={(e) => setForm({ ...form, client_name: e.target.value })}
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:outline-none" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">טלפון</label>
-          <input value={form.client_phone} onChange={(e) => setForm({ ...form, client_phone: e.target.value })}
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:outline-none" placeholder="050-0000000" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">כתובת לשירות</label>
-          <input value={form.service_address} onChange={(e) => setForm({ ...form, service_address: e.target.value })}
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:outline-none" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">הערות</label>
-          <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={3}
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:outline-none" />
-        </div>
-        <button type="submit" disabled={submitting}
-          className="w-full bg-teal-600 text-white py-3 rounded-xl font-bold hover:bg-teal-700 disabled:opacity-50 text-lg">
-          {submitting ? "שולח..." : `הזמן - ₪${service.price}`}
-        </button>
-      </form>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+              <Phone className="w-3.5 h-3.5 text-slate-400" />
+              טלפון
+            </label>
+            <Input
+              value={form.client_phone}
+              onChange={(e) => setForm({ ...form, client_phone: e.target.value })}
+              placeholder="050-0000000"
+              dir="ltr"
+              data-testid="book-phone"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-slate-400" />
+              כתובת לשירות
+            </label>
+            <Input
+              value={form.service_address}
+              onChange={(e) => setForm({ ...form, service_address: e.target.value })}
+              data-testid="book-address"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-slate-400" />
+              הערות
+            </label>
+            <Textarea
+              value={form.notes}
+              onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              data-testid="book-notes"
+            />
+          </div>
+
+          <Button type="submit" className="w-full" size="lg" disabled={submitting} data-testid="book-submit">
+            {submitting ? (
+              <span className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white" />
+            ) : (
+              `הזמינו - ${"\u20AA"}${service.price}`
+            )}
+          </Button>
+        </form>
+      </Card>
     </div>
   );
 }

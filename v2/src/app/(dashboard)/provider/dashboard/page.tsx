@@ -4,6 +4,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/api-client";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  CalendarDays, FileText, MessageCircle, Bell,
+  Clock, CheckCircle, Hourglass, Edit, ChevronLeft,
+} from "lucide-react";
 import type { Booking } from "@/lib/types";
 
 export default function ProviderDashboardPage() {
@@ -13,81 +21,107 @@ export default function ProviderDashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      api.get<{ bookings: Booking[] }>("/bookings", { limit: "10" }),
-    ]).then(([b]) => {
-      setBookings(b.bookings);
-      const pending = b.bookings.filter((x) => x.status === "pending").length;
-      const confirmed = b.bookings.filter((x) => x.status === "confirmed").length;
-      const completed = b.bookings.filter((x) => x.status === "completed").length;
-      setStats({ pending, confirmed, completed });
-    }).catch(() => {}).finally(() => setLoading(false));
+    api.get<{ bookings: Booking[] }>("/bookings", { limit: "10" })
+      .then((b) => {
+        setBookings(b.bookings);
+        setStats({
+          pending: b.bookings.filter((x) => x.status === "pending").length,
+          confirmed: b.bookings.filter((x) => x.status === "confirmed").length,
+          completed: b.bookings.filter((x) => x.status === "completed").length,
+        });
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
+  const statCards = [
+    { label: "ממתין לאישור", value: stats.pending, icon: Hourglass, color: "bg-amber-50 text-amber-600" },
+    { label: "מאושרות", value: stats.confirmed, icon: Clock, color: "bg-blue-50 text-blue-600" },
+    { label: "הושלמו", value: stats.completed, icon: CheckCircle, color: "bg-emerald-50 text-emerald-600" },
+  ];
+
+  const quickLinks = [
+    { href: "/bookings", label: "הזמנות", icon: CalendarDays },
+    { href: "/requests", label: "בקשות שירות", icon: FileText },
+    { href: "/chats", label: "הודעות", icon: MessageCircle },
+    { href: "/notifications", label: "התראות", icon: Bell },
+  ];
+
   return (
-    <div dir="rtl">
-      <div className="flex justify-between items-center mb-8">
+    <div>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">לוח בקרה ספק</h1>
-          <p className="text-gray-500">{provider?.business_name || user?.name}</p>
+          <h1 className="mb-1">לוח בקרה</h1>
+          <p className="text-slate-500">{provider?.business_name || user?.name}</p>
         </div>
-        <Link href={`/provider/edit/${provider?.provider_id}`} className="bg-teal-600 text-white px-6 py-2 rounded-lg hover:bg-teal-700">
-          ערוך פרופיל
-        </Link>
+        <Button asChild data-testid="edit-profile">
+          <Link href={`/provider/edit/${provider?.provider_id}`}>
+            <Edit className="w-4 h-4 me-2" />
+            ערוך פרופיל
+          </Link>
+        </Button>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4 mb-8">
-        <div className="bg-yellow-50 rounded-xl p-6 text-center">
-          <p className="text-3xl font-bold text-yellow-600">{stats.pending}</p>
-          <p className="text-sm text-gray-500">ממתין לאישור</p>
-        </div>
-        <div className="bg-blue-50 rounded-xl p-6 text-center">
-          <p className="text-3xl font-bold text-blue-600">{stats.confirmed}</p>
-          <p className="text-sm text-gray-500">מאושרות</p>
-        </div>
-        <div className="bg-green-50 rounded-xl p-6 text-center">
-          <p className="text-3xl font-bold text-green-600">{stats.completed}</p>
-          <p className="text-sm text-gray-500">הושלמו</p>
-        </div>
+        {statCards.map((s) => (
+          <Card key={s.label} className={`p-6 text-center ${s.color} border-0`}>
+            <s.icon className="w-6 h-6 mx-auto mb-2" />
+            <p className="text-3xl font-heading font-bold">{s.value}</p>
+            <p className="text-sm mt-1 opacity-80">{s.label}</p>
+          </Card>
+        ))}
       </div>
 
       {/* Quick Links */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {[
-          { href: "/bookings", label: "הזמנות", icon: "📅" },
-          { href: "/requests", label: "בקשות שירות", icon: "📋" },
-          { href: "/chats", label: "הודעות", icon: "💬" },
-          { href: "/notifications", label: "התראות", icon: "🔔" },
-        ].map((item) => (
-          <Link key={item.href} href={item.href} className="bg-white rounded-xl shadow-sm p-4 text-center hover:shadow-md transition-shadow">
-            <span className="text-2xl">{item.icon}</span>
-            <p className="text-sm font-medium mt-1">{item.label}</p>
+        {quickLinks.map((item) => (
+          <Link key={item.href} href={item.href}>
+            <Card className="p-5 text-center hover-lift">
+              <item.icon className="w-6 h-6 mx-auto mb-2 text-accent" />
+              <p className="text-sm font-medium text-primary">{item.label}</p>
+            </Card>
           </Link>
         ))}
       </div>
 
       {/* Recent Bookings */}
-      <div className="bg-white rounded-2xl shadow-lg p-6">
-        <h2 className="text-xl font-bold mb-4">הזמנות אחרונות</h2>
-        {loading ? <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-14 bg-gray-100 rounded-xl" />)}</div> : bookings.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">אין הזמנות עדיין</p>
+      <Card className="p-6 md:p-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-heading font-semibold">הזמנות אחרונות</h2>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/bookings">
+              הצג הכל
+              <ChevronLeft className="w-4 h-4 ms-1" />
+            </Link>
+          </Button>
+        </div>
+
+        {loading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full" />)}
+          </div>
+        ) : bookings.length === 0 ? (
+          <p className="text-slate-400 text-center py-10">אין הזמנות עדיין</p>
         ) : (
           <div className="space-y-3">
             {bookings.slice(0, 5).map((b) => (
-              <div key={b.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+              <div key={b.id} className="flex items-center justify-between p-4 bg-secondary/50 rounded-2xl">
                 <div>
-                  <p className="font-medium">{b.serviceName}</p>
-                  <p className="text-sm text-gray-500">{b.clientName} • {b.bookingDate ? new Date(b.bookingDate).toLocaleDateString("he-IL") : "יתואם"}</p>
+                  <p className="font-medium text-primary">{b.serviceName}</p>
+                  <p className="text-sm text-slate-400">
+                    {b.clientName} {b.bookingDate ? ` \u2022 ${new Date(b.bookingDate).toLocaleDateString("he-IL")}` : ""}
+                  </p>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${b.status === "pending" ? "bg-yellow-100 text-yellow-700" : b.status === "confirmed" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
-                  {b.status === "pending" ? "ממתין" : b.status === "confirmed" ? "מאושר" : b.status}
-                </span>
+                <Badge variant={b.status === "pending" ? "warning" : b.status === "confirmed" ? "accent" : b.status === "completed" ? "success" : "outline"}>
+                  {b.status === "pending" ? "ממתין" : b.status === "confirmed" ? "מאושר" : b.status === "completed" ? "הושלם" : b.status}
+                </Badge>
               </div>
             ))}
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

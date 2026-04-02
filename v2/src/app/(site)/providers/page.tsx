@@ -4,6 +4,12 @@ import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import api from "@/lib/api-client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Search, MapPin, Star, Shield, ChevronDown } from "lucide-react";
 import type { Provider } from "@/lib/types";
 
 export default function ProvidersPage() {
@@ -15,7 +21,7 @@ function ProvidersContent() {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState(searchParams.get("search") || "");
+  const [search, setSearch] = useState(searchParams.get("search") || searchParams.get("q") || "");
   const [city, setCity] = useState(searchParams.get("city") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
   const [page, setPage] = useState(0);
@@ -48,75 +54,141 @@ function ProvidersContent() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8" dir="rtl">
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">מטפלים וספקי שירות</h1>
-      <p className="text-gray-600 mb-6">מצאו את נותני השירות המתאימים לכם</p>
+    <div className="container-main py-10 md:py-16">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="mb-3">מטפלים וספקי שירות</h1>
+        <p className="text-lg text-slate-500">מצאו את נותני השירות המתאימים לכם מתוך מאות מטפלים מאומתים</p>
+      </div>
 
       {/* Search Bar */}
-      <form onSubmit={handleSearch} className="bg-white rounded-2xl shadow-lg p-4 mb-6">
-        <div className="grid md:grid-cols-3 gap-3">
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="מקצוע, התמחות, שם ספק..."
-            className="px-4 py-3 border-2 border-gray-100 rounded-xl focus:border-teal-500 focus:outline-none" />
-          <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="עיר או אזור"
-            className="px-4 py-3 border-2 border-gray-100 rounded-xl focus:border-teal-500 focus:outline-none" />
-          <button type="submit" className="bg-teal-600 text-white py-3 rounded-xl font-bold hover:bg-teal-700 transition-colors">
+      <form onSubmit={handleSearch} className="glass-card p-4 mb-8">
+        <div className="grid md:grid-cols-4 gap-3">
+          <div className="relative md:col-span-2">
+            <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="מקצוע, התמחות, שם ספק..."
+              className="ps-11 border-0 bg-white/60"
+              data-testid="providers-search"
+            />
+          </div>
+          <div className="relative">
+            <MapPin className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="עיר או אזור"
+              className="ps-11 border-0 bg-white/60"
+              data-testid="providers-city"
+            />
+          </div>
+          <Button type="submit" className="h-12" data-testid="providers-search-btn">
+            <Search className="w-4 h-4 me-2" />
             חיפוש
-          </button>
+          </Button>
         </div>
       </form>
 
-      {/* Results */}
-      <p className="text-gray-500 mb-4">{total} תוצאות</p>
+      {/* Results count */}
+      <p className="text-sm text-slate-400 mb-6">{total} תוצאות</p>
+
+      {/* Loading */}
       {loading && page === 0 ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="bg-white rounded-xl shadow p-6 animate-pulse">
-              <div className="h-12 w-12 bg-gray-200 rounded-full mb-4" />
-              <div className="h-5 bg-gray-200 rounded w-3/4 mb-3" />
-              <div className="h-4 bg-gray-200 rounded w-1/2" />
-            </div>
+            <Card key={i} className="p-6">
+              <div className="flex items-start gap-4">
+                <Skeleton className="w-14 h-14 rounded-full" />
+                <div className="flex-1">
+                  <Skeleton className="h-5 w-3/4 mb-3" />
+                  <Skeleton className="h-4 w-1/2 mb-2" />
+                  <Skeleton className="h-4 w-1/3" />
+                </div>
+              </div>
+            </Card>
           ))}
         </div>
       ) : (
         <>
+          {/* Results grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {providers.map((p) => (
-              <Link key={p.provider_id} href={`/providers/${p.provider_id}`}
-                className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-gray-100">
-                <div className="flex items-start gap-4">
-                  <div className="w-14 h-14 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-bold text-xl flex-shrink-0">
-                    {p.business_name?.[0] || "?"}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-gray-900 truncate">{p.business_name || "ספק"}</h3>
-                    <p className="text-sm text-teal-600">{p.profession_name || p.profession_title}</p>
-                    <p className="text-sm text-gray-500 mt-1">{p.location?.city}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-yellow-500">⭐</span>
-                      <span className="font-medium">{p.rating.toFixed(1)}</span>
-                      <span className="text-gray-400">({p.total_reviews})</span>
-                      {p.is_verified && <span className="bg-teal-100 text-teal-700 text-xs px-2 py-0.5 rounded-full">מאומת</span>}
-                      {p.distance_km != null && <span className="text-gray-400 text-sm">{p.distance_km} ק&quot;מ</span>}
+              <Link key={p.provider_id} href={`/providers/${p.provider_id}`} data-testid={`provider-${p.provider_id}`}>
+                <Card className="p-6 hover-lift group">
+                  <div className="flex items-start gap-4">
+                    <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center text-accent font-heading font-bold text-xl flex-shrink-0">
+                      {p.profile_image ? (
+                        <img src={p.profile_image} alt="" className="w-full h-full rounded-full object-cover" />
+                      ) : (
+                        p.business_name?.[0] || "?"
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-primary truncate group-hover:text-accent transition-colors">
+                        {p.business_name || "ספק"}
+                      </h3>
+                      <p className="text-sm text-accent font-medium">{p.profession_name || p.profession_title}</p>
+                      {p.location?.city && (
+                        <p className="text-sm text-slate-400 flex items-center gap-1 mt-1">
+                          <MapPin className="w-3 h-3" />
+                          {p.location.city}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-2 mt-3 flex-wrap">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3.5 h-3.5 text-accent fill-accent" />
+                          <span className="text-sm font-medium text-primary">{p.rating.toFixed(1)}</span>
+                          <span className="text-xs text-slate-400">({p.total_reviews})</span>
+                        </div>
+                        {p.is_verified && (
+                          <Badge variant="success" className="text-[10px]">
+                            <Shield className="w-3 h-3 me-1" />
+                            מאומת
+                          </Badge>
+                        )}
+                        {p.distance_km != null && (
+                          <span className="text-xs text-slate-400">{p.distance_km} ק&quot;מ</span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Card>
               </Link>
             ))}
           </div>
 
+          {/* Load more */}
           {providers.length < total && (
-            <div className="text-center mt-8">
-              <button onClick={() => { const next = page + 1; setPage(next); fetchProviders(next); }}
-                className="bg-white border-2 border-teal-600 text-teal-600 px-8 py-3 rounded-xl font-medium hover:bg-teal-50 transition-colors">
-                {loading ? "טוען..." : "הצג עוד"}
-              </button>
+            <div className="text-center mt-10">
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={() => { const next = page + 1; setPage(next); fetchProviders(next); }}
+                disabled={loading}
+                data-testid="providers-load-more"
+              >
+                {loading ? (
+                  <span className="animate-spin rounded-full h-5 w-5 border-2 border-primary/30 border-t-primary" />
+                ) : (
+                  <>
+                    הצג עוד
+                    <ChevronDown className="w-4 h-4 ms-2" />
+                  </>
+                )}
+              </Button>
             </div>
           )}
 
+          {/* Empty state */}
           {!loading && providers.length === 0 && (
-            <div className="text-center py-16 text-gray-500">
-              <p className="text-xl mb-2">לא נמצאו תוצאות</p>
-              <p>נסו לשנות את מילות החיפוש או הפילטרים</p>
+            <div className="text-center py-20">
+              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="w-8 h-8 text-slate-300" />
+              </div>
+              <p className="text-xl font-heading text-slate-600 mb-2">לא נמצאו תוצאות</p>
+              <p className="text-slate-400">נסו לשנות את מילות החיפוש או הפילטרים</p>
             </div>
           )}
         </>

@@ -5,7 +5,24 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/api-client";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Search, FileText, CalendarDays, MessageCircle, ChevronLeft } from "lucide-react";
 import type { Booking } from "@/lib/types";
+
+const statusConfig: Record<string, { label: string; variant: "success" | "warning" | "destructive" | "outline" | "accent" }> = {
+  pending: { label: "ממתין", variant: "warning" },
+  confirmed: { label: "מאושר", variant: "accent" },
+  completed: { label: "הושלם", variant: "success" },
+  cancelled: { label: "בוטל", variant: "destructive" },
+  in_progress: { label: "בתהליך", variant: "accent" },
+  provider_completed: { label: "הספק סיים", variant: "success" },
+  cancellation_requested: { label: "בקשת ביטול", variant: "warning" },
+  rejected: { label: "נדחה", variant: "destructive" },
+  on_hold: { label: "בהמתנה", variant: "outline" },
+};
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -25,69 +42,74 @@ export default function DashboardPage() {
 
   if (!user || user.role !== "patient") return null;
 
+  const actions = [
+    { href: "/providers", label: "חפש מטפל", icon: Search, color: "bg-accent/10 text-accent" },
+    { href: "/requests", label: "בקשת שירות", icon: FileText, color: "bg-primary/10 text-primary" },
+    { href: "/bookings", label: "ההזמנות שלי", icon: CalendarDays, color: "bg-emerald-50 text-emerald-600" },
+    { href: "/chats", label: "הודעות", icon: MessageCircle, color: "bg-blue-50 text-blue-600" },
+  ];
+
   return (
-    <div dir="rtl">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">שלום, {user.name}!</h1>
+    <div>
+      <h1 className="mb-2">שלום, {user.name}!</h1>
+      <p className="text-slate-500 mb-8">מה תרצו לעשות היום?</p>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {[
-          { href: "/providers", label: "חפש מטפל", icon: "🔍" },
-          { href: "/requests", label: "בקשת שירות", icon: "📋" },
-          { href: "/bookings", label: "ההזמנות שלי", icon: "📅" },
-          { href: "/chats", label: "הודעות", icon: "💬" },
-        ].map((item) => (
-          <Link key={item.href} href={item.href} className="bg-white rounded-xl shadow-sm p-6 text-center hover:shadow-md transition-shadow">
-            <span className="text-3xl block mb-2">{item.icon}</span>
-            <span className="font-medium text-gray-700">{item.label}</span>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+        {actions.map((item) => (
+          <Link key={item.href} href={item.href} data-testid={`action-${item.href.slice(1)}`}>
+            <Card className="p-6 text-center hover-lift">
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 ${item.color}`}>
+                <item.icon className="w-6 h-6" />
+              </div>
+              <span className="font-medium text-primary text-sm">{item.label}</span>
+            </Card>
           </Link>
         ))}
       </div>
 
       {/* Recent Bookings */}
-      <div className="bg-white rounded-2xl shadow-lg p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-900">הזמנות אחרונות</h2>
-          <Link href="/bookings" className="text-teal-600 hover:underline text-sm">הצג הכל</Link>
+      <Card className="p-6 md:p-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-heading font-semibold">הזמנות אחרונות</h2>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/bookings">
+              הצג הכל
+              <ChevronLeft className="w-4 h-4 ms-1" />
+            </Link>
+          </Button>
         </div>
+
         {loading ? (
-          <div className="space-y-3">{[1, 2, 3].map((i) => <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />)}</div>
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full" />)}
+          </div>
         ) : bookings.length === 0 ? (
-          <p className="text-gray-500 py-8 text-center">אין הזמנות עדיין. <Link href="/providers" className="text-teal-600 hover:underline">חפשו מטפל</Link></p>
+          <div className="text-center py-10">
+            <p className="text-slate-400 mb-2">אין הזמנות עדיין</p>
+            <Button variant="secondary" size="sm" asChild>
+              <Link href="/providers">חפשו מטפל</Link>
+            </Button>
+          </div>
         ) : (
           <div className="space-y-3">
-            {bookings.map((b) => (
-              <Link key={b.id} href={`/bookings`} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                <div>
-                  <p className="font-medium text-gray-900">{b.serviceName}</p>
-                  <p className="text-sm text-gray-500">{b.providerName} • {b.bookingDate ? new Date(b.bookingDate).toLocaleDateString("he-IL") : "יתואם"}</p>
-                </div>
-                <StatusBadge status={b.status} />
-              </Link>
-            ))}
+            {bookings.map((b) => {
+              const config = statusConfig[b.status] || { label: b.status, variant: "outline" as const };
+              return (
+                <Link key={b.id} href="/bookings" className="flex items-center justify-between p-4 bg-secondary/50 rounded-2xl hover:bg-secondary transition-colors">
+                  <div>
+                    <p className="font-medium text-primary">{b.serviceName}</p>
+                    <p className="text-sm text-slate-400">
+                      {b.providerName} {b.bookingDate ? ` \u2022 ${new Date(b.bookingDate).toLocaleDateString("he-IL")}` : ""}
+                    </p>
+                  </div>
+                  <Badge variant={config.variant}>{config.label}</Badge>
+                </Link>
+              );
+            })}
           </div>
         )}
-      </div>
+      </Card>
     </div>
-  );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const colors: Record<string, string> = {
-    pending: "bg-yellow-100 text-yellow-700",
-    confirmed: "bg-blue-100 text-blue-700",
-    completed: "bg-green-100 text-green-700",
-    cancelled: "bg-red-100 text-red-700",
-    in_progress: "bg-purple-100 text-purple-700",
-  };
-  const labels: Record<string, string> = {
-    pending: "ממתין", confirmed: "מאושר", completed: "הושלם",
-    cancelled: "בוטל", in_progress: "בתהליך", provider_completed: "הספק סיים",
-    cancellation_requested: "בקשת ביטול", rejected: "נדחה", on_hold: "בהמתנה",
-  };
-  return (
-    <span className={`px-3 py-1 rounded-full text-xs font-medium ${colors[status] || "bg-gray-100 text-gray-600"}`}>
-      {labels[status] || status}
-    </span>
   );
 }

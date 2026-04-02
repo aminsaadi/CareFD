@@ -4,6 +4,9 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import api from "@/lib/api-client";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { CheckCircle, XCircle } from "lucide-react";
 
 export default function VerifyEmailPage() {
   return <Suspense><VerifyEmailContent /></Suspense>;
@@ -23,24 +26,37 @@ function VerifyEmailContent() {
   }, [token]);
 
   return (
-    <div className="w-full max-w-md text-center" dir="rtl">
-      <div className="bg-white rounded-2xl shadow-xl p-8">
-        {status === "loading" && <div className="animate-spin h-8 w-8 border-4 border-teal-600 border-t-transparent rounded-full mx-auto" />}
-        {status === "success" && (
-          <>
-            <h1 className="text-2xl font-bold text-teal-600 mb-4">✓ האימייל אומת!</h1>
-            <p className="text-gray-600 mb-4">{message}</p>
-            <Link href="/login" className="bg-teal-600 text-white px-6 py-2 rounded-xl hover:bg-teal-700 inline-block">התחברות</Link>
-          </>
-        )}
-        {status === "error" && (
-          <>
-            <h1 className="text-2xl font-bold text-red-600 mb-4">שגיאה</h1>
-            <p className="text-gray-600 mb-4">{message}</p>
-            <Link href="/login" className="text-teal-600 hover:underline">חזרה להתחברות</Link>
-          </>
-        )}
-      </div>
-    </div>
+    <Card className="p-8 md:p-10 shadow-floating border-0 text-center">
+      {status === "loading" && (
+        <div className="py-8">
+          <span className="animate-spin inline-block rounded-full h-10 w-10 border-4 border-primary/20 border-t-primary" />
+          <p className="text-slate-500 mt-4">מאמת את כתובת האימייל...</p>
+        </div>
+      )}
+      {status === "success" && (
+        <div className="py-4">
+          <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="w-8 h-8 text-emerald-500" />
+          </div>
+          <h2 className="mb-2">האימייל אומת בהצלחה</h2>
+          <p className="text-slate-500 mb-6">{message}</p>
+          <Button asChild>
+            <Link href="/login">המשיכו להתחברות</Link>
+          </Button>
+        </div>
+      )}
+      {status === "error" && (
+        <div className="py-4">
+          <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <XCircle className="w-8 h-8 text-red-500" />
+          </div>
+          <h2 className="mb-2">שגיאה באימות</h2>
+          <p className="text-slate-500 mb-6">{message}</p>
+          <Button variant="secondary" asChild>
+            <Link href="/login">חזרה להתחברות</Link>
+          </Button>
+        </div>
+      )}
+    </Card>
   );
 }

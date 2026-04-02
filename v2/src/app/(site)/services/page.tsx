@@ -4,6 +4,11 @@ import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import api from "@/lib/api-client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Search, ChevronLeft } from "lucide-react";
 import type { Service } from "@/lib/types";
 
 export default function ServicesPage() {
@@ -32,29 +37,82 @@ function ServicesContent() {
   useEffect(() => { fetchServices(); }, [fetchServices]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8" dir="rtl">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">שירותים</h1>
-      <form onSubmit={(e) => { e.preventDefault(); fetchServices(); }} className="bg-white rounded-xl shadow p-4 mb-6 flex gap-3">
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="חפשו שירות..." className="flex-1 px-4 py-3 border-2 border-gray-100 rounded-xl focus:border-teal-500 focus:outline-none" />
-        <button type="submit" className="bg-teal-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-teal-700">חיפוש</button>
+    <div className="container-main py-10 md:py-16">
+      <div className="mb-8">
+        <h1 className="mb-3">שירותים</h1>
+        <p className="text-lg text-slate-500">מצאו את השירות המתאים לכם</p>
+      </div>
+
+      {/* Search */}
+      <form onSubmit={(e) => { e.preventDefault(); fetchServices(); }} className="glass-card p-4 mb-8 flex gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="חפשו שירות..."
+            className="ps-11 border-0 bg-white/60"
+            data-testid="services-search"
+          />
+        </div>
+        <Button type="submit" className="h-12" data-testid="services-search-btn">
+          <Search className="w-4 h-4 me-2" />
+          חיפוש
+        </Button>
       </form>
-      <p className="text-gray-500 mb-4">{total} שירותים</p>
-      {loading ? <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">{[1,2,3,4,5,6].map(i => <div key={i} className="h-40 bg-white rounded-xl animate-pulse" />)}</div> : (
+
+      <p className="text-sm text-slate-400 mb-6">{total} שירותים</p>
+
+      {loading ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((s) => (
-            <div key={s.service_id} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-shadow">
-              <h3 className="font-bold text-gray-900 text-lg mb-2">{s.name}</h3>
-              {s.description && <p className="text-sm text-gray-600 mb-3 line-clamp-2">{s.description}</p>}
-              <div className="flex justify-between items-center">
-                <div>
-                  <span className="text-xl font-bold text-teal-600">₪{s.price}</span>
-                  {s.provider && <p className="text-sm text-gray-500">{s.provider.business_name}</p>}
-                </div>
-                <Link href={`/book/${s.service_id}`} className="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-700">הזמן</Link>
-              </div>
-            </div>
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Card key={i} className="p-6">
+              <Skeleton className="h-6 w-3/4 mb-3" />
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-1/2 mb-4" />
+              <Skeleton className="h-8 w-20" />
+            </Card>
           ))}
         </div>
+      ) : (
+        <>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {services.map((s) => (
+              <Card key={s.service_id} className="p-6 hover-lift group" data-testid={`service-${s.service_id}`}>
+                <h3 className="font-heading font-semibold text-lg text-primary mb-2 group-hover:text-accent transition-colors">
+                  {s.name}
+                </h3>
+                {s.description && (
+                  <p className="text-sm text-slate-500 mb-4 line-clamp-2 leading-relaxed">{s.description}</p>
+                )}
+                <div className="flex justify-between items-center">
+                  <div>
+                    <span className="text-xl font-heading font-bold text-primary">{"\u20AA"}{s.price}</span>
+                    {s.provider && (
+                      <p className="text-xs text-slate-400 mt-0.5">{s.provider.business_name}</p>
+                    )}
+                  </div>
+                  <Button size="sm" asChild>
+                    <Link href={`/book/${s.service_id}`}>
+                      הזמינו
+                      <ChevronLeft className="w-3 h-3 ms-1" />
+                    </Link>
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          {!loading && services.length === 0 && (
+            <div className="text-center py-20">
+              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="w-8 h-8 text-slate-300" />
+              </div>
+              <p className="text-xl font-heading text-slate-600 mb-2">לא נמצאו שירותים</p>
+              <p className="text-slate-400">נסו לשנות את מילות החיפוש</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

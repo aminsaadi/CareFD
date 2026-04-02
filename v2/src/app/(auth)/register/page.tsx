@@ -4,6 +4,10 @@ import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Mail, Lock, User, UserPlus, Stethoscope, Heart } from "lucide-react";
 
 export default function RegisterPage() {
   return <Suspense><RegisterContent /></Suspense>;
@@ -23,6 +27,7 @@ function RegisterContent() {
     e.preventDefault();
     setError("");
     if (form.password !== form.confirmPassword) { setError("הסיסמאות לא תואמות"); return; }
+    if (form.password.length < 6) { setError("הסיסמה חייבת להכיל לפחות 6 תווים"); return; }
     setLoading(true);
     try {
       await register({ email: form.email, password: form.password, name: form.name, role: form.role });
@@ -35,51 +40,131 @@ function RegisterContent() {
   };
 
   return (
-    <div className="w-full max-w-md" dir="rtl">
-      <div className="bg-white rounded-2xl shadow-xl p-8">
-        <h1 className="text-2xl font-bold text-center text-gray-900 mb-6">הרשמה</h1>
-        {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">{error}</div>}
-
-        {/* Role selector */}
-        <div className="flex gap-2 mb-6">
-          {[{ value: "patient", label: "מטופל" }, { value: "provider", label: "ספק שירות" }].map((r) => (
-            <button key={r.value} type="button" onClick={() => setForm({ ...form, role: r.value })}
-              className={`flex-1 py-3 rounded-xl font-medium transition-colors ${form.role === r.value ? "bg-teal-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
-              {r.label}
-            </button>
-          ))}
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">שם מלא</label>
-            <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:outline-none" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">אימייל</label>
-            <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:outline-none" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">סיסמה</label>
-            <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:outline-none" placeholder="לפחות 8 תווים, אות וספרה" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">אימות סיסמה</label>
-            <input type="password" value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} required
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:outline-none" />
-          </div>
-          <button type="submit" disabled={loading}
-            className="w-full bg-teal-600 text-white py-3 rounded-xl font-bold hover:bg-teal-700 disabled:opacity-50 transition-colors">
-            {loading ? "נרשם..." : "הרשמה"}
-          </button>
-        </form>
-        <div className="mt-4 text-center text-sm text-gray-500">
-          כבר רשום? <Link href="/login" className="text-teal-600 hover:underline">התחברות</Link>
-        </div>
+    <Card className="p-8 md:p-10 shadow-floating border-0">
+      <div className="text-center mb-8">
+        <h2 className="mb-2">יצירת חשבון</h2>
+        <p className="text-slate-500">הצטרפו לקהילת CareFD</p>
       </div>
-    </div>
+
+      {/* Role Selector */}
+      <div className="grid grid-cols-2 gap-3 mb-8">
+        <button
+          type="button"
+          onClick={() => setForm({ ...form, role: "patient" })}
+          className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
+            form.role === "patient"
+              ? "border-primary bg-primary/5 text-primary"
+              : "border-slate-200 text-slate-400 hover:border-slate-300"
+          }`}
+          data-testid="register-role-patient"
+        >
+          <Heart className="w-6 h-6" />
+          <span className="text-sm font-medium">מטופל</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setForm({ ...form, role: "provider" })}
+          className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${
+            form.role === "provider"
+              ? "border-primary bg-primary/5 text-primary"
+              : "border-slate-200 text-slate-400 hover:border-slate-300"
+          }`}
+          data-testid="register-role-provider"
+        >
+          <Stethoscope className="w-6 h-6" />
+          <span className="text-sm font-medium">ספק שירות</span>
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {error && (
+          <div className="bg-red-50 text-red-600 text-sm rounded-xl p-4 border border-red-100" data-testid="register-error">
+            {error}
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-slate-700">שם מלא</label>
+          <div className="relative">
+            <User className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="הזינו שם מלא"
+              className="ps-11"
+              required
+              data-testid="register-name"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-slate-700">אימייל</label>
+          <div className="relative">
+            <Mail className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input
+              type="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="name@example.com"
+              className="ps-11"
+              dir="ltr"
+              required
+              data-testid="register-email"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-slate-700">סיסמה</label>
+          <div className="relative">
+            <Lock className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input
+              type="password"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              placeholder="לפחות 6 תווים"
+              className="ps-11"
+              required
+              data-testid="register-password"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-slate-700">אימות סיסמה</label>
+          <div className="relative">
+            <Lock className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input
+              type="password"
+              value={form.confirmPassword}
+              onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+              placeholder="הזינו סיסמה שוב"
+              className="ps-11"
+              required
+              data-testid="register-confirm-password"
+            />
+          </div>
+        </div>
+
+        <Button type="submit" className="w-full" size="lg" disabled={loading} data-testid="register-submit">
+          {loading ? (
+            <span className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white" />
+          ) : (
+            <>
+              <UserPlus className="w-4 h-4 me-2" />
+              הרשמה
+            </>
+          )}
+        </Button>
+      </form>
+
+      <p className="text-center text-sm text-slate-500 mt-6">
+        יש לכם חשבון?{" "}
+        <Link href="/login" className="text-primary font-semibold hover:underline">
+          התחברו
+        </Link>
+      </p>
+    </Card>
   );
 }
