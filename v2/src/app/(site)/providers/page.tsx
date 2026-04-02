@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import AdvancedSearch from "@/components/AdvancedSearch";
 import { Search, MapPin, Star, Shield, ChevronDown } from "lucide-react";
 import type { Provider } from "@/lib/types";
 
@@ -62,34 +63,7 @@ function ProvidersContent() {
       </div>
 
       {/* Search Bar */}
-      <form onSubmit={handleSearch} className="glass-card p-4 mb-8">
-        <div className="grid md:grid-cols-4 gap-3">
-          <div className="relative md:col-span-2">
-            <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="מקצוע, התמחות, שם ספק..."
-              className="ps-11 border-0 bg-white/60"
-              data-testid="providers-search"
-            />
-          </div>
-          <div className="relative">
-            <MapPin className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <Input
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              placeholder="עיר או אזור"
-              className="ps-11 border-0 bg-white/60"
-              data-testid="providers-city"
-            />
-          </div>
-          <Button type="submit" className="h-12" data-testid="providers-search-btn">
-            <Search className="w-4 h-4 me-2" />
-            חיפוש
-          </Button>
-        </div>
-      </form>
+      <AdvancedSearch defaultTab="providers" compact className="mb-8" />
 
       {/* Results count */}
       <p className="text-sm text-slate-400 mb-6">{total} תוצאות</p>

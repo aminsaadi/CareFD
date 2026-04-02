@@ -5,9 +5,9 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import api from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import AdvancedSearch from "@/components/AdvancedSearch";
 import { Search, ChevronLeft } from "lucide-react";
 import type { Service } from "@/lib/types";
 
@@ -44,22 +44,7 @@ function ServicesContent() {
       </div>
 
       {/* Search */}
-      <form onSubmit={(e) => { e.preventDefault(); fetchServices(); }} className="glass-card p-4 mb-8 flex gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="חפשו שירות..."
-            className="ps-11 border-0 bg-white/60"
-            data-testid="services-search"
-          />
-        </div>
-        <Button type="submit" className="h-12" data-testid="services-search-btn">
-          <Search className="w-4 h-4 me-2" />
-          חיפוש
-        </Button>
-      </form>
+      <AdvancedSearch defaultTab="services" className="mb-8" />
 
       <p className="text-sm text-slate-400 mb-6">{total} שירותים</p>
 

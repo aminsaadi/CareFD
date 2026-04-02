@@ -6,7 +6,7 @@ import api from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import AdvancedSearch from "@/components/AdvancedSearch";
 import {
   Search, MapPin, Star, Shield, Clock, Users,
   Heart, Stethoscope, Brain, Baby, Eye, Leaf,
@@ -47,7 +47,6 @@ const stats = [
 
 export default function Landing() {
   const [professions, setProfessions] = useState<any[]>(fallbackProfessions);
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     api.get<{ professions: Profession[] }>("/professions")
@@ -79,25 +78,7 @@ export default function Landing() {
             </p>
 
             {/* Search Box */}
-            <div className="glass-card p-3 max-w-2xl flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1">
-                <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <Input
-                  type="text"
-                  placeholder="חפשו מקצוע, שירות או שם מטפל..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="ps-12 border-0 bg-white/60 h-14"
-                  data-testid="hero-search-input"
-                />
-              </div>
-              <Button size="lg" asChild className="h-14 px-8" data-testid="hero-search-btn">
-                <Link href={`/providers${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ""}`}>
-                  חיפוש
-                  <ChevronLeft className="w-4 h-4 ms-2" />
-                </Link>
-              </Button>
-            </div>
+            <AdvancedSearch className="max-w-2xl" />
           </div>
         </div>
 
