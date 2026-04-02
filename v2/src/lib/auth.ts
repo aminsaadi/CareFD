@@ -6,9 +6,8 @@ import prisma from "./db";
 function getJwtSecret(): string {
   const key = process.env.SECRET_KEY;
   if (key) return key;
-  if (process.env.NODE_ENV === "production" && typeof window === "undefined") {
-    // Only warn, don't crash build – crash at runtime if actually used
-    console.warn("WARNING: SECRET_KEY not set in production!");
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("FATAL: SECRET_KEY not set in production!");
   }
   return "dev-only-secret-not-for-production";
 }

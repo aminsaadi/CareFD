@@ -29,6 +29,26 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
     userEmail = user.email;
   }
 
+  // Validate booking_date is a valid future date
+  if (body.booking_date) {
+    const bookingDate = new Date(body.booking_date);
+    if (isNaN(bookingDate.getTime())) return errorResponse("Invalid booking date", 400);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (bookingDate < today) return errorResponse("Booking date must be in the future", 400);
+  }
+
+  // Validate booking_time format (HH:MM)
+  if (body.booking_time) {
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    if (!timeRegex.test(body.booking_time)) return errorResponse("Invalid booking time format (expected HH:MM)", 400);
+  }
+
+  // Validate hours_booked
+  if (body.hours_booked !== undefined && (typeof body.hours_booked !== "number" || body.hours_booked <= 0)) {
+    return errorResponse("hours_booked must be a positive number", 400);
+  }
+
   // Get service
   const service = await prisma.service.findUnique({
     where: { id: body.service_id },
@@ -37,19 +57,6 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
   if (!service) return errorResponse("Service not found", 404);
   if (!service.provider.isVerified && service.provider.verificationStatus !== "verified") {
     return errorResponse("Provider is not verified", 400);
-  }
-
-  // Check conflicts via transaction
-  if (body.booking_date && body.booking_time) {
-    const existing = await prisma.booking.findFirst({
-      where: {
-        providerId: service.providerId,
-        bookingDate: new Date(body.booking_date),
-        bookingTime: body.booking_time,
-        status: { in: ["pending", "confirmed", "in_progress"] },
-      },
-    });
-    if (existing) return errorResponse("Time slot already booked", 400);
   }
 
   // Calculate pricing
@@ -89,50 +96,70 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
   const bookingNumber = `B${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
   const clientName = body.client_name || body.guest_name || userName;
 
-  const booking = await prisma.booking.create({
-    data: {
-      bookingNumber,
-      userId: isGuest ? userId : userId,
-      providerId: service.providerId,
-      serviceId: service.id,
-      bookingDate: body.booking_date ? new Date(body.booking_date) : null,
-      bookingTime: body.booking_time,
-      serviceName: service.name,
-      serviceCategory: service.serviceCategory,
-      deliveryType: body.delivery_type,
-      clientName: clientName,
-      clientPhone: body.client_phone || body.guest_phone,
-      clientEmail: body.client_email || body.guest_email || userEmail,
-      contactPersonName: body.contact_person_name,
-      contactPersonPhone: body.contact_person_phone,
-      contactPersonRelation: body.contact_person_relationship,
-      isContactSameAsRequester: body.is_contact_same_as_requester ?? true,
-      serviceAddress: body.service_address || body.guest_address,
-      serviceCity: body.service_city,
-      serviceFloor: body.service_floor,
-      serviceApartment: body.service_apartment,
-      serviceEntryCode: body.service_entry_code,
-      serviceLocationNotes: body.service_notes,
-      serviceLatitude: body.service_latitude,
-      serviceLongitude: body.service_longitude,
-      shippingAddress: body.shipping_address,
-      shippingCity: body.shipping_city,
-      hoursBooked: hoursBooked,
-      selectedShift: body.selected_shift,
-      platform: body.platform,
-      numSessions: body.num_sessions,
-      notes: body.notes,
-      specialRequirements: body.special_requirements,
-      basePrice: service.price,
-      travelCost: travelCost > 0 ? travelCost : null,
-      weekendAddition: weekendAddition > 0 ? weekendAddition : null,
-      shippingCost: shippingCost > 0 ? shippingCost : null,
-      finalPrice,
-      providerName: service.provider.businessName,
-      userName: userName,
-      isGuestBooking: isGuest,
-    },
+  // Check conflicts and create booking inside a transaction to prevent race conditions
+  const booking = await prisma.$transaction(async (tx) => {
+    if (body.booking_date && body.booking_time) {
+      const existing = await tx.booking.findFirst({
+        where: {
+          providerId: service.providerId,
+          bookingDate: new Date(body.booking_date),
+          bookingTime: body.booking_time,
+          status: { in: ["pending", "confirmed", "in_progress"] },
+        },
+      });
+      if (existing) throw new Error("Time slot already booked");
+    }
+
+    return tx.booking.create({
+      data: {
+        bookingNumber,
+        userId: isGuest ? userId : userId,
+        providerId: service.providerId,
+        serviceId: service.id,
+        bookingDate: body.booking_date ? new Date(body.booking_date) : null,
+        bookingTime: body.booking_time,
+        serviceName: service.name,
+        serviceCategory: service.serviceCategory,
+        deliveryType: body.delivery_type,
+        clientName: clientName,
+        clientPhone: body.client_phone || body.guest_phone,
+        clientEmail: body.client_email || body.guest_email || userEmail,
+        contactPersonName: body.contact_person_name,
+        contactPersonPhone: body.contact_person_phone,
+        contactPersonRelation: body.contact_person_relationship,
+        isContactSameAsRequester: body.is_contact_same_as_requester ?? true,
+        serviceAddress: body.service_address || body.guest_address,
+        serviceCity: body.service_city,
+        serviceFloor: body.service_floor,
+        serviceApartment: body.service_apartment,
+        serviceEntryCode: body.service_entry_code,
+        serviceLocationNotes: body.service_notes,
+        serviceLatitude: body.service_latitude,
+        serviceLongitude: body.service_longitude,
+        shippingAddress: body.shipping_address,
+        shippingCity: body.shipping_city,
+        hoursBooked: hoursBooked,
+        selectedShift: body.selected_shift,
+        platform: body.platform,
+        numSessions: body.num_sessions,
+        notes: body.notes,
+        specialRequirements: body.special_requirements,
+        basePrice: service.price,
+        travelCost: travelCost > 0 ? travelCost : null,
+        weekendAddition: weekendAddition > 0 ? weekendAddition : null,
+        shippingCost: shippingCost > 0 ? shippingCost : null,
+        finalPrice,
+        providerName: service.provider.businessName,
+        userName: userName,
+        isGuestBooking: isGuest,
+      },
+    });
+  }).catch((e) => {
+    if (e.message === "Time slot already booked") return null;
+    throw e;
   });
+
+  if (!booking) return errorResponse("Time slot already booked", 400);
 
   // Notify provider
   const dateFormatted = body.booking_date ? new Date(body.booking_date).toLocaleDateString("he-IL") : "יתואם טלפונית";

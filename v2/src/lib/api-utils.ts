@@ -22,7 +22,7 @@ export function withErrorHandler(
   return async (req: Request, ctx: { params: Promise<Record<string, string>> }) => {
     try {
       return await handler(req, ctx);
-    } catch (err) {
+    } catch (err: any) {
       if (err instanceof RateLimitError) {
         return NextResponse.json(
           { error: err.message },

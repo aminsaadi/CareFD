@@ -4,12 +4,11 @@
 generator client {
   provider        = "prisma-client"
   output          = "../src/generated/prisma"
-  previewFeatures = ["fullTextSearchPostgres", "postgresqlExtensions"]
+  previewFeatures = ["fullTextSearchPostgres"]
 }
 
 datasource db {
-  provider   = "postgresql"
-  extensions = [postgis]
+  provider = "postgresql"
 }
 
 // ==================== ENUMS ====================
@@ -275,8 +274,6 @@ model Provider {
   latitude             Float?
   longitude            Float?
   coverageRadiusKm     Float?             @map("coverage_radius_km")
-  // PostGIS point for geo queries
-  location             Unsupported("geography(Point, 4326)")?
   serviceAreas         String[]           @default([]) @map("service_areas")
   languages            String[]           @default([])
   targetAudience       String[]           @default([]) @map("target_audience")

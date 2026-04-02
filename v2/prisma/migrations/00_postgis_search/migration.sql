@@ -1,43 +1,16 @@
--- PostGIS extension and spatial search setup
--- This runs after Prisma creates the base tables
+-- Search indexes for CareFD v2
+-- No PostGIS required - uses Haversine formula for geo queries
 
--- Enable PostGIS
-CREATE EXTENSION IF NOT EXISTS postgis;
+-- Index on lat/lng for geo search
+CREATE INDEX IF NOT EXISTS idx_providers_lat_lng
+  ON providers (latitude, longitude) WHERE latitude IS NOT NULL;
 
--- Enable pg_trgm for Hebrew fuzzy text search
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
+-- Text search indexes (ILIKE-friendly)
+CREATE INDEX IF NOT EXISTS idx_providers_business_name_lower
+  ON providers (lower(business_name));
 
--- Update the location geography column from lat/lng
--- Trigger function to auto-update geography point from lat/lng columns
-CREATE OR REPLACE FUNCTION update_provider_location()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.latitude IS NOT NULL AND NEW.longitude IS NOT NULL THEN
-    NEW.location = ST_SetSRID(ST_MakePoint(NEW.longitude, NEW.latitude), 4326)::geography;
-  ELSE
-    NEW.location = NULL;
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Trigger on providers table
-DROP TRIGGER IF EXISTS trg_provider_location ON providers;
-CREATE TRIGGER trg_provider_location
-  BEFORE INSERT OR UPDATE OF latitude, longitude ON providers
-  FOR EACH ROW
-  EXECUTE FUNCTION update_provider_location();
-
--- Spatial index on the geography column
-CREATE INDEX IF NOT EXISTS idx_providers_location_geo
-  ON providers USING GIST (location);
-
--- Full-text search index on business_name and description (Hebrew + general)
-CREATE INDEX IF NOT EXISTS idx_providers_business_name_trgm
-  ON providers USING GIN (business_name gin_trgm_ops);
-
-CREATE INDEX IF NOT EXISTS idx_providers_description_trgm
-  ON providers USING GIN (description gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_providers_city_lower
+  ON providers (lower(city));
 
 -- Composite indexes for common search patterns
 CREATE INDEX IF NOT EXISTS idx_providers_verified_rating
@@ -45,13 +18,6 @@ CREATE INDEX IF NOT EXISTS idx_providers_verified_rating
 
 CREATE INDEX IF NOT EXISTS idx_providers_city_verified
   ON providers (city, is_verified);
-
--- Services search indexes
-CREATE INDEX IF NOT EXISTS idx_services_name_trgm
-  ON services USING GIN (name gin_trgm_ops);
-
-CREATE INDEX IF NOT EXISTS idx_services_description_trgm
-  ON services USING GIN (description gin_trgm_ops);
 
 -- Bookings date index for calendar queries
 CREATE INDEX IF NOT EXISTS idx_bookings_provider_date
@@ -64,3 +30,17 @@ CREATE INDEX IF NOT EXISTS idx_notifications_user_unread
 -- Chat messages room + date index
 CREATE INDEX IF NOT EXISTS idx_chat_messages_room_date
   ON chat_messages (room_id, created_at DESC);
+
+-- Optional: pg_trgm for fuzzy Hebrew search (skip if not available)
+DO $$
+BEGIN
+  CREATE EXTENSION IF NOT EXISTS pg_trgm;
+  CREATE INDEX IF NOT EXISTS idx_providers_business_name_trgm
+    ON providers USING GIN (business_name gin_trgm_ops);
+  CREATE INDEX IF NOT EXISTS idx_providers_description_trgm
+    ON providers USING GIN (description gin_trgm_ops);
+  CREATE INDEX IF NOT EXISTS idx_services_name_trgm
+    ON services USING GIN (name gin_trgm_ops);
+EXCEPTION WHEN OTHERS THEN
+  RAISE NOTICE 'pg_trgm not available, skipping trigram indexes';
+END $$;

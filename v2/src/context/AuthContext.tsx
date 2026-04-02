@@ -9,10 +9,12 @@ interface AuthState {
   provider: any | null;
   token: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (data: { email: string; password: string; name: string; role?: string }) => Promise<void>;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<User>;
+  register: (data: { email: string; password: string; name: string; role?: string; language_preference?: string }) => Promise<{ email_verification_required?: boolean }>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  setUser: (user: User | null) => void;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -48,19 +50,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshUser();
   }, [refreshUser]);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<User> => {
     const data = await api.post<{ user: User; provider: any; token: string }>("/auth/login", { email, password });
     localStorage.setItem("token", data.token);
     setToken(data.token);
     setUser(data.user);
     setProvider(data.provider);
+    return data.user;
   };
 
-  const register = async (regData: { email: string; password: string; name: string; role?: string }) => {
-    const data = await api.post<{ user: User; token: string }>("/auth/register", regData);
-    localStorage.setItem("token", data.token);
-    setToken(data.token);
-    setUser(data.user);
+  const register = async (regData: { email: string; password: string; name: string; role?: string; language_preference?: string }): Promise<{ email_verification_required?: boolean }> => {
+    const data = await api.post<{ user?: User; token?: string; email_verification_required?: boolean }>("/auth/register", regData);
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      setToken(data.token);
+    }
+    if (data.user) {
+      setUser(data.user);
+    }
+    return { email_verification_required: data.email_verification_required };
   };
 
   const logout = () => {
@@ -71,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, provider, token, loading, login, register, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, provider, token, loading, isAuthenticated: !!user, login, register, logout, refreshUser, setUser }}>
       {children}
     </AuthContext.Provider>
   );

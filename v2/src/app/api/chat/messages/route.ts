@@ -17,6 +17,12 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
   });
   if (!room) return errorResponse("Room not found", 404);
 
+  // Verify the authenticated user is a participant in this chat room
+  const provider = await prisma.provider.findUnique({ where: { userId: user.id }, select: { id: true } });
+  if (room.userId !== user.id && room.providerId !== provider?.id && user.role !== "admin") {
+    return errorResponse("Not authorized", 403);
+  }
+
   const senderRole = user.id === room.userId ? "patient" : "provider";
 
   const message = await prisma.chatMessage.create({

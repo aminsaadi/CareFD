@@ -16,6 +16,9 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
   if (!request) return errorResponse("Request not found", 404);
   if (request.status !== "open" && request.status !== "in_progress") return errorResponse("Request is not accepting offers", 400);
 
+  // Validate price
+  if (typeof body.price !== "number" || body.price <= 0) return errorResponse("Price must be a positive number", 400);
+
   // Check duplicate
   const existing = await prisma.offer.findFirst({ where: { requestId: body.request_id, providerId: provider.id, status: { in: ["pending", "accepted"] } } });
   if (existing) return errorResponse("כבר הגשת הצעה לבקשה זו", 400);

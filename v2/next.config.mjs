@@ -23,3 +23,4 @@ const nextConfig = {
 };
 
 export default nextConfig;
+// trigger redeploy Thu Apr  2 14:16:04 UTC 2026

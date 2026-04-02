@@ -219,6 +219,8 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
     location?: { address?: string; city?: string; latitude?: number; longitude?: number };
   }>(req);
 
+  if (!user.emailVerified) return errorResponse("Email verification required", 403);
+
   // Check if already a provider
   const existing = await prisma.provider.findUnique({ where: { userId: user.id } });
   if (existing) {
