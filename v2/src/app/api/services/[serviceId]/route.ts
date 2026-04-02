@@ -32,7 +32,8 @@ export const PUT = withErrorHandler(async (req: NextRequest, ctx) => {
   if (!service) return errorResponse("Service not found", 404);
 
   const provider = await prisma.provider.findUnique({ where: { userId: user.id }, select: { id: true } });
-  if (service.providerId !== provider?.id && user.role !== "admin") return errorResponse("Not authorized", 403);
+  if (!provider) return errorResponse("Not a provider", 403);
+  if (service.providerId !== provider.id && user.role !== "admin") return errorResponse("Not authorized", 403);
 
   const body = await parseBody<any>(req);
   const data: any = {};
@@ -60,7 +61,8 @@ export const DELETE = withErrorHandler(async (req: NextRequest, ctx) => {
   if (!service) return errorResponse("Service not found", 404);
 
   const provider = await prisma.provider.findUnique({ where: { userId: user.id }, select: { id: true } });
-  if (service.providerId !== provider?.id && user.role !== "admin") return errorResponse("Not authorized", 403);
+  if (!provider) return errorResponse("Not a provider", 403);
+  if (service.providerId !== provider.id && user.role !== "admin") return errorResponse("Not authorized", 403);
 
   await prisma.service.delete({ where: { id: serviceId } });
   return json({ message: "Service deleted" });

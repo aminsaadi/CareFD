@@ -29,6 +29,26 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
     userEmail = user.email;
   }
 
+  // Validate booking_date is a valid future date
+  if (body.booking_date) {
+    const bookingDate = new Date(body.booking_date);
+    if (isNaN(bookingDate.getTime())) return errorResponse("Invalid booking date", 400);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (bookingDate < today) return errorResponse("Booking date must be in the future", 400);
+  }
+
+  // Validate booking_time format (HH:MM)
+  if (body.booking_time) {
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    if (!timeRegex.test(body.booking_time)) return errorResponse("Invalid booking time format (expected HH:MM)", 400);
+  }
+
+  // Validate hours_booked
+  if (body.hours_booked !== undefined && (typeof body.hours_booked !== "number" || body.hours_booked <= 0)) {
+    return errorResponse("hours_booked must be a positive number", 400);
+  }
+
   // Get service
   const service = await prisma.service.findUnique({
     where: { id: body.service_id },

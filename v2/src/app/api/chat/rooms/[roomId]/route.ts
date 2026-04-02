@@ -12,6 +12,12 @@ export const PUT = withErrorHandler(async (req: NextRequest, ctx) => {
   const room = await prisma.chatRoom.findUnique({ where: { id: roomId } });
   if (!room) return errorResponse("Room not found", 404);
 
+  // Verify user is a participant in this room
+  const provider = await prisma.provider.findUnique({ where: { userId: user.id }, select: { id: true } });
+  if (room.userId !== user.id && room.providerId !== provider?.id && user.role !== "admin") {
+    return errorResponse("Not authorized", 403);
+  }
+
   if (body.action === "archive") {
     if (!room.archivedBy.includes(user.id)) {
       await prisma.chatRoom.update({ where: { id: roomId }, data: { archivedBy: { push: user.id } } });
@@ -33,6 +39,12 @@ export const DELETE = withErrorHandler(async (req: NextRequest, ctx) => {
 
   const room = await prisma.chatRoom.findUnique({ where: { id: roomId } });
   if (!room) return errorResponse("Room not found", 404);
+
+  // Verify user is a participant in this room
+  const provider = await prisma.provider.findUnique({ where: { userId: user.id }, select: { id: true } });
+  if (room.userId !== user.id && room.providerId !== provider?.id && user.role !== "admin") {
+    return errorResponse("Not authorized", 403);
+  }
 
   if (!room.deletedBy.includes(user.id)) {
     await prisma.chatRoom.update({ where: { id: roomId }, data: { deletedBy: { push: user.id } } });

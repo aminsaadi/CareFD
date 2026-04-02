@@ -29,8 +29,9 @@ export const POST = withErrorHandler(async (req: NextRequest, ctx) => {
 
       // Accept offer + create booking + create chat room atomically
       await prisma.$transaction(async (tx) => {
-        // Update offer
-        await tx.offer.update({ where: { id: offerId }, data: { status: "accepted" } });
+        // Update offer - include status: "pending" in WHERE to prevent double acceptance
+        const updated = await tx.offer.updateMany({ where: { id: offerId, status: "pending" }, data: { status: "accepted" } });
+        if (updated.count === 0) throw new Error("Offer is no longer pending");
 
         // Update request
         await tx.serviceRequest.update({
