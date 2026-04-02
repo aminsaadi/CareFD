@@ -6,7 +6,7 @@ import api from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import AdvancedSearch from "@/components/AdvancedSearch";
 import {
   Search, MapPin, Star, Shield, Clock, Users,
   Heart, Stethoscope, Brain, Baby, Eye, Leaf,
@@ -47,7 +47,6 @@ const stats = [
 
 export default function Landing() {
   const [professions, setProfessions] = useState<any[]>(fallbackProfessions);
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     api.get<{ professions: Profession[] }>("/professions")
@@ -60,7 +59,7 @@ export default function Landing() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-stone-100 via-white to-white">
+      <section className="relative overflow-hidden bg-gradient-to-bl from-carefd-navy via-[#1a3a4f] to-carefd-teal text-white">
         <div className="container-main py-20 md:py-32">
           <div className="max-w-3xl">
             <Badge variant="accent" className="mb-6 text-sm px-4 py-1.5">
@@ -70,40 +69,22 @@ export default function Landing() {
 
             <h1 className="text-balance mb-6">
               שירותי בריאות פרמיום{" "}
-              <span className="text-accent">בדלת הבית</span>
+              <span className="text-carefd-teal">בדלת הבית</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-slate-500 mb-10 max-w-2xl leading-relaxed">
+            <p className="text-lg md:text-xl text-white/70 mb-10 max-w-2xl leading-relaxed">
               מצאו את המטפל המושלם מתוך מאות ספקי שירות מאומתים בכל רחבי ישראל.
               סיעוד, רפואה, שיקום ועוד - הכל במקום אחד.
             </p>
 
             {/* Search Box */}
-            <div className="glass-card p-3 max-w-2xl flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1">
-                <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <Input
-                  type="text"
-                  placeholder="חפשו מקצוע, שירות או שם מטפל..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="ps-12 border-0 bg-white/60 h-14"
-                  data-testid="hero-search-input"
-                />
-              </div>
-              <Button size="lg" asChild className="h-14 px-8" data-testid="hero-search-btn">
-                <Link href={`/providers${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ""}`}>
-                  חיפוש
-                  <ChevronLeft className="w-4 h-4 ms-2" />
-                </Link>
-              </Button>
-            </div>
+            <AdvancedSearch className="max-w-2xl" />
           </div>
         </div>
 
         {/* Decorative elements */}
-        <div className="absolute top-20 end-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl -z-10" />
-        <div className="absolute bottom-0 start-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10" />
+        <div className="absolute top-20 end-0 w-96 h-96 bg-carefd-teal/5 rounded-full blur-3xl -z-10" />
+        <div className="absolute bottom-0 start-1/4 w-64 h-64 bg-carefd-navy/5 rounded-full blur-3xl -z-10" />
       </section>
 
       {/* Stats Bar */}
@@ -112,8 +93,8 @@ export default function Landing() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat) => (
               <div key={stat.label} className="text-center">
-                <stat.icon className="w-6 h-6 text-accent mx-auto mb-2" />
-                <div className="text-2xl md:text-3xl font-heading font-bold text-primary">{stat.value}</div>
+                <stat.icon className="w-6 h-6 text-carefd-teal mx-auto mb-2" />
+                <div className="text-2xl md:text-3xl font-heading font-bold text-carefd-navy">{stat.value}</div>
                 <div className="text-sm text-slate-500 mt-1">{stat.label}</div>
               </div>
             ))}
@@ -141,11 +122,11 @@ export default function Landing() {
                   className="group"
                   data-testid={`profession-${prof.profession_id}`}
                 >
-                  <Card className="text-center p-6 hover-lift border-transparent hover:border-accent/30">
-                    <div className="w-14 h-14 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-accent/20 transition-colors">
-                      <IconComp className="w-7 h-7 text-accent" />
+                  <Card className="text-center p-6 hover-lift border-transparent hover:border-carefd-teal/30">
+                    <div className="w-14 h-14 bg-carefd-teal/10 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-carefd-teal/20 transition-colors">
+                      <IconComp className="w-7 h-7 text-carefd-teal" />
                     </div>
-                    <h3 className="font-semibold text-primary text-sm">{prof.name}</h3>
+                    <h3 className="font-semibold text-carefd-navy text-sm">{prof.name}</h3>
                     {prof.specializations?.length > 0 && (
                       <p className="text-xs text-slate-400 mt-1">
                         {prof.specializations.length} התמחויות
@@ -175,14 +156,14 @@ export default function Landing() {
             ].map((item) => (
               <div key={item.step} className="text-center group">
                 <div className="relative inline-block mb-6">
-                  <div className="w-20 h-20 bg-secondary rounded-3xl flex items-center justify-center mx-auto group-hover:bg-accent/10 transition-colors">
-                    <item.icon className="w-8 h-8 text-primary" />
+                  <div className="w-20 h-20 bg-carefd-stone rounded-3xl flex items-center justify-center mx-auto group-hover:bg-carefd-teal/10 transition-colors">
+                    <item.icon className="w-8 h-8 text-carefd-navy" />
                   </div>
-                  <span className="absolute -top-2 -end-2 text-xs font-bold text-accent bg-accent/10 rounded-full w-7 h-7 flex items-center justify-center">
+                  <span className="absolute -top-2 -end-2 text-xs font-bold text-carefd-teal bg-carefd-teal/10 rounded-full w-7 h-7 flex items-center justify-center">
                     {item.step}
                   </span>
                 </div>
-                <h3 className="text-xl font-heading font-semibold text-primary mb-3">{item.title}</h3>
+                <h3 className="text-xl font-heading font-semibold text-carefd-navy mb-3">{item.title}</h3>
                 <p className="text-slate-500 leading-relaxed">{item.desc}</p>
               </div>
             ))}
@@ -203,16 +184,16 @@ export default function Landing() {
               <Card key={t.name} className="p-8">
                 <div className="flex items-center gap-1 mb-4">
                   {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-accent fill-accent" />
+                    <Star key={i} className="w-4 h-4 text-carefd-teal fill-carefd-teal" />
                   ))}
                 </div>
                 <p className="text-slate-600 leading-relaxed mb-6">&ldquo;{t.content}&rdquo;</p>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center text-accent font-heading font-bold">
+                  <div className="w-10 h-10 bg-carefd-teal/10 rounded-full flex items-center justify-center text-carefd-teal font-heading font-bold">
                     {t.avatar}
                   </div>
                   <div>
-                    <div className="font-semibold text-primary text-sm">{t.name}</div>
+                    <div className="font-semibold text-carefd-navy text-sm">{t.name}</div>
                     <div className="text-xs text-slate-400">{t.role}</div>
                   </div>
                 </div>
@@ -223,7 +204,7 @@ export default function Landing() {
       </section>
 
       {/* CTA - Provider Signup */}
-      <section className="py-20 md:py-28 bg-primary text-white relative overflow-hidden">
+      <section className="py-20 md:py-28 bg-gradient-to-bl from-carefd-navy via-carefd-navy to-carefd-teal text-white relative overflow-hidden">
         <div className="container-main relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-white mb-6">אתם מטפלים? הצטרפו אלינו</h2>
@@ -244,8 +225,8 @@ export default function Landing() {
           </div>
         </div>
         {/* Decorative */}
-        <div className="absolute top-0 end-0 w-72 h-72 bg-accent/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 start-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 end-0 w-72 h-72 bg-carefd-teal/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 start-0 w-96 h-96 bg-carefd-teal/5 rounded-full blur-3xl" />
       </section>
     </div>
   );

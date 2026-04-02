@@ -35,14 +35,14 @@ export default function AdminRequestsPage() {
       ) : (
         <Card className="overflow-hidden p-0">
           <table className="w-full text-sm">
-            <thead><tr className="border-b border-slate-100 text-slate-500 bg-secondary/50"><th className="p-3 text-start font-medium">כותרת</th><th className="p-3 text-start font-medium">משתמש</th><th className="p-3 text-start font-medium">דחיפות</th><th className="p-3 text-start font-medium">סטטוס</th><th className="p-3 text-start font-medium">הצעות</th><th className="p-3 text-start font-medium">תאריך</th></tr></thead>
+            <thead><tr className="border-b border-slate-100 text-slate-500 bg-carefd-stone/50"><th className="p-3 text-start font-medium">כותרת</th><th className="p-3 text-start font-medium">משתמש</th><th className="p-3 text-start font-medium">דחיפות</th><th className="p-3 text-start font-medium">סטטוס</th><th className="p-3 text-start font-medium">הצעות</th><th className="p-3 text-start font-medium">תאריך</th></tr></thead>
             <tbody>
               {requests.map((r) => {
                 const status = statusConfig[r.status] || { label: r.status, variant: "outline" as const };
                 const urgency = urgencyConfig[r.urgency] || { label: r.urgency, variant: "outline" as const };
                 return (
-                  <tr key={r.id} className="border-b border-slate-50 hover:bg-secondary/30">
-                    <td className="p-3 font-medium text-primary">{r.title}</td>
+                  <tr key={r.id} className="border-b border-slate-50 hover:bg-carefd-stone/30">
+                    <td className="p-3 font-medium text-carefd-navy">{r.title}</td>
                     <td className="p-3 text-slate-500">{r.user?.name || "-"}</td>
                     <td className="p-3"><Badge variant={urgency.variant}>{urgency.label}</Badge></td>
                     <td className="p-3"><Badge variant={status.variant}>{status.label}</Badge></td>

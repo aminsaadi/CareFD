@@ -39,11 +39,11 @@ export default function AdminServicesPage() {
       ) : (
         <Card className="overflow-hidden p-0">
           <table className="w-full text-sm">
-            <thead><tr className="border-b border-slate-100 text-slate-500 bg-secondary/50"><th className="p-3 text-start font-medium">שם</th><th className="p-3 text-start font-medium">ספק</th><th className="p-3 text-start font-medium">מחיר</th><th className="p-3 text-start font-medium">קטגוריה</th><th className="p-3 text-start font-medium">סטטוס</th></tr></thead>
+            <thead><tr className="border-b border-slate-100 text-slate-500 bg-carefd-stone/50"><th className="p-3 text-start font-medium">שם</th><th className="p-3 text-start font-medium">ספק</th><th className="p-3 text-start font-medium">מחיר</th><th className="p-3 text-start font-medium">קטגוריה</th><th className="p-3 text-start font-medium">סטטוס</th></tr></thead>
             <tbody>
               {services.map((s) => (
-                <tr key={s.service_id} className="border-b border-slate-50 hover:bg-secondary/30 transition-colors">
-                  <td className="p-3 font-medium text-primary">{s.name}</td>
+                <tr key={s.service_id} className="border-b border-slate-50 hover:bg-carefd-stone/30 transition-colors">
+                  <td className="p-3 font-medium text-carefd-navy">{s.name}</td>
                   <td className="p-3 text-slate-500">{s.provider?.business_name || "-"}</td>
                   <td className="p-3 font-heading font-medium">{"\u20AA"}{s.price}</td>
                   <td className="p-3"><Badge variant="outline">{s.serviceCategory || "-"}</Badge></td>

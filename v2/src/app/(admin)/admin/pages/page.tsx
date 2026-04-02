@@ -62,7 +62,7 @@ export default function AdminPagesPage() {
           {pages.map((p) => (
             <Card key={p.id} className="p-4 flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-primary">{p.title}</h3>
+                <h3 className="font-semibold text-carefd-navy">{p.title}</h3>
                 <p className="text-xs text-slate-400">/page/{p.slug}</p>
               </div>
               <div className="flex items-center gap-2">

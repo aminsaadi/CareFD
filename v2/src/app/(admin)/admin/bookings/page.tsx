@@ -38,7 +38,7 @@ export default function AdminBookingsPage() {
       <div className="flex gap-2 mb-6 flex-wrap">
         {filters.map((f) => (
           <button key={f.v} onClick={() => setFilter(f.v)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${filter === f.v ? "bg-primary text-primary-foreground shadow-sm" : "bg-white text-slate-600 hover:bg-secondary border border-slate-200"}`}>
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${filter === f.v ? "bg-carefd-navy text-carefd-navy-foreground shadow-sm" : "bg-white text-slate-600 hover:bg-carefd-stone border border-slate-200"}`}>
             {f.l}
           </button>
         ))}
@@ -49,16 +49,16 @@ export default function AdminBookingsPage() {
       ) : (
         <Card className="overflow-hidden p-0">
           <table className="w-full text-sm">
-            <thead><tr className="border-b border-slate-100 text-slate-500 bg-secondary/50"><th className="p-3 text-start font-medium">#</th><th className="p-3 text-start font-medium">שירות</th><th className="p-3 text-start font-medium">לקוח</th><th className="p-3 text-start font-medium">ספק</th><th className="p-3 text-start font-medium">סטטוס</th><th className="p-3 text-start font-medium">מחיר</th><th className="p-3 text-start font-medium">תאריך</th></tr></thead>
+            <thead><tr className="border-b border-slate-100 text-slate-500 bg-carefd-stone/50"><th className="p-3 text-start font-medium">#</th><th className="p-3 text-start font-medium">שירות</th><th className="p-3 text-start font-medium">לקוח</th><th className="p-3 text-start font-medium">ספק</th><th className="p-3 text-start font-medium">סטטוס</th><th className="p-3 text-start font-medium">מחיר</th><th className="p-3 text-start font-medium">תאריך</th></tr></thead>
             <tbody>
               {bookings.map((b) => (
-                <tr key={b.id} className="border-b border-slate-50 hover:bg-secondary/30 transition-colors">
+                <tr key={b.id} className="border-b border-slate-50 hover:bg-carefd-stone/30 transition-colors">
                   <td className="p-3 font-mono text-xs text-slate-400">{b.bookingNumber}</td>
-                  <td className="p-3 text-primary">{b.serviceName || b.service?.name || "-"}</td>
+                  <td className="p-3 text-carefd-navy">{b.serviceName || b.service?.name || "-"}</td>
                   <td className="p-3 text-slate-500">{b.clientName || b.userName || "-"}</td>
                   <td className="p-3 text-slate-500">{b.providerName || "-"}</td>
                   <td className="p-3"><Badge variant={statusVariants[b.status] || "outline"}>{statusLabels[b.status] || b.status}</Badge></td>
-                  <td className="p-3 font-heading font-medium text-primary">{b.finalPrice ? `\u20AA${b.finalPrice}` : "-"}</td>
+                  <td className="p-3 font-heading font-medium text-carefd-navy">{b.finalPrice ? `\u20AA${b.finalPrice}` : "-"}</td>
                   <td className="p-3 text-slate-400">{b.bookingDate ? new Date(b.bookingDate).toLocaleDateString("he-IL") : "-"}</td>
                 </tr>
               ))}

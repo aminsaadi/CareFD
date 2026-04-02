@@ -32,11 +32,11 @@ export default function NotificationsPage() {
               key={n.id}
               onClick={() => !n.isRead && markAsRead(n.id)}
               className={`p-4 cursor-pointer transition-all ${
-                n.isRead ? "opacity-60" : "border-e-4 border-accent"
+                n.isRead ? "opacity-60" : "border-e-4 border-carefd-teal"
               }`}
             >
               <div className="flex justify-between">
-                <h3 className="font-medium text-primary text-sm">{n.title}</h3>
+                <h3 className="font-medium text-carefd-navy text-sm">{n.title}</h3>
                 <span className="text-xs text-slate-400">{new Date(n.createdAt).toLocaleDateString("he-IL")}</span>
               </div>
               <p className="text-sm text-slate-500 mt-1">{n.message}</p>

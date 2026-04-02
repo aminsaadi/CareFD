@@ -87,7 +87,7 @@ export default function ResetPasswordPage() {
       </form>
 
       <p className="text-center text-sm text-slate-500 mt-6">
-        <Link href="/login" className="text-primary font-semibold hover:underline">
+        <Link href="/login" className="text-carefd-navy font-semibold hover:underline">
           חזרה להתחברות
         </Link>
       </p>

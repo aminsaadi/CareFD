@@ -26,14 +26,14 @@ export default function AdminMessagesPage() {
         <div className="space-y-2">
           {rooms.map((r) => (
             <Card key={r.room_id} className="p-4 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent font-heading font-bold flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-carefd-teal/10 flex items-center justify-center text-carefd-teal font-heading font-bold flex-shrink-0">
                 {(r.provider_name || r.user_name)?.[0] || "?"}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-primary text-sm">{r.user_name || "משתמש"}</span>
+                  <span className="font-medium text-carefd-navy text-sm">{r.user_name || "משתמש"}</span>
                   <span className="text-slate-300">&harr;</span>
-                  <span className="font-medium text-primary text-sm">{r.provider_name || "ספק"}</span>
+                  <span className="font-medium text-carefd-navy text-sm">{r.provider_name || "ספק"}</span>
                 </div>
                 <p className="text-xs text-slate-400 truncate">{r.last_message || "אין הודעות"}</p>
               </div>

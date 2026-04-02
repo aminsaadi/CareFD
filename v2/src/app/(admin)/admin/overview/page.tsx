@@ -34,13 +34,13 @@ export default function AdminOverview() {
 
   const cards = [
     { label: "משתמשים", value: stats?.total_users, icon: Users, color: "text-blue-600 bg-blue-50" },
-    { label: "ספקים", value: stats?.total_providers, icon: Stethoscope, color: "text-accent bg-accent/10" },
+    { label: "ספקים", value: stats?.total_providers, icon: Stethoscope, color: "text-carefd-teal bg-carefd-teal/10" },
     { label: "הזמנות", value: stats?.total_bookings, icon: CalendarDays, color: "text-purple-600 bg-purple-50" },
     { label: "שירותים", value: stats?.total_services, icon: Wrench, color: "text-emerald-600 bg-emerald-50" },
     { label: "ממתין לאימות", value: stats?.pending_providers, icon: Clock, color: "text-amber-600 bg-amber-50" },
     { label: "הזמנות היום", value: stats?.today_bookings, icon: CalendarCheck, color: "text-pink-600 bg-pink-50" },
     { label: "הכנסות החודש", value: `\u20AA${stats?.monthly_revenue?.toLocaleString() || 0}`, icon: Wallet, color: "text-emerald-600 bg-emerald-50" },
-    { label: "דירוג ממוצע", value: stats?.average_rating?.toFixed(1) || "0", icon: Star, color: "text-accent bg-accent/10" },
+    { label: "דירוג ממוצע", value: stats?.average_rating?.toFixed(1) || "0", icon: Star, color: "text-carefd-teal bg-carefd-teal/10" },
   ];
 
   return (
@@ -55,7 +55,7 @@ export default function AdminOverview() {
               </div>
             </div>
             <p className="text-sm text-slate-500 mb-1">{c.label}</p>
-            <p className="text-2xl font-heading font-bold text-primary">{c.value}</p>
+            <p className="text-2xl font-heading font-bold text-carefd-navy">{c.value}</p>
           </Card>
         ))}
       </div>

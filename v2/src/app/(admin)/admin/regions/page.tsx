@@ -66,12 +66,12 @@ export default function AdminRegionsPage() {
             <Card key={r.id} className="p-5">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center"><MapPin className="w-5 h-5 text-accent" /></div>
-                  <h3 className="font-semibold text-primary">{r.name}</h3>
+                  <div className="w-10 h-10 bg-carefd-teal/10 rounded-xl flex items-center justify-center"><MapPin className="w-5 h-5 text-carefd-teal" /></div>
+                  <h3 className="font-semibold text-carefd-navy">{r.name}</h3>
                   <span className="text-xs text-slate-400">{r.cities.length} ערים</span>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="sm" onClick={() => addCity(r.id)} className="text-accent"><Plus className="w-3 h-3 me-1" /> עיר</Button>
+                  <Button variant="ghost" size="sm" onClick={() => addCity(r.id)} className="text-carefd-teal"><Plus className="w-3 h-3 me-1" /> עיר</Button>
                   <Button variant="ghost" size="icon" onClick={() => deleteRegion(r.id)} className="text-red-400 hover:text-red-600 hover:bg-red-50"><Trash2 className="w-4 h-4" /></Button>
                 </div>
               </div>

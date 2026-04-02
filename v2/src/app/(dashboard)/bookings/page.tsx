@@ -43,8 +43,8 @@ export default function BookingsPage() {
             onClick={() => setFilter(f.v)}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
               filter === f.v
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "bg-white text-slate-600 hover:bg-secondary border border-slate-200"
+                ? "bg-carefd-navy text-carefd-navy-foreground shadow-sm"
+                : "bg-white text-slate-600 hover:bg-carefd-stone border border-slate-200"
             }`}
             data-testid={`filter-${f.v || "all"}`}
           >
@@ -65,7 +65,7 @@ export default function BookingsPage() {
           {bookings.map((b) => (
             <Card key={b.id} className="p-5 flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-primary">{b.serviceName}</h3>
+                <h3 className="font-semibold text-carefd-navy">{b.serviceName}</h3>
                 <p className="text-sm text-slate-400">{b.providerName} &bull; #{b.bookingNumber}</p>
                 <p className="text-sm text-slate-400">
                   {b.bookingDate ? new Date(b.bookingDate).toLocaleDateString("he-IL") : "יתואם"} {b.bookingTime || ""}
@@ -75,7 +75,7 @@ export default function BookingsPage() {
                 <Badge variant={statusVariants[b.status] || "outline"}>
                   {statusLabels[b.status] || b.status}
                 </Badge>
-                {b.finalPrice && <p className="font-heading font-bold text-primary mt-1">{"\u20AA"}{b.finalPrice}</p>}
+                {b.finalPrice && <p className="font-heading font-bold text-carefd-navy mt-1">{"\u20AA"}{b.finalPrice}</p>}
               </div>
             </Card>
           ))}

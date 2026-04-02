@@ -65,7 +65,7 @@ export default function AdminBlogPage() {
           {posts.map((p) => (
             <Card key={p.id} className="p-4 flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-primary">{p.title}</h3>
+                <h3 className="font-semibold text-carefd-navy">{p.title}</h3>
                 <p className="text-xs text-slate-400">/{p.slug} &bull; {new Date(p.createdAt).toLocaleDateString("he-IL")}</p>
               </div>
               <div className="flex items-center gap-2">

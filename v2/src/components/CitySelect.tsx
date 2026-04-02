@@ -1,125 +1,53 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { israeliLocalities } from '@/lib/data/localities';
+import { useState, useRef, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { MapPin } from "lucide-react";
+import { israeliRegions } from "@/data/searchData";
 
-const sortedCities = Array.from(new Set(israeliLocalities.map(l => l.name))).sort((a, b) => a.localeCompare(b, 'he'));
+const allCities = israeliRegions.flatMap((r) => r.cities);
 
-const CitySelect = ({
-  value,
-  onChange,
-  name = 'city',
-  placeholder = 'הקלד לחיפוש או בחר עיר...',
-  required = false,
-  className = '',
-  inputClassName = '',
-  disabled = false,
-  'data-testid': dataTestId = undefined
-}: any) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const containerRef = useRef<any>(null);
-  const inputRef = useRef<any>(null);
+interface CitySelectProps {
+  value: string;
+  onChange: (city: string) => void;
+  placeholder?: string;
+  className?: string;
+}
 
-  const filtered = search
-    ? sortedCities.filter(city => city.includes(search))
-    : sortedCities;
+export default function CitySelect({ value, onChange, placeholder = "בחר עיר", className }: CitySelectProps) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState(value);
+  const ref = useRef<HTMLDivElement>(null);
 
-  const handleSelect = useCallback((city) => {
-    onChange({ target: { name, value: city } });
-    setSearch('');
-    setIsOpen(false);
-  }, [onChange, name]);
-
-  const handleInputChange = (e) => {
-    setSearch(e.target.value);
-    setIsOpen(true);
-    if (!e.target.value) {
-      onChange({ target: { name, value: '' } });
-    }
-  };
-
-  const handleFocus = () => {
-    setIsOpen(true);
-    setSearch('');
-  };
-
-  const handleClear = () => {
-    onChange({ target: { name, value: '' } });
-    setSearch('');
-    setIsOpen(false);
-  };
+  useEffect(() => { setQuery(value); }, [value]);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
-        setIsOpen(false);
-        setSearch('');
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const displayValue = isOpen ? search : (value || '');
+  const filtered = query ? allCities.filter((c) => c.includes(query)).slice(0, 10) : allCities.slice(0, 10);
 
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
-      <div className="relative">
-        <input
-          ref={inputRef}
-          type="text"
-          value={displayValue}
-          onChange={handleInputChange}
-          onFocus={handleFocus}
-          placeholder={value ? value : placeholder}
-          required={required && !value}
-          disabled={disabled}
-          className={inputClassName || 'w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent'}
-          autoComplete="off"
-          data-testid={dataTestId}
-        />
-        {value && !disabled && (
-          <button
-            type="button"
-            onClick={handleClear}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm"
-            tabIndex={-1}
-          >
-            ✕
-          </button>
-        )}
-      </div>
-
-      {isOpen && filtered.length > 0 && (
-        <ul className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
-          {filtered.slice(0, 50).map((city) => (
-            <li
-              key={city}
-              onClick={() => handleSelect(city)}
-              className={`px-4 py-2.5 cursor-pointer hover:bg-teal-50 transition text-sm ${
-                city === value ? 'bg-teal-50 text-teal-700 font-medium' : 'text-gray-700'
-              }`}
-            >
-              {city}
-            </li>
+    <div className="relative" ref={ref}>
+      <MapPin className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-carefd-gray" />
+      <Input
+        value={query}
+        onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)}
+        placeholder={placeholder}
+        className={`ps-11 ${className || ""}`}
+      />
+      {open && filtered.length > 0 && (
+        <div className="absolute top-full mt-1 start-0 end-0 bg-white rounded-xl shadow-soft-lg border border-slate-100 py-1 z-20 max-h-60 overflow-y-auto">
+          {filtered.map((c) => (
+            <button key={c} onClick={() => { onChange(c); setQuery(c); setOpen(false); }} className="w-full text-start px-4 py-2 text-sm text-carefd-navy hover:bg-carefd-teal/5 transition-colors">
+              <MapPin className="w-3 h-3 inline me-2 text-carefd-gray" />{c}
+            </button>
           ))}
-          {filtered.length > 50 && (
-            <li className="px-4 py-2 text-xs text-gray-400 text-center">
-              הקלד לצמצום התוצאות ({filtered.length} ערים)
-            </li>
-          )}
-        </ul>
-      )}
-
-      {isOpen && search && filtered.length === 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg p-4 text-center text-sm text-gray-500">
-          לא נמצאו תוצאות
         </div>
       )}
     </div>
   );
-};
-
-export { sortedCities };
-export default CitySelect;
+}

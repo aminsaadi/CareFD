@@ -1,30 +1,15 @@
-"use client";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-import React from "react";
+interface LogoProps { size?: "sm" | "md" | "lg"; className?: string; }
 
-interface LogoProps {
-  size?: "small" | "default" | "large";
-  variant?: "white" | "default";
-  className?: string;
-}
+const sizes = { sm: "text-xl", md: "text-2xl", lg: "text-3xl" };
 
-const Logo: React.FC<LogoProps> = ({ size = "default", variant, className = "" }) => {
-  const textSizeClasses: Record<string, string> = {
-    small: "text-lg",
-    default: "text-3xl",
-    large: "text-4xl",
-  };
-
-  const textColorClass = variant === "white" ? "text-white" : "text-carefd-navy";
-
+export default function Logo({ size = "md", className }: LogoProps) {
   return (
-    <span
-      className={`${textSizeClasses[size] || textSizeClasses.default} font-bold ${textColorClass} ${className}`}
-      data-testid="logo"
-    >
-      CareFD
-    </span>
+    <Link href="/" className={cn("inline-flex items-center gap-0.5", className)}>
+      <span className={`font-heading font-bold text-carefd-navy ${sizes[size]}`}>Care</span>
+      <span className={`font-heading font-bold text-carefd-teal ${sizes[size]}`}>FD</span>
+    </Link>
   );
-};
-
-export default Logo;
+}

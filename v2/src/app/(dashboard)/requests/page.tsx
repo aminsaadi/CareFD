@@ -56,11 +56,11 @@ export default function RequestsPage() {
                 <Card className="p-5 hover-lift">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="font-semibold text-primary">{r.title}</h3>
+                      <h3 className="font-semibold text-carefd-navy">{r.title}</h3>
                       <p className="text-sm text-slate-500 mt-1 line-clamp-2">{r.description}</p>
                       <div className="flex gap-2 mt-3 items-center">
                         <Badge variant={urgency.variant}>{urgency.label}</Badge>
-                        {r.budget && <span className="text-sm font-heading font-bold text-primary">{"\u20AA"}{r.budget}</span>}
+                        {r.budget && <span className="text-sm font-heading font-bold text-carefd-navy">{"\u20AA"}{r.budget}</span>}
                         <span className="text-sm text-slate-400">{r.offer_count} הצעות</span>
                       </div>
                     </div>

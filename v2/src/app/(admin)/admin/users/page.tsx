@@ -41,11 +41,11 @@ export default function AdminUsersPage() {
       ) : (
         <Card className="overflow-hidden p-0">
           <table className="w-full text-sm">
-            <thead><tr className="border-b border-slate-100 text-slate-500 bg-secondary/50"><th className="p-3 text-start font-medium">שם</th><th className="p-3 text-start font-medium">אימייל</th><th className="p-3 text-start font-medium">תפקיד</th><th className="p-3 text-start font-medium">סטטוס</th><th className="p-3 text-start font-medium">תאריך</th></tr></thead>
+            <thead><tr className="border-b border-slate-100 text-slate-500 bg-carefd-stone/50"><th className="p-3 text-start font-medium">שם</th><th className="p-3 text-start font-medium">אימייל</th><th className="p-3 text-start font-medium">תפקיד</th><th className="p-3 text-start font-medium">סטטוס</th><th className="p-3 text-start font-medium">תאריך</th></tr></thead>
             <tbody>
               {users.map((u) => (
-                <tr key={u.id} className="border-b border-slate-50 hover:bg-secondary/30 transition-colors">
-                  <td className="p-3 font-medium text-primary">{u.name}</td>
+                <tr key={u.id} className="border-b border-slate-50 hover:bg-carefd-stone/30 transition-colors">
+                  <td className="p-3 font-medium text-carefd-navy">{u.name}</td>
                   <td className="p-3 text-slate-500" dir="ltr">{u.email}</td>
                   <td className="p-3"><Badge variant="outline">{u.role}</Badge></td>
                   <td className="p-3">{u.isSuspended ? <Badge variant="destructive">מושעה</Badge> : <Badge variant="success">פעיל</Badge>}</td>

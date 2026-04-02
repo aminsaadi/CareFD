@@ -37,9 +37,9 @@ export default function AdminPushPage() {
 
       <Card className="p-6 md:p-8 max-w-2xl">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center"><Bell className="w-5 h-5 text-accent" /></div>
+          <div className="w-10 h-10 bg-carefd-teal/10 rounded-xl flex items-center justify-center"><Bell className="w-5 h-5 text-carefd-teal" /></div>
           <div>
-            <h3 className="font-heading font-semibold text-primary">התראה חדשה</h3>
+            <h3 className="font-heading font-semibold text-carefd-navy">התראה חדשה</h3>
             <p className="text-xs text-slate-400">ישלח לכל המשתמשים הרשומים</p>
           </div>
         </div>

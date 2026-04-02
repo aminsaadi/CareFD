@@ -48,7 +48,7 @@ export default function AdminProvidersPage() {
       <div className="flex gap-2 mb-4 flex-wrap">
         {filters.map((f) => (
           <button key={f.v} onClick={() => setFilter(f.v)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${filter === f.v ? "bg-primary text-primary-foreground shadow-sm" : "bg-white text-slate-600 hover:bg-secondary border border-slate-200"}`}>
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${filter === f.v ? "bg-carefd-navy text-carefd-navy-foreground shadow-sm" : "bg-white text-slate-600 hover:bg-carefd-stone border border-slate-200"}`}>
             {f.l}
           </button>
         ))}
@@ -69,7 +69,7 @@ export default function AdminProvidersPage() {
           {providers.map((p) => (
             <Card key={p.id} className="p-5 flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-primary">{p.businessName || "ללא שם"}</h3>
+                <h3 className="font-semibold text-carefd-navy">{p.businessName || "ללא שם"}</h3>
                 <p className="text-sm text-slate-400">{p.user?.email} &bull; {p.city || ""}</p>
                 <Badge variant={p.verificationStatus === "verified" ? "success" : p.verificationStatus === "rejected" ? "destructive" : "warning"} className="mt-1">
                   {p.verificationStatus}

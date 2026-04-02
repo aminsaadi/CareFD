@@ -5,9 +5,9 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import api from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import AdvancedSearch from "@/components/AdvancedSearch";
 import { Search, ChevronLeft } from "lucide-react";
 import type { Service } from "@/lib/types";
 
@@ -44,22 +44,7 @@ function ServicesContent() {
       </div>
 
       {/* Search */}
-      <form onSubmit={(e) => { e.preventDefault(); fetchServices(); }} className="glass-card p-4 mb-8 flex gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="חפשו שירות..."
-            className="ps-11 border-0 bg-white/60"
-            data-testid="services-search"
-          />
-        </div>
-        <Button type="submit" className="h-12" data-testid="services-search-btn">
-          <Search className="w-4 h-4 me-2" />
-          חיפוש
-        </Button>
-      </form>
+      <AdvancedSearch defaultTab="services" className="mb-8" />
 
       <p className="text-sm text-slate-400 mb-6">{total} שירותים</p>
 
@@ -79,7 +64,7 @@ function ServicesContent() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((s) => (
               <Card key={s.service_id} className="p-6 hover-lift group" data-testid={`service-${s.service_id}`}>
-                <h3 className="font-heading font-semibold text-lg text-primary mb-2 group-hover:text-accent transition-colors">
+                <h3 className="font-heading font-semibold text-lg text-carefd-navy mb-2 group-hover:text-carefd-teal transition-colors">
                   {s.name}
                 </h3>
                 {s.description && (
@@ -87,7 +72,7 @@ function ServicesContent() {
                 )}
                 <div className="flex justify-between items-center">
                   <div>
-                    <span className="text-xl font-heading font-bold text-primary">{"\u20AA"}{s.price}</span>
+                    <span className="text-xl font-heading font-bold text-carefd-navy">{"\u20AA"}{s.price}</span>
                     {s.provider && (
                       <p className="text-xs text-slate-400 mt-0.5">{s.provider.business_name}</p>
                     )}

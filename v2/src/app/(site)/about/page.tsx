@@ -31,10 +31,10 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f) => (
               <Card key={f.title} className="p-8 hover-lift">
-                <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center mb-4">
-                  <f.icon className="w-6 h-6 text-accent" />
+                <div className="w-12 h-12 bg-carefd-teal/10 rounded-2xl flex items-center justify-center mb-4">
+                  <f.icon className="w-6 h-6 text-carefd-teal" />
                 </div>
-                <h3 className="font-heading font-semibold text-lg text-primary mb-2">{f.title}</h3>
+                <h3 className="font-heading font-semibold text-lg text-carefd-navy mb-2">{f.title}</h3>
                 <p className="text-slate-500 leading-relaxed">{f.desc}</p>
               </Card>
             ))}

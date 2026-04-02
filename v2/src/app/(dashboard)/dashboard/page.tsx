@@ -43,8 +43,8 @@ export default function DashboardPage() {
   if (!user || user.role !== "patient") return null;
 
   const actions = [
-    { href: "/providers", label: "חפש מטפל", icon: Search, color: "bg-accent/10 text-accent" },
-    { href: "/requests", label: "בקשת שירות", icon: FileText, color: "bg-primary/10 text-primary" },
+    { href: "/providers", label: "חפש מטפל", icon: Search, color: "bg-carefd-teal/10 text-carefd-teal" },
+    { href: "/requests", label: "בקשת שירות", icon: FileText, color: "bg-carefd-navy/10 text-carefd-navy" },
     { href: "/bookings", label: "ההזמנות שלי", icon: CalendarDays, color: "bg-emerald-50 text-emerald-600" },
     { href: "/chats", label: "הודעות", icon: MessageCircle, color: "bg-blue-50 text-blue-600" },
   ];
@@ -62,7 +62,7 @@ export default function DashboardPage() {
               <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 ${item.color}`}>
                 <item.icon className="w-6 h-6" />
               </div>
-              <span className="font-medium text-primary text-sm">{item.label}</span>
+              <span className="font-medium text-carefd-navy text-sm">{item.label}</span>
             </Card>
           </Link>
         ))}
@@ -96,9 +96,9 @@ export default function DashboardPage() {
             {bookings.map((b) => {
               const config = statusConfig[b.status] || { label: b.status, variant: "outline" as const };
               return (
-                <Link key={b.id} href="/bookings" className="flex items-center justify-between p-4 bg-secondary/50 rounded-2xl hover:bg-secondary transition-colors">
+                <Link key={b.id} href="/bookings" className="flex items-center justify-between p-4 bg-carefd-stone/50 rounded-2xl hover:bg-carefd-stone transition-colors">
                   <div>
-                    <p className="font-medium text-primary">{b.serviceName}</p>
+                    <p className="font-medium text-carefd-navy">{b.serviceName}</p>
                     <p className="text-sm text-slate-400">
                       {b.providerName} {b.bookingDate ? ` \u2022 ${new Date(b.bookingDate).toLocaleDateString("he-IL")}` : ""}
                     </p>
