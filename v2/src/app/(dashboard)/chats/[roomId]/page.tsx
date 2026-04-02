@@ -4,6 +4,9 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import api from "@/lib/api-client";
 import { useAuth } from "@/context/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Send } from "lucide-react";
 import type { ChatMessage } from "@/lib/types";
 
 export default function ChatRoomPage() {
@@ -39,16 +42,20 @@ export default function ChatRoomPage() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-12rem)]" dir="rtl">
+    <div className="flex flex-col h-[calc(100vh-12rem)]">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto space-y-3 p-4 bg-white rounded-xl">
+      <div className="flex-1 overflow-y-auto space-y-3 p-4 bg-white rounded-2xl border border-slate-100">
         {messages.map((m) => {
           const isMine = m.senderId === user?.user_id;
           return (
             <div key={m.id} className={`flex ${isMine ? "justify-start" : "justify-end"}`}>
-              <div className={`max-w-[75%] px-4 py-2 rounded-2xl ${isMine ? "bg-teal-600 text-white" : "bg-gray-100 text-gray-800"}`}>
-                <p>{m.content}</p>
-                <span className={`text-xs ${isMine ? "text-teal-200" : "text-gray-400"} block mt-1`}>
+              <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl ${
+                isMine
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-secondary-foreground"
+              }`}>
+                <p className="text-sm">{m.content}</p>
+                <span className={`text-[10px] block mt-1 ${isMine ? "text-white/60" : "text-slate-400"}`}>
                   {new Date(m.createdAt).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })}
                 </span>
               </div>
@@ -60,11 +67,16 @@ export default function ChatRoomPage() {
 
       {/* Input */}
       <form onSubmit={sendMessage} className="flex gap-2 mt-4">
-        <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="כתבו הודעה..."
-          className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:outline-none" />
-        <button type="submit" disabled={sending} className="bg-teal-600 text-white px-6 py-3 rounded-xl font-medium hover:bg-teal-700 disabled:opacity-50">
-          שלח
-        </button>
+        <Input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="כתבו הודעה..."
+          className="flex-1"
+          data-testid="chat-input"
+        />
+        <Button type="submit" disabled={sending} data-testid="chat-send">
+          <Send className="w-4 h-4" />
+        </Button>
       </form>
     </div>
   );

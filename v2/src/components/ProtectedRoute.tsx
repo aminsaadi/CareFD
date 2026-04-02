@@ -17,7 +17,11 @@ export default function ProtectedRoute({ children, requiredRole }: { children: R
     }
   }, [user, loading, requiredRole, router]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin h-8 w-8 border-4 border-teal-600 border-t-transparent rounded-full" /></div>;
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-[var(--background-alt)]">
+      <span className="animate-spin rounded-full h-10 w-10 border-4 border-primary/20 border-t-primary" />
+    </div>
+  );
   if (!user) return null;
 
   return <>{children}</>;

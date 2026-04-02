@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from "react";
 import api from "@/lib/api-client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Search } from "lucide-react";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -9,39 +15,46 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const fetch = (s = search) => {
+  const fetchUsers = (s = search) => {
     setLoading(true);
     const params: Record<string, string> = { limit: "20" };
     if (s) params.search = s;
     api.get<{ users: any[]; total: number }>("/admin/users", params).then((d) => { setUsers(d.users); setTotal(d.total); }).catch(() => {}).finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetch(); }, []);
+  useEffect(() => { fetchUsers(); }, []);
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">ניהול משתמשים ({total})</h1>
-      </div>
-      <form onSubmit={(e) => { e.preventDefault(); fetch(); }} className="flex gap-2 mb-6">
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="חפש לפי שם או אימייל..." className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:border-teal-500" />
-        <button type="submit" className="bg-teal-600 text-white px-4 py-2 rounded-lg">חפש</button>
+      <h2 className="font-heading font-semibold text-2xl mb-6">ניהול משתמשים ({total})</h2>
+
+      <form onSubmit={(e) => { e.preventDefault(); fetchUsers(); }} className="flex gap-2 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="חפש לפי שם או אימייל..." className="ps-10 h-10" />
+        </div>
+        <Button type="submit" size="sm">חפש</Button>
       </form>
-      {loading ? <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-12 bg-gray-200 rounded" />)}</div> : (
-        <table className="w-full bg-white rounded-xl shadow-sm">
-          <thead><tr className="border-b text-sm text-gray-500"><th className="p-3 text-right">שם</th><th className="p-3 text-right">אימייל</th><th className="p-3 text-right">תפקיד</th><th className="p-3 text-right">סטטוס</th><th className="p-3 text-right">תאריך</th></tr></thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.id} className="border-b hover:bg-gray-50">
-                <td className="p-3 font-medium">{u.name}</td>
-                <td className="p-3 text-sm">{u.email}</td>
-                <td className="p-3"><span className="px-2 py-1 rounded-full text-xs bg-gray-100">{u.role}</span></td>
-                <td className="p-3">{u.isSuspended ? <span className="text-red-600 text-xs">מושעה</span> : <span className="text-green-600 text-xs">פעיל</span>}</td>
-                <td className="p-3 text-sm text-gray-400">{new Date(u.createdAt).toLocaleDateString("he-IL")}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+
+      {loading ? (
+        <div className="space-y-3">{[1, 2, 3].map((i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
+      ) : (
+        <Card className="overflow-hidden p-0">
+          <table className="w-full text-sm">
+            <thead><tr className="border-b border-slate-100 text-slate-500 bg-secondary/50"><th className="p-3 text-start font-medium">שם</th><th className="p-3 text-start font-medium">אימייל</th><th className="p-3 text-start font-medium">תפקיד</th><th className="p-3 text-start font-medium">סטטוס</th><th className="p-3 text-start font-medium">תאריך</th></tr></thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.id} className="border-b border-slate-50 hover:bg-secondary/30 transition-colors">
+                  <td className="p-3 font-medium text-primary">{u.name}</td>
+                  <td className="p-3 text-slate-500" dir="ltr">{u.email}</td>
+                  <td className="p-3"><Badge variant="outline">{u.role}</Badge></td>
+                  <td className="p-3">{u.isSuspended ? <Badge variant="destructive">מושעה</Badge> : <Badge variant="success">פעיל</Badge>}</td>
+                  <td className="p-3 text-slate-400">{new Date(u.createdAt).toLocaleDateString("he-IL")}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
       )}
     </div>
   );

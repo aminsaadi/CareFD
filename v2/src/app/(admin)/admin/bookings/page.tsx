@@ -2,9 +2,17 @@
 
 import { useEffect, useState } from "react";
 import api from "@/lib/api-client";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const statusLabels: Record<string, string> = { pending: "ממתין", confirmed: "מאושר", completed: "הושלם", cancelled: "בוטל", in_progress: "בתהליך", provider_completed: "הספק סיים", cancellation_requested: "בקשת ביטול", rejected: "נדחה" };
-const statusColors: Record<string, string> = { pending: "bg-yellow-100 text-yellow-700", confirmed: "bg-blue-100 text-blue-700", completed: "bg-green-100 text-green-700", cancelled: "bg-red-100 text-red-700" };
+const statusVariants: Record<string, "warning" | "accent" | "success" | "destructive" | "outline"> = { pending: "warning", confirmed: "accent", completed: "success", cancelled: "destructive" };
+
+const filters = [
+  { v: "", l: "הכל" }, { v: "pending", l: "ממתין" }, { v: "confirmed", l: "מאושר" },
+  { v: "completed", l: "הושלם" }, { v: "cancelled", l: "בוטל" },
+];
 
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -25,30 +33,38 @@ export default function AdminBookingsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">ניהול הזמנות ({total})</h1>
+      <h2 className="font-heading font-semibold text-2xl mb-6">ניהול הזמנות ({total})</h2>
+
       <div className="flex gap-2 mb-6 flex-wrap">
-        {[{ v: "", l: "הכל" }, { v: "pending", l: "ממתין" }, { v: "confirmed", l: "מאושר" }, { v: "completed", l: "הושלם" }, { v: "cancelled", l: "בוטל" }].map((f) => (
+        {filters.map((f) => (
           <button key={f.v} onClick={() => setFilter(f.v)}
-            className={`px-3 py-1.5 rounded-full text-sm ${filter === f.v ? "bg-teal-600 text-white" : "bg-white text-gray-600"}`}>{f.l}</button>
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${filter === f.v ? "bg-primary text-primary-foreground shadow-sm" : "bg-white text-slate-600 hover:bg-secondary border border-slate-200"}`}>
+            {f.l}
+          </button>
         ))}
       </div>
-      {loading ? <div className="animate-pulse space-y-3">{[1,2,3,4].map(i => <div key={i} className="h-16 bg-gray-200 rounded" />)}</div> : (
-        <table className="w-full bg-white rounded-xl shadow-sm text-sm">
-          <thead><tr className="border-b text-gray-500"><th className="p-3 text-right">#</th><th className="p-3 text-right">שירות</th><th className="p-3 text-right">לקוח</th><th className="p-3 text-right">ספק</th><th className="p-3 text-right">סטטוס</th><th className="p-3 text-right">מחיר</th><th className="p-3 text-right">תאריך</th></tr></thead>
-          <tbody>
-            {bookings.map((b) => (
-              <tr key={b.id} className="border-b hover:bg-gray-50">
-                <td className="p-3 font-mono text-xs">{b.bookingNumber}</td>
-                <td className="p-3">{b.serviceName || b.service?.name || "-"}</td>
-                <td className="p-3">{b.clientName || b.userName || "-"}</td>
-                <td className="p-3">{b.providerName || "-"}</td>
-                <td className="p-3"><span className={`px-2 py-1 rounded-full text-xs ${statusColors[b.status] || "bg-gray-100 text-gray-600"}`}>{statusLabels[b.status] || b.status}</span></td>
-                <td className="p-3 font-medium">{b.finalPrice ? `₪${b.finalPrice}` : "-"}</td>
-                <td className="p-3 text-gray-400">{b.bookingDate ? new Date(b.bookingDate).toLocaleDateString("he-IL") : "-"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+
+      {loading ? (
+        <div className="space-y-3">{[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-12 w-full" />)}</div>
+      ) : (
+        <Card className="overflow-hidden p-0">
+          <table className="w-full text-sm">
+            <thead><tr className="border-b border-slate-100 text-slate-500 bg-secondary/50"><th className="p-3 text-start font-medium">#</th><th className="p-3 text-start font-medium">שירות</th><th className="p-3 text-start font-medium">לקוח</th><th className="p-3 text-start font-medium">ספק</th><th className="p-3 text-start font-medium">סטטוס</th><th className="p-3 text-start font-medium">מחיר</th><th className="p-3 text-start font-medium">תאריך</th></tr></thead>
+            <tbody>
+              {bookings.map((b) => (
+                <tr key={b.id} className="border-b border-slate-50 hover:bg-secondary/30 transition-colors">
+                  <td className="p-3 font-mono text-xs text-slate-400">{b.bookingNumber}</td>
+                  <td className="p-3 text-primary">{b.serviceName || b.service?.name || "-"}</td>
+                  <td className="p-3 text-slate-500">{b.clientName || b.userName || "-"}</td>
+                  <td className="p-3 text-slate-500">{b.providerName || "-"}</td>
+                  <td className="p-3"><Badge variant={statusVariants[b.status] || "outline"}>{statusLabels[b.status] || b.status}</Badge></td>
+                  <td className="p-3 font-heading font-medium text-primary">{b.finalPrice ? `\u20AA${b.finalPrice}` : "-"}</td>
+                  <td className="p-3 text-slate-400">{b.bookingDate ? new Date(b.bookingDate).toLocaleDateString("he-IL") : "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
       )}
     </div>
   );

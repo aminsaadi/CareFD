@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import api from "@/lib/api-client";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card } from "@/components/ui/card";
+import { Star, Send } from "lucide-react";
 
 export default function WriteReviewPage() {
   const { bookingId } = useParams();
@@ -13,60 +17,75 @@ export default function WriteReviewPage() {
   const [punctuality, setPunctuality] = useState(5);
   const [communication, setCommunication] = useState(5);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setError("");
     try {
-      // We need provider_id from the booking
       const booking = await api.get<any>(`/bookings/${bookingId}`);
       await api.post("/reviews", {
         provider_id: booking.providerId,
         booking_id: bookingId,
-        rating,
-        comment,
-        service_quality: serviceQuality,
-        punctuality,
-        communication,
+        rating, comment, service_quality: serviceQuality,
+        punctuality, communication,
       });
-      alert("הביקורת נשלחה לאישור!");
       router.push("/bookings");
     } catch (err: any) {
-      alert(err.message || "שגיאה");
+      setError(err.message || "שגיאה");
     } finally { setSubmitting(false); }
   };
 
   const StarRating = ({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) => (
     <div className="flex items-center justify-between">
-      <span className="text-sm text-gray-600">{label}</span>
+      <span className="text-sm text-slate-600">{label}</span>
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((s) => (
-          <button key={s} type="button" onClick={() => onChange(s)}
-            className={`text-2xl ${s <= value ? "text-yellow-400" : "text-gray-200"}`}>★</button>
+          <button key={s} type="button" onClick={() => onChange(s)} className="p-0.5" data-testid={`star-${label}-${s}`}>
+            <Star className={`w-6 h-6 transition-colors ${s <= value ? "text-accent fill-accent" : "text-slate-200"}`} />
+          </button>
         ))}
       </div>
     </div>
   );
 
   return (
-    <div className="max-w-xl mx-auto" dir="rtl">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">כתיבת ביקורת</h1>
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8 space-y-6">
-        <StarRating label="דירוג כללי" value={rating} onChange={setRating} />
-        <StarRating label="איכות השירות" value={serviceQuality} onChange={setServiceQuality} />
-        <StarRating label="דייקנות" value={punctuality} onChange={setPunctuality} />
-        <StarRating label="תקשורת" value={communication} onChange={setCommunication} />
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">ביקורת</label>
-          <textarea value={comment} onChange={(e) => setComment(e.target.value)} required rows={4}
-            placeholder="ספרו על החוויה שלכם..."
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:outline-none" />
-        </div>
-        <button type="submit" disabled={submitting}
-          className="w-full bg-teal-600 text-white py-3 rounded-xl font-bold hover:bg-teal-700 disabled:opacity-50">
-          {submitting ? "שולח..." : "שלח ביקורת"}
-        </button>
-      </form>
+    <div className="max-w-xl mx-auto">
+      <h1 className="mb-6">כתיבת ביקורת</h1>
+      <Card className="p-8">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {error && <div className="bg-red-50 text-red-600 text-sm rounded-xl p-4 border border-red-100">{error}</div>}
+
+          <StarRating label="דירוג כללי" value={rating} onChange={setRating} />
+          <StarRating label="איכות השירות" value={serviceQuality} onChange={setServiceQuality} />
+          <StarRating label="דייקנות" value={punctuality} onChange={setPunctuality} />
+          <StarRating label="תקשורת" value={communication} onChange={setCommunication} />
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-700">ביקורת</label>
+            <Textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              required
+              placeholder="ספרו על החוויה שלכם..."
+              className="min-h-[140px]"
+              data-testid="review-comment"
+            />
+          </div>
+
+          <Button type="submit" className="w-full" size="lg" disabled={submitting} data-testid="review-submit">
+            {submitting ? (
+              <span className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white" />
+            ) : (
+              <>
+                <Send className="w-4 h-4 me-2" />
+                שלח ביקורת
+              </>
+            )}
+          </Button>
+        </form>
+      </Card>
     </div>
   );
 }

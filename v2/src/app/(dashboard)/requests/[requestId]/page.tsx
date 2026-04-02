@@ -4,6 +4,19 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import api from "@/lib/api-client";
 import { useAuth } from "@/context/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
+import { Star, Check, X } from "lucide-react";
+
+const statusConfig: Record<string, { label: string; variant: "success" | "accent" | "outline" }> = {
+  open: { label: "פתוח", variant: "success" },
+  in_progress: { label: "בטיפול", variant: "accent" },
+  completed: { label: "הושלם", variant: "outline" },
+  cancelled: { label: "בוטל", variant: "outline" },
+};
 
 export default function RequestDetailPage() {
   const { requestId } = useParams();
@@ -23,66 +36,82 @@ export default function RequestDetailPage() {
     } catch (err: any) { alert(err.message); }
   };
 
-  if (loading) return <div className="flex justify-center py-20"><div className="animate-spin h-8 w-8 border-4 border-teal-600 border-t-transparent rounded-full" /></div>;
-  if (!request) return <div className="text-center py-20 text-gray-500">הבקשה לא נמצאה</div>;
+  if (loading) return (
+    <div>
+      <Skeleton className="h-10 w-64 mb-6" />
+      <Card className="p-8 mb-6"><Skeleton className="h-40 w-full" /></Card>
+      <Card className="p-8"><Skeleton className="h-60 w-full" /></Card>
+    </div>
+  );
+
+  if (!request) return <div className="text-center py-20 text-slate-400">הבקשה לא נמצאה</div>;
+
+  const status = statusConfig[request.status] || { label: request.status, variant: "outline" as const };
 
   return (
-    <div dir="rtl">
+    <div>
       {/* Request Details */}
-      <div className="bg-white rounded-2xl shadow-lg p-8 mb-6">
+      <Card className="p-8 mb-8">
         <div className="flex justify-between items-start mb-4">
-          <h1 className="text-2xl font-bold text-gray-900">{request.title}</h1>
-          <span className={`px-3 py-1 rounded-full text-xs font-medium ${request.status === "open" ? "bg-green-100 text-green-700" : request.status === "in_progress" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-600"}`}>
-            {request.status === "open" ? "פתוח" : request.status === "in_progress" ? "בטיפול" : request.status}
-          </span>
+          <h1>{request.title}</h1>
+          <Badge variant={status.variant}>{status.label}</Badge>
         </div>
-        <p className="text-gray-700 whitespace-pre-wrap mb-4">{request.description}</p>
-        <div className="flex gap-4 text-sm text-gray-500">
-          {request.budget && <span>תקציב: ₪{request.budget}</span>}
+        <p className="text-slate-600 whitespace-pre-wrap mb-6 leading-relaxed">{request.description}</p>
+        <div className="flex gap-6 text-sm text-slate-400">
+          {request.budget && <span>תקציב: <span className="font-heading font-bold text-primary">{"\u20AA"}{request.budget}</span></span>}
           <span>נוצר: {new Date(request.createdAt).toLocaleDateString("he-IL")}</span>
         </div>
-      </div>
+      </Card>
 
       {/* Offers */}
-      <div className="bg-white rounded-2xl shadow-lg p-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">הצעות ({request.offers?.length || 0})</h2>
+      <Card className="p-8">
+        <h2 className="text-xl font-heading font-semibold mb-6">הצעות ({request.offers?.length || 0})</h2>
         {!request.offers?.length ? (
-          <p className="text-gray-500 text-center py-8">אין הצעות עדיין</p>
+          <p className="text-slate-400 text-center py-10">אין הצעות עדיין</p>
         ) : (
           <div className="space-y-4">
             {request.offers.map((offer: any) => (
-              <div key={offer.id} className="border border-gray-100 rounded-xl p-5">
+              <div key={offer.id} className="border border-slate-100 rounded-2xl p-5">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-bold">
+                    <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent font-heading font-bold">
                       {offer.provider?.businessName?.[0] || "?"}
                     </div>
                     <div>
-                      <p className="font-medium">{offer.providerName || offer.provider?.businessName}</p>
-                      {offer.provider?.rating > 0 && <p className="text-xs text-gray-400">⭐ {offer.provider.rating.toFixed(1)}</p>}
+                      <p className="font-medium text-primary">{offer.providerName || offer.provider?.businessName}</p>
+                      {offer.provider?.rating > 0 && (
+                        <p className="text-xs text-slate-400 flex items-center gap-0.5">
+                          <Star className="w-3 h-3 text-accent fill-accent" />
+                          {offer.provider.rating.toFixed(1)}
+                        </p>
+                      )}
                     </div>
                   </div>
-                  <div className="text-left">
-                    <p className="text-xl font-bold text-teal-600">₪{offer.price}</p>
-                    <span className={`text-xs px-2 py-1 rounded-full ${offer.status === "pending" ? "bg-yellow-100 text-yellow-700" : offer.status === "accepted" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
+                  <div className="text-end">
+                    <p className="text-xl font-heading font-bold text-primary">{"\u20AA"}{offer.price}</p>
+                    <Badge variant={offer.status === "pending" ? "warning" : offer.status === "accepted" ? "success" : "outline"}>
                       {offer.status === "pending" ? "ממתין" : offer.status === "accepted" ? "התקבל" : offer.status === "rejected" ? "נדחה" : offer.status}
-                    </span>
+                    </Badge>
                   </div>
                 </div>
-                <p className="text-gray-600 mt-3">{offer.message}</p>
+                <p className="text-slate-500 mt-3 text-sm">{offer.message}</p>
                 {offer.status === "pending" && request.userId === user?.user_id && (
                   <div className="flex gap-2 mt-4">
-                    <button onClick={() => handleOfferAction(offer.id, "accept")}
-                      className="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-teal-700">קבל הצעה</button>
-                    <button onClick={() => handleOfferAction(offer.id, "reject")}
-                      className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200">דחה</button>
+                    <Button size="sm" onClick={() => handleOfferAction(offer.id, "accept")} data-testid={`accept-${offer.id}`}>
+                      <Check className="w-4 h-4 me-1" />
+                      קבל הצעה
+                    </Button>
+                    <Button variant="secondary" size="sm" onClick={() => handleOfferAction(offer.id, "reject")} data-testid={`reject-${offer.id}`}>
+                      <X className="w-4 h-4 me-1" />
+                      דחה
+                    </Button>
                   </div>
                 )}
               </div>
             ))}
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

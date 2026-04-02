@@ -1,8 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import api from "@/lib/api-client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Search, Check, X } from "lucide-react";
+
+const filters = [
+  { v: "", l: "הכל" }, { v: "pending", l: "ממתין" },
+  { v: "verified", l: "מאומת" }, { v: "rejected", l: "נדחה" },
+];
 
 export default function AdminProvidersPage() {
   const [providers, setProviders] = useState<any[]>([]);
@@ -23,11 +33,7 @@ export default function AdminProvidersPage() {
 
   useEffect(() => { fetchData(); }, [filter]);
 
-  const handleVerify = async (id: string) => {
-    await api.put(`/admin/providers/${id}`, { action: "verify" });
-    fetchData();
-  };
-
+  const handleVerify = async (id: string) => { await api.put(`/admin/providers/${id}`, { action: "verify" }); fetchData(); };
   const handleReject = async (id: string) => {
     const notes = prompt("סיבת הדחייה:");
     if (notes === null) return;
@@ -37,35 +43,53 @@ export default function AdminProvidersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">ניהול ספקים ({total})</h1>
-      <div className="flex gap-2 mb-4">
-        {[{ v: "", l: "הכל" }, { v: "pending", l: "ממתין" }, { v: "verified", l: "מאומת" }, { v: "rejected", l: "נדחה" }].map((f) => (
+      <h2 className="font-heading font-semibold text-2xl mb-6">ניהול ספקים ({total})</h2>
+
+      <div className="flex gap-2 mb-4 flex-wrap">
+        {filters.map((f) => (
           <button key={f.v} onClick={() => setFilter(f.v)}
-            className={`px-3 py-1.5 rounded-full text-sm ${filter === f.v ? "bg-teal-600 text-white" : "bg-white text-gray-600"}`}>{f.l}</button>
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${filter === f.v ? "bg-primary text-primary-foreground shadow-sm" : "bg-white text-slate-600 hover:bg-secondary border border-slate-200"}`}>
+            {f.l}
+          </button>
         ))}
       </div>
+
       <form onSubmit={(e) => { e.preventDefault(); fetchData(); }} className="flex gap-2 mb-6">
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="חפש..." className="flex-1 px-4 py-2 border rounded-lg" />
-        <button type="submit" className="bg-teal-600 text-white px-4 py-2 rounded-lg">חפש</button>
+        <div className="relative flex-1">
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="חפש..." className="ps-10 h-10" />
+        </div>
+        <Button type="submit" size="sm">חפש</Button>
       </form>
-      {loading ? <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-16 bg-gray-200 rounded" />)}</div> : (
+
+      {loading ? (
+        <div className="space-y-3">{[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full" />)}</div>
+      ) : (
         <div className="space-y-3">
           {providers.map((p) => (
-            <div key={p.id} className="bg-white rounded-xl shadow-sm p-5 flex items-center justify-between">
+            <Card key={p.id} className="p-5 flex items-center justify-between">
               <div>
-                <h3 className="font-bold">{p.businessName || "ללא שם"}</h3>
-                <p className="text-sm text-gray-500">{p.user?.email} • {p.city || ""}</p>
-                <p className="text-xs text-gray-400">סטטוס: {p.verificationStatus}</p>
+                <h3 className="font-semibold text-primary">{p.businessName || "ללא שם"}</h3>
+                <p className="text-sm text-slate-400">{p.user?.email} &bull; {p.city || ""}</p>
+                <Badge variant={p.verificationStatus === "verified" ? "success" : p.verificationStatus === "rejected" ? "destructive" : "warning"} className="mt-1">
+                  {p.verificationStatus}
+                </Badge>
               </div>
               <div className="flex gap-2">
                 {p.verificationStatus !== "verified" && (
-                  <button onClick={() => handleVerify(p.id)} className="bg-green-600 text-white px-3 py-1.5 rounded-lg text-sm">אמת</button>
+                  <Button size="sm" onClick={() => handleVerify(p.id)} className="bg-emerald-600 hover:bg-emerald-700">
+                    <Check className="w-3 h-3 me-1" />
+                    אמת
+                  </Button>
                 )}
-                {!["verified","rejected"].includes(p.verificationStatus) && (
-                  <button onClick={() => handleReject(p.id)} className="bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-sm">דחה</button>
+                {!["verified", "rejected"].includes(p.verificationStatus) && (
+                  <Button variant="secondary" size="sm" onClick={() => handleReject(p.id)} className="text-red-600 border-red-200 hover:bg-red-50">
+                    <X className="w-3 h-3 me-1" />
+                    דחה
+                  </Button>
                 )}
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}
