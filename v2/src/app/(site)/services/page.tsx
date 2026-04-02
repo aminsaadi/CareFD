@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import ServiceCard from '@/components/ServiceCard';
-import UnifiedAdvancedFilters from '@/components/UnifiedAdvancedFilters';
+import AdvancedFilters from '@/components/AdvancedFilters';
 import api from '@/lib/api-client';
 import { israeliLocalities } from '@/lib/data/localities';
 import { israeliRegions, healthcareProfessions, popularSearches as searchData, serviceTypes, serviceCategories } from '@/lib/data/searchData';
@@ -677,7 +677,7 @@ const Services = () => {
           {/* Advanced Filters Sidebar - Using Unified Component */}
           <div className={`lg:w-80 ${showFilters ? 'block' : 'hidden lg:block'}`}>
             <div className="sticky top-4">
-              <UnifiedAdvancedFilters
+              <AdvancedFilters
                 filters={filters}
                 onFilterChange={setFilters}
                 onReset={resetFilters}
