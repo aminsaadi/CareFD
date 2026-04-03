@@ -28,21 +28,21 @@ const providerTypeLabels: Record<string, string> = {
 interface ProviderCardProps {
   provider: {
     provider_id: string;
-    business_name?: string;
-    profession_name?: string;
-    profession_title?: string;
-    provider_type?: string;
-    description?: string;
-    profile_image?: string;
-    location?: { city?: string };
+    business_name?: string | null;
+    profession_name?: string | null;
+    profession_title?: string | null;
+    provider_type?: string | null;
+    description?: string | null;
+    profile_image?: string | null;
+    location?: { city?: string } | null;
     rating: number;
     total_reviews: number;
     is_verified?: boolean;
     is_recommended?: boolean;
-    distance_km?: number;
-    phone?: string;
+    distance_km?: number | null;
+    phone?: string | null;
     show_phone?: boolean;
-    whatsapp_number?: string;
+    whatsapp_number?: string | null;
     show_whatsapp?: boolean;
     service_types?: string[];
     specializations?: string[];

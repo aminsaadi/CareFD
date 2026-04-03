@@ -39,9 +39,15 @@ export const languageOptions = [
 ];
 
 export const healthFunds = [
-  { id: "clalit", name: "כללית" },
-  { id: "maccabi", name: "מכבי" },
-  { id: "meuhedet", name: "מאוחדת" },
-  { id: "leumit", name: "לאומית" },
-  { id: "private", name: "פרטי" },
+  { id: "clalit", name: "כללית", color: "#00AEEF" },
+  { id: "maccabi", name: "מכבי", color: "#E31E24" },
+  { id: "meuhedet", name: "מאוחדת", color: "#8DC63F" },
+  { id: "leumit", name: "לאומית", color: "#F7941D" },
+  { id: "private", name: "פרטי", color: "#6B7280" },
+];
+
+export const genderOptions = [
+  { id: "male", name: "גבר" },
+  { id: "female", name: "אישה" },
+  { id: "any", name: "לא משנה" },
 ];
