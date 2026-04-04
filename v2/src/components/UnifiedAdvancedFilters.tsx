@@ -344,9 +344,8 @@ export default function UnifiedAdvancedFilters({
         </div>
       </FilterSection>
 
-      {/* ===== GENDER (providers only) ===== */}
-      {pageType === "providers" && (
-        <FilterSection title="מגדר" icon={Users} sectionKey="gender">
+      {/* ===== GENDER (both) ===== */}
+      <FilterSection title="מגדר" icon={Users} sectionKey="gender">
           <div className="flex gap-2">
             {genderOptions.map((option) => (
               <button key={option.id} onClick={() => onFilterChange({ ...filters, gender: filters.gender === option.id ? "" : option.id })}
@@ -356,31 +355,27 @@ export default function UnifiedAdvancedFilters({
             ))}
           </div>
         </FilterSection>
-      )}
 
-      {/* ===== LANGUAGES (providers only) ===== */}
-      {pageType === "providers" && (
-        <FilterSection title="שפות" icon={Globe} sectionKey="languages">
-          <div className="grid grid-cols-2 gap-1.5">
-            {languageOptions.map((lang) => {
-              const isSelected = filters.languages?.includes(lang.id);
-              return (
-                <button key={lang.id} onClick={() => {
-                  const current = filters.languages || [];
-                  const next = isSelected ? current.filter((l) => l !== lang.id) : [...current, lang.id];
-                  onFilterChange({ ...filters, languages: next });
-                }} className={`px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${isSelected ? "bg-carefd-teal text-white" : "bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale"}`}>
-                  {lang.name}
-                </button>
-              );
-            })}
-          </div>
-        </FilterSection>
-      )}
+      {/* ===== LANGUAGES (both) ===== */}
+      <FilterSection title="שפות" icon={Globe} sectionKey="languages">
+        <div className="grid grid-cols-2 gap-1.5">
+          {languageOptions.map((lang) => {
+            const isSelected = filters.languages?.includes(lang.id);
+            return (
+              <button key={lang.id} onClick={() => {
+                const current = filters.languages || [];
+                const next = isSelected ? current.filter((l) => l !== lang.id) : [...current, lang.id];
+                onFilterChange({ ...filters, languages: next });
+              }} className={`px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${isSelected ? "bg-carefd-teal text-white" : "bg-carefd-teal-pale/30 text-carefd-navy hover:bg-carefd-teal-pale"}`}>
+                {lang.name}
+              </button>
+            );
+          })}
+        </div>
+      </FilterSection>
 
-      {/* ===== HEALTH FUNDS (providers only) ===== */}
-      {pageType === "providers" && (
-        <FilterSection title="קופות חולים" icon={Hospital} sectionKey="healthFunds">
+      {/* ===== HEALTH FUNDS (both) ===== */}
+      <FilterSection title="קופות חולים" icon={Hospital} sectionKey="healthFunds">
           <div className="space-y-1.5">
             {healthFunds.map((fund) => {
               const isSelected = filters.healthFunds?.includes(fund.id);
@@ -398,7 +393,6 @@ export default function UnifiedAdvancedFilters({
             })}
           </div>
         </FilterSection>
-      )}
 
       {/* ===== BADGES (both) ===== */}
       <FilterSection title="תגיות מיוחדות" icon={Award} sectionKey="badges">
