@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { MapPin, Star, Navigation } from "lucide-react";
+import { MapPin, Star } from "lucide-react";
 
 interface MapProvider {
   provider_id: string;
@@ -67,6 +66,7 @@ export default function ProvidersMap({
         mapInstanceRef.current = null;
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update markers when providers change

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Mail, Lock, LogIn, Eye, EyeOff, AlertCircle, CheckCircle, Send } from "lucide-react";
+import { toast } from "sonner";
 import api from "@/lib/api-client";
 
 export default function LoginPage() {
@@ -53,7 +54,7 @@ export default function LoginPage() {
       await api.post("/auth/resend-verification", { email });
       setError("");
       setEmailNotVerified(false);
-      alert("נשלח אימייל אימות חדש. בדוק את תיבת הדואר שלך.");
+      toast.success("נשלח אימייל אימות חדש. בדוק את תיבת הדואר שלך.");
     } catch {
       setError("שגיאה בשליחת אימייל אימות");
     } finally {

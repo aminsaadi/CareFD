@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import api from "@/lib/api-client";
 import { Card } from "@/components/ui/card";
-import { Bell, BellOff, Check, Loader2, CalendarDays, MessageCircle, Shield, Megaphone, Settings, AlertCircle } from "lucide-react";
+import { Bell, Check, Loader2, CalendarDays, MessageCircle, Shield, Megaphone, Settings, AlertCircle } from "lucide-react";
 
 interface NotificationPreferences {
   new_booking: boolean;

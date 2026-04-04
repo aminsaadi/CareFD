@@ -62,6 +62,7 @@ export default function MapPicker({
         mapInstanceRef.current = null;
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update selected location marker

@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import DOMPurify from "dompurify";
 import api from "@/lib/api-client";
 
 export default function PrivacyPage() {
   const [dbContent, setDbContent] = useState<string | null>(null);
 
   useEffect(() => {
-    api.get("/pages/privacy")
-      .then((d: any) => {
-        if (d?.content) setDbContent(d.content);
+    api.get<{ content?: string }>("/pages/privacy")
+      .then((d) => {
+        if (d?.content) setDbContent(DOMPurify.sanitize(d.content));
       })
       .catch(() => {});
   }, []);

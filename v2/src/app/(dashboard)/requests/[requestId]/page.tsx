@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Star, Check, X } from "lucide-react";
+import { toast } from "sonner";
 
 const statusConfig: Record<string, { label: string; variant: "success" | "accent" | "outline" }> = {
   open: { label: "פתוח", variant: "success" },
@@ -32,7 +33,7 @@ export default function RequestDetailPage() {
     try {
       await api.post(`/offers/${offerId}`, { action });
       api.get(`/requests/${requestId}`).then(setRequest);
-    } catch (err: any) { alert(err.message); }
+    } catch (err: any) { toast.error(err?.message || "שגיאה בביצוע הפעולה"); }
   };
 
   if (loading) return (

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import NotificationSettings from "@/components/NotificationSettings";
 import {
-  User, Camera, Trash2, Phone, Mail, Home, Lock, Shield, Eye, EyeOff,
+  User, Camera, Trash2, Phone, Home, Lock, Shield, Eye, EyeOff,
   CheckCircle, Loader2, IdCard,
 } from "lucide-react";
 

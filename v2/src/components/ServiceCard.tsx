@@ -38,7 +38,7 @@ interface ServiceCardProps {
   service: {
     service_id: string;
     name: string;
-    description?: string;
+    description?: string | null;
     price: number;
     pricing_type?: string;
     service_category?: string;
@@ -48,13 +48,14 @@ interface ServiceCardProps {
     provider_id?: string;
     provider?: {
       provider_id?: string;
-      business_name?: string;
+      business_name?: string | null;
       rating?: number;
       total_reviews?: number;
-      phone?: string;
+      phone?: string | null;
       user_id?: string;
-    };
-    location?: { city?: string };
+      is_verified?: boolean;
+    } | null;
+    location?: { city?: string } | null;
   };
   showProvider?: boolean;
 }

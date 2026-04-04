@@ -168,6 +168,7 @@ function ProvidersContent() {
             <button
               onClick={() => setShowFilters(true)}
               className="lg:hidden flex items-center gap-2 px-4 py-2 bg-carefd-navy text-white rounded-xl font-medium text-sm"
+              aria-label="פתח סינון מתקדם"
             >
               <Filter className="w-4 h-4" />
               סינון מתקדם
@@ -197,11 +198,13 @@ function ProvidersContent() {
           </div>
 
           {/* View Mode Toggle */}
-          <div className="hidden md:flex border-2 border-carefd-teal-pale rounded-xl overflow-hidden">
+          <div className="hidden md:flex border-2 border-carefd-teal-pale rounded-xl overflow-hidden" role="group" aria-label="מצב תצוגה">
             <button
               onClick={() => setViewMode("grid")}
               className={`px-3 py-2 transition-colors ${viewMode === "grid" ? "bg-carefd-teal text-white" : "bg-white text-carefd-gray hover:bg-carefd-teal-pale/30"}`}
               title="תצוגת רשת"
+              aria-label="תצוגת רשת"
+              aria-pressed={viewMode === "grid"}
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
@@ -209,6 +212,8 @@ function ProvidersContent() {
               onClick={() => setViewMode("list")}
               className={`px-3 py-2 transition-colors ${viewMode === "list" ? "bg-carefd-teal text-white" : "bg-white text-carefd-gray hover:bg-carefd-teal-pale/30"}`}
               title="תצוגת רשימה"
+              aria-label="תצוגת רשימה"
+              aria-pressed={viewMode === "list"}
             >
               <List className="w-4 h-4" />
             </button>
@@ -216,6 +221,8 @@ function ProvidersContent() {
               onClick={() => setViewMode("map")}
               className={`px-3 py-2 transition-colors ${viewMode === "map" ? "bg-carefd-teal text-white" : "bg-white text-carefd-gray hover:bg-carefd-teal-pale/30"}`}
               title="תצוגת מפה"
+              aria-label="תצוגת מפה"
+              aria-pressed={viewMode === "map"}
               data-testid="map-view-btn"
             >
               <Map className="w-4 h-4" />

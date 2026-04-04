@@ -3,6 +3,8 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { NotificationProvider } from "@/context/NotificationContext";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
+import CookieConsent from "@/components/CookieConsent";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export const metadata: Metadata = {
   title: "CareFD - שירותי בריאות פרמיום בישראל",
@@ -16,7 +18,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <AuthProvider>
           <NotificationProvider>
             {children}
+            <ScrollToTop />
             <AccessibilityWidget />
+            <CookieConsent />
           </NotificationProvider>
         </AuthProvider>
       </body>

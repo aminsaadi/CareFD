@@ -33,6 +33,21 @@ export default function AccessibilityWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [settings, setSettings] = useState<AccessibilitySettings>(defaultSettings);
 
+  const applySettings = useCallback((s: AccessibilitySettings) => {
+    const html = document.documentElement;
+    const body = document.body;
+    html.style.fontSize = `${s.fontSize}%`;
+    const toggleClass = (cls: string, on: boolean) => { if (on) body.classList.add(cls); else body.classList.remove(cls); };
+    toggleClass("accessibility-high-contrast", s.highContrast);
+    toggleClass("accessibility-highlight-links", s.highlightLinks);
+    toggleClass("accessibility-readable-font", s.readableFont);
+    toggleClass("accessibility-stop-animations", s.stopAnimations);
+    toggleClass("accessibility-big-cursor", s.bigCursor);
+    toggleClass("accessibility-focus-highlight", s.focusHighlight);
+    toggleClass("accessibility-hide-images", s.hideImages);
+    body.style.filter = s.grayscale ? "grayscale(100%)" : "";
+  }, []);
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem("accessibility_settings");
@@ -42,47 +57,7 @@ export default function AccessibilityWidget() {
         applySettings(parsed);
       }
     } catch {}
-  }, []);
-
-  const applySettings = useCallback((s: AccessibilitySettings) => {
-    const html = document.documentElement;
-    const body = document.body;
-
-    // Font size
-    html.style.fontSize = `${s.fontSize}%`;
-
-    // High contrast
-    if (s.highContrast) body.classList.add("accessibility-high-contrast");
-    else body.classList.remove("accessibility-high-contrast");
-
-    // Grayscale
-    if (s.grayscale) body.style.filter = "grayscale(100%)";
-    else body.style.filter = "";
-
-    // Highlight links
-    if (s.highlightLinks) body.classList.add("accessibility-highlight-links");
-    else body.classList.remove("accessibility-highlight-links");
-
-    // Readable font
-    if (s.readableFont) body.classList.add("accessibility-readable-font");
-    else body.classList.remove("accessibility-readable-font");
-
-    // Stop animations
-    if (s.stopAnimations) body.classList.add("accessibility-stop-animations");
-    else body.classList.remove("accessibility-stop-animations");
-
-    // Big cursor
-    if (s.bigCursor) body.classList.add("accessibility-big-cursor");
-    else body.classList.remove("accessibility-big-cursor");
-
-    // Focus highlight
-    if (s.focusHighlight) body.classList.add("accessibility-focus-highlight");
-    else body.classList.remove("accessibility-focus-highlight");
-
-    // Hide images
-    if (s.hideImages) body.classList.add("accessibility-hide-images");
-    else body.classList.remove("accessibility-hide-images");
-  }, []);
+  }, [applySettings]);
 
   const updateSetting = <K extends keyof AccessibilitySettings>(key: K, value: AccessibilitySettings[K]) => {
     const updated = { ...settings, [key]: value };
