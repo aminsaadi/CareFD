@@ -4,11 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/api-client';
-import { 
-  FaUpload, FaIdCard, FaFileAlt, FaCheckCircle, 
-  FaClock, FaTimesCircle, FaSpinner, FaArrowRight,
-  FaShieldAlt, FaExclamationTriangle
-} from 'react-icons/fa';
+import {
+  Upload, CreditCard, FileText, CheckCircle,
+  Clock, XCircle, Loader2, ArrowRight,
+  Shield, AlertTriangle
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 const VerificationRequest = () => {
@@ -113,7 +113,7 @@ const VerificationRequest = () => {
 
     const statusConfig = {
       pending: {
-        icon: FaClock,
+        icon: Clock,
         color: 'text-yellow-500',
         bg: 'bg-yellow-50',
         border: 'border-yellow-200',
@@ -121,7 +121,7 @@ const VerificationRequest = () => {
         description: 'הבקשה שלך נמצאת בתהליך בדיקה. נעדכן אותך בהקדם.'
       },
       approved: {
-        icon: FaCheckCircle,
+        icon: CheckCircle,
         color: 'text-green-500',
         bg: 'bg-green-50',
         border: 'border-green-200',
@@ -129,7 +129,7 @@ const VerificationRequest = () => {
         description: 'החשבון שלך אומת בהצלחה!'
       },
       rejected: {
-        icon: FaTimesCircle,
+        icon: XCircle,
         color: 'text-red-500',
         bg: 'bg-red-50',
         border: 'border-red-200',
@@ -161,7 +161,7 @@ const VerificationRequest = () => {
               className="flex items-center gap-2 text-carefd-teal hover:underline"
             >
               <span>חזור לדאשבורד</span>
-              <FaArrowRight />
+              <ArrowRight />
             </button>
           </div>
         )}
@@ -174,7 +174,7 @@ const VerificationRequest = () => {
       <div className="min-h-screen bg-gray-50">
         
         <div className="flex items-center justify-center py-20">
-          <FaSpinner className="animate-spin text-4xl text-carefd-teal" />
+          <Loader2 className="animate-spin text-4xl text-carefd-teal" />
         </div>
         
       </div>
@@ -206,7 +206,7 @@ const VerificationRequest = () => {
             <ul className="space-y-2 text-gray-600">
               {verificationStatus.documents?.map((doc, index) => (
                 <li key={index} className="flex items-center gap-2">
-                  <FaFileAlt className="text-carefd-teal" />
+                  <FileText className="text-carefd-teal" />
                   <span>{doc.name || `מסמך ${index + 1}`}</span>
                 </li>
               ))}
@@ -226,7 +226,7 @@ const VerificationRequest = () => {
         {/* Header */}
         <div className="text-center mb-10">
           <div className="w-20 h-20 bg-carefd-teal/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FaShieldAlt className="text-4xl text-carefd-teal" />
+            <Shield className="text-4xl text-carefd-teal" />
           </div>
           <h1 className="text-3xl font-bold text-carefd-navy mb-2">
             בקשת אימות {isProvider ? 'ספק' : 'משתמש'}
@@ -243,7 +243,7 @@ const VerificationRequest = () => {
         {/* Upload Form */}
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-8">
           <h2 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2">
-            <FaUpload className="text-carefd-teal" />
+            <Upload className="text-carefd-teal" />
             העלאת מסמכים
           </h2>
 
@@ -269,7 +269,7 @@ const VerificationRequest = () => {
                 {previews.id_card ? (
                   previews.id_card === 'pdf' ? (
                     <div className="flex items-center justify-center gap-2 text-carefd-teal">
-                      <FaFileAlt className="text-2xl" />
+                      <FileText className="text-2xl" />
                       <span>{documents.id_card?.name}</span>
                     </div>
                   ) : (
@@ -277,7 +277,7 @@ const VerificationRequest = () => {
                   )
                 ) : (
                   <>
-                    <FaIdCard className="text-4xl text-gray-400 mx-auto mb-2" />
+                    <CreditCard className="text-4xl text-gray-400 mx-auto mb-2" />
                     <p className="text-gray-500">לחץ להעלאת קובץ</p>
                     <p className="text-xs text-gray-400 mt-1">JPG, PNG, WEBP או PDF (עד 5MB)</p>
                   </>
@@ -305,7 +305,7 @@ const VerificationRequest = () => {
                 {previews.id_card_back ? (
                   previews.id_card_back === 'pdf' ? (
                     <div className="flex items-center justify-center gap-2 text-carefd-teal">
-                      <FaFileAlt className="text-2xl" />
+                      <FileText className="text-2xl" />
                       <span>{documents.id_card_back?.name}</span>
                     </div>
                   ) : (
@@ -313,7 +313,7 @@ const VerificationRequest = () => {
                   )
                 ) : (
                   <>
-                    <FaIdCard className="text-4xl text-gray-400 mx-auto mb-2" />
+                    <CreditCard className="text-4xl text-gray-400 mx-auto mb-2" />
                     <p className="text-gray-500">לחץ להעלאת קובץ</p>
                   </>
                 )}
@@ -341,7 +341,7 @@ const VerificationRequest = () => {
                   {previews.professional_license ? (
                     previews.professional_license === 'pdf' ? (
                       <div className="flex items-center justify-center gap-2 text-carefd-teal">
-                        <FaFileAlt className="text-2xl" />
+                        <FileText className="text-2xl" />
                         <span>{documents.professional_license?.name}</span>
                       </div>
                     ) : (
@@ -349,7 +349,7 @@ const VerificationRequest = () => {
                     )
                   ) : (
                     <>
-                      <FaFileAlt className="text-4xl text-gray-400 mx-auto mb-2" />
+                      <FileText className="text-4xl text-gray-400 mx-auto mb-2" />
                       <p className="text-gray-500">לחץ להעלאת קובץ</p>
                     </>
                   )}
@@ -377,7 +377,7 @@ const VerificationRequest = () => {
                 {previews.additional_doc ? (
                   previews.additional_doc === 'pdf' ? (
                     <div className="flex items-center justify-center gap-2 text-carefd-teal">
-                      <FaFileAlt className="text-2xl" />
+                      <FileText className="text-2xl" />
                       <span>{documents.additional_doc?.name}</span>
                     </div>
                   ) : (
@@ -385,7 +385,7 @@ const VerificationRequest = () => {
                   )
                 ) : (
                   <>
-                    <FaFileAlt className="text-4xl text-gray-400 mx-auto mb-2" />
+                    <FileText className="text-4xl text-gray-400 mx-auto mb-2" />
                     <p className="text-gray-500">לחץ להעלאת קובץ</p>
                   </>
                 )}
@@ -409,7 +409,7 @@ const VerificationRequest = () => {
 
           {/* Warning */}
           <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl flex items-start gap-3">
-            <FaExclamationTriangle className="text-yellow-500 mt-1 flex-shrink-0" />
+            <AlertTriangle className="text-yellow-500 mt-1 flex-shrink-0" />
             <div className="text-sm text-yellow-800">
               <p className="font-semibold">שים לב:</p>
               <p>המסמכים שתעלה ישמשו לאימות זהותך בלבד ולא יופצו לצדדים שלישיים.</p>
@@ -426,12 +426,12 @@ const VerificationRequest = () => {
           >
             {submitting ? (
               <>
-                <FaSpinner className="animate-spin" />
+                <Loader2 className="animate-spin" />
                 שולח בקשה...
               </>
             ) : (
               <>
-                <FaShieldAlt />
+                <Shield />
                 שלח בקשת אימות
               </>
             )}

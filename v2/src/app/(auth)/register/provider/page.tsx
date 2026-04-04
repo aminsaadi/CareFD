@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import Logo from '@/components/Logo';
-import {
-  FaEnvelope, FaLock, FaUser, FaArrowLeft, FaUserMd, FaBuilding,
-  FaPhone, FaMapMarkerAlt, FaCheckCircle, FaBriefcaseMedical,
-  FaUsers, FaCalendarCheck, FaChartLine, FaEye, FaEyeSlash
-} from 'react-icons/fa';
 import CitySelect from '@/components/CitySelect';
+import {
+  Mail, Lock, User, ArrowLeft, Stethoscope, Building2,
+  Phone, MapPin, CheckCircle, Briefcase,
+  Users, CalendarCheck, TrendingUp, Eye, EyeOff
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 const ProviderRegister = () => {
   const { register } = useAuth();
@@ -33,9 +33,9 @@ const ProviderRegister = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const providerTypes = [
-    { value: 'individual', label: 'עצמאי', icon: FaUserMd, desc: 'מטפל/ת עצמאי/ת' },
-    { value: 'clinic', label: 'מרפאה', icon: FaBriefcaseMedical, desc: 'מרפאה או מרכז רפואי' },
-    { value: 'company', label: 'חברה', icon: FaBuilding, desc: 'חברת שירותי בריאות' }
+    { value: 'individual', label: 'עצמאי', icon: Stethoscope, desc: 'מטפל/ת עצמאי/ת' },
+    { value: 'clinic', label: 'מרפאה', icon: Briefcase, desc: 'מרפאה או מרכז רפואי' },
+    { value: 'company', label: 'חברה', icon: Building2, desc: 'חברת שירותי בריאות' }
   ];
 
   const specializations = [
@@ -86,9 +86,9 @@ const ProviderRegister = () => {
   };
 
   const benefits = [
-    { icon: FaUsers, title: 'הגיעו ללקוחות חדשים', desc: 'אלפי משתמשים מחפשים שירותים כל יום' },
-    { icon: FaCalendarCheck, title: 'ניהול תורים חכם', desc: 'מערכת לניהול זמינות והזמנות' },
-    { icon: FaChartLine, title: 'צמחו את העסק', desc: 'כלים לשיווק ובניית מוניטין' }
+    { icon: Users, title: 'הגיעו ללקוחות חדשים', desc: 'אלפי משתמשים מחפשים שירותים כל יום' },
+    { icon: CalendarCheck, title: 'ניהול תורים חכם', desc: 'מערכת לניהול זמינות והזמנות' },
+    { icon: TrendingUp, title: 'צמחו את העסק', desc: 'כלים לשיווק ובניית מוניטין' }
   ];
 
   return (
@@ -102,7 +102,7 @@ const ProviderRegister = () => {
         
         <div className="relative z-10 text-white max-w-lg">
           <div className="bg-white px-8 py-4 rounded-2xl shadow-2xl inline-block mb-8">
-            <Logo size="large" />
+            <Logo size="lg" />
           </div>
           <h1 className="text-4xl font-bold font-heading mb-4">הצטרפו כספק שירותים</h1>
           <p className="text-xl text-carefd-teal-pale mb-8">
@@ -160,7 +160,7 @@ const ProviderRegister = () => {
                       step >= s ? 'bg-carefd-teal text-white' : 'bg-carefd-teal-pale text-carefd-gray'
                     }`}
                   >
-                    {step > s ? <FaCheckCircle /> : s}
+                    {step > s ? <CheckCircle /> : s}
                   </div>
                   {s < 2 && (
                     <div className={`w-16 h-1 rounded ${step > s ? 'bg-carefd-teal' : 'bg-carefd-teal-pale'}`}></div>
@@ -190,7 +190,7 @@ const ProviderRegister = () => {
                   <div>
                     <label className="block text-sm font-semibold text-carefd-navy mb-2">שם מלא</label>
                     <div className="relative">
-                      <FaUser className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
+                      <User className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
                       <input
                         name="name"
                         type="text"
@@ -206,7 +206,7 @@ const ProviderRegister = () => {
                   <div>
                     <label className="block text-sm font-semibold text-carefd-navy mb-2">אימייל</label>
                     <div className="relative">
-                      <FaEnvelope className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
+                      <Mail className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
                       <input
                         name="email"
                         type="email"
@@ -222,7 +222,7 @@ const ProviderRegister = () => {
                   <div>
                     <label className="block text-sm font-semibold text-carefd-navy mb-2">סיסמה</label>
                     <div className="relative">
-                      <FaLock className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
+                      <Lock className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
                       <input
                         name="password"
                         type={showPassword ? 'text' : 'password'}
@@ -239,7 +239,7 @@ const ProviderRegister = () => {
                         className="absolute right-12 top-1/2 -translate-y-1/2 text-carefd-gray hover:text-carefd-teal transition"
                         aria-label="הצג/הסתר סיסמה"
                       >
-                        {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     </div>
                   </div>
@@ -251,7 +251,7 @@ const ProviderRegister = () => {
                     className="w-full bg-carefd-teal text-white py-4 rounded-xl hover:bg-carefd-teal-medium font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     המשך
-                    <FaArrowLeft className="rtl:rotate-180" />
+                    <ArrowLeft className="rtl:rotate-180" />
                   </button>
                 </form>
               </>
@@ -262,7 +262,7 @@ const ProviderRegister = () => {
                 <div>
                   <label className="block text-sm font-semibold text-carefd-navy mb-2">שם העסק</label>
                   <div className="relative">
-                    <FaBuilding className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
+                    <Building2 className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
                     <input
                       name="business_name"
                       type="text"
@@ -301,7 +301,7 @@ const ProviderRegister = () => {
                   <div>
                     <label className="block text-sm font-semibold text-carefd-navy mb-2">טלפון</label>
                     <div className="relative">
-                      <FaPhone className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
+                      <Phone className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray" />
                       <input
                         name="phone"
                         type="tel"
@@ -314,16 +314,11 @@ const ProviderRegister = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-carefd-navy mb-2">עיר</label>
-                    <div className="relative">
-                      <FaMapMarkerAlt className="absolute right-4 rtl:right-auto rtl:left-4 top-1/2 -translate-y-1/2 text-carefd-gray z-10 pointer-events-none" />
-                      <CitySelect
-                        name="city"
-                        value={formData.city}
-                        onChange={handleChange}
-                        placeholder="בחר עיר..."
-                        inputClassName="w-full px-4 py-3 pr-12 rtl:pr-4 rtl:pl-12 border-2 border-carefd-teal-pale rounded-xl focus:outline-none focus:border-carefd-teal"
-                      />
-                    </div>
+                    <CitySelect
+                      value={formData.city}
+                      onChange={(city) => setFormData({ ...formData, city })}
+                      placeholder="בחר עיר..."
+                    />
                   </div>
                 </div>
 
@@ -365,7 +360,7 @@ const ProviderRegister = () => {
                     ) : (
                       <>
                         הרשמה
-                        <FaArrowLeft className="rtl:rotate-180" />
+                        <ArrowLeft className="rtl:rotate-180" />
                       </>
                     )}
                   </button>
@@ -386,7 +381,7 @@ const ProviderRegister = () => {
           {/* Back to Home */}
           <div className="text-center mt-6">
             <Link href="/" className="text-white/80 hover:text-white transition flex items-center justify-center gap-2">
-              <FaArrowLeft className="rtl:rotate-180" />
+              <ArrowLeft className="rtl:rotate-180" />
               חזרה לדף הבית
             </Link>
           </div>
