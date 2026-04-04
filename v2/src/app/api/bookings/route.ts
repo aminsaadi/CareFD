@@ -3,6 +3,7 @@ import prisma from "@/lib/db";
 import { getCurrentUser, requireAuth } from "@/lib/auth";
 import { json, errorResponse, withErrorHandler, parseBody, getSearchParams } from "@/lib/api-utils";
 import { createNotification } from "@/lib/notifications";
+import { sendBookingNotificationEmail } from "@/lib/email";
 import { rateLimit } from "@/lib/rate-limiter";
 
 // POST /api/bookings - Create booking
@@ -52,7 +53,7 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
   // Get service
   const service = await prisma.service.findUnique({
     where: { id: body.service_id },
-    include: { provider: { select: { id: true, userId: true, businessName: true, isVerified: true, verificationStatus: true } } },
+    include: { provider: { select: { id: true, userId: true, businessName: true, isVerified: true, verificationStatus: true, email: true } } },
   });
   if (!service) return errorResponse("Service not found", 404);
   if (!service.provider.isVerified && service.provider.verificationStatus !== "verified") {
@@ -170,6 +171,19 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
     `${clientName} הזמין ${service.name} לתאריך ${dateFormatted}`,
     { booking_id: booking.id, service_id: service.id }
   );
+
+  // Send email to provider
+  if (service.provider.email) {
+    sendBookingNotificationEmail(
+      service.provider.email,
+      booking.bookingNumber,
+      clientName,
+      service.name,
+      dateFormatted,
+      finalPrice,
+      process.env.NEXT_PUBLIC_SITE_URL || "https://carefd.com"
+    ).catch(() => {});
+  }
 
   return json({
     booking_id: booking.id,

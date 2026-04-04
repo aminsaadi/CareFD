@@ -127,75 +127,58 @@ export default function Landing() {
           />
         </div>
 
-        <div className="container-main py-20 md:py-32 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <Badge variant="accent" className="mb-6 text-sm px-4 py-1.5">
-                <Shield className="w-3.5 h-3.5 me-1.5" />
-                מטפלים מאומתים בלבד
-              </Badge>
+        <div className="container-main py-20 md:py-28 relative z-10">
+          {/* Hero Content - Centered */}
+          <div className="text-center max-w-4xl mx-auto mb-10">
+            <Badge variant="accent" className="mb-6 text-sm px-4 py-1.5 inline-flex">
+              <Shield className="w-3.5 h-3.5 me-1.5" />
+              מטפלים מאומתים בלבד
+            </Badge>
 
-              <h1 className="text-balance mb-6">
-                שירותי בריאות פרמיום{" "}
-                <span className="text-carefd-teal-light">בדלת הבית</span>
-              </h1>
+            <h1 className="text-balance mb-6">
+              שירותי בריאות פרמיום{" "}
+              <span className="text-carefd-teal-light">בדלת הבית</span>
+            </h1>
 
-              <p className="text-lg md:text-xl text-white/70 mb-10 max-w-2xl leading-relaxed">
-                מצאו את המטפל המושלם מתוך מאות ספקי שירות מאומתים בכל רחבי ישראל.
-                סיעוד, רפואה, שיקום ועוד - הכל במקום אחד.
-              </p>
-
-              {/* Search Box */}
-              <AdvancedSearch className="max-w-2xl" />
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                <Link
-                  href="/register"
-                  className="bg-carefd-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition-colors text-center"
-                >
-                  התחל עכשיו
-                </Link>
-                <Link
-                  href="/providers"
-                  className="bg-white/10 text-white border border-white/20 px-6 py-3 rounded-xl font-semibold hover:bg-white/20 transition-colors text-center"
-                >
-                  צפה בספקים
-                </Link>
-              </div>
-            </div>
-
-            {/* Right side stats grid (desktop only) */}
-            <div className="hidden lg:grid grid-cols-2 gap-4">
-              {stats.map((stat, idx) => (
-                <div
-                  key={stat.label}
-                  className={`bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 ${
-                    idx === 0 ? "animate-float" : ""
-                  }`}
-                  style={{ animationDelay: `${idx * 0.5}s` }}
-                >
-                  <stat.icon className="w-8 h-8 text-carefd-teal-light mb-3" />
-                  <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-                  <div className="text-sm text-white/60">{stat.label}</div>
-                </div>
-              ))}
-            </div>
+            <p className="text-lg md:text-xl text-white/70 mb-0 max-w-2xl mx-auto leading-relaxed">
+              מצאו את המטפל המושלם מתוך מאות ספקי שירות מאומתים בכל רחבי ישראל.
+              סיעוד, רפואה, שיקום ועוד - הכל במקום אחד.
+            </p>
           </div>
-        </div>
-      </section>
 
-      {/* Stats Bar (mobile only - desktop shows in hero) */}
-      <section className="border-y border-slate-100 bg-white lg:hidden">
-        <div className="container-main py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <stat.icon className="w-6 h-6 text-carefd-teal mx-auto mb-2" />
-                <div className="text-2xl font-heading font-bold text-carefd-navy">{stat.value}</div>
-                <div className="text-sm text-slate-500 mt-1">{stat.label}</div>
+          {/* Stats Row */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mb-10">
+            {stats.map((stat, idx) => (
+              <div
+                key={stat.label}
+                className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 text-center"
+              >
+                <stat.icon className="w-6 h-6 text-carefd-teal-light mx-auto mb-2" />
+                <div className="text-2xl font-bold text-white">{stat.value}</div>
+                <div className="text-xs text-white/60">{stat.label}</div>
               </div>
             ))}
+          </div>
+
+          {/* Search Box - Full Width */}
+          <div className="max-w-4xl mx-auto">
+            <AdvancedSearch className="" />
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 mt-8 justify-center">
+            <Link
+              href="/register"
+              className="bg-carefd-teal text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-carefd-teal-medium transition-colors text-center text-lg"
+            >
+              התחל עכשיו
+            </Link>
+            <Link
+              href="/providers"
+              className="bg-white/10 text-white border border-white/20 px-8 py-3.5 rounded-xl font-semibold hover:bg-white/20 transition-colors text-center text-lg"
+            >
+              צפה בספקים
+            </Link>
           </div>
         </div>
       </section>

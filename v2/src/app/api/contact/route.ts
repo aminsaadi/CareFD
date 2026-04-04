@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import prisma from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { json, errorResponse, withErrorHandler, parseBody } from "@/lib/api-utils";
+import { sendContactEmail } from "@/lib/email";
 
 // POST /api/contact
 export const POST = withErrorHandler(async (req: NextRequest) => {
@@ -30,6 +31,9 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
       message: body.message,
     },
   });
+
+  // Send email notification to admin
+  sendContactEmail(body.name, body.email, body.subject || "", body.message).catch(() => {});
 
   return json({ message: "ההודעה נשלחה בהצלחה" }, 201);
 });

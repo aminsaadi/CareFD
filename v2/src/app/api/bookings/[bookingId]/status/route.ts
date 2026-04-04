@@ -3,6 +3,7 @@ import prisma from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { json, errorResponse, withErrorHandler, parseBody } from "@/lib/api-utils";
 import { createNotification } from "@/lib/notifications";
+import { sendBookingStatusEmail } from "@/lib/email";
 
 // PUT /api/bookings/:bookingId/status - Update booking status
 export const PUT = withErrorHandler(async (req: NextRequest, ctx) => {
@@ -102,6 +103,17 @@ export const PUT = withErrorHandler(async (req: NextRequest, ctx) => {
     }
     default:
       return errorResponse(`Unknown action: ${body.action}`, 400);
+  }
+
+  // Send status email to client
+  const statusLabels: Record<string, string> = {
+    confirm: "אושרה", reject: "נדחתה", cancel: "בוטלה",
+    complete: "הושלמה", provider_complete: "הספק סיים",
+  };
+  const statusLabel = statusLabels[body.action] || body.action;
+  const clientUser = await prisma.user.findUnique({ where: { id: booking.userId } });
+  if (clientUser?.email) {
+    sendBookingStatusEmail(clientUser.email, booking.bookingNumber, booking.serviceName || "", body.action, statusLabel).catch(() => {});
   }
 
   return json({ message: "Booking status updated", action: body.action });

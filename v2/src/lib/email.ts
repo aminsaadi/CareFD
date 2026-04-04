@@ -69,6 +69,62 @@ export async function sendPasswordResetEmail(email: string, token: string) {
   `);
 }
 
+export async function sendContactEmail(name: string, email: string, subject: string, message: string) {
+  const adminEmail = process.env.ADMIN_EMAIL || SENDER_EMAIL;
+  return sendEmail(adminEmail, `פנייה חדשה: ${subject || "כללי"} - CareFD`, `
+    <!DOCTYPE html>
+    <html dir="rtl" lang="he">
+    <body style="font-family: Arial, sans-serif; direction: rtl; text-align: right; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #1e293b, #0f766e); color: white; padding: 30px; border-radius: 15px 15px 0 0; text-align: center;">
+        <h1 style="margin: 0;">CareFD</h1>
+        <p>פנייה חדשה מהאתר</p>
+      </div>
+      <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 15px 15px;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr><td style="padding: 10px 0; color: #666;">שם:</td><td style="font-weight: bold;">${name}</td></tr>
+          <tr><td style="padding: 10px 0; color: #666;">אימייל:</td><td>${email}</td></tr>
+          <tr><td style="padding: 10px 0; color: #666;">נושא:</td><td>${subject || "כללי"}</td></tr>
+        </table>
+        <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 10px; border: 1px solid #e5e7eb;">
+          <p style="color: #333; white-space: pre-line;">${message}</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `);
+}
+
+export async function sendBookingStatusEmail(
+  to: string,
+  bookingNumber: string,
+  serviceName: string,
+  status: string,
+  statusLabel: string,
+) {
+  const statusColors: Record<string, string> = {
+    confirmed: "#10b981", rejected: "#ef4444", cancelled: "#f59e0b", completed: "#0d9488",
+  };
+  const color = statusColors[status] || "#0d9488";
+  return sendEmail(to, `עדכון הזמנה #${bookingNumber} - ${statusLabel}`, `
+    <!DOCTYPE html>
+    <html dir="rtl" lang="he">
+    <body style="font-family: Arial, sans-serif; direction: rtl; text-align: right; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <div style="background: linear-gradient(135deg, ${color}, #1e293b); color: white; padding: 30px; border-radius: 15px 15px 0 0; text-align: center;">
+        <h1 style="margin: 0;">עדכון הזמנה</h1>
+        <p>מספר הזמנה: ${bookingNumber}</p>
+      </div>
+      <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 15px 15px;">
+        <p>שירות: <strong>${serviceName}</strong></p>
+        <p>סטטוס חדש: <strong style="color: ${color};">${statusLabel}</strong></p>
+        <div style="text-align: center; margin-top: 30px;">
+          <a href="${SITE_URL}/bookings" style="background: #0d9488; color: white; padding: 15px 40px; text-decoration: none; border-radius: 25px; font-weight: bold;">צפה בהזמנות</a>
+        </div>
+      </div>
+    </body>
+    </html>
+  `);
+}
+
 export async function sendBookingNotificationEmail(
   to: string,
   bookingNumber: string,
