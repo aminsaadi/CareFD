@@ -1,331 +1,231 @@
 "use client";
 
-import React, { useState } from 'react';
-import { X, Star, DollarSign, MessageSquare, ThumbsUp, ThumbsDown, CheckCircle } from 'lucide-react';
-import api from '@/lib/api-client';
-import { toast } from 'sonner';
+import { useState } from "react";
+import api from "@/lib/api-client";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import {
+  X, CheckCircle, Star, ThumbsUp, ThumbsDown, Loader2, MessageSquare,
+} from "lucide-react";
 
-const CompletionConfirmDialog = ({ booking, onClose, onSuccess }) => {
-  const [step, setStep] = useState(1); // 1: confirm + payment, 2: success, 3: review
+interface CompletionConfirmDialogProps {
+  bookingId: string;
+  providerName: string;
+  serviceName: string;
+  onClose: () => void;
+  onComplete: () => void;
+}
+
+type Step = "confirm" | "success" | "review";
+
+export default function CompletionConfirmDialog({
+  bookingId,
+  providerName,
+  serviceName,
+  onClose,
+  onComplete,
+}: CompletionConfirmDialogProps) {
+  const [step, setStep] = useState<Step>("confirm");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  
-  const [paymentData, setPaymentData] = useState({
-    final_price: '',
-    payment_notes: ''
-  });
-  
-  const [reviewData, setReviewData] = useState({
-    rating: 5,
-    comment: '',
-    service_quality: 5,
-    punctuality: 5,
-    communication: 5,
-    price_value: 5,
-    would_recommend: true
+  const [notes, setNotes] = useState("");
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [recommend, setRecommend] = useState<boolean | null>(null);
+  const [detailedRatings, setDetailedRatings] = useState({
+    service_quality: 0,
+    punctuality: 0,
+    communication: 0,
+    value_for_money: 0,
   });
 
-  const handleConfirmCompletion = async () => {
+  const handleConfirm = async () => {
     setLoading(true);
-    setError('');
-
     try {
-      await api.put(`/bookings/${booking.booking_id}/client-confirm`, {
-        final_price: paymentData.final_price ? parseFloat(paymentData.final_price) : null,
-        payment_notes: paymentData.payment_notes || null
-      });
-      toast.success('ההזמנה אושרה כהושלמה!');
-      setStep(2); // success step
+      await api.post(`/bookings/${bookingId}/client-confirm`, { notes: notes || undefined });
+      setStep("success");
+      onComplete();
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'שגיאה באישור ההשלמה');
+      toast.error(err?.detail || "שגיאה באישור ההשלמה");
     } finally {
       setLoading(false);
     }
   };
 
   const handleSubmitReview = async () => {
+    if (rating === 0) { toast.error("נא לבחור דירוג"); return; }
     setLoading(true);
-    setError('');
-
     try {
-      await api.post('/reviews', {
-        provider_id: booking.provider_id,
-        booking_id: booking.booking_id,
-        rating: reviewData.rating,
-        comment: reviewData.comment,
-        service_quality: reviewData.service_quality,
-        punctuality: reviewData.punctuality,
-        communication: reviewData.communication,
-        price_value: reviewData.price_value,
-        would_recommend: reviewData.would_recommend
+      await api.post("/reviews", {
+        booking_id: bookingId,
+        rating,
+        comment: comment || undefined,
+        recommend,
+        detailed_ratings: detailedRatings,
       });
-      toast.success('הביקורת נשלחה בהצלחה!');
-      onSuccess?.();
+      toast.success("הביקורת נשלחה בהצלחה!");
+      onClose();
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'שגיאה בשליחת הביקורת');
+      toast.error(err?.detail || "שגיאה בשליחת הביקורת");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSkipReview = () => {
-    onSuccess?.();
-  };
-
-  const RatingStars = ({ value, onChange, label }) => (
-    <div className="flex items-center justify-between">
-      <span className="text-sm text-gray-600">{label}</span>
-      <div className="flex gap-1">
-        {[1, 2, 3, 4, 5].map(star => (
-          <button
-            key={star}
-            type="button"
-            onClick={() => onChange(star)}
-            className="p-0.5"
-          >
-            <Star
-              className={`w-5 h-5 ${star <= value ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
-            />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
+  const detailedLabels: { key: keyof typeof detailedRatings; label: string }[] = [
+    { key: "service_quality", label: "איכות השירות" },
+    { key: "punctuality", label: "דייקנות" },
+    { key: "communication", label: "תקשורת" },
+    { key: "value_for_money", label: "תמורה למחיר" },
+  ];
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true">
+      <div className="bg-white rounded-2xl max-w-lg w-full shadow-xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="border-b p-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-gray-900">
-            {step === 1 ? 'אישור השלמת השירות' : step === 2 ? 'ההזמנה הושלמה!' : 'דירוג וביקורת'}
-          </h2>
-          <button
-            onClick={step >= 2 ? () => onSuccess?.() : onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <X className="w-5 h-5" />
+        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+          <h3 className="text-lg font-bold text-carefd-navy">
+            {step === "confirm" ? "אישור השלמת שירות" : step === "success" ? "השירות הושלם" : "כתיבת ביקורת"}
+          </h3>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition">
+            <X className="w-5 h-5 text-carefd-gray" />
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
-          {error && (
-            <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm">
-              {error}
+        <div className="p-6">
+          {step === "confirm" && (
+            <div className="space-y-4">
+              <div className="bg-carefd-teal-pale/20 rounded-xl p-4">
+                <p className="font-medium text-carefd-navy">{serviceName}</p>
+                <p className="text-sm text-carefd-gray">ספק: {providerName}</p>
+              </div>
+              <p className="text-sm text-carefd-gray">
+                בלחיצה על &quot;אשר השלמה&quot; אתה מאשר שהשירות בוצע כצפוי.
+              </p>
+              <div>
+                <label className="block text-sm font-medium text-carefd-navy mb-2">הערות (אופציונלי)</label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-carefd-teal outline-none text-sm resize-none"
+                  placeholder="הוסף הערות לגבי השירות..."
+                />
+              </div>
+              <div className="flex gap-3">
+                <Button onClick={handleConfirm} disabled={loading} className="flex-1">
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin me-2" /> : <CheckCircle className="w-4 h-4 me-2" />}
+                  אשר השלמה
+                </Button>
+                <Button variant="outline" onClick={onClose}>ביטול</Button>
+              </div>
             </div>
           )}
 
-          {step === 1 && (
-            <>
-              {/* Booking Info */}
-              <div className="bg-teal-50 p-4 rounded-lg">
-                <p className="font-medium text-teal-900">{booking.service_name}</p>
-                <p className="text-sm text-teal-700">{booking.provider_name}</p>
-                <p className="text-xs text-teal-600 mt-1">
-                  {booking.booking_date ? new Date(booking.booking_date).toLocaleDateString('he-IL') : ''}
-                </p>
+          {step === "success" && (
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                <CheckCircle className="w-8 h-8 text-green-600" />
               </div>
-
-              {/* Payment Recording */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <DollarSign className="w-5 h-5 text-green-600" />
-                  רישום תשלום
-                </h3>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    כמה שילמת עבור השירות?
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      value={paymentData.final_price}
-                      onChange={(e) => setPaymentData(prev => ({ ...prev, final_price: e.target.value }))}
-                      placeholder="0"
-                      className="w-full px-4 py-2 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                      dir="ltr"
-                    />
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                      ₪
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    הערות לתשלום (אופציונלי)
-                  </label>
-                  <input
-                    type="text"
-                    value={paymentData.payment_notes}
-                    onChange={(e) => setPaymentData(prev => ({ ...prev, payment_notes: e.target.value }))}
-                    placeholder="למשל: שולם במזומן, קיבלתי קבלה..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              <button
-                onClick={handleConfirmCompletion}
-                disabled={loading}
-                className="w-full px-6 py-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors font-medium disabled:opacity-50"
-                data-testid="confirm-completion-btn"
-              >
-                {loading ? 'מאשר...' : 'אשר השלמת השירות'}
-              </button>
-            </>
-          )}
-
-          {step === 2 && (
-            <>
-              {/* Success confirmation */}
-              <div className="text-center py-4">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="w-10 h-10 text-green-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">ההזמנה הושלמה בהצלחה!</h3>
-                <p className="text-gray-600 mb-1">
-                  השירות <span className="font-medium">{booking.service_name}</span> סומן כהושלם.
-                </p>
-                <p className="text-sm text-gray-500">
-                  תרצה לדרג את השירות שקיבלת?
-                </p>
-              </div>
-
+              <h4 className="text-xl font-bold text-carefd-navy">השירות אושר בהצלחה!</h4>
+              <p className="text-carefd-gray">תודה על האישור. תרצה לכתוב ביקורת?</p>
               <div className="flex gap-3">
-                <button
-                  onClick={() => onSuccess?.()}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
-                >
-                  לא תודה
-                </button>
-                <button
-                  onClick={() => setStep(3)}
-                  className="flex-1 px-6 py-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors font-medium"
-                  data-testid="go-to-review-btn"
-                >
-                  דרג את השירות
-                </button>
+                <Button onClick={() => setStep("review")} className="flex-1">
+                  <Star className="w-4 h-4 me-2" />
+                  כתוב ביקורת
+                </Button>
+                <Button variant="outline" onClick={onClose}>לא עכשיו</Button>
               </div>
-            </>
+            </div>
           )}
 
-          {step === 3 && (
-            <>
-              {/* Rating */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900">דרג את השירות</h3>
-                
-                {/* Main Rating */}
-                <div className="flex items-center justify-center gap-2 py-4">
-                  {[1, 2, 3, 4, 5].map(star => (
+          {step === "review" && (
+            <div className="space-y-5">
+              {/* Main Rating */}
+              <div className="text-center">
+                <p className="text-sm font-medium text-carefd-navy mb-2">דירוג כללי</p>
+                <div className="flex items-center justify-center gap-1">
+                  {[1, 2, 3, 4, 5].map((i) => (
                     <button
-                      key={star}
-                      type="button"
-                      onClick={() => setReviewData(prev => ({ ...prev, rating: star }))}
-                      className="p-1"
+                      key={i}
+                      onMouseEnter={() => setHoverRating(i)}
+                      onMouseLeave={() => setHoverRating(0)}
+                      onClick={() => setRating(i)}
                     >
-                      <Star
-                        className={`w-10 h-10 ${star <= reviewData.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
-                      />
+                      <Star className={`w-8 h-8 transition-colors ${
+                        i <= (hoverRating || rating) ? "text-yellow-400 fill-yellow-400" : "text-gray-200"
+                      }`} />
                     </button>
                   ))}
                 </div>
-                
-                {/* Detailed Ratings */}
-                <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
-                  <RatingStars
-                    label="איכות השירות"
-                    value={reviewData.service_quality}
-                    onChange={(v) => setReviewData(prev => ({ ...prev, service_quality: v }))}
-                  />
-                  <RatingStars
-                    label="דייקנות"
-                    value={reviewData.punctuality}
-                    onChange={(v) => setReviewData(prev => ({ ...prev, punctuality: v }))}
-                  />
-                  <RatingStars
-                    label="תקשורת"
-                    value={reviewData.communication}
-                    onChange={(v) => setReviewData(prev => ({ ...prev, communication: v }))}
-                  />
-                  <RatingStars
-                    label="תמורה למחיר"
-                    value={reviewData.price_value}
-                    onChange={(v) => setReviewData(prev => ({ ...prev, price_value: v }))}
-                  />
-                </div>
+              </div>
+
+              {/* Detailed Ratings */}
+              <div className="space-y-3">
+                {detailedLabels.map(({ key, label }) => (
+                  <div key={key} className="flex items-center justify-between">
+                    <span className="text-sm text-carefd-navy">{label}</span>
+                    <div className="flex gap-0.5">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <button key={i} onClick={() => setDetailedRatings((p) => ({ ...p, [key]: i }))}>
+                          <Star className={`w-5 h-5 transition-colors ${
+                            i <= detailedRatings[key] ? "text-yellow-400 fill-yellow-400" : "text-gray-200"
+                          }`} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
 
               {/* Comment */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  ספר על החוויה שלך
+                <label className="block text-sm font-medium text-carefd-navy mb-2">
+                  <MessageSquare className="w-4 h-4 inline me-1" />
+                  ביקורת מילולית
                 </label>
                 <textarea
-                  value={reviewData.comment}
-                  onChange={(e) => setReviewData(prev => ({ ...prev, comment: e.target.value }))}
-                  rows={4}
-                  placeholder="מה אהבת? מה היה פחות טוב? האם תמליץ?"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent resize-none"
-                  data-testid="review-comment-input"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-carefd-teal outline-none text-sm resize-none"
+                  placeholder="ספרו על החוויה שלכם..."
                 />
               </div>
 
-              {/* Would Recommend */}
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-700">האם תמליץ על ספק זה?</span>
-                <div className="flex gap-2">
+              {/* Recommendation */}
+              <div>
+                <p className="text-sm font-medium text-carefd-navy mb-2">ממליץ על ספק זה?</p>
+                <div className="flex gap-3">
                   <button
-                    type="button"
-                    onClick={() => setReviewData(prev => ({ ...prev, would_recommend: true }))}
-                    className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors ${
-                      reviewData.would_recommend 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-gray-100 text-gray-500'
+                    onClick={() => setRecommend(true)}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-medium transition ${
+                      recommend === true ? "bg-green-100 text-green-700 border-2 border-green-300" : "bg-gray-50 text-carefd-gray border-2 border-transparent"
                     }`}
                   >
-                    <ThumbsUp className="w-4 h-4" />
+                    <ThumbsUp className="w-5 h-5" />
                     כן
                   </button>
                   <button
-                    type="button"
-                    onClick={() => setReviewData(prev => ({ ...prev, would_recommend: false }))}
-                    className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors ${
-                      !reviewData.would_recommend 
-                        ? 'bg-red-100 text-red-700' 
-                        : 'bg-gray-100 text-gray-500'
+                    onClick={() => setRecommend(false)}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-medium transition ${
+                      recommend === false ? "bg-red-100 text-red-700 border-2 border-red-300" : "bg-gray-50 text-carefd-gray border-2 border-transparent"
                     }`}
                   >
-                    <ThumbsDown className="w-4 h-4" />
+                    <ThumbsDown className="w-5 h-5" />
                     לא
                   </button>
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-4">
-                <button
-                  onClick={handleSkipReview}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
-                >
-                  דלג
-                </button>
-                <button
-                  onClick={handleSubmitReview}
-                  disabled={loading || !reviewData.comment.trim()}
-                  className="flex-1 px-6 py-3 bg-teal-600 text-white rounded-xl hover:bg-teal-700 transition-colors font-medium disabled:opacity-50"
-                  data-testid="submit-review-btn"
-                >
-                  {loading ? 'שולח...' : 'שלח ביקורת'}
-                </button>
-              </div>
-            </>
+              <Button onClick={handleSubmitReview} disabled={loading} className="w-full">
+                {loading ? <Loader2 className="w-4 h-4 animate-spin me-2" /> : <Star className="w-4 h-4 me-2" />}
+                שלח ביקורת
+              </Button>
+            </div>
           )}
         </div>
       </div>
     </div>
   );
-};
-
-export default CompletionConfirmDialog;
+}

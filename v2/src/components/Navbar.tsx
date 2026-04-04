@@ -4,8 +4,9 @@ import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { useNotifications } from "@/context/NotificationContext";
+// import { useNotifications } from "@/context/NotificationContext";
 import NotificationBell from "@/components/NotificationBell";
+import api from "@/lib/api-client";
 import {
   Search, Menu, X, MessageCircle, User, Settings,
   LogOut, LayoutDashboard, ChevronDown,
@@ -18,6 +19,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [unreadChats, setUnreadChats] = useState(0);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,6 +31,25 @@ export default function Navbar() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Poll for unread chat count
+  useEffect(() => {
+    if (!user) return;
+    const fetchUnread = () => {
+      api.get("/chat/rooms")
+        .then((d: any) => {
+          const rooms = d.rooms || d || [];
+          if (Array.isArray(rooms)) {
+            const count = rooms.reduce((sum: number, r: any) => sum + (r.unread_count || 0), 0);
+            setUnreadChats(count);
+          }
+        })
+        .catch(() => {});
+    };
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   const handleLogout = () => {
     setProfileDropdownOpen(false);
@@ -94,10 +115,15 @@ export default function Navbar() {
               <Search className="w-5 h-5" />
             </button>
 
-            {/* Chat Messages Icon */}
+            {/* Chat Messages Icon with unread badge */}
             {user && (
               <Link href="/chats" className="relative p-2.5 rounded-lg hover:bg-carefd-teal-pale/30 text-carefd-slate hover:text-carefd-teal transition-colors">
                 <MessageCircle className="w-5 h-5" />
+                {unreadChats > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                    {unreadChats > 9 ? "9+" : unreadChats}
+                  </span>
+                )}
               </Link>
             )}
 
@@ -113,9 +139,13 @@ export default function Navbar() {
                     className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl hover:bg-carefd-teal-pale/30 transition-colors"
                     data-testid="profile-dropdown-btn"
                   >
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-carefd-teal to-carefd-navy flex items-center justify-center text-white text-sm font-bold">
-                      {getUserInitials()}
-                    </div>
+                    {user?.picture ? (
+                      <img src={user.picture} alt="" className="w-9 h-9 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-carefd-teal to-carefd-navy flex items-center justify-center text-white text-sm font-bold">
+                        {getUserInitials()}
+                      </div>
+                    )}
                     <div className="text-right hidden lg:block">
                       <span className="text-sm font-medium text-carefd-navy leading-tight block">
                         שלום, {user?.name?.split(" ")[0] || "משתמש"}
@@ -133,9 +163,13 @@ export default function Navbar() {
                       {/* User info header */}
                       <div className="px-4 py-3 border-b border-gray-100">
                         <div className="flex items-center gap-3">
-                          <div className="w-11 h-11 rounded-full bg-gradient-to-br from-carefd-teal to-carefd-navy flex items-center justify-center text-white font-bold">
-                            {getUserInitials()}
-                          </div>
+                          {user?.picture ? (
+                            <img src={user.picture} alt="" className="w-11 h-11 rounded-full object-cover" />
+                          ) : (
+                            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-carefd-teal to-carefd-navy flex items-center justify-center text-white font-bold">
+                              {getUserInitials()}
+                            </div>
+                          )}
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-carefd-navy text-sm truncate">{user?.name}</p>
                             <p className="text-xs text-carefd-gray truncate">{user?.email}</p>
@@ -154,7 +188,7 @@ export default function Navbar() {
                           <User className="w-4 h-4 text-carefd-gray" />
                           <span>הפרופיל שלי</span>
                         </Link>
-                        <Link href="/dashboard?tab=settings" onClick={() => setProfileDropdownOpen(false)}
+                        <Link href="/profile" onClick={() => setProfileDropdownOpen(false)}
                           className="flex items-center gap-3 px-4 py-2.5 text-sm text-carefd-slate hover:bg-carefd-teal-pale/30 hover:text-carefd-teal transition-colors">
                           <Settings className="w-4 h-4 text-carefd-gray" />
                           <span>הגדרות</span>

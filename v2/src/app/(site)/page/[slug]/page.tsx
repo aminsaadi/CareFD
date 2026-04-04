@@ -2,19 +2,26 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import DOMPurify from "dompurify";
 import api from "@/lib/api-client";
 import { Skeleton } from "@/components/ui/skeleton";
 
+interface PageData {
+  title: string;
+  content: string;
+  slug: string;
+}
+
 export default function GenericPage() {
   const { slug } = useParams();
-  const [page, setPage] = useState<{ title: string; content: string } | null>(null);
+  const [page, setPage] = useState<PageData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!slug) return;
-    api.get<any>(`/admin/content/pages`).then((d: any) => {
-      const found = d.pages?.find((p: any) => p.slug === slug);
-      if (found) setPage(found);
+    api.get<{ pages: PageData[] }>("/admin/content/pages").then((d) => {
+      const found = d.pages?.find((p) => p.slug === slug);
+      if (found) setPage({ ...found, content: DOMPurify.sanitize(found.content) });
     }).catch(() => {}).finally(() => setLoading(false));
   }, [slug]);
 

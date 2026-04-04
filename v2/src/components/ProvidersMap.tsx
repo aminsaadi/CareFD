@@ -1,208 +1,181 @@
 "use client";
 
-import React, { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { useEffect, useRef, useState } from "react";
+import { MapPin, Star } from "lucide-react";
 
-// Custom SVG provider marker (teal)
-const createProviderIcon = () => {
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="50" viewBox="0 0 40 50">
-      <defs>
-        <filter id="pshadow" x="-20%" y="-10%" width="140%" height="130%">
-          <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.25"/>
-        </filter>
-      </defs>
-      <path d="M20 0C9 0 0 9 0 20c0 14 20 30 20 30s20-16 20-30C40 9 31 0 20 0z"
-            fill="#0d9488" filter="url(#pshadow)"/>
-      <circle cx="20" cy="18" r="6" fill="none" stroke="#fff" stroke-width="2"/>
-      <path d="M20 24c-5 0-9 2.5-9 5.5V31h18v-1.5C29 26.5 25 24 20 24z"
-            fill="#fff" opacity="0.9"/>
-      <circle cx="20" cy="18" r="4.5" fill="#fff" opacity="0.9"/>
-    </svg>`;
-  return new L.DivIcon({
-    html: svg,
-    className: 'custom-map-marker',
-    iconSize: [40, 50],
-    iconAnchor: [20, 50],
-    popupAnchor: [0, -50],
-  });
-};
+interface MapProvider {
+  provider_id: string;
+  business_name?: string | null;
+  profession_name?: string | null;
+  profession_title?: string | null;
+  profile_image?: string | null;
+  rating?: number;
+  total_reviews?: number;
+  distance_km?: number | null;
+  location?: { city?: string; latitude?: number; longitude?: number } | null;
+}
 
-// Custom SVG user location marker (blue pulse)
-const createUserIcon = () => {
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
-      <circle cx="20" cy="20" r="18" fill="#3b82f6" opacity="0.15">
-        <animate attributeName="r" values="14;18;14" dur="2s" repeatCount="indefinite"/>
-        <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite"/>
-      </circle>
-      <circle cx="20" cy="20" r="10" fill="#3b82f6" opacity="0.2"/>
-      <circle cx="20" cy="20" r="7" fill="#fff" stroke="#3b82f6" stroke-width="3"/>
-      <circle cx="20" cy="20" r="3.5" fill="#3b82f6"/>
-    </svg>`;
-  return new L.DivIcon({
-    html: svg,
-    className: 'custom-map-marker',
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
-    popupAnchor: [0, -20],
-  });
-};
+interface ProvidersMapProps {
+  providers: MapProvider[];
+  userLocation?: { lat: number; lng: number } | null;
+  radiusKm?: number | null;
+  onProviderClick?: (provider: MapProvider) => void;
+  height?: string;
+  className?: string;
+}
 
-const providerIcon = createProviderIcon();
-const userIcon = createUserIcon();
-
-// Component to fit bounds when providers change
-const FitBounds = ({ providers, userLocation }) => {
-  const map = useMap();
+export default function ProvidersMap({
+  providers,
+  userLocation,
+  radiusKm,
+  onProviderClick,
+  height = "500px",
+  className = "",
+}: ProvidersMapProps) {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
-    if (providers.length === 0 && !userLocation) return;
+    if (!mapRef.current || mapInstanceRef.current) return;
 
-    const bounds: any[] = [];
+    // Dynamically import Leaflet
+    const loadMap = async () => {
+      const L = (await import("leaflet")).default;
+      // CSS loaded via link tag below
 
-    if (userLocation) {
-      bounds.push([userLocation.lat, userLocation.lng]);
-    }
+      const map = L.map(mapRef.current!, {
+        center: userLocation ? [userLocation.lat, userLocation.lng] : [31.77, 35.23],
+        zoom: userLocation ? 12 : 8,
+        zoomControl: true,
+      });
 
-    providers.forEach(p => {
-      if (p.location?.coordinates?.lat && p.location?.coordinates?.lng) {
-        bounds.push([p.location.coordinates.lat, p.location.coordinates.lng]);
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      }).addTo(map);
+
+      mapInstanceRef.current = map;
+      setMapLoaded(true);
+    };
+
+    loadMap();
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
       }
-    });
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    if (bounds.length > 0) {
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 13 });
-    }
-  }, [providers, userLocation, map]);
+  // Update markers when providers change
+  useEffect(() => {
+    if (!mapInstanceRef.current || !mapLoaded) return;
 
-  return null;
-};
+    const loadMarkers = async () => {
+      const L = (await import("leaflet")).default;
+      const map = mapInstanceRef.current;
 
-const ProvidersMap = ({
-  providers = [],
-  userLocation = null,
-  radiusKm = null,
-  onProviderClick = null,
-  height = '400px',
-  className = ''
-}: any) => {
-  // Default center - Israel
-  const defaultCenter: [number, number] = [31.7683, 35.2137]; // Jerusalem
+      // Clear existing markers
+      map.eachLayer((layer: any) => {
+        if (layer instanceof L.Marker || layer instanceof L.Circle) {
+          map.removeLayer(layer);
+        }
+      });
 
-  // Filter providers with valid coordinates
-  const validProviders = providers.filter(
-    p => p.location?.coordinates?.lat && p.location?.coordinates?.lng
-  );
+      // User location marker
+      if (userLocation) {
+        const userIcon = L.divIcon({
+          className: "custom-marker",
+          html: `<div style="width:16px;height:16px;background:#3b82f6;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(59,130,246,0.5);animation:pulse 2s infinite"></div>`,
+          iconSize: [16, 16],
+          iconAnchor: [8, 8],
+        });
+        L.marker([userLocation.lat, userLocation.lng], { icon: userIcon }).addTo(map);
+
+        if (radiusKm) {
+          L.circle([userLocation.lat, userLocation.lng], {
+            radius: radiusKm * 1000,
+            color: "#3b82f6",
+            fillColor: "#3b82f6",
+            fillOpacity: 0.08,
+            weight: 2,
+            dashArray: "6 4",
+          }).addTo(map);
+        }
+      }
+
+      // Provider markers
+      const bounds = L.latLngBounds([]);
+      let hasMarkers = false;
+
+      providers.forEach((provider) => {
+        const lat = provider.location?.latitude;
+        const lng = provider.location?.longitude;
+        if (!lat || !lng) return;
+
+        hasMarkers = true;
+        bounds.extend([lat, lng]);
+
+        const providerIcon = L.divIcon({
+          className: "custom-marker",
+          html: `<div style="width:32px;height:32px;background:linear-gradient(135deg,#14b8a6,#0d9488);border:2px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(20,184,166,0.4);display:flex;align-items:center;justify-content:center">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3" fill="#0d9488"/></svg>
+          </div>`,
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+        });
+
+        const marker = L.marker([lat, lng], { icon: providerIcon }).addTo(map);
+
+        const popupContent = `
+          <div style="min-width:180px;font-family:inherit;direction:rtl;text-align:right">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              ${provider.profile_image
+                ? `<img src="${provider.profile_image}" style="width:40px;height:40px;border-radius:50%;object-fit:cover" />`
+                : `<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#14b8a6,#0d9488);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:16px">${(provider.business_name || "?")[0]}</div>`
+              }
+              <div>
+                <div style="font-weight:600;color:#1e293b">${provider.business_name || "ספק"}</div>
+                <div style="font-size:12px;color:#64748b">${provider.profession_name || provider.profession_title || ""}</div>
+              </div>
+            </div>
+            ${provider.rating ? `<div style="font-size:12px;color:#f59e0b;margin-bottom:4px">⭐ ${Number(provider.rating).toFixed(1)} (${provider.total_reviews || 0})</div>` : ""}
+            ${provider.distance_km != null ? `<div style="font-size:12px;color:#3b82f6">📍 ${provider.distance_km} ק"מ</div>` : ""}
+            <a href="/providers/${provider.provider_id}" style="display:block;margin-top:8px;text-align:center;padding:6px;background:#14b8a6;color:white;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500">צפה בפרופיל</a>
+          </div>
+        `;
+
+        marker.bindPopup(popupContent, { maxWidth: 250 });
+
+        marker.on("click", () => {
+          if (onProviderClick) onProviderClick(provider);
+        });
+      });
+
+      if (userLocation) bounds.extend([userLocation.lat, userLocation.lng]);
+
+      if (hasMarkers) {
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+      } else if (userLocation) {
+        map.setView([userLocation.lat, userLocation.lng], 12);
+      }
+    };
+
+    loadMarkers();
+  }, [providers, userLocation, radiusKm, mapLoaded, onProviderClick]);
 
   return (
-    <div className={`rounded-xl overflow-hidden border border-gray-200 shadow-sm ${className}`} style={{ height }}>
-      <style>{`
-        .custom-map-marker {
-          background: none !important;
-          border: none !important;
-        }
-      `}</style>
-      <MapContainer
-        center={userLocation ? [userLocation.lat, userLocation.lng] : defaultCenter}
-        zoom={10}
-        style={{ height: '100%', width: '100%' }}
-        scrollWheelZoom={true}
-      >
-        <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
-        />
-
-        <FitBounds providers={validProviders} userLocation={userLocation} />
-
-        {/* User location marker */}
-        {userLocation && (
-          <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
-            <Popup>
-              <div className="text-center" dir="rtl">
-                <strong>📍 המיקום שלך</strong>
-              </div>
-            </Popup>
-          </Marker>
-        )}
-
-        {/* Search radius circle */}
-        {userLocation && radiusKm && (
-          <Circle
-            center={[userLocation.lat, userLocation.lng]}
-            radius={radiusKm * 1000}
-            pathOptions={{
-              color: '#3b82f6',
-              fillColor: '#3b82f6',
-              fillOpacity: 0.06,
-              weight: 2,
-              dashArray: '8, 4',
-            }}
-          />
-        )}
-
-        {/* Provider markers */}
-        {validProviders.map((provider) => (
-          <Marker
-            key={provider.provider_id}
-            position={[provider.location.coordinates.lat, provider.location.coordinates.lng]}
-            icon={providerIcon}
-            eventHandlers={{
-              click: () => onProviderClick && onProviderClick(provider)
-            }}
-          >
-            <Popup>
-              <div className="min-w-[200px]" dir="rtl">
-                <div className="flex items-center gap-2 mb-2">
-                  {provider.profile_image ? (
-                    <img
-                      src={provider.profile_image}
-                      alt={provider.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-carefd-teal/20 flex items-center justify-center text-carefd-teal font-bold">
-                      {provider.name?.charAt(0)}
-                    </div>
-                  )}
-                  <div>
-                    <strong className="text-carefd-navy">{provider.name}</strong>
-                    <p className="text-xs text-carefd-slate">{provider.profession_name || provider.profession}</p>
-                  </div>
-                </div>
-
-                <div className="text-sm space-y-1">
-                  {provider.location?.city && (
-                    <p className="text-carefd-slate">📍 {provider.location.city}</p>
-                  )}
-                  {provider.distance_km != null && (
-                    <p className="text-carefd-teal font-medium">
-                      🚗 {provider.distance_km} ק״מ ממך
-                    </p>
-                  )}
-                  {provider.rating != null && provider.rating > 0 && (
-                    <p className="text-amber-500">
-                      ⭐ {Number(provider.rating).toFixed(1)} ({provider.total_reviews || 0} ביקורות)
-                    </p>
-                  )}
-                </div>
-
-                <a
-                  href={`/providers/${provider.provider_id}`}
-                  className="block mt-3 text-center bg-carefd-teal text-white py-1.5 px-3 rounded-lg text-sm font-medium hover:bg-carefd-teal/90 transition"
-                >
-                  צפה בפרופיל
-                </a>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+    <div className={`relative rounded-xl overflow-hidden ${className}`} style={{ height }}>
+      {/* eslint-disable-next-line @next/next/no-css-tags */}
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+      <div ref={mapRef} className="w-full h-full" />
+      {!mapLoaded && (
+        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-carefd-teal border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
     </div>
   );
-};
-
-export default ProvidersMap;
+}

@@ -1,195 +1,147 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { FiBell, FiBellOff, FiCheck, FiX, FiAlertCircle } from 'react-icons/fi';
-import usePushNotifications from '@/hooks/usePushNotifications';
-import api from '@/lib/api-client';
+import { useState, useEffect } from "react";
+import api from "@/lib/api-client";
+import { Card } from "@/components/ui/card";
+import { Bell, Check, Loader2, CalendarDays, MessageCircle, Shield, Megaphone, Settings, AlertCircle } from "lucide-react";
 
-const NotificationSettings = () => {
-  const {
-    isSupported,
-    isSubscribed,
-    permission,
-    loading,
-    error,
-    subscribe,
-    unsubscribe
-  } = usePushNotifications();
-  
-  const [preferences, setPreferences] = useState({
-    new_booking: true,
-    booking_confirmed: true,
-    booking_cancelled: true,
-    new_message: true,
-    provider_verified: true,
-    system_updates: true,
-    marketing: false
-  });
-  const [savingPrefs, setSavingPrefs] = useState(false);
-  const [prefsSaved, setPrefsSaved] = useState(false);
+interface NotificationPreferences {
+  new_booking: boolean;
+  booking_confirmation: boolean;
+  new_message: boolean;
+  verification_update: boolean;
+  system_updates: boolean;
+  marketing: boolean;
+}
+
+const defaultPrefs: NotificationPreferences = {
+  new_booking: true,
+  booking_confirmation: true,
+  new_message: true,
+  verification_update: true,
+  system_updates: true,
+  marketing: false,
+};
+
+const prefConfig: { key: keyof NotificationPreferences; label: string; description: string; icon: typeof Bell }[] = [
+  { key: "new_booking", label: "הזמנה חדשה", description: "התראה כאשר מתקבלת הזמנה חדשה", icon: CalendarDays },
+  { key: "booking_confirmation", label: "אישור הזמנה", description: "כאשר הזמנה מאושרת או נדחית", icon: Check },
+  { key: "new_message", label: "הודעה חדשה", description: "כאשר מתקבלת הודעת צ׳אט חדשה", icon: MessageCircle },
+  { key: "verification_update", label: "עדכון אימות", description: "עדכונים על סטטוס אימות החשבון", icon: Shield },
+  { key: "system_updates", label: "עדכוני מערכת", description: "עדכונים טכניים ושדרוגים", icon: Settings },
+  { key: "marketing", label: "עדכונים שיווקיים", description: "מבצעים, טיפים וחדשות", icon: Megaphone },
+];
+
+export default function NotificationSettings() {
+  const [preferences, setPreferences] = useState<NotificationPreferences>(defaultPrefs);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState<string | null>(null);
+  const [pushSupported, setPushSupported] = useState(true);
+  const [pushEnabled, setPushEnabled] = useState(false);
 
   useEffect(() => {
-    fetchPreferences();
+    if (!("Notification" in window) || !("serviceWorker" in navigator)) {
+      setPushSupported(false);
+    } else {
+      setPushEnabled(Notification.permission === "granted");
+    }
+
+    api.get<{ preferences: NotificationPreferences }>("/push/preferences")
+      .then((data) => {
+        if (data.preferences) setPreferences(data.preferences);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  const fetchPreferences = async () => {
+  const togglePreference = async (key: keyof NotificationPreferences) => {
+    const updated = { ...preferences, [key]: !preferences[key] };
+    setPreferences(updated);
+    setSaving(key);
     try {
-      const { data } = await api.get('/push/preferences');
-      setPreferences(prev => ({ ...prev, ...data }));
-    } catch (err: any) {
-      console.error('Failed to fetch preferences:', err);
-    }
-  };
-
-  const savePreferences = async (newPrefs) => {
-    setSavingPrefs(true);
-    setPrefsSaved(false);
-    try {
-      await api.put('/push/preferences', newPrefs);
-      setPrefsSaved(true);
-      setTimeout(() => setPrefsSaved(false), 2000);
-    } catch (err: any) {
-      console.error('Failed to save preferences:', err);
+      await api.put("/push/preferences", updated);
+    } catch {
+      setPreferences(preferences);
     } finally {
-      setSavingPrefs(false);
+      setTimeout(() => setSaving(null), 500);
     }
   };
 
-  const togglePreference = (key) => {
-    const newPrefs = { ...preferences, [key]: !preferences[key] };
-    setPreferences(newPrefs);
-    savePreferences(newPrefs);
-  };
-
-  const handleSubscriptionToggle = async () => {
-    if (isSubscribed) {
-      await unsubscribe();
-    } else {
-      await subscribe();
-    }
-  };
-
-  const preferenceLabels = {
-    new_booking: { label: 'הזמנה חדשה', desc: 'קבלו התראה כשמישהו מזמין את השירותים שלכם' },
-    booking_confirmed: { label: 'אישור הזמנה', desc: 'קבלו התראה כשהזמנה מאושרת' },
-    booking_cancelled: { label: 'ביטול הזמנה', desc: 'קבלו התראה כשהזמנה מבוטלת' },
-    new_message: { label: 'הודעה חדשה', desc: 'קבלו התראה על הודעות צ\'אט חדשות' },
-    provider_verified: { label: 'אימות ספק', desc: 'קבלו התראה כשהחשבון שלכם מאומת' },
-    system_updates: { label: 'עדכוני מערכת', desc: 'קבלו עדכונים חשובים על המערכת' },
-    marketing: { label: 'שיווק ומבצעים', desc: 'קבלו התראות על מבצעים ותכנים חדשים' }
+  const requestPush = async () => {
+    try {
+      const permission = await Notification.requestPermission();
+      setPushEnabled(permission === "granted");
+    } catch {}
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6" dir="rtl">
-      <h2 className="text-xl font-bold text-carefd-navy mb-4 flex items-center gap-2">
-        <FiBell className="text-carefd-teal" />
+    <Card className="p-6">
+      <h3 className="text-xl font-bold text-carefd-navy mb-2 flex items-center gap-2">
+        <Bell className="w-5 h-5 text-carefd-teal" />
         הגדרות התראות
-      </h2>
+      </h3>
+      <p className="text-sm text-carefd-gray mb-6">בחרו אילו התראות תרצו לקבל</p>
 
-      {/* Push Notifications Status */}
-      <div className="mb-6 p-4 bg-gray-50 rounded-xl">
-        <div className="flex items-center justify-between">
+      {/* Push notification status */}
+      {!pushSupported ? (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="font-semibold text-carefd-navy">התראות Push</h3>
-            <p className="text-sm text-carefd-gray">
-              {!isSupported ? (
-                'הדפדפן שלך לא תומך בהתראות Push'
-              ) : permission === 'denied' ? (
-                'ההתראות חסומות - אנא שנו בהגדרות הדפדפן'
-              ) : isSubscribed ? (
-                'התראות מופעלות - תקבלו התראות בזמן אמת'
-              ) : (
-                'התראות כבויות - הפעילו כדי לקבל עדכונים בזמן אמת'
-              )}
-            </p>
+            <p className="text-sm font-medium text-amber-800">הדפדפן שלך לא תומך בהתראות Push</p>
+            <p className="text-xs text-amber-600 mt-1">נסו דפדפן אחר או בדקו את ההגדרות</p>
           </div>
-          
-          <button
-            onClick={handleSubscriptionToggle}
-            disabled={!isSupported || permission === 'denied' || loading}
-            className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
-              isSubscribed
-                ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                : 'bg-carefd-teal text-white hover:bg-carefd-teal-medium'
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
-            {loading ? (
-              <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            ) : isSubscribed ? (
-              <>
-                <FiBellOff />
-                כבה התראות
-              </>
-            ) : (
-              <>
-                <FiBell />
-                הפעל התראות
-              </>
-            )}
-          </button>
         </div>
-
-        {error && (
-          <div className="mt-3 p-3 bg-red-50 text-red-600 rounded-lg flex items-center gap-2">
-            <FiAlertCircle />
-            {error}
-          </div>
-        )}
-
-        {!isSupported && (
-          <div className="mt-3 p-3 bg-amber-50 text-amber-700 rounded-lg flex items-center gap-2 text-sm">
-            <FiAlertCircle className="flex-shrink-0" />
-            <div>
-              <p className="font-medium">הדפדפן לא תומך בהתראות Push</p>
-              <p className="mt-1">
-                {/iPad|iPhone|iPod/.test(navigator.userAgent) 
-                  ? 'ב-Safari באייפון: לחצו על כפתור השיתוף ← "הוסף למסך הבית" ← פתחו את האפליקציה משם כדי לקבל התראות'
-                  : 'נסו להשתמש ב-Chrome, Firefox או Safari עדכני'
-                }
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Notification Preferences */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold text-carefd-navy">סוגי התראות</h3>
-          {prefsSaved && (
-            <span className="text-sm text-emerald-500 flex items-center gap-1">
-              <FiCheck /> נשמר
-            </span>
-          )}
+      ) : !pushEnabled ? (
+        <button
+          onClick={requestPush}
+          className="w-full mb-6 flex items-center justify-center gap-2 py-3 bg-carefd-teal-pale/30 rounded-xl text-sm font-medium text-carefd-navy hover:bg-carefd-teal-pale transition"
+        >
+          <Bell className="w-4 h-4 text-carefd-teal" />
+          הפעל התראות Push
+        </button>
+      ) : (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-6 flex items-center gap-2">
+          <Check className="w-4 h-4 text-green-600" />
+          <span className="text-sm text-green-700 font-medium">התראות Push מופעלות</span>
         </div>
+      )}
 
-        {Object.entries(preferenceLabels).map(([key, { label, desc }]) => (
-          <div
-            key={key}
-            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
-          >
-            <div>
-              <p className="font-medium text-carefd-navy">{label}</p>
-              <p className="text-sm text-carefd-gray">{desc}</p>
-            </div>
-            <button
-              onClick={() => togglePreference(key)}
-              disabled={savingPrefs}
-              className={`relative w-12 h-6 rounded-full transition-colors ${
-                preferences[key] ? 'bg-carefd-teal' : 'bg-gray-300'
-              }`}
+      {loading ? (
+        <div className="flex justify-center py-8">
+          <Loader2 className="w-6 h-6 animate-spin text-carefd-teal" />
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {prefConfig.map(({ key, label, description, icon: Icon }) => (
+            <div
+              key={key}
+              className="flex items-center justify-between p-3 rounded-xl hover:bg-carefd-teal-pale/10 transition"
             >
-              <span
-                className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                  preferences[key] ? 'right-0.5' : 'right-6'
+              <div className="flex items-center gap-3">
+                <Icon className="w-4 h-4 text-carefd-teal" />
+                <div>
+                  <p className="text-sm font-medium text-carefd-navy">{label}</p>
+                  <p className="text-xs text-carefd-gray">{description}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => togglePreference(key)}
+                className={`relative w-12 h-7 rounded-full transition-colors ${
+                  preferences[key] ? "bg-carefd-teal" : "bg-gray-200"
                 }`}
-              />
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
+              >
+                <div className={`absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                  preferences[key] ? "start-1" : "start-6"
+                }`}>
+                  {saving === key && (
+                    <Loader2 className="w-3 h-3 animate-spin absolute top-1 start-1 text-carefd-teal" />
+                  )}
+                </div>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
   );
-};
-
-export default NotificationSettings;
+}

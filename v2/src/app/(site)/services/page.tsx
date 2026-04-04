@@ -2,13 +2,12 @@
 
 import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 import api from "@/lib/api-client";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import AdvancedSearch from "@/components/AdvancedSearch";
-import { Search, ChevronLeft } from "lucide-react";
+import ServiceCard from "@/components/ServiceCard";
+import { Search } from "lucide-react";
 import type { Service } from "@/lib/types";
 
 export default function ServicesPage() {
@@ -63,28 +62,7 @@ function ServicesContent() {
         <>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {services.map((s) => (
-              <Card key={s.service_id} className="p-6 hover-lift group" data-testid={`service-${s.service_id}`}>
-                <h3 className="font-heading font-semibold text-lg text-carefd-navy mb-2 group-hover:text-carefd-teal transition-colors">
-                  {s.name}
-                </h3>
-                {s.description && (
-                  <p className="text-sm text-slate-500 mb-4 line-clamp-2 leading-relaxed">{s.description}</p>
-                )}
-                <div className="flex justify-between items-center">
-                  <div>
-                    <span className="text-xl font-heading font-bold text-carefd-navy">{"\u20AA"}{s.price}</span>
-                    {s.provider && (
-                      <p className="text-xs text-slate-400 mt-0.5">{s.provider.business_name}</p>
-                    )}
-                  </div>
-                  <Button size="sm" asChild>
-                    <Link href={`/book/${s.service_id}`}>
-                      הזמינו
-                      <ChevronLeft className="w-3 h-3 ms-1" />
-                    </Link>
-                  </Button>
-                </div>
-              </Card>
+              <ServiceCard key={s.service_id} service={s} />
             ))}
           </div>
 
