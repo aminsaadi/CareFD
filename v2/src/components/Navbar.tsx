@@ -188,7 +188,7 @@ export default function Navbar() {
                           <User className="w-4 h-4 text-carefd-gray" />
                           <span>הפרופיל שלי</span>
                         </Link>
-                        <Link href="/dashboard?tab=settings" onClick={() => setProfileDropdownOpen(false)}
+                        <Link href="/profile" onClick={() => setProfileDropdownOpen(false)}
                           className="flex items-center gap-3 px-4 py-2.5 text-sm text-carefd-slate hover:bg-carefd-teal-pale/30 hover:text-carefd-teal transition-colors">
                           <Settings className="w-4 h-4 text-carefd-gray" />
                           <span>הגדרות</span>
