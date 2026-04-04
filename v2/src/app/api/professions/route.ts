@@ -2,6 +2,8 @@ import prisma from "@/lib/db";
 import { json, withErrorHandler } from "@/lib/api-utils";
 import { defaultProfessions } from "@/lib/seed/professions";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/professions - Public endpoint for professions hierarchy
 export const GET = withErrorHandler(async () => {
   let professions = await prisma.profession.findMany({

@@ -3,6 +3,8 @@ import prisma from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { json, withErrorHandler, parseBody } from "@/lib/api-utils";
 
+export const dynamic = "force-dynamic";
+
 export const GET = withErrorHandler(async () => {
   const regions = await prisma.region.findMany({ orderBy: { name: "asc" } });
   return json({ regions });

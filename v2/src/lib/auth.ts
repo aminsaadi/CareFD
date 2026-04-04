@@ -7,11 +7,14 @@ function getJwtSecret(): string {
   const key = process.env.SECRET_KEY;
   if (key) return key;
   if (process.env.NODE_ENV === "production") {
+    // During build phase, return a placeholder - actual requests will have the env var set
+    if (process.env.NEXT_PHASE === "phase-production-build") {
+      return "build-phase-placeholder";
+    }
     throw new Error("FATAL: SECRET_KEY not set in production!");
   }
   return "dev-only-secret-not-for-production";
 }
-const JWT_SECRET = getJwtSecret();
 const TOKEN_EXPIRY = "7d";
 
 // ==================== PASSWORD ====================
@@ -33,12 +36,12 @@ export interface TokenPayload {
 }
 
 export function createToken(payload: TokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: TOKEN_EXPIRY });
 }
 
 export function verifyToken(token: string): TokenPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as TokenPayload;
+    return jwt.verify(token, getJwtSecret()) as TokenPayload;
   } catch {
     return null;
   }
