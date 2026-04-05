@@ -8,12 +8,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FileStack, Plus, Trash2 } from "lucide-react";
+import { FileStack, Plus, Trash2, Edit, Save, X, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AdminPagesPage() {
   const [pages, setPages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ title: "", slug: "", content: "" });
 
   const fetchData = () => {
@@ -23,18 +26,26 @@ export default function AdminPagesPage() {
 
   useEffect(() => { fetchData(); }, []);
 
-  const createPage = async () => {
-    if (!form.title || !form.slug) return;
-    await api.post("/admin/content/pages", form);
-    setForm({ title: "", slug: "", content: "" });
-    setShowForm(false);
-    fetchData();
+  const handleEdit = (page: any) => {
+    setForm({ title: page.title || "", slug: page.slug || "", content: page.content || "" });
+    setEditingId(page.id); setShowForm(true);
+  };
+
+  const handleSave = async () => {
+    if (!form.title || !form.slug) { toast.error("נא למלא כותרת ו-slug"); return; }
+    setSaving(true);
+    try {
+      if (editingId) { await api.put(`/admin/content/pages/${editingId}`, form); toast.success("הדף עודכן"); }
+      else { await api.post("/admin/content/pages", form); toast.success("הדף נוצר"); }
+      setForm({ title: "", slug: "", content: "" }); setEditingId(null); setShowForm(false); fetchData();
+    } catch { toast.error("שגיאה בשמירה"); }
+    finally { setSaving(false); }
   };
 
   const deletePage = async (id: string) => {
     if (!confirm("למחוק דף זה?")) return;
-    await api.delete(`/admin/content/pages/${id}`);
-    fetchData();
+    try { await api.delete(`/admin/content/pages/${id}`); toast.success("הדף נמחק"); fetchData(); }
+    catch { toast.error("שגיאה"); }
   };
 
   return (
@@ -49,7 +60,7 @@ export default function AdminPagesPage() {
           <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="כותרת" />
           <Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="slug (URL)" dir="ltr" />
           <Textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} placeholder="תוכן HTML..." className="min-h-[150px]" dir="ltr" />
-          <div className="flex gap-2"><Button onClick={createPage} size="sm">שמור</Button><Button variant="ghost" size="sm" onClick={() => setShowForm(false)}>ביטול</Button></div>
+          <div className="flex gap-2"><Button onClick={handleSave} disabled={saving} size="sm">{saving ? <Loader2 className="w-4 h-4 animate-spin me-1" /> : <Save className="w-4 h-4 me-1" />}שמור</Button><Button variant="ghost" size="sm" onClick={() => { setShowForm(false); setEditingId(null); }}>ביטול</Button></div>
         </Card>
       )}
 
@@ -67,6 +78,7 @@ export default function AdminPagesPage() {
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant={p.isActive ? "success" : "outline"}>{p.isActive ? "פעיל" : "מושבת"}</Badge>
+                <Button variant="ghost" size="icon" onClick={() => handleEdit(p)}><Edit className="w-4 h-4 text-carefd-teal" /></Button>
                 <Button variant="ghost" size="icon" onClick={() => deletePage(p.id)} className="text-red-400 hover:text-red-600"><Trash2 className="w-4 h-4" /></Button>
               </div>
             </Card>
