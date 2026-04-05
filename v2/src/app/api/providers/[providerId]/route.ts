@@ -103,6 +103,7 @@ export const GET = withErrorHandler(async (_req: NextRequest, ctx) => {
     education: provider.education,
     certifications: provider.certifications,
     profile_color: provider.profileColor,
+    coverage_radius_km: provider.coverageRadiusKm,
     views_count: provider.viewsCount + 1,
     created_at: provider.createdAt,
   });
@@ -159,6 +160,7 @@ export const PUT = withErrorHandler(async (req: NextRequest, ctx) => {
     education: "education",
     certifications: "certifications",
     profile_color: "profileColor",
+    coverage_radius_km: "coverageRadiusKm",
   };
 
   const data: Record<string, unknown> = {};
@@ -181,6 +183,24 @@ export const PUT = withErrorHandler(async (req: NextRequest, ctx) => {
     where: { id: providerId },
     data,
   });
+
+  // Handle availability separately (replace all)
+  if (Array.isArray(updates.availability)) {
+    await prisma.providerAvailability.deleteMany({ where: { providerId } });
+    const avRows = (updates.availability as any[]).filter((a) => a.is_available);
+    if (avRows.length > 0) {
+      await prisma.providerAvailability.createMany({
+        data: avRows.map((a) => ({
+          providerId,
+          day: a.day,
+          shift: a.shift,
+          startTime: a.start_time || null,
+          endTime: a.end_time || null,
+          isAvailable: true,
+        })),
+      });
+    }
+  }
 
   return json({ message: "Provider updated successfully" });
 });
