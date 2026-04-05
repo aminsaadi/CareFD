@@ -36,7 +36,7 @@ export default function AdminVerificationPage() {
   const handleVerify = async (id: string) => {
     setActionLoading(id);
     try {
-      await api.put(`/admin/providers/${id}/verify`);
+      await api.put(`/admin/providers/${id}`, { action: "verify" });
       toast.success("הספק אומת בהצלחה!");
       fetchData();
     } catch { toast.error("שגיאה באימות"); }
@@ -46,7 +46,7 @@ export default function AdminVerificationPage() {
   const handleReject = async (id: string) => {
     setActionLoading(id);
     try {
-      await api.put(`/admin/providers/${id}/reject`, { reason: rejectReason || "נדחה על ידי מנהל" });
+      await api.put(`/admin/providers/${id}`, { action: "reject", notes: rejectReason || "נדחה על ידי מנהל" });
       toast.success("הספק נדחה");
       setRejectDialogId(null);
       setRejectReason("");

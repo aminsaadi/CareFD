@@ -55,7 +55,7 @@ export default function AdminBookingsPage() {
   const handleCancel = async (bookingId: string) => {
     if (!confirm("האם לבטל הזמנה זו?")) return;
     try {
-      await api.put(`/bookings/${bookingId}/cancel`, { reason: "בוטל על ידי מנהל" });
+      await api.put(`/admin/bookings/${bookingId}`, { status: "cancelled" });
       toast.success("ההזמנה בוטלה");
       fetchData();
     } catch { toast.error("שגיאה בביטול ההזמנה"); }

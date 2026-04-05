@@ -114,9 +114,9 @@ export default function ProviderDashboardPage() {
 
   useEffect(() => { fetchData(); }, []);
 
-  const updateBookingStatus = async (bookingId: string, endpoint: string) => {
+  const updateBookingStatus = async (bookingId: string, action: string) => {
     try {
-      await api.put(`/bookings/${bookingId}/${endpoint}`);
+      await api.put(`/bookings/${bookingId}/status`, { action });
       toast.success("הסטטוס עודכן בהצלחה");
       fetchData();
     } catch { toast.error("שגיאה בעדכון הסטטוס"); }
@@ -124,7 +124,7 @@ export default function ProviderDashboardPage() {
 
   const handleCancellationResponse = async (bookingId: string, action: string) => {
     try {
-      await api.put(`/bookings/${bookingId}/${action}-cancellation`);
+      await api.put(`/bookings/${bookingId}/status`, { action: `${action}_cancellation` });
       toast.success(action === "approve" ? "בקשת הביטול אושרה" : "בקשת הביטול נדחתה");
       fetchData();
     } catch { toast.error("שגיאה בעדכון"); }
@@ -361,7 +361,7 @@ export default function ProviderDashboardPage() {
                                   <Button size="sm" variant="outline" className="h-8" onClick={(e) => { e.stopPropagation(); updateBookingStatus(b.booking_id, "hold"); }}><Hourglass className="w-3.5 h-3.5 me-1" />השהה</Button>
                                 </>)}
                                 {b.status === "confirmed" && (
-                                  <Button size="sm" className="bg-purple-500 hover:bg-purple-600 h-8" onClick={(e) => { e.stopPropagation(); updateBookingStatus(b.booking_id, "provider-complete"); }}><CheckCircle className="w-3.5 h-3.5 me-1" />סמן כהושלם</Button>
+                                  <Button size="sm" className="bg-purple-500 hover:bg-purple-600 h-8" onClick={(e) => { e.stopPropagation(); updateBookingStatus(b.booking_id, "provider_complete"); }}><CheckCircle className="w-3.5 h-3.5 me-1" />סמן כהושלם</Button>
                                 )}
                                 {b.status === "on_hold" && (<>
                                   <Button size="sm" className="bg-green-500 hover:bg-green-600 h-8" onClick={(e) => { e.stopPropagation(); updateBookingStatus(b.booking_id, "confirm"); }}>אשר</Button>
@@ -594,7 +594,7 @@ export default function ProviderDashboardPage() {
                           <div className="mt-3 flex gap-2">
                             {offer.status === "pending" && (
                               <Button size="sm" variant="outline" className="text-red-600 border-red-200 hover:bg-red-50" onClick={async () => {
-                                try { await api.post(`/offers/${offer.offer_id || offer.id}/withdraw`); toast.success("ההצעה נמשכה"); fetchData(); }
+                                try { await api.post(`/offers/${offer.offer_id || offer.id}`, { action: "withdraw" }); toast.success("ההצעה נמשכה"); fetchData(); }
                                 catch { toast.error("שגיאה"); }
                               }}>משוך הצעה</Button>
                             )}

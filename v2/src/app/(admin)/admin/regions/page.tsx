@@ -66,7 +66,7 @@ export default function AdminRegionsPage() {
     const city = newCityInputs[regionId]?.trim();
     if (!city) { toast.error("נא להזין שם עיר"); return; }
     try {
-      await api.post(`/admin/regions/${regionId}/cities`, { city });
+      await api.put(`/admin/regions/${regionId}`, { action: "add_city", city });
       toast.success(`${city} נוספה`);
       setNewCityInputs((p) => ({ ...p, [regionId]: "" }));
       fetchData();
@@ -75,7 +75,7 @@ export default function AdminRegionsPage() {
 
   const removeCity = async (regionId: string, city: string) => {
     try {
-      await api.delete(`/admin/regions/${regionId}/cities/${encodeURIComponent(city)}`);
+      await api.put(`/admin/regions/${regionId}`, { action: "remove_city", city });
       toast.success(`${city} הוסרה`);
       fetchData();
     } catch { toast.error("שגיאה בהסרת עיר"); }

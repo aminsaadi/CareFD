@@ -34,7 +34,7 @@ export default function AdminUsersPage() {
   const handleRoleChange = async (userId: string, newRole: string) => {
     setActionLoading(userId);
     try {
-      await api.put(`/admin/users/${userId}/role`, { role: newRole });
+      await api.put(`/admin/users/${userId}`, { role: newRole });
       toast.success("התפקיד עודכן בהצלחה");
       fetchUsers();
     } catch { toast.error("שגיאה בעדכון תפקיד"); }
@@ -44,7 +44,7 @@ export default function AdminUsersPage() {
   const handleSuspend = async (userId: string, isSuspended: boolean) => {
     setActionLoading(userId);
     try {
-      await api.put(`/admin/users/${userId}/suspend`, { suspended: !isSuspended });
+      await api.put(`/admin/users/${userId}`, { is_suspended: !isSuspended });
       toast.success(isSuspended ? "המשתמש הופעל" : "המשתמש הושעה");
       fetchUsers();
     } catch { toast.error("שגיאה בעדכון סטטוס"); }

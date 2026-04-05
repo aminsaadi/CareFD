@@ -23,7 +23,7 @@ export default function AdminFeaturedPage() {
 
   const toggleFeatured = async (id: string, current: boolean) => {
     try {
-      await api.put(`/admin/providers/${id}/recommend`);
+      await api.put(`/admin/providers/${id}`, { action: current ? "unrecommend" : "recommend" });
       toast.success(current ? "ההמלצה הוסרה" : "הספק סומן כמומלץ");
       fetchData();
     } catch { toast.error("שגיאה בעדכון"); }

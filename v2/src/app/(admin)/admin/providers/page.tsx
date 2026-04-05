@@ -47,7 +47,7 @@ export default function AdminProvidersPage() {
   const handleVerify = async (id: string) => {
     setActionLoading(id);
     try {
-      await api.put(`/admin/providers/${id}/verify`);
+      await api.put(`/admin/providers/${id}`, { action: "verify" });
       toast.success("הספק אומת בהצלחה!");
       fetchData();
     } catch { toast.error("שגיאה באימות הספק"); }
@@ -57,7 +57,7 @@ export default function AdminProvidersPage() {
   const handleReject = async (id: string) => {
     setActionLoading(id);
     try {
-      await api.put(`/admin/providers/${id}/reject`, { reason: rejectReason || "נדחה על ידי מנהל" });
+      await api.put(`/admin/providers/${id}`, { action: "reject", notes: rejectReason || "נדחה על ידי מנהל" });
       toast.success("הספק נדחה");
       setRejectDialogId(null);
       setRejectReason("");
@@ -69,7 +69,7 @@ export default function AdminProvidersPage() {
   const handleRecommend = async (id: string) => {
     setActionLoading(id);
     try {
-      await api.put(`/admin/providers/${id}/recommend`);
+      await api.put(`/admin/providers/${id}`, { action: "recommend" });
       toast.success("הספק סומן כמומלץ");
       fetchData();
     } catch { toast.error("שגיאה בעדכון"); }

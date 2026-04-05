@@ -110,7 +110,7 @@ export default function DashboardPage() {
 
   const handleCancelRequest = async (requestId: string) => {
     if (!confirm("האם לבטל בקשה זו?")) return;
-    try { await api.put(`/requests/${requestId}`, { status: "cancelled" }); toast.success("הבקשה בוטלה"); fetchData(); }
+    try { await api.put(`/requests/${requestId}`, { action: "cancel" }); toast.success("הבקשה בוטלה"); fetchData(); }
     catch { toast.error("שגיאה בביטול"); }
   };
 

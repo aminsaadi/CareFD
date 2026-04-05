@@ -48,7 +48,7 @@ export default function AdminOverview() {
 
   const handleVerify = async (providerId: string) => {
     try {
-      await api.put(`/admin/providers/${providerId}/verify`);
+      await api.put(`/admin/providers/${providerId}`, { action: "verify" });
       toast.success("הספק אומת בהצלחה");
       fetchData();
     } catch { toast.error("שגיאה באימות הספק"); }
@@ -56,7 +56,7 @@ export default function AdminOverview() {
 
   const handleReject = async (providerId: string) => {
     try {
-      await api.put(`/admin/providers/${providerId}/reject`, { reason: "נדחה על ידי מנהל" });
+      await api.put(`/admin/providers/${providerId}`, { action: "reject", notes: "נדחה על ידי מנהל" });
       toast.success("הספק נדחה");
       fetchData();
     } catch { toast.error("שגיאה בדחיית הספק"); }
