@@ -14,8 +14,8 @@ const DEMO_USERS = [
 const DEMO_SERVICES = [
   { name: "ביקור בית - סיעוד", description: "שירות סיעודי מקצועי בבית המטופל. כולל טיפול, מעקב ותמיכה.", price: 250, category: "visit", pricingType: "per_visit", duration: 60 },
   { name: "פיזיותרפיה - טיפול ביתי", description: "טיפול פיזיותרפי בבית לשיקום לאחר ניתוח או פציעה.", price: 350, category: "visit", pricingType: "per_visit", duration: 45 },
-  { name: "ייעוץ תזונה אונליין", description: "ייעוץ תזונה מקצועי בשיחת וידאו. תפריט מותאם אישית.", price: 200, category: "consultation", pricingType: "per_session", duration: 50 },
-  { name: "טיפול פסיכולוגי", description: "טיפול פסיכולוגי אישי עם מטפלת מוסמכת. סודיות מלאה.", price: 400, category: "consultation", pricingType: "per_session", duration: 50 },
+  { name: "ייעוץ תזונה אונליין", description: "ייעוץ תזונה מקצועי בשיחת וידאו. תפריט מותאם אישית.", price: 200, category: "consultation", pricingType: "fixed", duration: 50 },
+  { name: "טיפול פסיכולוגי", description: "טיפול פסיכולוגי אישי עם מטפלת מוסמכת. סודיות מלאה.", price: 400, category: "consultation", pricingType: "fixed", duration: 50 },
   { name: "שירות אחות פרטית - שעתי", description: "אחות פרטית מוסמכת לטיפול שעתי. מתן תרופות, חבישות ומעקב.", price: 120, category: "hourly", pricingType: "per_hour", duration: 60 },
 ];
 
@@ -34,7 +34,6 @@ async function runSeed() {
       data: {
         email: u.email, name: u.name, passwordHash: hashedPw, role: u.role, phone: u.phone,
         isVerified: true, emailVerified: true, languagePreference: "he",
-        userNumber: `USR${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 5).toUpperCase()}`,
       },
     });
     results[u.email] = { status: "created", user_id: user.id, role: u.role };
@@ -123,7 +122,13 @@ async function runSeed() {
 
 // GET /api/seed - create demo users if they don't exist
 export const GET = withErrorHandler(async () => {
-  const { password, results } = await runSeed();
+  let seedResult;
+  try {
+    seedResult = await runSeed();
+  } catch (e: any) {
+    return json({ error: "Seed failed", detail: e?.message || String(e) }, 500);
+  }
+  const { password, results } = seedResult;
 
   const allExist = Object.values(results).every((r: any) => r?.status === "exists");
   return json({
