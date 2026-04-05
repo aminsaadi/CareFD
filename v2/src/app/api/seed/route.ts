@@ -121,16 +121,13 @@ async function runSeed() {
   return { password, results };
 }
 
-// GET /api/seed - auto-seed if no users exist (safe, one-time)
+// GET /api/seed - create demo users if they don't exist
 export const GET = withErrorHandler(async () => {
-  const userCount = await prisma.user.count();
-  if (userCount > 0) {
-    return json({ message: "Database already seeded", user_count: userCount });
-  }
-
   const { password, results } = await runSeed();
+
+  const allExist = Object.values(results).every((r: any) => r?.status === "exists");
   return json({
-    message: "Demo data created successfully!",
+    message: allExist ? "Demo accounts already exist" : "Demo data created successfully!",
     accounts: {
       admin: { email: "admin@carefd.com", password },
       patient: { email: "user@carefd.com", password },
