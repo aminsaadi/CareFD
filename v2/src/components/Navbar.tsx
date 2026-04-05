@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 // import { useNotifications } from "@/context/NotificationContext";
 import NotificationBell from "@/components/NotificationBell";
 import api from "@/lib/api-client";
+import Logo from "@/components/Logo";
 import {
   Search, Menu, X, MessageCircle, User, Settings,
   LogOut, LayoutDashboard, ChevronDown,
@@ -84,10 +85,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20">
           <div className="flex items-center">
-            <Link href="/" className="flex items-center" data-testid="logo-link">
-              <span className="text-2xl font-heading font-bold text-carefd-navy">Care</span>
-              <span className="text-2xl font-heading font-bold text-carefd-teal">FD</span>
-            </Link>
+            <Logo size="md" data-testid="logo-link" />
 
             {/* Desktop navigation links */}
             <div className="hidden md:flex me-10 gap-1">

@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Save, CheckCircle, Settings, Mail } from "lucide-react";
+import { Save, CheckCircle, Settings, Mail, Globe, Palette } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<any>({});
@@ -25,14 +26,14 @@ export default function AdminSettingsPage() {
   const saveSettings = async () => {
     setSaving(true); setSaved(false);
     try { await api.put("/admin/settings", settings); setSaved(true); setTimeout(() => setSaved(false), 3000); }
-    catch (err: any) { alert(err.message); }
+    catch { toast.error("שגיאה בשמירת ההגדרות"); }
     finally { setSaving(false); }
   };
 
   const saveSmtp = async () => {
     setSaving(true);
-    try { await api.put("/admin/settings", { smtp }); alert("הגדרות SMTP נשמרו"); }
-    catch (err: any) { alert(err.message); }
+    try { await api.put("/admin/settings", { smtp }); toast.success("הגדרות SMTP נשמרו"); }
+    catch { toast.error("שגיאה בשמירת ההגדרות"); }
     finally { setSaving(false); }
   };
 
@@ -66,6 +67,44 @@ export default function AdminSettingsPage() {
         </div>
       </Card>
 
+      {/* SEO & Social */}
+      <Card className="p-6 md:p-8 mb-6">
+        <h3 className="font-heading font-semibold text-lg text-carefd-navy mb-4 flex items-center gap-2">
+          <Globe className="w-5 h-5 text-carefd-teal" /> SEO ורשתות חברתיות
+        </h3>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2"><label className="text-sm font-medium text-slate-700">כותרת SEO</label><Input value={settings.seo_title || ""} onChange={(e) => setSettings({ ...settings, seo_title: e.target.value })} /></div>
+            <div className="space-y-2"><label className="text-sm font-medium text-slate-700">תיאור SEO</label><Input value={settings.seo_description || ""} onChange={(e) => setSettings({ ...settings, seo_description: e.target.value })} /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2"><label className="text-sm font-medium text-slate-700">Facebook</label><Input value={settings.social_facebook || ""} onChange={(e) => setSettings({ ...settings, social_facebook: e.target.value })} dir="ltr" placeholder="https://facebook.com/..." /></div>
+            <div className="space-y-2"><label className="text-sm font-medium text-slate-700">Instagram</label><Input value={settings.social_instagram || ""} onChange={(e) => setSettings({ ...settings, social_instagram: e.target.value })} dir="ltr" placeholder="https://instagram.com/..." /></div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2"><label className="text-sm font-medium text-slate-700">Twitter/X</label><Input value={settings.social_twitter || ""} onChange={(e) => setSettings({ ...settings, social_twitter: e.target.value })} dir="ltr" /></div>
+            <div className="space-y-2"><label className="text-sm font-medium text-slate-700">LinkedIn</label><Input value={settings.social_linkedin || ""} onChange={(e) => setSettings({ ...settings, social_linkedin: e.target.value })} dir="ltr" /></div>
+          </div>
+          <Button onClick={saveSettings} disabled={saving}><Save className="w-4 h-4 me-2" /> {saving ? "שומר..." : "שמור"}</Button>
+        </div>
+      </Card>
+
+      {/* Appearance */}
+      <Card className="p-6 md:p-8 mb-6">
+        <h3 className="font-heading font-semibold text-lg text-carefd-navy mb-4 flex items-center gap-2">
+          <Palette className="w-5 h-5 text-carefd-teal" /> מראה
+        </h3>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2"><label className="text-sm font-medium text-slate-700">טאגליין</label><Input value={settings.site_tagline || ""} onChange={(e) => setSettings({ ...settings, site_tagline: e.target.value })} /></div>
+            <div className="space-y-2"><label className="text-sm font-medium text-slate-700">כתובת</label><Input value={settings.contact_address || ""} onChange={(e) => setSettings({ ...settings, contact_address: e.target.value })} /></div>
+          </div>
+          <div className="space-y-2"><label className="text-sm font-medium text-slate-700">טקסט תחתית (Footer)</label><Input value={settings.footer_text || ""} onChange={(e) => setSettings({ ...settings, footer_text: e.target.value })} /></div>
+          <Button onClick={saveSettings} disabled={saving}><Save className="w-4 h-4 me-2" /> {saving ? "שומר..." : "שמור"}</Button>
+        </div>
+      </Card>
+
+      {/* SMTP */}
       <Card className="p-6 md:p-8">
         <h3 className="font-heading font-semibold text-lg text-carefd-navy mb-4 flex items-center gap-2">
           <Mail className="w-5 h-5 text-carefd-teal" /> הגדרות SMTP

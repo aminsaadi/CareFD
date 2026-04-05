@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Award, Star, StarOff } from "lucide-react";
+import { Award, Star, StarOff, Search } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AdminFeaturedPage() {
   const [providers, setProviders] = useState<any[]>([]);
@@ -21,8 +22,11 @@ export default function AdminFeaturedPage() {
   useEffect(() => { fetchData(); }, []);
 
   const toggleFeatured = async (id: string, current: boolean) => {
-    await api.put(`/admin/providers/${id}`, { is_recommended: !current });
-    fetchData();
+    try {
+      await api.put(`/admin/providers/${id}`, { action: current ? "unrecommend" : "recommend" });
+      toast.success(current ? "ההמלצה הוסרה" : "הספק סומן כמומלץ");
+      fetchData();
+    } catch { toast.error("שגיאה בעדכון"); }
   };
 
   return (

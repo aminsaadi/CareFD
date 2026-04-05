@@ -6,16 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Star, Check, X } from "lucide-react";
+import { Star, Check, X, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 const filters = [
-  { v: "pending", l: "ממתין" }, { v: "approved", l: "מאושר" },
-  { v: "rejected", l: "נדחה" }, { v: "all", l: "הכל" },
+  { v: "all", l: "הכל" }, { v: "pending", l: "ממתין" },
+  { v: "approved", l: "מאושר" }, { v: "rejected", l: "נדחה" },
 ];
 
 export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState<any[]>([]);
-  const [filter, setFilter] = useState("pending");
+  const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
 
   const fetchData = () => {
@@ -28,8 +29,20 @@ export default function AdminReviewsPage() {
   useEffect(() => { fetchData(); }, [filter]);
 
   const handleAction = async (id: string, action: string) => {
-    try { await api.put(`/admin/reviews/${id}`, { action }); fetchData(); }
-    catch (err: any) { alert(err.message); }
+    try {
+      await api.put(`/admin/reviews/${id}`, { action });
+      toast.success(action === "approve" ? "הביקורת אושרה" : "הביקורת נדחתה");
+      fetchData();
+    } catch { toast.error("שגיאה בעדכון הביקורת"); }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("האם למחוק ביקורת זו?")) return;
+    try {
+      await api.delete(`/admin/reviews/${id}`);
+      toast.success("הביקורת נמחקה");
+      fetchData();
+    } catch { toast.error("שגיאה במחיקת הביקורת"); }
   };
 
   return (
@@ -68,16 +81,21 @@ export default function AdminReviewsPage() {
               <p className="text-sm text-slate-400 mb-3">
                 מאת: {r.user?.name || "אנונימי"} &bull; על: {r.provider?.businessName || "ספק"}
               </p>
-              {r.status === "pending" && (
-                <div className="flex gap-2">
-                  <Button size="sm" onClick={() => handleAction(r.id, "approve")} className="bg-emerald-600 hover:bg-emerald-700">
-                    <Check className="w-3 h-3 me-1" /> אשר
-                  </Button>
-                  <Button variant="secondary" size="sm" onClick={() => handleAction(r.id, "reject")} className="text-red-600 border-red-200 hover:bg-red-50">
-                    <X className="w-3 h-3 me-1" /> דחה
-                  </Button>
-                </div>
-              )}
+              <div className="flex gap-2">
+                {r.status === "pending" && (
+                  <>
+                    <Button size="sm" onClick={() => handleAction(r.id || r.review_id, "approve")} className="bg-emerald-600 hover:bg-emerald-700">
+                      <Check className="w-3 h-3 me-1" /> אשר
+                    </Button>
+                    <Button variant="secondary" size="sm" onClick={() => handleAction(r.id || r.review_id, "reject")} className="text-red-600 border-red-200 hover:bg-red-50">
+                      <X className="w-3 h-3 me-1" /> דחה
+                    </Button>
+                  </>
+                )}
+                <Button variant="ghost" size="sm" onClick={() => handleDelete(r.id || r.review_id)} className="text-red-500 hover:text-red-600">
+                  <Trash2 className="w-3 h-3 me-1" /> מחק
+                </Button>
+              </div>
             </Card>
           ))}
         </div>

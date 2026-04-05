@@ -7,19 +7,26 @@ import Navbar from "@/components/Navbar";
 import {
   BarChart3, Users, Stethoscope, CalendarDays, Wrench,
   FileText, Star, GraduationCap, MapPin, CreditCard,
-  FileStack, PenTool, Megaphone, Settings,
+  FileStack, PenTool, Megaphone, Settings, Shield,
+  Bell, TrendingUp, MessageCircle, Tag, Award,
 } from "lucide-react";
 
 const adminLinks = [
   { href: "/admin/overview", label: "סקירה", icon: BarChart3 },
   { href: "/admin/users", label: "משתמשים", icon: Users },
   { href: "/admin/providers", label: "ספקים", icon: Stethoscope },
+  { href: "/admin/verification", label: "אימות", icon: Shield },
   { href: "/admin/bookings", label: "הזמנות", icon: CalendarDays },
   { href: "/admin/services", label: "שירותים", icon: Wrench },
+  { href: "/admin/service-types", label: "סוגי שירות", icon: Tag },
   { href: "/admin/requests", label: "בקשות", icon: FileText },
   { href: "/admin/reviews", label: "ביקורות", icon: Star },
   { href: "/admin/professions", label: "מקצועות", icon: GraduationCap },
   { href: "/admin/regions", label: "אזורים", icon: MapPin },
+  { href: "/admin/featured", label: "מומלצים", icon: Award },
+  { href: "/admin/push", label: "התראות", icon: Bell },
+  { href: "/admin/messages", label: "הודעות", icon: MessageCircle },
+  { href: "/admin/reports", label: "דוחות", icon: TrendingUp },
   { href: "/admin/subscriptions", label: "מנויים", icon: CreditCard },
   { href: "/admin/pages", label: "דפים", icon: FileStack },
   { href: "/admin/blog", label: "בלוג", icon: PenTool },

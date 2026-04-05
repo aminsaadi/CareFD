@@ -170,8 +170,10 @@ export interface ChatRoom {
   provider_picture?: string;
   last_message?: string;
   last_message_at?: string;
+  unread_count?: number;
   is_archived: boolean;
   created_at: string;
+  other_user?: { name: string; picture?: string; user_id?: string };
 }
 
 export interface ChatMessage {
