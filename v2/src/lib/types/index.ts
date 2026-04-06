@@ -78,7 +78,9 @@ export interface ServiceSummary {
   price: number;
   pricing_type: string;
   service_category: string;
+  service_type?: string;
   delivery_types: string[];
+  duration_minutes?: number;
   is_active: boolean;
 }
 
