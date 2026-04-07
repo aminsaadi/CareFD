@@ -64,7 +64,7 @@ export default function Footer() {
                     href={s.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-carefd-slate p-2 rounded-full hover:bg-carefd-teal transition-colors"
+                    className="bg-carefd-slate p-2.5 rounded-full hover:bg-carefd-teal hover:scale-110 hover:shadow-glow transition-all duration-300"
                   >
                     <s.icon className="w-4 h-4" />
                   </a>

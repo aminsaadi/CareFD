@@ -77,6 +77,11 @@ const config: Config = {
         glass: "0 8px 32px rgba(0,0,0,0.08)",
         glow: "0 2px 8px rgba(25,184,186,0.3)",
       },
+      transitionDuration: {
+        "fast": "150ms",
+        "base": "300ms",
+        "slow": "500ms",
+      },
       keyframes: {
         "fade-in": {
           from: { opacity: "0", transform: "translateY(20px)" },
@@ -86,6 +91,10 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(30px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        "fade-only": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
         "scale-in": {
           from: { opacity: "0", transform: "scale(0.95)" },
           to: { opacity: "1", transform: "scale(1)" },
@@ -93,6 +102,10 @@ const config: Config = {
         "slide-in-right": {
           from: { opacity: "0", transform: "translateX(-20px)" },
           to: { opacity: "1", transform: "translateX(0)" },
+        },
+        "slide-up": {
+          from: { opacity: "0", transform: "translateY(100%)" },
+          to: { opacity: "1", transform: "translateY(0)" },
         },
         float: {
           "0%, 100%": { transform: "translateY(0)" },
@@ -102,14 +115,21 @@ const config: Config = {
           from: { backgroundPosition: "200% 0" },
           to: { backgroundPosition: "-200% 0" },
         },
+        "pulse-glow": {
+          "0%, 100%": { boxShadow: "0 0 0 0 rgba(25, 184, 186, 0)" },
+          "50%": { boxShadow: "0 0 20px 4px rgba(25, 184, 186, 0.15)" },
+        },
       },
       animation: {
-        "fade-in": "fade-in 0.6s ease-out forwards",
-        "fade-in-up": "fade-in-up 0.8s ease-out forwards",
-        "scale-in": "scale-in 0.5s ease-out forwards",
-        "slide-in": "slide-in-right 0.5s ease-out forwards",
+        "fade-in": "fade-in 0.5s ease-out forwards",
+        "fade-in-up": "fade-in-up 0.6s ease-out forwards",
+        "fade-only": "fade-only 0.3s ease-out forwards",
+        "scale-in": "scale-in 0.3s ease-out forwards",
+        "slide-in": "slide-in-right 0.4s ease-out forwards",
+        "slide-up": "slide-up 0.4s ease-out forwards",
         float: "float 6s ease-in-out infinite",
         shimmer: "shimmer 8s ease-in-out infinite",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
       },
     },
   },

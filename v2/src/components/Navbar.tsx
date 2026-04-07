@@ -157,7 +157,7 @@ export default function Navbar() {
 
                   {/* Profile Dropdown */}
                   {profileDropdownOpen && (
-                    <div className="absolute left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-50 animate-fade-in">
+                    <div className="absolute start-0 mt-2 w-64 bg-white rounded-2xl shadow-soft-lg border border-gray-100/50 py-2 z-50 animate-scale-in">
                       {/* User info header */}
                       <div className="px-4 py-3 border-b border-gray-100">
                         <div className="flex items-center gap-3">

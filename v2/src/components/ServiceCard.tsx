@@ -97,7 +97,7 @@ export default function ServiceCard({ service: s, showProvider = true }: Service
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all border border-gray-100 hover:border-carefd-teal relative group overflow-hidden"
+      className="bg-white rounded-2xl shadow-soft hover:shadow-soft-lg transition-all duration-300 border-2 border-transparent hover:border-carefd-teal/40 relative group overflow-hidden hover:-translate-y-1"
       data-testid={`service-card-${s.service_id}`}
     >
       <div className="p-5">
@@ -110,7 +110,7 @@ export default function ServiceCard({ service: s, showProvider = true }: Service
             {serviceTypeInfo.label}
           </span>
           {categoryLabel && (
-            <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium bg-gray-100 text-gray-600">
+            <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium bg-carefd-teal-pale/40 text-carefd-navy">
               <Tag className="w-3 h-3" />
               {categoryLabel}
             </span>
