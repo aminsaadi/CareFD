@@ -127,17 +127,22 @@ export default function Landing() {
           />
         </div>
 
-        <div className="container-main py-20 md:py-28 relative z-10">
+        <div className="container-main py-20 md:py-32 relative z-10">
           {/* Hero Content - Centered */}
-          <div className="text-center max-w-4xl mx-auto mb-10">
-            <Badge variant="accent" className="mb-6 text-sm px-4 py-1.5 inline-flex">
+          <div className="text-center max-w-4xl mx-auto mb-12 animate-fade-in">
+            <Badge variant="accent" className="mb-6 text-sm px-5 py-2 inline-flex shadow-glow animate-float">
               <Shield className="w-3.5 h-3.5 me-1.5" />
               מטפלים מאומתים בלבד
             </Badge>
 
-            <h1 className="text-balance mb-6">
+            <h1 className="text-balance mb-6 leading-tight">
               שירותי בריאות פרמיום{" "}
-              <span className="text-carefd-teal-light">בדלת הבית</span>
+              <span className="text-carefd-teal-light relative">
+                בדלת הבית
+                <svg className="absolute -bottom-2 start-0 end-0 w-full" viewBox="0 0 200 8" fill="none">
+                  <path d="M2 6C50 2 150 2 198 6" stroke="#19B8BA" strokeWidth="3" strokeLinecap="round" opacity="0.4" />
+                </svg>
+              </span>
             </h1>
 
             <p className="text-lg md:text-xl text-white/70 mb-0 max-w-2xl mx-auto leading-relaxed">
@@ -147,15 +152,15 @@ export default function Landing() {
           </div>
 
           {/* Stats Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mb-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mb-12 stagger-animation">
             {stats.map((stat, idx) => (
               <div
                 key={stat.label}
-                className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/10 text-center"
+                className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15 text-center hover:bg-white/15 transition-all duration-300 hover:-translate-y-1"
               >
                 <stat.icon className="w-6 h-6 text-carefd-teal-light mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">{stat.value}</div>
-                <div className="text-xs text-white/60">{stat.label}</div>
+                <div className="text-2xl md:text-3xl font-bold text-white">{stat.value}</div>
+                <div className="text-xs text-white/60 mt-1">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -166,10 +171,10 @@ export default function Landing() {
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mt-8 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 mt-10 justify-center animate-fade-in" style={{ animationDelay: "0.3s" }}>
             <Link
               href="/register"
-              className="bg-carefd-teal text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-carefd-teal-medium transition-colors text-center text-lg"
+              className="bg-carefd-teal text-white px-8 py-4 rounded-2xl font-semibold hover:bg-carefd-teal-medium transition-all text-center text-lg shadow-glow hover:shadow-lg hover:-translate-y-0.5"
             >
               התחל עכשיו
             </Link>
@@ -322,18 +327,20 @@ export default function Landing() {
               <p className="text-slate-500 text-lg">שלושה צעדים פשוטים לקבלת טיפול מקצועי</p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 md:gap-12">
+            <div className="grid md:grid-cols-3 gap-8 md:gap-12 stagger-animation">
               {[
-                { step: "01", icon: Search, title: "חפשו", desc: "מצאו את המטפל המתאים לפי מקצוע, מיקום, דירוג וזמינות" },
-                { step: "02", icon: Clock, title: "הזמינו", desc: "קבעו תור ישירות דרך הפלטפורמה בזמן שנוח לכם" },
-                { step: "03", icon: Heart, title: "קבלו טיפול", desc: "קבלו שירות מקצועי בבית, במרפאה או באופן מקוון" },
+                { step: "01", icon: Search, title: "חפשו", desc: "מצאו את המטפל המתאים לפי מקצוע, מיקום, דירוג וזמינות", color: "from-blue-500 to-indigo-500" },
+                { step: "02", icon: Clock, title: "הזמינו", desc: "קבעו תור ישירות דרך הפלטפורמה בזמן שנוח לכם", color: "from-carefd-teal to-emerald-500" },
+                { step: "03", icon: Heart, title: "קבלו טיפול", desc: "קבלו שירות מקצועי בבית, במרפאה או באופן מקוון", color: "from-amber-500 to-orange-500" },
               ].map((item) => (
                 <div key={item.step} className="text-center group">
                   <div className="relative inline-block mb-6">
-                    <div className="w-20 h-20 bg-carefd-stone rounded-3xl flex items-center justify-center mx-auto group-hover:bg-carefd-teal/10 transition-colors">
-                      <item.icon className="w-8 h-8 text-carefd-navy" />
+                    <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto shadow-soft group-hover:shadow-soft-lg transition-all duration-300 group-hover:-translate-y-2">
+                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center`}>
+                        <item.icon className="w-6 h-6 text-white" />
+                      </div>
                     </div>
-                    <span className="absolute -top-2 -end-2 text-xs font-bold text-carefd-teal bg-carefd-teal/10 rounded-full w-7 h-7 flex items-center justify-center">
+                    <span className="absolute -top-2 -end-2 text-xs font-bold text-white bg-carefd-navy rounded-full w-7 h-7 flex items-center justify-center shadow-sm">
                       {item.step}
                     </span>
                   </div>

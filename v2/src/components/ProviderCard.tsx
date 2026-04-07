@@ -101,7 +101,7 @@ export default function ProviderCard({ provider: p, showContact = true }: Provid
   return (
     <>
       <div
-        className="bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition-all border-2 border-carefd-teal-pale hover:border-carefd-teal relative group"
+        className="bg-white p-6 rounded-2xl shadow-soft hover:shadow-soft-lg transition-all duration-300 border-2 border-transparent hover:border-carefd-teal/40 relative group hover:-translate-y-1"
         data-testid={`provider-card-${p.provider_id}`}
       >
         {/* Badges - positioned above card */}
