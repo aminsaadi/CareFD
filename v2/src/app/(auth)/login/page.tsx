@@ -112,7 +112,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="ps-11"
+                className="ps-11 bg-slate-50/50 border-2 border-slate-200 focus:border-carefd-teal focus:bg-white h-12 rounded-xl"
                 dir="ltr"
                 required
                 data-testid="login-email"
@@ -138,7 +138,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="הזינו סיסמה"
-                className="ps-11 pe-11"
+                className="ps-11 pe-11 bg-slate-50/50 border-2 border-slate-200 focus:border-carefd-teal focus:bg-white h-12 rounded-xl"
                 required
                 data-testid="login-password"
               />
@@ -152,7 +152,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full" size="lg" disabled={loading} data-testid="login-submit">
+          <Button type="submit" className="w-full h-12 rounded-xl bg-gradient-to-l from-carefd-teal to-carefd-teal-medium hover:from-carefd-teal-medium hover:to-carefd-teal shadow-glow hover:shadow-lg transition-all duration-300" size="lg" disabled={loading} data-testid="login-submit">
             {loading ? (
               <span className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white" />
             ) : (
