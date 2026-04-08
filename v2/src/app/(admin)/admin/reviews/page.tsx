@@ -84,7 +84,7 @@ export default function AdminReviewsPage() {
               <div className="flex gap-2">
                 {r.status === "pending" && (
                   <>
-                    <Button size="sm" onClick={() => handleAction(r.id || r.review_id, "approve")} className="bg-emerald-600 hover:bg-emerald-700">
+                    <Button size="sm" onClick={() => handleAction(r.id || r.review_id, "approve")} className="bg-carefd-teal hover:bg-carefd-teal-medium">
                       <Check className="w-3 h-3 me-1" /> אשר
                     </Button>
                     <Button variant="secondary" size="sm" onClick={() => handleAction(r.id || r.review_id, "reject")} className="text-red-600 border-red-200 hover:bg-red-50">

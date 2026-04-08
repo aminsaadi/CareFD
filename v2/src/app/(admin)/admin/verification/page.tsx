@@ -121,7 +121,7 @@ export default function AdminVerificationPage() {
                       <Button size="sm" variant="outline" asChild>
                         <Link href={`/providers/${id}`}><Eye className="w-4 h-4 me-1" />צפה</Link>
                       </Button>
-                      <Button size="sm" className="bg-green-500 hover:bg-green-600" onClick={() => handleVerify(id)}
+                      <Button size="sm" className="bg-carefd-teal hover:bg-carefd-teal-medium" onClick={() => handleVerify(id)}
                         disabled={actionLoading === id}>
                         {actionLoading === id ? <Loader2 className="w-4 h-4 animate-spin me-1" /> : <Check className="w-4 h-4 me-1" />}
                         אמת

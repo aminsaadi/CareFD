@@ -283,7 +283,7 @@ export default function ProviderDashboardPage() {
                             <p className="text-sm text-slate-500">{b.service_name} • {b.booking_date ? new Date(b.booking_date).toLocaleDateString("he-IL") : ""}</p>
                           </div>
                           <div className="flex gap-2">
-                            <Button size="sm" className="bg-green-500 hover:bg-green-600 h-8" onClick={() => updateBookingStatus(b.booking_id, "confirm")}>אשר</Button>
+                            <Button size="sm" className="bg-carefd-teal hover:bg-carefd-teal-medium h-8" onClick={() => updateBookingStatus(b.booking_id, "confirm")}>אשר</Button>
                             <Button size="sm" variant="destructive" className="h-8" onClick={() => updateBookingStatus(b.booking_id, "reject")}>דחה</Button>
                           </div>
                         </div>
@@ -314,7 +314,7 @@ export default function ProviderDashboardPage() {
                 <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                   <h3 className="text-xl font-bold text-carefd-navy">ניהול תורים</h3>
                   <select value={bookingSortBy} onChange={(e) => setBookingSortBy(e.target.value)}
-                    className="bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium cursor-pointer hover:border-carefd-teal focus:outline-none">
+                    className="bg-white border-2 border-carefd-teal-pale/50 rounded-xl px-4 py-2 text-sm font-medium cursor-pointer hover:border-carefd-teal focus:border-carefd-teal focus:outline-none focus:ring-2 focus:ring-carefd-teal/15 transition-all">
                     <option value="date_desc">חדש ← ישן</option>
                     <option value="date_asc">ישן ← חדש</option>
                     <option value="status">לפי סטטוס</option>
@@ -356,7 +356,7 @@ export default function ProviderDashboardPage() {
                               {b.notes && <div className="bg-blue-50 rounded-lg p-3 mb-4 text-sm"><span className="font-medium">הערות: </span>{b.notes}</div>}
                               <div className="flex flex-wrap items-center gap-2">
                                 {b.status === "pending" && (<>
-                                  <Button size="sm" className="bg-green-500 hover:bg-green-600 h-8" onClick={(e) => { e.stopPropagation(); updateBookingStatus(b.booking_id, "confirm"); }}><CheckCircle className="w-3.5 h-3.5 me-1" />אשר</Button>
+                                  <Button size="sm" className="bg-carefd-teal hover:bg-carefd-teal-medium h-8" onClick={(e) => { e.stopPropagation(); updateBookingStatus(b.booking_id, "confirm"); }}><CheckCircle className="w-3.5 h-3.5 me-1" />אשר</Button>
                                   <Button size="sm" variant="destructive" className="h-8" onClick={(e) => { e.stopPropagation(); updateBookingStatus(b.booking_id, "reject"); }}><XCircle className="w-3.5 h-3.5 me-1" />דחה</Button>
                                   <Button size="sm" variant="outline" className="h-8" onClick={(e) => { e.stopPropagation(); updateBookingStatus(b.booking_id, "hold"); }}><Hourglass className="w-3.5 h-3.5 me-1" />השהה</Button>
                                 </>)}
@@ -364,7 +364,7 @@ export default function ProviderDashboardPage() {
                                   <Button size="sm" className="bg-purple-500 hover:bg-purple-600 h-8" onClick={(e) => { e.stopPropagation(); updateBookingStatus(b.booking_id, "provider_complete"); }}><CheckCircle className="w-3.5 h-3.5 me-1" />סמן כהושלם</Button>
                                 )}
                                 {b.status === "on_hold" && (<>
-                                  <Button size="sm" className="bg-green-500 hover:bg-green-600 h-8" onClick={(e) => { e.stopPropagation(); updateBookingStatus(b.booking_id, "confirm"); }}>אשר</Button>
+                                  <Button size="sm" className="bg-carefd-teal hover:bg-carefd-teal-medium h-8" onClick={(e) => { e.stopPropagation(); updateBookingStatus(b.booking_id, "confirm"); }}>אשר</Button>
                                   <Button size="sm" variant="destructive" className="h-8" onClick={(e) => { e.stopPropagation(); updateBookingStatus(b.booking_id, "reject"); }}>דחה</Button>
                                 </>)}
                                 {b.status === "cancellation_requested" && (<>

@@ -211,7 +211,7 @@ export default function AdminProvidersPage() {
                     {!(p.is_verified || p.verificationStatus === "verified") && (
                       <Button
                         size="sm"
-                        className="bg-emerald-600 hover:bg-emerald-700"
+                        className="bg-carefd-teal hover:bg-carefd-teal-medium"
                         onClick={() => handleVerify(id)}
                         disabled={actionLoading === id}
                       >

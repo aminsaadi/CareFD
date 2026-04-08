@@ -145,7 +145,7 @@ export default function AdminOverview() {
                   <Button size="sm" variant="outline" asChild>
                     <Link href={`/providers/${p.provider_id}`}><Eye className="w-4 h-4" /></Link>
                   </Button>
-                  <Button size="sm" className="bg-green-500 hover:bg-green-600" onClick={() => handleVerify(p.provider_id)}>
+                  <Button size="sm" className="bg-carefd-teal hover:bg-carefd-teal-medium" onClick={() => handleVerify(p.provider_id)}>
                     <CheckCircle className="w-4 h-4 me-1" /> אשר
                   </Button>
                   <Button size="sm" variant="destructive" onClick={() => handleReject(p.provider_id)}>

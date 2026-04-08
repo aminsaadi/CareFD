@@ -175,7 +175,7 @@ export default function DashboardPage() {
                     { label: "סה\"כ הזמנות", value: stats.totalBookings, icon: CalendarDays, color: "bg-blue-50 text-blue-600" },
                     { label: "ממתינים", value: stats.pendingBookings, icon: Hourglass, color: "bg-yellow-50 text-yellow-600" },
                     { label: "הושלמו", value: stats.completedBookings, icon: CheckCircle, color: "bg-green-50 text-green-600" },
-                    { label: "בקשות", value: stats.totalRequests, icon: FileText, color: "bg-purple-50 text-purple-600", onClick: () => setActiveTab("requests") },
+                    { label: "בקשות", value: stats.totalRequests, icon: FileText, color: "bg-purple-50 text-carefd-teal", onClick: () => setActiveTab("requests") },
                   ].map((s) => (
                     <Card key={s.label} className={`p-5 border-0 ${s.onClick ? "cursor-pointer hover-lift" : ""}`} onClick={s.onClick}>
                       <div className="flex items-center gap-3 mb-2">
@@ -189,10 +189,10 @@ export default function DashboardPage() {
 
                 {/* Awaiting Confirmation Alert */}
                 {stats.awaitingConfirmation > 0 && (
-                  <Card className="p-5 border-purple-200 bg-purple-50">
+                  <Card className="p-5 border-carefd-teal-pale bg-carefd-teal/5">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <CheckCircle className="w-5 h-5 text-purple-600" />
+                        <CheckCircle className="w-5 h-5 text-carefd-teal" />
                         <div>
                           <p className="font-bold text-carefd-navy">{stats.awaitingConfirmation} הזמנות ממתינות לאישור השלמה</p>
                           <p className="text-sm text-slate-500">הספק סימן שהשירות הושלם, נא לאשר</p>
@@ -254,7 +254,7 @@ export default function DashboardPage() {
                   <h3 className="text-xl font-bold text-carefd-navy">ההזמנות שלי</h3>
                   <div className="flex items-center gap-3">
                     <select value={bookingSortBy} onChange={(e) => setBookingSortBy(e.target.value)}
-                      className="bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium cursor-pointer hover:border-carefd-teal focus:outline-none">
+                      className="bg-white border-2 border-carefd-teal-pale/50 rounded-xl px-4 py-2 text-sm font-medium cursor-pointer hover:border-carefd-teal focus:border-carefd-teal focus:outline-none focus:ring-2 focus:ring-carefd-teal/15 transition-all">
                       <option value="date_desc">חדש ← ישן</option><option value="date_asc">ישן ← חדש</option>
                       <option value="status">לפי סטטוס</option><option value="price_desc">לפי מחיר</option>
                     </select>

@@ -95,9 +95,9 @@ export default function BookingsPage() {
 
       {/* Awaiting Confirmation Alert */}
       {stats.awaitingConfirm > 0 && (
-        <Card className="p-4 mb-4 border-purple-200 bg-purple-50 flex items-center justify-between">
+        <Card className="p-4 mb-4 border-carefd-teal-pale bg-carefd-teal/5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CheckCircle className="w-5 h-5 text-purple-600" />
+            <CheckCircle className="w-5 h-5 text-carefd-teal" />
             <span className="font-medium text-purple-900">{stats.awaitingConfirm} הזמנות ממתינות לאישור השלמה</span>
           </div>
           <Button size="sm" variant="outline" onClick={() => setFilter("provider_completed")}>הצג</Button>
@@ -117,7 +117,7 @@ export default function BookingsPage() {
           ))}
         </div>
         <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}
-          className="ms-auto bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm cursor-pointer hover:border-carefd-teal focus:outline-none">
+          className="ms-auto bg-white border-2 border-carefd-teal-pale/50 rounded-xl px-4 py-2 text-sm cursor-pointer hover:border-carefd-teal focus:border-carefd-teal focus:outline-none focus:ring-2 focus:ring-carefd-teal/15 transition-all">
           <option value="date_desc">חדש ← ישן</option><option value="date_asc">ישן ← חדש</option>
           <option value="status">לפי סטטוס</option><option value="price_desc">לפי מחיר</option>
         </select>

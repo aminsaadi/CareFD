@@ -74,8 +74,8 @@ export default function BookServicePage() {
   if (success) return (
     <div className="container-main py-16 max-w-2xl">
       <Card className="p-10 text-center shadow-floating border-0">
-        <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
-          <CheckCircle className="w-8 h-8 text-emerald-500" />
+        <div className="w-16 h-16 bg-carefd-teal/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <CheckCircle className="w-8 h-8 text-carefd-teal" />
         </div>
         <h2 className="mb-2">ההזמנה נשלחה בהצלחה!</h2>
         <p className="text-slate-500 mb-1">מספר הזמנה: <span className="font-mono font-semibold text-carefd-navy">{success.booking_number}</span></p>
@@ -109,7 +109,7 @@ export default function BookServicePage() {
             <div className="bg-red-50 text-red-600 text-sm rounded-xl p-4 border border-red-100">{error}</div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-slate-400" />
@@ -186,7 +186,7 @@ export default function BookServicePage() {
             />
           </div>
 
-          <Button type="submit" className="w-full" size="lg" disabled={submitting} data-testid="book-submit">
+          <Button type="submit" className="w-full h-14 rounded-xl bg-gradient-to-l from-carefd-teal to-carefd-teal-medium hover:from-carefd-teal-medium hover:to-carefd-teal shadow-glow hover:shadow-lg transition-all text-lg" size="lg" disabled={submitting} data-testid="book-submit">
             {submitting ? (
               <span className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white" />
             ) : (
