@@ -8,7 +8,7 @@ import {
   BarChart3, Users, Stethoscope, CalendarDays, Wrench,
   FileText, Star, GraduationCap, MapPin, CreditCard,
   FileStack, PenTool, Megaphone, Settings, Shield,
-  Bell, TrendingUp, MessageCircle, Tag, Award,
+  Bell, TrendingUp, MessageCircle, Tag, Award, Smartphone,
 } from "lucide-react";
 
 const adminLinks = [
@@ -24,14 +24,16 @@ const adminLinks = [
   { href: "/admin/professions", label: "מקצועות", icon: GraduationCap },
   { href: "/admin/regions", label: "אזורים", icon: MapPin },
   { href: "/admin/featured", label: "מומלצים", icon: Award },
-  { href: "/admin/push", label: "התראות", icon: Bell },
+  { href: "/admin/notifications", label: "התראות מערכת", icon: Bell },
+  { href: "/admin/push", label: "שליחת התראות", icon: Bell },
   { href: "/admin/messages", label: "הודעות", icon: MessageCircle },
   { href: "/admin/reports", label: "דוחות", icon: TrendingUp },
   { href: "/admin/subscriptions", label: "מנויים", icon: CreditCard },
   { href: "/admin/pages", label: "דפים", icon: FileStack },
   { href: "/admin/blog", label: "בלוג", icon: PenTool },
   { href: "/admin/ads", label: "פרסום", icon: Megaphone },
-  { href: "/admin/settings", label: "הגדרות", icon: Settings },
+  { href: "/admin/app-settings", label: "הגדרות אפליקציה", icon: Smartphone },
+  { href: "/admin/settings", label: "הגדרות כלליות", icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
