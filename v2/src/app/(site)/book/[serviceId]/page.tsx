@@ -136,42 +136,85 @@ export default function BookServicePage() {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-slate-400" />
-              שם
-            </label>
-            <Input
-              value={form.client_name || user?.name || ""}
-              onChange={(e) => setForm({ ...form, client_name: e.target.value })}
-              data-testid="book-name"
-            />
+          {/* Delivery Type */}
+          {service.delivery_types?.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">דרך מתן השירות</label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {(service.delivery_types as string[]).map((dt: string) => {
+                  const dtLabels: Record<string, { label: string; emoji: string }> = {
+                    home_visit: { label: "בבית", emoji: "🏠" },
+                    hospital: { label: "בי\"ח/מוסד", emoji: "🏥" },
+                    clinic: { label: "בקליניקה", emoji: "🏢" },
+                    virtual: { label: "וירטואלי", emoji: "💻" },
+                  };
+                  const info = dtLabels[dt] || { label: dt, emoji: "📋" };
+                  return (
+                    <button key={dt} type="button" onClick={() => setForm({ ...form, delivery_type: dt })}
+                      className={`p-3 rounded-xl border-2 text-center transition-all ${form.delivery_type === dt ? "border-carefd-teal bg-carefd-teal/5" : "border-slate-200 hover:border-carefd-teal/40"}`}>
+                      <span className="text-xl block mb-1">{info.emoji}</span>
+                      <span className="text-xs font-medium">{info.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-slate-400" />
+                שם
+              </label>
+              <Input
+                value={form.client_name || user?.name || ""}
+                onChange={(e) => setForm({ ...form, client_name: e.target.value })}
+                data-testid="book-name"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 text-slate-400" />
+                טלפון
+              </label>
+              <Input
+                value={form.client_phone}
+                onChange={(e) => setForm({ ...form, client_phone: e.target.value })}
+                placeholder="050-0000000"
+                dir="ltr"
+                data-testid="book-phone"
+              />
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5 text-slate-400" />
-              טלפון
-            </label>
-            <Input
-              value={form.client_phone}
-              onChange={(e) => setForm({ ...form, client_phone: e.target.value })}
-              placeholder="050-0000000"
-              dir="ltr"
-              data-testid="book-phone"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-slate-400" />
-              כתובת לשירות
-            </label>
-            <Input
-              value={form.service_address}
-              onChange={(e) => setForm({ ...form, service_address: e.target.value })}
-              data-testid="book-address"
-            />
+          {/* Address fields */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                עיר
+              </label>
+              <Input
+                value={form.service_city}
+                onChange={(e) => setForm({ ...form, service_city: e.target.value })}
+                placeholder="תל אביב"
+                data-testid="book-city"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                כתובת
+              </label>
+              <Input
+                value={form.service_address}
+                onChange={(e) => setForm({ ...form, service_address: e.target.value })}
+                placeholder="רחוב, מספר בית"
+                data-testid="book-address"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">

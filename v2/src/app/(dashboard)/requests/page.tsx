@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, FileText, MapPin, Clock, DollarSign, XCircle } from "lucide-react";
+import { Plus, FileText, MapPin, Clock, DollarSign, XCircle, Save, X, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import type { ServiceRequest } from "@/lib/types";
 
@@ -32,6 +34,9 @@ export default function RequestsPage() {
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [showForm, setShowForm] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({ title: "", description: "", budget: "", urgency: "medium", city: "" });
 
   const fetchData = () => {
     setLoading(true);
@@ -69,7 +74,7 @@ export default function RequestsPage() {
           <h1>בקשות שירות</h1>
           <p className="text-sm text-slate-400 mt-1">{stats.total} בקשות • {stats.open} פתוחות</p>
         </div>
-        <Button asChild><Link href="/requests/new"><Plus className="w-4 h-4 me-1" />בקשה חדשה</Link></Button>
+        <Button onClick={() => setShowForm(!showForm)}><Plus className="w-4 h-4 me-1" />בקשה חדשה</Button>
       </div>
 
       {/* Filters */}
@@ -83,6 +88,41 @@ export default function RequestsPage() {
           </button>
         ))}
       </div>
+
+      {/* Create Request Form */}
+      {showForm && (
+        <Card className="p-6 mb-6 border-2 border-carefd-teal">
+          <h3 className="font-bold text-carefd-navy text-lg mb-4">בקשה חדשה</h3>
+          <div className="space-y-4">
+            <div className="space-y-1"><label className="text-sm font-medium text-slate-700">כותרת *</label>
+              <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="מה אתם מחפשים?" /></div>
+            <div className="space-y-1"><label className="text-sm font-medium text-slate-700">תיאור</label>
+              <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="תארו את השירות שאתם צריכים..." className="min-h-[100px]" /></div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-1"><label className="text-sm font-medium text-slate-700">תקציב (₪)</label>
+                <Input type="number" value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} placeholder="אופציונלי" /></div>
+              <div className="space-y-1"><label className="text-sm font-medium text-slate-700">דחיפות</label>
+                <select value={form.urgency} onChange={(e) => setForm({ ...form, urgency: e.target.value })}
+                  className="w-full border-2 border-carefd-teal-pale/50 rounded-xl px-3 py-2 text-sm focus:border-carefd-teal focus:outline-none focus:ring-2 focus:ring-carefd-teal/15 transition-all">
+                  <option value="low">נמוכה</option><option value="medium">בינונית</option><option value="high">גבוהה</option><option value="urgent">דחופה</option>
+                </select></div>
+              <div className="space-y-1"><label className="text-sm font-medium text-slate-700">עיר</label>
+                <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="תל אביב" /></div>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={async () => {
+                if (!form.title) { toast.error("נא למלא כותרת"); return; }
+                setSaving(true);
+                try {
+                  await api.post("/requests", { title: form.title, description: form.description, budget: form.budget ? parseFloat(form.budget) : undefined, urgency: form.urgency, city: form.city || undefined });
+                  toast.success("הבקשה נוצרה!"); setShowForm(false); setForm({ title: "", description: "", budget: "", urgency: "medium", city: "" }); fetchData();
+                } catch { toast.error("שגיאה ביצירה"); } finally { setSaving(false); }
+              }} disabled={saving}>{saving ? <Loader2 className="w-4 h-4 animate-spin me-1" /> : <Save className="w-4 h-4 me-1" />}שלח בקשה</Button>
+              <Button variant="ghost" onClick={() => setShowForm(false)}><X className="w-4 h-4 me-1" />ביטול</Button>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {loading ? (
         <div className="space-y-3">{[1, 2, 3].map((i) => <Skeleton key={i} className="h-24 w-full" />)}</div>

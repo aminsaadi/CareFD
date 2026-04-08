@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { NotificationProvider } from "@/context/NotificationContext";
+import { SiteSettingsProvider } from "@/context/SiteSettingsContext";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
 import CookieConsent from "@/components/CookieConsent";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -16,12 +17,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="he" dir="rtl">
       <body className="font-sans antialiased">
         <AuthProvider>
-          <NotificationProvider>
-            {children}
-            <ScrollToTop />
-            <AccessibilityWidget />
-            <CookieConsent />
-          </NotificationProvider>
+          <SiteSettingsProvider>
+            <NotificationProvider>
+              {children}
+              <ScrollToTop />
+              <AccessibilityWidget />
+              <CookieConsent />
+            </NotificationProvider>
+          </SiteSettingsProvider>
         </AuthProvider>
       </body>
     </html>
