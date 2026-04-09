@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { Card } from "@/components/ui/card";
-import { Shield, Heart, Eye, Lightbulb, Users, MapPin, Star, Stethoscope } from "lucide-react";
+import { Shield, Heart, Eye, Lightbulb, Users, MapPin, Star, Stethoscope, CheckCircle, ArrowLeft } from "lucide-react";
 
 const values = [
   { icon: Heart, title: "אכפתיות", desc: "אנחנו שמים את המטופלים והספקים במרכז. כל החלטה שלנו נעשית מתוך אכפתיות אמיתית." },
@@ -16,14 +15,23 @@ const stats = [
   { icon: Star, value: "4.9", label: "דירוג ממוצע" },
 ];
 
+const features = [
+  "חיפוש מתקדם לפי מקצוע, מיקום ודירוג",
+  "תהליך אימות מקיף לכל ספק",
+  "הזמנת תורים אונליין 24/7",
+  "ביקורות ודירוגים אמיתיים",
+  "שיחות צ'אט ישירות עם הספקים",
+  "מערכת בקשות שירות חכמה",
+];
+
 export default function AboutPage() {
   return (
     <div>
-      {/* Hero */}
-      <section className="section-padding bg-gradient-to-br from-carefd-teal-pale/20 via-white to-white">
-        <div className="container-main max-w-4xl text-center">
-          <h1 className="mb-6">אודות CareFD</h1>
-          <p className="text-lg text-slate-500 leading-relaxed max-w-2xl mx-auto">
+      {/* Hero - V1 style */}
+      <section className="bg-gradient-to-br from-carefd-navy to-carefd-teal py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-3xl md:text-4xl font-bold text-white font-heading mb-6">אודות CareFD</h1>
+          <p className="text-lg md:text-xl text-carefd-teal-pale leading-relaxed max-w-2xl mx-auto">
             CareFD היא פלטפורמת שירותי בריאות פרמיום בישראל, המחברת בין מטופלים לנותני שירותים
             מקצועיים ומאומתים. המשימה שלנו היא להפוך את הגישה לשירותי בריאות איכותיים לפשוטה,
             נגישה ושקופה.
@@ -31,35 +39,37 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Mission + Stats */}
-      <section className="section-padding">
-        <div className="container-main">
-          <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+      {/* Mission - V1 style with stats grid */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-2xl font-bold text-carefd-navy mb-6">המשימה שלנו</h2>
+              <h2 className="text-3xl font-bold text-carefd-navy font-heading mb-6">המשימה שלנו</h2>
               <p className="text-carefd-slate leading-relaxed mb-4">
                 אנחנו מאמינים שכל אדם זכאי לגישה קלה ונוחה לשירותי בריאות איכותיים.
                 CareFD נוצרה כדי לגשר על הפער בין מטופלים שמחפשים טיפול מקצועי לבין
                 נותני שירותים מוסמכים ומנוסים.
               </p>
-              <p className="text-carefd-slate leading-relaxed mb-4">
+              <p className="text-carefd-slate leading-relaxed mb-6">
                 הפלטפורמה שלנו מאפשרת חיפוש מתקדם, השוואת מחירים, קריאת ביקורות אמיתיות,
                 והזמנת תורים - הכל במקום אחד.
               </p>
-              <p className="text-carefd-slate leading-relaxed">
-                אנחנו מחויבים לאיכות, שקיפות ובטיחות. כל ספק שירות עובר תהליך אימות מקיף
-                לפני שהוא מופיע בפלטפורמה.
-              </p>
+              <div className="space-y-3">
+                {features.map((f) => (
+                  <div key={f} className="flex items-center gap-3">
+                    <CheckCircle className="w-5 h-5 text-carefd-teal flex-shrink-0" />
+                    <span className="text-carefd-slate text-sm">{f}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Stats Grid */}
+            {/* Stats Grid - V1 style */}
             <div className="bg-carefd-teal-pale/30 rounded-2xl p-8">
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-4">
                 {stats.map((stat) => (
-                  <div key={stat.label} className="text-center">
-                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mx-auto mb-3 shadow-sm">
-                      <stat.icon className="w-6 h-6 text-carefd-teal" />
-                    </div>
+                  <div key={stat.label} className="text-center p-4 bg-white rounded-xl shadow-md">
+                    <stat.icon className="w-8 h-8 text-carefd-teal mx-auto mb-2" />
                     <p className="text-3xl font-bold text-carefd-navy mb-1">{stat.value}</p>
                     <p className="text-sm text-carefd-gray">{stat.label}</p>
                   </div>
@@ -70,42 +80,38 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Values */}
-      <section className="section-padding bg-carefd-teal-pale/10">
-        <div className="container-main">
-          <h2 className="text-center mb-12">הערכים שלנו</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+      {/* Values - V1 style */}
+      <section className="py-16 bg-carefd-teal-pale/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-carefd-navy font-heading mb-4">הערכים שלנו</h2>
+          </div>
+          <div className="grid md:grid-cols-4 gap-6">
             {values.map((v) => (
-              <Card key={v.title} className="p-8 hover-lift text-center">
-                <div className="w-16 h-16 bg-carefd-teal-pale rounded-full flex items-center justify-center mx-auto mb-4">
-                  <v.icon className="w-7 h-7 text-carefd-teal" />
+              <div key={v.title} className="bg-white p-6 rounded-2xl shadow-md text-center hover:shadow-lg transition group">
+                <div className="w-16 h-16 mx-auto bg-carefd-teal-pale rounded-full flex items-center justify-center mb-4">
+                  <v.icon className="w-8 h-8 text-carefd-teal" />
                 </div>
-                <h3 className="font-heading font-semibold text-lg text-carefd-navy mb-2">{v.title}</h3>
+                <h3 className="font-bold text-lg text-carefd-navy mb-3">{v.title}</h3>
                 <p className="text-slate-500 text-sm leading-relaxed">{v.desc}</p>
-              </Card>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA - V1 style dark navy */}
       <section className="py-16 bg-carefd-navy">
-        <div className="container-main text-center max-w-3xl">
-          <h2 className="text-3xl font-bold text-white mb-4">מוכנים להתחיל?</h2>
-          <p className="text-white/60 text-lg mb-8">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">מוכנים להתחיל?</h2>
+          <p className="text-carefd-teal-pale text-lg mb-8">
             הצטרפו לאלפי משתמשים שכבר מצאו את הספק המתאים להם
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/register"
-              className="bg-carefd-teal text-white px-8 py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition-colors text-center"
-            >
+            <Link href="/register" className="bg-carefd-teal text-white px-8 py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition">
               הרשמו עכשיו
             </Link>
-            <Link
-              href="/providers"
-              className="bg-white/10 text-white border border-white/20 px-8 py-3 rounded-xl font-semibold hover:bg-white/20 transition-colors text-center"
-            >
+            <Link href="/providers" className="bg-white/10 text-white px-8 py-3 rounded-xl font-semibold hover:bg-white/20 transition border border-white/30">
               צפו בספקים
             </Link>
           </div>

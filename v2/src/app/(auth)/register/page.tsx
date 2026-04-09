@@ -83,7 +83,7 @@ function RegisterContent() {
   // Verification sent screen
   if (verificationSent) {
     return (
-      <Card className="p-8 md:p-10 shadow-floating border-0 text-center">
+      <div className="bg-white rounded-3xl shadow-2xl p-8 text-center">
         <div className="w-20 h-20 bg-carefd-teal-pale/30 rounded-full flex items-center justify-center mx-auto mb-6">
           <MailOpen className="w-10 h-10 text-carefd-teal" />
         </div>
@@ -110,14 +110,14 @@ function RegisterContent() {
             חזרה להתחברות
           </Link>
         </div>
-      </Card>
+      </div>
     );
   }
 
   return (
-    <Card className="p-8 md:p-10 shadow-floating border-0">
+    <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-8">
       <div className="text-center mb-8">
-        <h2 className="mb-2">יצירת חשבון</h2>
+        <h2 className="text-2xl font-bold text-carefd-navy mb-2">יצירת חשבון</h2>
         <p className="text-slate-500">הצטרפו לקהילת CareFD</p>
       </div>
 
@@ -215,7 +215,7 @@ function RegisterContent() {
           <p className="text-xs text-slate-400">8 תווים לפחות, כולל ספרה ואות</p>
         </div>
 
-        <Button type="submit" className="w-full" size="lg" disabled={loading} data-testid="register-submit">
+        <Button type="submit" className="w-full bg-carefd-teal text-white py-4 rounded-xl hover:bg-carefd-teal-medium font-semibold transition-all shadow-lg hover:shadow-xl disabled:opacity-50" size="lg" disabled={loading} data-testid="register-submit">
           {loading ? (
             <span className="animate-spin rounded-full h-5 w-5 border-2 border-white/30 border-t-white" />
           ) : (
@@ -250,6 +250,6 @@ function RegisterContent() {
           התחברו
         </Link>
       </p>
-    </Card>
+    </div>
   );
 }

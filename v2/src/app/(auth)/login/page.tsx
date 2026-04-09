@@ -77,9 +77,9 @@ export default function LoginPage() {
 
   return (
     <>
-      <Card className="p-8 md:p-10 shadow-floating border-0">
+      <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 lg:p-10">
         <div className="text-center mb-8">
-          <h2 className="mb-2">ברוכים השבים</h2>
+          <h2 className="text-2xl font-bold text-carefd-navy mb-2">ברוכים השבים</h2>
           <p className="text-slate-500">התחברו לחשבון שלכם</p>
         </div>
 
@@ -171,14 +171,13 @@ export default function LoginPage() {
               הרשמו עכשיו
             </Link>
           </p>
-          <p className="text-slate-500">
-            ספק שירות?{" "}
-            <Link href="/register?role=provider" className="text-carefd-teal font-semibold hover:underline">
-              הרשמו כספק
-            </Link>
-          </p>
+          {/* Provider registration CTA - V1 style */}
+          <Link href="/register?role=provider"
+            className="flex items-center justify-center gap-3 w-full bg-carefd-navy/5 text-carefd-navy py-3.5 rounded-xl hover:bg-carefd-navy/10 font-medium transition group">
+            ספק שירות? הרשמו כאן
+          </Link>
         </div>
-      </Card>
+      </div>
 
       {/* Forgot Password Modal */}
       {showForgotPassword && (

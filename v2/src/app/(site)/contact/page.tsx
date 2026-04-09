@@ -64,15 +64,20 @@ export default function ContactPage() {
     );
 
   return (
-    <div className="container-main py-10 md:py-16">
-      <div className="text-center mb-10">
-        <h1 className="mb-3">צור קשר</h1>
-        <p className="text-lg text-slate-500">נשמח לשמוע מכם. מלאו את הטופס ונחזור אליכם בהקדם.</p>
-      </div>
+    <div>
+      {/* Hero Section - V1 style */}
+      <section className="bg-gradient-to-br from-carefd-navy to-carefd-teal py-16">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 font-heading">צור קשר</h1>
+          <p className="text-lg text-carefd-teal-pale">נשמח לשמוע מכם. צוות CareFD כאן לעזור בכל שאלה.</p>
+        </div>
+      </section>
 
-      <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+      <div className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12">
         {/* Contact Form */}
-        <Card className="p-8 md:p-10">
+        <Card className="p-6 shadow-lg border border-gray-200">
           {error && (
             <div className="bg-red-50 text-red-600 text-sm rounded-xl p-4 border border-red-100 mb-6">
               {error}
@@ -169,57 +174,51 @@ export default function ContactPage() {
           </form>
         </Card>
 
-        {/* Contact Info */}
+        {/* Contact Info - V1 style */}
         <div className="space-y-6">
-          <div className="bg-carefd-teal-pale/20 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-carefd-teal rounded-lg flex items-center justify-center">
-                <Phone className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-carefd-navy">טלפון</h3>
-                <p className="text-sm text-carefd-gray">ימים א-ה, 9:00-18:00 | יום ו, 9:00-13:00</p>
-              </div>
+          <div className="flex items-start gap-4 p-4 bg-carefd-teal-pale/20 rounded-xl">
+            <div className="w-12 h-12 bg-carefd-teal rounded-full flex items-center justify-center flex-shrink-0">
+              <Phone className="w-5 h-5 text-white" />
             </div>
-            <p className="text-lg font-bold text-carefd-navy direction-ltr text-right">03-1234567</p>
-          </div>
-
-          <div className="bg-carefd-teal-pale/20 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-carefd-teal rounded-lg flex items-center justify-center">
-                <Mail className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-carefd-navy">אימייל</h3>
-                <p className="text-sm text-carefd-gray">נחזור אליכם תוך 24 שעות</p>
-              </div>
-            </div>
-            <p className="text-lg font-bold text-carefd-navy" dir="ltr">support@carefd.com</p>
-          </div>
-
-          <div className="bg-carefd-teal-pale/20 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-carefd-teal rounded-lg flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-carefd-navy">כתובת</h3>
-                <p className="text-sm text-carefd-gray">ישראל</p>
-              </div>
+            <div>
+              <h3 className="font-semibold text-carefd-navy mb-1">טלפון</h3>
+              <p className="text-lg font-bold text-carefd-navy direction-ltr text-right">03-1234567</p>
+              <p className="text-sm text-carefd-gray mt-1">ימים א-ה, 9:00-18:00 | יום ו, 9:00-13:00</p>
             </div>
           </div>
 
-          <div className="bg-carefd-teal-pale/20 rounded-xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-carefd-teal rounded-lg flex items-center justify-center">
-                <Clock className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-carefd-navy">שעות פעילות</h3>
-                <p className="text-sm text-carefd-gray">ימים א-ה: 9:00-18:00</p>
-                <p className="text-sm text-carefd-gray">יום ו: 9:00-13:00</p>
-              </div>
+          <div className="flex items-start gap-4 p-4 bg-carefd-teal-pale/20 rounded-xl">
+            <div className="w-12 h-12 bg-carefd-teal rounded-full flex items-center justify-center flex-shrink-0">
+              <Mail className="w-5 h-5 text-white" />
             </div>
+            <div>
+              <h3 className="font-semibold text-carefd-navy mb-1">אימייל</h3>
+              <p className="text-lg font-bold text-carefd-navy" dir="ltr">support@carefd.com</p>
+              <p className="text-sm text-carefd-gray mt-1">נחזור אליכם תוך 24 שעות</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-4 p-4 bg-carefd-teal-pale/20 rounded-xl">
+            <div className="w-12 h-12 bg-carefd-teal rounded-full flex items-center justify-center flex-shrink-0">
+              <MapPin className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-carefd-navy mb-1">כתובת</h3>
+              <p className="text-sm text-carefd-gray">ישראל</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-4 p-4 bg-carefd-teal-pale/20 rounded-xl">
+            <div className="w-12 h-12 bg-carefd-teal rounded-full flex items-center justify-center flex-shrink-0">
+              <Clock className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-carefd-navy mb-1">שעות פעילות</h3>
+              <p className="text-sm text-carefd-gray">ימים א-ה: 9:00-18:00</p>
+              <p className="text-sm text-carefd-gray">יום ו: 9:00-13:00</p>
+            </div>
+          </div>
+        </div>
           </div>
         </div>
       </div>
