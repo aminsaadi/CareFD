@@ -15,7 +15,7 @@ import {
   MapPin, Star, Shield, Phone, MessageCircle, Clock, Globe, Heart,
   Award, ChevronLeft, Share2, Copy, Check, GraduationCap, Users,
   CalendarDays, Briefcase, CreditCard, Home, Video, Building2,
-  PhoneCall, Info, FileText,
+  PhoneCall, Info, FileText, User,
 } from "lucide-react";
 import type { Provider, Review } from "@/lib/types";
 
@@ -440,6 +440,34 @@ export default function ProviderProfilePage() {
                   {(provider as any).service_areas.map((a: string, i: number) => <Badge key={i} variant="outline" className="text-xs">{a}</Badge>)}
                 </div>
               )}
+            </Card>
+          )}
+
+          {/* about */}
+          {provider.about && (
+            <Card className="p-6">
+              <h3 className="font-heading font-semibold text-carefd-navy mb-3 flex items-center gap-2"><User className="w-4 h-4 text-carefd-teal" />אודות</h3>
+              <p className="text-slate-500 text-sm leading-relaxed whitespace-pre-line">{provider.about}</p>
+            </Card>
+          )}
+
+          {/* target audience */}
+          {(provider as any).target_audience?.length > 0 && (
+            <Card className="p-6">
+              <h3 className="font-heading font-semibold text-carefd-navy mb-3 flex items-center gap-2"><Users className="w-4 h-4 text-carefd-teal" />קהל יעד</h3>
+              <div className="flex flex-wrap gap-2">
+                {((provider as any).target_audience as string[]).map((t, i) => (
+                  <Badge key={i} variant="outline" className="text-xs">{t}</Badge>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* gender */}
+          {provider.gender && (
+            <Card className="p-6">
+              <h3 className="font-heading font-semibold text-carefd-navy mb-3">מגדר</h3>
+              <p className="text-slate-500 text-sm">{provider.gender === "male" ? "גבר" : provider.gender === "female" ? "אישה" : provider.gender}</p>
             </Card>
           )}
 

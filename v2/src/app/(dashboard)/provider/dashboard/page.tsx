@@ -18,6 +18,7 @@ import {
   Plus, Trash2, Save, ChevronLeft, ChevronDown, ChevronUp,
   CheckCircle, XCircle, Hourglass, ArrowUpDown, MapPin,
   Home, Video, Building2, Phone as PhoneIcon, Loader2,
+  Crown, Users, Shield, User,
 } from "lucide-react";
 
 const tabs = [
@@ -29,6 +30,11 @@ const tabs = [
   { id: "my_offers", label: "ההצעות שלי", icon: DollarSign },
   { id: "messages", label: "הודעות", icon: MessageCircle },
   { id: "reviews", label: "ביקורות", icon: Star },
+  { id: "subscription", label: "מנוי", icon: Crown },
+  { id: "clinics", label: "קליניקות", icon: Building2 },
+  { id: "team", label: "צוות", icon: Users },
+  { id: "user_info", label: "פרטי משתמש", icon: User },
+  { id: "verification", label: "אימות", icon: Shield },
   { id: "settings", label: "הגדרות", icon: Settings },
 ];
 
@@ -662,6 +668,138 @@ export default function ProviderDashboardPage() {
                   </div>
                 )}
               </Card>
+            )}
+
+            {/* ===== SUBSCRIPTION TAB ===== */}
+            {activeTab === "subscription" && (
+              <Card className="p-6">
+                <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2"><Crown className="w-5 h-5 text-amber-500" />מנוי</h3>
+                <div className={`p-6 rounded-2xl mb-6 ${providerData?.subscription_tier === "pro" ? "bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200" : providerData?.subscription_tier === "premium" ? "bg-gradient-to-br from-carefd-teal/10 to-carefd-navy/10 border-2 border-carefd-teal" : "bg-slate-50 border-2 border-slate-200"}`}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <Crown className={`w-8 h-8 ${providerData?.subscription_tier === "premium" ? "text-carefd-teal" : providerData?.subscription_tier === "pro" ? "text-blue-600" : "text-slate-400"}`} />
+                    <div>
+                      <h4 className="text-lg font-bold text-carefd-navy">{providerData?.subscription_tier === "premium" ? "פרמיום" : providerData?.subscription_tier === "pro" ? "פרו" : "חינמי"}</h4>
+                      <p className="text-sm text-slate-500">התוכנית הנוכחית שלך</p>
+                    </div>
+                  </div>
+                  {(!providerData?.subscription_tier || providerData?.subscription_tier === "free") && (
+                    <div className="bg-gradient-to-l from-blue-500 to-blue-600 rounded-xl p-4 text-white mt-4">
+                      <p className="font-bold mb-1">שדרג לפרו!</p>
+                      <p className="text-sm text-blue-100 mb-3">30 יום ניסיון חינם - פרופיל מקודם, שירותים ללא הגבלה</p>
+                      <Button className="bg-white text-blue-600 hover:bg-blue-50" size="sm">נסה חינם 30 יום</Button>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-3">
+                  {["פרופיל מקודם בתוצאות החיפוש", "שירותים ללא הגבלה", "תווית 'מומלץ'", "סטטיסטיקות מתקדמות", "תמיכה מועדפת"].map((f, i) => (
+                    <div key={i} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
+                      <CheckCircle className={`w-5 h-5 flex-shrink-0 ${providerData?.subscription_tier !== "free" ? "text-carefd-teal" : i < 2 ? "text-carefd-teal" : "text-slate-300"}`} />
+                      <span className={`text-sm ${providerData?.subscription_tier !== "free" || i < 2 ? "text-carefd-navy" : "text-slate-400"}`}>{f}</span>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+
+            {/* ===== CLINICS TAB ===== */}
+            {activeTab === "clinics" && (
+              <Card className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-carefd-navy flex items-center gap-2"><Building2 className="w-5 h-5 text-carefd-teal" />קליניקות</h3>
+                  <Button size="sm" asChild><Link href={`/provider/edit/${pid}?tab=location`}><Plus className="w-4 h-4 me-1" />הוסף קליניקה</Link></Button>
+                </div>
+                {providerData?.clinics?.length > 0 ? (
+                  <div className="space-y-3">
+                    {providerData.clinics.map((clinic: any, i: number) => (
+                      <div key={i} className="border-2 border-slate-200 rounded-xl p-4 hover:border-carefd-teal transition">
+                        <h4 className="font-bold text-carefd-navy">{clinic.name || `קליניקה ${i + 1}`}</h4>
+                        {clinic.address && <p className="text-sm text-slate-500 flex items-center gap-1 mt-1"><MapPin className="w-3 h-3" />{clinic.address}{clinic.city ? `, ${clinic.city}` : ""}</p>}
+                        {clinic.phone && <p className="text-sm text-slate-500 flex items-center gap-1 mt-1"><PhoneIcon className="w-3 h-3" />{clinic.phone}</p>}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-slate-400">
+                    <Building2 className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                    <p className="text-lg mb-2">אין קליניקות</p>
+                    <p className="text-sm">הוסף קליניקה כדי שלקוחות ידעו היכן אתה מקבל</p>
+                  </div>
+                )}
+              </Card>
+            )}
+
+            {/* ===== TEAM TAB ===== */}
+            {activeTab === "team" && (
+              <Card className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-carefd-navy flex items-center gap-2"><Users className="w-5 h-5 text-carefd-teal" />צוות</h3>
+                  <Button size="sm" asChild><Link href={`/provider/edit/${pid}`}><Plus className="w-4 h-4 me-1" />הוסף חבר צוות</Link></Button>
+                </div>
+                {providerData?.team_members?.length > 0 ? (
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {providerData.team_members.map((member: any, i: number) => (
+                      <div key={i} className="border-2 border-slate-200 rounded-xl p-4 flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-carefd-teal to-carefd-navy flex items-center justify-center text-white font-bold">{(member.name || "?")[0]}</div>
+                        <div>
+                          <h4 className="font-bold text-carefd-navy">{member.name}</h4>
+                          <p className="text-sm text-slate-500">{member.role || member.title || "חבר צוות"}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-slate-400">
+                    <Users className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+                    <p className="text-lg mb-2">אין חברי צוות</p>
+                    <p className="text-sm">הוסף חברי צוות שעובדים איתך</p>
+                  </div>
+                )}
+              </Card>
+            )}
+
+            {/* ===== USER INFO TAB ===== */}
+            {activeTab === "user_info" && (
+              <div className="space-y-6">
+                <Card className="p-6">
+                  <h3 className="text-xl font-bold text-carefd-navy mb-6 flex items-center gap-2"><User className="w-5 h-5 text-carefd-teal" />פרטים אישיים</h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="p-4 bg-slate-50 rounded-xl"><p className="text-sm text-slate-400">שם</p><p className="font-medium text-carefd-navy">{user?.name || "-"}</p></div>
+                    <div className="p-4 bg-slate-50 rounded-xl"><p className="text-sm text-slate-400">אימייל</p><p className="font-medium text-carefd-navy" dir="ltr">{user?.email || "-"}</p></div>
+                    <div className="p-4 bg-slate-50 rounded-xl"><p className="text-sm text-slate-400">טלפון</p><p className="font-medium text-carefd-navy" dir="ltr">{(user as any)?.phone || "-"}</p></div>
+                    <div className="p-4 bg-slate-50 rounded-xl"><p className="text-sm text-slate-400">עיר</p><p className="font-medium text-carefd-navy">{(user as any)?.city || "-"}</p></div>
+                  </div>
+                  <Button className="mt-4" variant="outline" asChild><Link href="/profile"><Edit className="w-4 h-4 me-1" />ערוך פרטים אישיים</Link></Button>
+                </Card>
+              </div>
+            )}
+
+            {/* ===== VERIFICATION TAB ===== */}
+            {activeTab === "verification" && (
+              <div className="max-w-2xl">
+                <Card className="p-6 mb-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Shield className="w-6 h-6 text-carefd-teal" />
+                    <div>
+                      <h3 className="text-xl font-bold text-carefd-navy">אימות חשבון</h3>
+                      <p className="text-sm text-slate-500">אמת את החשבון שלך כדי לקבל תג אימות בפרופיל</p>
+                    </div>
+                  </div>
+                  {providerData?.is_verified ? (
+                    <div className="bg-green-50 rounded-xl p-4 flex items-center gap-3">
+                      <CheckCircle className="w-6 h-6 text-green-500" />
+                      <div><p className="font-bold text-green-800">החשבון מאומת!</p><p className="text-sm text-green-600">תג אימות מופיע בפרופיל שלך</p></div>
+                    </div>
+                  ) : (
+                    <div className="bg-amber-50 rounded-xl p-4 flex items-center gap-3 mb-4">
+                      <Hourglass className="w-6 h-6 text-amber-500" />
+                      <div><p className="font-bold text-amber-800">החשבון טרם אומת</p><p className="text-sm text-amber-600">העלה מסמכים כדי להתחיל את תהליך האימות</p></div>
+                    </div>
+                  )}
+                </Card>
+                {!providerData?.is_verified && (
+                  <Button asChild><Link href="/verification"><Shield className="w-4 h-4 me-1" />עבור לדף אימות מסמכים</Link></Button>
+                )}
+              </div>
             )}
 
             {/* ===== SETTINGS TAB ===== */}
