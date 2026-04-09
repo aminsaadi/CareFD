@@ -14,6 +14,8 @@ import { Switch } from "@/components/ui/switch";
 import {
   Save, Loader2, ArrowRight, Eye, Shield, Award,
   User, MapPin, Phone, Mail, Globe, Star, CheckCircle,
+  Briefcase, Heart, CreditCard, Languages, Calendar,
+  Building2, Trash2, Ban,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -135,9 +137,89 @@ export default function AdminProviderEditPage() {
         </Card>
       </div>
 
+      {/* About & Description */}
+      <Card className="p-6 space-y-4 mt-6">
+        <h3 className="font-bold text-carefd-navy flex items-center gap-2"><User className="w-5 h-5 text-carefd-teal" />אודות</h3>
+        <div className="space-y-1"><label className="text-sm font-medium">תיאור מפורט</label>
+          <Textarea value={form.about || ""} onChange={(e) => setForm({ ...form, about: e.target.value })} className="min-h-[120px]" placeholder="תיאור מפורט על הספק, ניסיון, גישה..." /></div>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-1"><label className="text-sm font-medium">סוג ספק</label>
+            <select value={form.provider_type || "individual"} onChange={(e) => setForm({ ...form, provider_type: e.target.value })}
+              className="w-full border-2 border-carefd-teal-pale/50 rounded-xl px-3 py-2 text-sm focus:border-carefd-teal focus:outline-none transition-all">
+              <option value="individual">עצמאי</option><option value="clinic">מרפאה</option><option value="company">חברה</option>
+            </select></div>
+          <div className="space-y-1"><label className="text-sm font-medium flex items-center gap-1"><Globe className="w-3.5 h-3.5" />אתר אינטרנט</label>
+            <Input value={form.website || ""} onChange={(e) => setForm({ ...form, website: e.target.value })} dir="ltr" placeholder="https://..." /></div>
+        </div>
+        <div className="space-y-1"><label className="text-sm font-medium">כתובת מלאה</label>
+          <Input value={form.location?.address || form.address || ""} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="רחוב, מספר בית" /></div>
+      </Card>
+
+      {/* Languages & Health Funds */}
+      <div className="grid lg:grid-cols-2 gap-6 mt-6">
+        <Card className="p-6 space-y-4">
+          <h3 className="font-bold text-carefd-navy flex items-center gap-2"><Languages className="w-5 h-5 text-carefd-teal" />שפות</h3>
+          <div className="flex flex-wrap gap-2">
+            {["עברית","אנגלית","ערבית","רוסית","אמהרית","צרפתית","ספרדית"].map((lang) => (
+              <button key={lang} type="button" onClick={() => {
+                const langs = form.languages || [];
+                setForm({ ...form, languages: langs.includes(lang) ? langs.filter((l: string) => l !== lang) : [...langs, lang] });
+              }} className={`px-3 py-1.5 rounded-full text-xs font-medium transition ${(form.languages || []).includes(lang) ? "bg-carefd-teal text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
+                {lang}
+              </button>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="p-6 space-y-4">
+          <h3 className="font-bold text-carefd-navy flex items-center gap-2"><Heart className="w-5 h-5 text-carefd-teal" />קופות חולים</h3>
+          <div className="flex flex-wrap gap-2">
+            {["כללית","מכבי","מאוחדת","לאומית","פרטי"].map((fund) => (
+              <button key={fund} type="button" onClick={() => {
+                const funds = form.health_funds || [];
+                setForm({ ...form, health_funds: funds.includes(fund) ? funds.filter((f: string) => f !== fund) : [...funds, fund] });
+              }} className={`px-3 py-1.5 rounded-full text-xs font-medium transition ${(form.health_funds || []).includes(fund) ? "bg-carefd-teal text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
+                {fund}
+              </button>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      {/* Services List */}
+      {provider.services_list?.length > 0 && (
+        <Card className="p-6 mt-6">
+          <h3 className="font-bold text-carefd-navy mb-4 flex items-center gap-2"><Briefcase className="w-5 h-5 text-carefd-teal" />שירותים ({provider.services_list.length})</h3>
+          <div className="space-y-2">
+            {provider.services_list.map((s: any) => (
+              <div key={s.service_id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                <div><p className="font-medium text-carefd-navy text-sm">{s.name}</p>{s.description && <p className="text-xs text-slate-400 line-clamp-1">{s.description}</p>}</div>
+                <span className="font-bold text-carefd-teal">₪{s.price}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Admin Actions */}
+      <Card className="p-6 mt-6 border-red-200 bg-red-50/30">
+        <h3 className="font-bold text-red-800 mb-4">פעולות מנהל</h3>
+        <div className="flex flex-wrap gap-3">
+          {!form.is_verified && <Button className="bg-carefd-teal hover:bg-carefd-teal-medium" onClick={handleVerify}><Shield className="w-4 h-4 me-1" />אמת ספק</Button>}
+          <Button variant={form.is_recommended ? "ghost" : "outline"} onClick={handleRecommend}>
+            <Award className="w-4 h-4 me-1" />{form.is_recommended ? "הסר המלצה" : "המלץ על ספק"}
+          </Button>
+          <Button variant="destructive" size="sm" onClick={async () => {
+            if (!confirm("האם להשעות ספק זה?")) return;
+            try { await api.put(`/admin/providers/${providerId}`, { is_suspended: true }); toast.success("הספק הושעה"); }
+            catch { toast.error("שגיאה"); }
+          }}><Ban className="w-4 h-4 me-1" />השעה ספק</Button>
+        </div>
+      </Card>
+
       {/* Save */}
       <div className="flex justify-end mt-6">
-        <Button onClick={handleSave} disabled={saving} size="lg">
+        <Button onClick={handleSave} disabled={saving} size="lg" className="bg-gradient-to-l from-carefd-teal to-carefd-teal-medium shadow-glow">
           {saving ? <Loader2 className="w-5 h-5 animate-spin me-2" /> : <Save className="w-5 h-5 me-2" />}
           {saving ? "שומר..." : "שמור שינויים"}
         </Button>
