@@ -35,8 +35,9 @@ function RequestsContent() {
   const [professions, setProfessions] = useState<any[]>([]);
   const [form, setForm] = useState({
     title: "", description: "", budget: "", budget_type: "per_treatment",
-    urgency: "medium", city: "", preferred_date: "", gender_preference: "",
-    professions: [] as string[],
+    urgency: "medium", city: "", address: "", preferred_date: "", preferred_time: "",
+    gender_preference: "", request_type: "one_time", hours_needed: "",
+    language_preferences: [] as string[], professions: [] as string[],
   });
 
   const fetchData = () => {
@@ -56,12 +57,21 @@ function RequestsContent() {
     setSaving(true);
     try {
       await api.post("/requests", {
-        ...form,
+        title: form.title, description: form.description,
         budget: form.budget ? parseFloat(form.budget) : undefined,
+        budget_type: form.budget_type || undefined,
+        urgency: form.urgency, city: form.city || undefined,
+        address: form.address || undefined,
+        preferred_date: form.preferred_date || undefined,
+        preferred_time: form.preferred_time || undefined,
+        gender_preference: form.gender_preference || undefined,
+        request_type: form.request_type,
+        hours_needed: form.hours_needed ? parseFloat(form.hours_needed) : undefined,
+        language_preferences: form.language_preferences.length > 0 ? form.language_preferences : undefined,
         professions: form.professions.length > 0 ? form.professions : undefined,
       });
       toast.success("הבקשה פורסמה!"); setShowCreateForm(false);
-      setForm({ title: "", description: "", budget: "", budget_type: "per_treatment", urgency: "medium", city: "", preferred_date: "", gender_preference: "", professions: [] });
+      setForm({ title: "", description: "", budget: "", budget_type: "per_treatment", urgency: "medium", city: "", address: "", preferred_date: "", preferred_time: "", gender_preference: "", request_type: "one_time", hours_needed: "", language_preferences: [], professions: [] });
       fetchData();
     } catch { toast.error("שגיאה ביצירת בקשה"); }
     finally { setSaving(false); }
@@ -112,6 +122,32 @@ function RequestsContent() {
                   className="w-full border-2 border-carefd-teal-pale/50 rounded-xl px-3 py-2 text-sm focus:border-carefd-teal focus:outline-none transition-all">
                   <option value="">ללא העדפה</option><option value="male">גבר</option><option value="female">אישה</option>
                 </select></div>
+            </div>
+            {/* Additional fields */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-1"><label className="text-sm font-medium text-slate-700">שעה מועדפת</label>
+                <Input type="time" value={form.preferred_time} onChange={(e) => setForm({ ...form, preferred_time: e.target.value })} /></div>
+              <div className="space-y-1"><label className="text-sm font-medium text-slate-700">סוג בקשה</label>
+                <select value={form.request_type} onChange={(e) => setForm({ ...form, request_type: e.target.value })}
+                  className="w-full border-2 border-carefd-teal-pale/50 rounded-xl px-3 py-2 text-sm focus:border-carefd-teal focus:outline-none transition-all">
+                  <option value="one_time">חד פעמי</option><option value="recurring">חוזר</option>
+                </select></div>
+              <div className="space-y-1"><label className="text-sm font-medium text-slate-700">שעות נדרשות</label>
+                <Input type="number" value={form.hours_needed} onChange={(e) => setForm({ ...form, hours_needed: e.target.value })} placeholder="אופציונלי" /></div>
+            </div>
+            <div className="space-y-1"><label className="text-sm font-medium text-slate-700">כתובת</label>
+              <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="רחוב, מספר בית" /></div>
+            {/* Language preferences */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">שפה מועדפת</label>
+              <div className="flex flex-wrap gap-2">
+                {["עברית","ערבית","אנגלית","רוסית","צרפתית","אמהרית"].map((lang) => (
+                  <button key={lang} type="button" onClick={() => setForm({ ...form, language_preferences: form.language_preferences.includes(lang) ? form.language_preferences.filter((l) => l !== lang) : [...form.language_preferences, lang] })}
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition ${form.language_preferences.includes(lang) ? "bg-carefd-navy text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}>
+                    {lang}
+                  </button>
+                ))}
+              </div>
             </div>
             {/* Professions */}
             {professions.length > 0 && (
