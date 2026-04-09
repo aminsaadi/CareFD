@@ -10,7 +10,8 @@ import AdvancedSearch from "@/components/AdvancedSearch";
 import {
   Search, MapPin, Star, Shield, Clock, Users,
   Heart, Stethoscope, Brain, Baby, Eye, Leaf,
-  ArrowLeft, ChevronLeft, ChevronRight,
+  ArrowLeft, ChevronLeft, ChevronRight, CheckCircle,
+  ChevronDown,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ElementType> = {
@@ -44,6 +45,21 @@ const fallbackProfessions = [
   { profession_id: "5", name: "אופטומטריה", icon: "eye" },
   { profession_id: "6", name: "רפואה משלימה", icon: "leaf" },
 ];
+
+function FaqItem({ question, answer }: { question: string; answer: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={`bg-white rounded-2xl shadow-soft border-2 transition-all ${open ? "border-carefd-teal" : "border-transparent"}`}>
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-5 text-right">
+        <span className="font-semibold text-carefd-navy text-base">{question}</span>
+        <ChevronDown className={`w-5 h-5 text-carefd-teal transition-transform flex-shrink-0 ms-3 ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="px-5 pb-5 pt-0 text-slate-500 leading-relaxed animate-fade-in">{answer}</div>
+      )}
+    </div>
+  );
+}
 
 const testimonials = [
   { name: "שרה לוי", role: "בת של מטופלת", content: "מצאנו מטפלת סיעודית מדהימה לאמא שלי תוך יום אחד. השירות מקצועי ואמין!", rating: 5, avatar: "ש" },
@@ -353,34 +369,114 @@ export default function Landing() {
         </section>
       </AnimatedSection>
 
-      {/* Testimonials */}
+      {/* Testimonials - Dark glass style like V1 */}
       <AnimatedSection>
-        <section className="section-padding bg-gradient-to-b from-gray-50 to-white">
+        <section className="section-padding bg-carefd-navy">
           <div className="container-main">
             <div className="text-center mb-12">
-              <h2 className="mb-4">מה אומרים עלינו</h2>
-              <p className="text-slate-500 text-lg">חוויות של לקוחות ומטפלים מרוצים</p>
+              <h2 className="mb-4 text-white">מה הלקוחות שלנו אומרים</h2>
+              <p className="text-carefd-teal-pale text-lg">אלפי לקוחות מרוצים כבר נהנים משירותים איכותיים</p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid md:grid-cols-3 gap-6 md:gap-8 stagger-animation">
               {testimonials.map((t) => (
-                <Card key={t.name} className="p-8">
+                <div key={t.name} className="glass-card-dark p-8 hover-lift">
                   <div className="flex items-center gap-1 mb-4">
                     {Array.from({ length: t.rating }).map((_, i) => (
-                      <Star key={i} className="w-4 h-4 text-carefd-teal fill-carefd-teal" />
+                      <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
                     ))}
                   </div>
-                  <p className="text-slate-600 leading-relaxed mb-6">&ldquo;{t.content}&rdquo;</p>
+                  <p className="text-white leading-relaxed mb-6">&ldquo;{t.content}&rdquo;</p>
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-carefd-teal-pale rounded-full flex items-center justify-center text-carefd-teal font-heading font-bold">
+                    <div className="w-12 h-12 bg-carefd-teal rounded-full flex items-center justify-center text-white font-heading font-bold text-lg">
                       {t.avatar}
                     </div>
                     <div>
-                      <div className="font-semibold text-carefd-navy text-sm">{t.name}</div>
-                      <div className="text-xs text-slate-400">{t.role}</div>
+                      <div className="font-semibold text-white text-sm">{t.name}</div>
+                      <div className="text-xs text-carefd-teal-pale">{t.role}</div>
                     </div>
                   </div>
-                </Card>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </AnimatedSection>
+
+      {/* Request Banner */}
+      <section className="py-10 bg-gradient-to-l from-carefd-teal via-carefd-teal-medium to-carefd-navy">
+        <div className="container-main max-w-5xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="text-center md:text-right">
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">לא מצאתם מה שחיפשתם?</h3>
+              <p className="text-carefd-teal-pale text-lg">פרסמו בקשה וקבלו הצעות מספקים מתאימים ישירות אליכם</p>
+            </div>
+            <Link href="/open-requests?create=true"
+              className="inline-flex items-center gap-2 bg-white text-carefd-teal px-8 py-4 rounded-xl font-bold text-lg hover:bg-carefd-teal-pale transition-all shadow-soft-lg hover-scale whitespace-nowrap">
+              <Search className="w-5 h-5" />פרסם בקשה
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* For Patients & Providers */}
+      <AnimatedSection>
+        <section className="section-padding bg-white">
+          <div className="container-main">
+            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              {/* For Patients */}
+              <Card className="p-8 bg-gradient-to-br from-carefd-teal to-carefd-teal-medium text-white border-0 shadow-soft-lg hover-lift">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center"><Users className="w-6 h-6" /></div>
+                  <h3 className="text-2xl font-bold">למטופלים</h3>
+                </div>
+                <ul className="space-y-3 mb-8">
+                  {["חפש ספקי שירותי בריאות לפי מיקום והתמחות", "קרא ביקורות מאומתות וקבל החלטות מושכלות", "הזמן שירותים ישירות דרך הפלטפורמה", "נהל את התורים וההזמנות שלך במקום אחד"].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3"><CheckCircle className="w-5 h-5 text-carefd-teal-pale mt-0.5 flex-shrink-0" /><span>{item}</span></li>
+                  ))}
+                </ul>
+                <Link href="/register" className="inline-flex items-center gap-2 bg-white text-carefd-teal px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-pale transition-all shadow-soft">
+                  הרשם כמטופל <ArrowLeft className="w-4 h-4" />
+                </Link>
+              </Card>
+
+              {/* For Providers */}
+              <Card className="p-8 bg-gradient-to-br from-carefd-navy to-carefd-slate text-white border-0 shadow-soft-lg hover-lift">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center"><Stethoscope className="w-6 h-6" /></div>
+                  <h3 className="text-2xl font-bold">לספקי שירות</h3>
+                </div>
+                <ul className="space-y-3 mb-8">
+                  {["צור פרופיל מקצועי והצג את השירותים שלך", "הגע ללקוחות חדשים והרחב את העסק", "נהל את הזמינות והפגישות שלך בקלות", "בנה את המוניטין המקצועי שלך דרך ביקורות"].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3"><CheckCircle className="w-5 h-5 text-carefd-teal-pale mt-0.5 flex-shrink-0" /><span>{item}</span></li>
+                  ))}
+                </ul>
+                <Link href="/register?role=provider" className="inline-flex items-center gap-2 bg-carefd-teal text-white px-6 py-3 rounded-xl font-semibold hover:bg-carefd-teal-medium transition-all shadow-soft">
+                  הרשם כספק <ArrowLeft className="w-4 h-4" />
+                </Link>
+              </Card>
+            </div>
+          </div>
+        </section>
+      </AnimatedSection>
+
+      {/* FAQ */}
+      <AnimatedSection>
+        <section className="section-padding bg-gradient-to-b from-white to-gray-50">
+          <div className="container-main max-w-3xl">
+            <div className="text-center mb-12">
+              <h2 className="mb-4">שאלות נפוצות</h2>
+              <p className="text-slate-500 text-lg">תשובות לשאלות הנפוצות ביותר</p>
+            </div>
+            <div className="space-y-4">
+              {[
+                { q: "איך מוצאים מטפל סיעודי דרך CareFD?", a: "ניתן לחפש מטפלים לפי מקצוע, אזור גיאוגרפי ודירוג. כל הספקים עוברים תהליך אימות מסמכים ותעודות." },
+                { q: "כמה עולה שירות סיעודי דרך הפלטפורמה?", a: "המחירים משתנים לפי סוג השירות והספק. ניתן לראות מחירים ולהשוות בין ספקים באתר. אין עלות לחיפוש והשוואה." },
+                { q: "האם המטפלים באתר מאומתים?", a: "כן, כל ספק עובר תהליך אימות מסמכים ותעודות לפני שמאושר להציע שירותים. ניתן לזהות ספקים מאומתים לפי תג האימות בפרופיל." },
+                { q: "באילו אזורים בישראל השירות זמין?", a: "CareFD פועלת בכל רחבי ישראל - מרכז, צפון, דרום, ירושלים, חיפה והסביבה. ניתן לחפש לפי עיר או אזור." },
+                { q: "איך אני יכול להירשם כספק שירות?", a: "ההרשמה פשוטה וחינמית. לחצו על 'הרשמה כספק', מלאו את הפרטים, העלו מסמכים לאימות, וצוות שלנו יאשר את הפרופיל שלכם." },
+              ].map((faq, idx) => (
+                <FaqItem key={idx} question={faq.q} answer={faq.a} />
               ))}
             </div>
           </div>
