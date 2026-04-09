@@ -138,7 +138,7 @@ export default function Navbar() {
                     data-testid="profile-dropdown-btn"
                   >
                     {user?.picture ? (
-                      <img src={user.picture} alt="" className="w-9 h-9 rounded-full object-cover" />
+                      <img src={user.picture} alt="" className="w-9 h-9 rounded-full object-cover border-2 border-carefd-teal" />
                     ) : (
                       <div className="w-9 h-9 rounded-full bg-gradient-to-br from-carefd-teal to-carefd-navy flex items-center justify-center text-white text-sm font-bold">
                         {getUserInitials()}
@@ -162,7 +162,7 @@ export default function Navbar() {
                       <div className="px-4 py-3 border-b border-gray-100">
                         <div className="flex items-center gap-3">
                           {user?.picture ? (
-                            <img src={user.picture} alt="" className="w-11 h-11 rounded-full object-cover" />
+                            <img src={user.picture} alt="" className="w-11 h-11 rounded-full object-cover border-2 border-carefd-teal" />
                           ) : (
                             <div className="w-11 h-11 rounded-full bg-gradient-to-br from-carefd-teal to-carefd-navy flex items-center justify-center text-white font-bold">
                               {getUserInitials()}
@@ -219,6 +219,8 @@ export default function Navbar() {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2.5 rounded-lg hover:bg-carefd-teal-pale/30 text-carefd-slate"
+              aria-label={mobileMenuOpen ? "סגור תפריט" : "פתח תפריט"}
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -254,9 +256,13 @@ export default function Navbar() {
               {user ? (
                 <>
                   <div className="flex items-center gap-3 px-3 py-3 mb-2 bg-carefd-teal-pale/20 rounded-xl">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-carefd-teal to-carefd-navy flex items-center justify-center text-white font-bold">
-                      {getUserInitials()}
-                    </div>
+                    {user?.picture ? (
+                      <img src={user.picture} alt={user.name} className="w-10 h-10 rounded-full object-cover border-2 border-carefd-teal" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-carefd-teal to-carefd-navy flex items-center justify-center text-white font-bold">
+                        {getUserInitials()}
+                      </div>
+                    )}
                     <div>
                       <p className="font-semibold text-carefd-navy text-sm">שלום, {user?.name || "משתמש"}</p>
                       <p className="text-xs text-carefd-gray">{user?.email}</p>
@@ -264,10 +270,20 @@ export default function Navbar() {
                   </div>
                   <Link href="/requests" className="text-carefd-slate hover:text-carefd-teal px-3 py-2 transition-colors font-medium" onClick={() => setMobileMenuOpen(false)}>בקשות</Link>
                   <Link href="/chats" className="text-carefd-slate hover:text-carefd-teal px-3 py-2 transition-colors font-medium flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                    <MessageCircle className="w-4 h-4" />הודעות
+                    <MessageCircle className="w-4 h-4" />
+                    הודעות
+                    {unreadChats > 0 && (
+                      <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{unreadChats}</span>
+                    )}
                   </Link>
                   <Link href={getDashboardPath()} className="text-carefd-slate hover:text-carefd-teal px-3 py-2 transition-colors font-medium flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
                     <LayoutDashboard className="w-4 h-4" />לוח בקרה
+                  </Link>
+                  <Link href="/dashboard?tab=overview" className="text-carefd-slate hover:text-carefd-teal px-3 py-2 transition-colors font-medium flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                    <User className="w-4 h-4" />הפרופיל שלי
+                  </Link>
+                  <Link href="/profile" className="text-carefd-slate hover:text-carefd-teal px-3 py-2 transition-colors font-medium flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                    <Settings className="w-4 h-4" />הגדרות
                   </Link>
                   <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="text-right text-red-600 hover:text-red-700 px-3 py-2 transition-colors font-medium flex items-center gap-2">
                     <LogOut className="w-4 h-4" />התנתקות

@@ -150,11 +150,12 @@ function ProvidersContent() {
   };
 
   return (
-    <div className="container-main py-10 md:py-16">
+    <div className="min-h-screen bg-gradient-to-b from-white to-carefd-teal-pale/30">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="mb-3">מטפלים וספקי שירות</h1>
-        <p className="text-lg text-slate-500">מצאו את נותני השירות המתאימים לכם מתוך מאות מטפלים מאומתים</p>
+        <h1 className="text-3xl font-bold text-carefd-navy font-heading mb-2" data-testid="providers-title">מטפלים וספקי שירות</h1>
+        <p className="text-carefd-gray">מצאו את נותני השירות המתאימים לכם</p>
       </div>
 
       {/* Search Bar */}
@@ -542,6 +543,7 @@ function ProvidersContent() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }
