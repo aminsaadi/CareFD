@@ -158,9 +158,9 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <div className="flex-1 min-w-0">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-carefd-navy font-heading">שלום, {user?.name?.split(" ")[0] || "משתמש"}!</h1>
-          <p className="text-carefd-gray text-sm">ברוכים הבאים לאזור האישי</p>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-carefd-navy font-heading mb-2">שלום, {user?.name?.split(" ")[0] || "משתמש"}! 👋</h1>
+          <p className="text-carefd-gray">ברוכים הבאים לאזור האישי שלכם</p>
         </div>
 
         {loading ? (
@@ -177,12 +177,12 @@ export default function DashboardPage() {
                     { label: "הושלמו", value: stats.completedBookings, icon: CheckCircle, color: "bg-green-50 text-green-600" },
                     { label: "בקשות", value: stats.totalRequests, icon: FileText, color: "bg-purple-50 text-purple-600", onClick: () => setActiveTab("requests") },
                   ].map((s) => (
-                    <Card key={s.label} className={`p-5 border-0 ${s.onClick ? "cursor-pointer hover-lift" : ""}`} onClick={s.onClick}>
+                    <Card key={s.label} className={`p-6 border-0 shadow-lg ${s.onClick ? "cursor-pointer hover-lift" : ""}`} onClick={s.onClick}>
                       <div className="flex items-center gap-3 mb-2">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.color}`}><s.icon className="w-5 h-5" /></div>
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${s.color}`}><s.icon className="w-6 h-6" /></div>
                       </div>
-                      <p className="text-2xl font-bold text-carefd-navy font-heading">{s.value}</p>
-                      <p className="text-xs text-slate-500 mt-1">{s.label}</p>
+                      <p className="text-3xl font-bold text-carefd-navy font-heading">{s.value}</p>
+                      <p className="text-sm text-carefd-gray mt-1">{s.label}</p>
                     </Card>
                   ))}
                 </div>
