@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, MapPin, Navigation, ChevronLeft, X } from "lucide-react";
+import { Search, MapPin, Navigation, X } from "lucide-react";
 import { israeliRegions, popularSearches, radiusOptions } from "@/data/searchData";
 
 interface AdvancedSearchProps {
@@ -28,7 +28,6 @@ export default function AdvancedSearch({ defaultTab = "providers", className = "
   const searchRef = useRef<HTMLDivElement>(null);
   const locationRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdowns on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) setShowSearchDropdown(false);
@@ -38,14 +37,9 @@ export default function AdvancedSearch({ defaultTab = "providers", className = "
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  // All cities from regions
   const allCities = israeliRegions.flatMap((r) => r.cities);
   const filteredCities = locationQuery ? allCities.filter((c) => c.includes(locationQuery)).slice(0, 8) : [];
-
-  // Filtered popular searches
-  const suggestions = (popularSearches[searchTab] || []).filter((s) =>
-    !searchQuery || s.includes(searchQuery)
-  ).slice(0, 6);
+  const suggestions = (popularSearches[searchTab] || []).filter((s) => !searchQuery || s.includes(searchQuery)).slice(0, 6);
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) { alert("הדפדפן שלך לא תומך באיתור מיקום"); return; }
@@ -97,20 +91,16 @@ export default function AdvancedSearch({ defaultTab = "providers", className = "
   };
 
   return (
-    <div className={`glass-card p-4 md:p-5 ${className}`}>
-      {/* Tabs */}
+    <div className={`glass-card p-3.5 md:p-4 ${className}`}>
       {!compact && (
-        <div className="flex gap-2 mb-4">
+        <div className="mb-3 flex gap-1 rounded-xl bg-slate-100/80 p-1 w-fit">
           {(["providers", "services"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setSearchTab(tab)}
-              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                searchTab === tab
-                  ? "bg-carefd-teal text-white shadow-glow"
-                  : "bg-white text-carefd-slate hover:bg-carefd-teal/5"
-              }`}
+              className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${searchTab === tab ? "bg-white text-carefd-navy shadow-soft" : "text-slate-500 hover:text-carefd-navy"}`}
               data-testid={`tab-${tab}`}
+              aria-pressed={searchTab === tab}
             >
               {tab === "providers" ? "מטפלים" : "שירותים"}
             </button>
@@ -118,29 +108,24 @@ export default function AdvancedSearch({ defaultTab = "providers", className = "
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row gap-3">
-        {/* Search input */}
+      <div className="flex flex-col gap-2.5 md:flex-row">
         <div className="relative flex-1" ref={searchRef}>
-          <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-carefd-gray" />
+          <Search className="absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
           <Input
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); setShowSearchDropdown(true); }}
             onFocus={() => setShowSearchDropdown(true)}
-            placeholder={searchTab === "providers" ? "מקצוע, שם מטפל..." : "שם שירות, סוג טיפול..."}
-            className="ps-12 h-14 border-0 bg-white/80"
+            onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
+            placeholder={searchTab === "providers" ? "מקצוע, התמחות או שם מטפל" : "שירות או סוג טיפול"}
+            className="h-14 border-slate-200 bg-white ps-12 shadow-none"
             data-testid="search-input"
+            aria-label={searchTab === "providers" ? "חיפוש מטפל" : "חיפוש שירות"}
           />
-
-          {/* Search dropdown */}
           {showSearchDropdown && suggestions.length > 0 && (
-            <div className="absolute top-full mt-2 start-0 end-0 bg-white rounded-xl shadow-soft-lg border border-slate-100 py-2 z-20 animate-scale-in">
-              <p className="px-4 py-1 text-xs text-carefd-gray font-medium">חיפושים פופולריים</p>
+            <div className="absolute start-0 end-0 top-full z-20 mt-2 overflow-hidden rounded-2xl border border-slate-100 bg-white py-2 shadow-soft-lg animate-scale-in">
+              <p className="px-4 py-1.5 text-xs font-medium text-slate-400">חיפושים נפוצים</p>
               {suggestions.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => { setSearchQuery(s); setShowSearchDropdown(false); }}
-                  className="w-full text-start px-4 py-2.5 text-sm text-carefd-navy hover:bg-carefd-teal/5 transition-colors"
-                >
+                <button key={s} onClick={() => { setSearchQuery(s); setShowSearchDropdown(false); }} className="w-full px-4 py-2.5 text-start text-sm text-carefd-navy transition-colors hover:bg-carefd-teal/5">
                   {s}
                 </button>
               ))}
@@ -148,62 +133,40 @@ export default function AdvancedSearch({ defaultTab = "providers", className = "
           )}
         </div>
 
-        {/* Location input */}
         <div className="relative md:w-64" ref={locationRef}>
-          <MapPin className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-carefd-gray" />
+          <MapPin className="absolute start-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
           <Input
             value={locationQuery}
             onChange={(e) => { setLocationQuery(e.target.value); setUserLocation(null); setShowLocationDropdown(true); }}
             onFocus={() => setShowLocationDropdown(true)}
+            onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
             placeholder="עיר או אזור"
-            className="ps-12 pe-12 h-14 border-0 bg-white/80"
+            className="h-14 border-slate-200 bg-white ps-12 pe-12 shadow-none"
             data-testid="location-input"
+            aria-label="עיר או אזור"
           />
-          {/* GPS button */}
-          <button
-            onClick={handleGetLocation}
-            className="absolute end-3 top-1/2 -translate-y-1/2 p-1.5 text-carefd-teal hover:bg-carefd-teal/10 rounded-lg transition-colors"
-            title="זהה מיקום"
-            data-testid="gps-btn"
-          >
-            {isLocating ? (
-              <span className="animate-spin block rounded-full h-5 w-5 border-2 border-carefd-teal/30 border-t-carefd-teal" />
-            ) : (
-              <Navigation className="w-5 h-5" />
-            )}
+          <button onClick={handleGetLocation} className="absolute end-2.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-carefd-teal transition-colors hover:bg-carefd-teal/10" title="איתור המיקום שלי" aria-label="איתור המיקום שלי" data-testid="gps-btn">
+            {isLocating ? <span className="block h-5 w-5 animate-spin rounded-full border-2 border-carefd-teal/30 border-t-carefd-teal" /> : <Navigation className="h-5 w-5" />}
           </button>
 
-          {/* Location dropdown */}
           {showLocationDropdown && (
-            <div className="absolute top-full mt-2 start-0 end-0 bg-white rounded-xl shadow-soft-lg border border-slate-100 py-2 z-20 animate-scale-in max-h-80 overflow-y-auto">
-              {/* Regions */}
+            <div className="absolute start-0 end-0 top-full z-20 mt-2 max-h-80 overflow-y-auto rounded-2xl border border-slate-100 bg-white py-2 shadow-soft-lg animate-scale-in">
               {!locationQuery && (
                 <>
-                  <p className="px-4 py-1 text-xs text-carefd-gray font-medium">אזורים</p>
-                  <div className="px-3 pb-2 flex flex-wrap gap-1.5">
+                  <p className="px-4 py-1.5 text-xs font-medium text-slate-400">אזורים</p>
+                  <div className="flex flex-wrap gap-1.5 px-3 pb-2">
                     {israeliRegions.map((r) => (
-                      <button key={r.id} onClick={() => selectRegion(r)}>
-                        <Badge variant="teal" className="cursor-pointer hover:bg-carefd-teal/20 transition-colors">
-                          {r.name}
-                        </Badge>
-                      </button>
+                      <button key={r.id} onClick={() => selectRegion(r)}><Badge variant="teal" className="cursor-pointer transition-colors hover:bg-carefd-teal/20">{r.name}</Badge></button>
                     ))}
                   </div>
                 </>
               )}
-
-              {/* Filtered cities */}
               {filteredCities.length > 0 && (
                 <>
-                  <p className="px-4 py-1 text-xs text-carefd-gray font-medium">ערים</p>
+                  <p className="px-4 py-1.5 text-xs font-medium text-slate-400">ערים</p>
                   {filteredCities.map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => selectCity(c)}
-                      className="w-full text-start px-4 py-2.5 text-sm text-carefd-navy hover:bg-carefd-teal/5 transition-colors"
-                    >
-                      <MapPin className="w-3.5 h-3.5 inline me-2 text-carefd-gray" />
-                      {c}
+                    <button key={c} onClick={() => selectCity(c)} className="w-full px-4 py-2.5 text-start text-sm text-carefd-navy transition-colors hover:bg-carefd-teal/5">
+                      <MapPin className="me-2 inline h-3.5 w-3.5 text-slate-400" />{c}
                     </button>
                   ))}
                 </>
@@ -212,44 +175,26 @@ export default function AdvancedSearch({ defaultTab = "providers", className = "
           )}
         </div>
 
-        {/* Search button */}
-        <Button onClick={handleSearch} className="h-14 px-8" data-testid="search-btn">
-          <Search className="w-5 h-5 me-2" />
-          חיפוש
+        <Button onClick={handleSearch} className="h-14 px-7 md:min-w-28" data-testid="search-btn">
+          <Search className="me-2 h-5 w-5" />חיפוש
         </Button>
       </div>
 
-      {/* Radius selector (shown when location detected) */}
       {userLocation && (
-        <div className="flex items-center gap-2 mt-3 flex-wrap">
-          <span className="text-xs text-carefd-gray">רדיוס:</span>
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3">
+          <span className="text-xs text-slate-400">רדיוס חיפוש:</span>
           {radiusOptions.map((r) => (
-            <button
-              key={r.value}
-              onClick={() => setSelectedRadius(r.value)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                selectedRadius === r.value
-                  ? "bg-carefd-teal text-white shadow-glow"
-                  : "bg-white text-carefd-slate border border-slate-200 hover:border-carefd-teal"
-              }`}
-              data-testid={`radius-${r.value}`}
-            >
-              {r.label}
-            </button>
+            <button key={r.value} onClick={() => setSelectedRadius(r.value)} className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${selectedRadius === r.value ? "bg-carefd-teal text-white" : "border border-slate-200 bg-white text-carefd-slate hover:border-carefd-teal"}`} data-testid={`radius-${r.value}`}>{r.label}</button>
           ))}
-          <button onClick={() => { setUserLocation(null); setLocationQuery(""); setSelectedRadius(""); }} className="text-xs text-carefd-gray hover:text-red-500 ms-2">
-            <X className="w-3.5 h-3.5" />
-          </button>
+          <button onClick={() => { setUserLocation(null); setLocationQuery(""); setSelectedRadius(""); }} className="ms-1 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-red-50 hover:text-red-500" aria-label="ניקוי מיקום"><X className="h-3.5 w-3.5" /></button>
         </div>
       )}
 
-      {/* Quick region tags (when no location selected) */}
       {!compact && !userLocation && !locationQuery && (
-        <div className="flex flex-wrap gap-2 mt-3">
+        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-slate-100 pt-3">
+          <span className="text-xs text-slate-400">חיפוש מהיר:</span>
           {israeliRegions.slice(0, 5).map((r) => (
-            <button key={r.id} onClick={() => selectRegion(r)} className="text-xs text-carefd-slate hover:text-carefd-teal transition-colors">
-              {r.name}
-            </button>
+            <button key={r.id} onClick={() => selectRegion(r)} className="text-xs font-medium text-carefd-slate transition-colors hover:text-carefd-teal">{r.name}</button>
           ))}
         </div>
       )}
