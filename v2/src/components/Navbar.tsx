@@ -42,7 +42,7 @@ export default function Navbar() {
                 href={item.href}
                 className={`relative rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
                   isActive(item.href)
-                    ? "bg-carefd-teal/8 text-carefd-navy"
+                    ? "bg-carefd-teal/[0.08] text-carefd-navy"
                     : "text-carefd-slate hover:bg-slate-50 hover:text-carefd-navy"
                 }`}
               >
@@ -105,7 +105,7 @@ export default function Navbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`block rounded-xl px-4 py-3 font-medium ${isActive(item.href) ? "bg-carefd-teal/8 text-carefd-navy" : "text-carefd-navy hover:bg-slate-50"}`}
+                className={`block rounded-xl px-4 py-3 font-medium ${isActive(item.href) ? "bg-carefd-teal/[0.08] text-carefd-navy" : "text-carefd-navy hover:bg-slate-50"}`}
                 onClick={() => setMenuOpen(false)}
               >
                 {item.label}
