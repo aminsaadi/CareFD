@@ -2,12 +2,21 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useNotifications } from "@/context/NotificationContext";
 import { Button } from "@/components/ui/button";
 import { Bell, MessageCircle, Menu, X, LogOut, LayoutDashboard, Shield } from "lucide-react";
 
+const publicLinks = [
+  { href: "/providers", label: "מטפלים" },
+  { href: "/services", label: "שירותים" },
+  { href: "/requests", label: "בקשות" },
+  { href: "/about", label: "אודות" },
+];
+
 export default function Navbar() {
+  const pathname = usePathname();
   const { user, logout } = useAuth();
   const { unreadCount } = useNotifications();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -15,79 +24,108 @@ export default function Navbar() {
   const dashboardHref = user?.role === "admin" ? "/admin/overview" : user?.role === "provider" ? "/provider/dashboard" : "/dashboard";
   const dashboardLabel = user?.role === "admin" ? "ניהול" : user?.role === "provider" ? "לוח בקרה" : "האזור שלי";
 
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+
   return (
-    <nav className="bg-white/90 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50 shadow-soft">
+    <nav className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/95 backdrop-blur-xl supports-[backdrop-filter]:bg-white/85">
       <div className="container-main">
-        <div className="flex justify-between h-16 items-center">
-          <Link href="/" className="flex items-center gap-1" data-testid="nav-logo">
-            <span className="text-2xl font-heading font-bold text-carefd-navy">Care</span>
-            <span className="text-2xl font-heading font-bold text-carefd-teal">FD</span>
+        <div className="flex h-[72px] items-center justify-between gap-6">
+          <Link href="/" className="flex min-h-11 items-center gap-0.5 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-carefd-teal/40" data-testid="nav-logo" aria-label="CaredZ - דף הבית">
+            <span className="text-[26px] font-heading font-bold tracking-tight text-carefd-navy">Cared</span>
+            <span className="text-[26px] font-heading font-bold tracking-tight text-carefd-teal">Z</span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/providers" className="text-carefd-slate hover:text-carefd-teal transition-colors font-medium text-sm">מטפלים</Link>
-            <Link href="/services" className="text-carefd-slate hover:text-carefd-teal transition-colors font-medium text-sm">שירותים</Link>
-            <Link href="/requests" className="text-carefd-slate hover:text-carefd-teal transition-colors font-medium text-sm">בקשות</Link>
-            <Link href="/about" className="text-carefd-slate hover:text-carefd-teal transition-colors font-medium text-sm">אודות</Link>
+          <div className="hidden md:flex flex-1 items-center justify-center gap-1 lg:gap-2">
+            {publicLinks.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`relative rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
+                  isActive(item.href)
+                    ? "bg-carefd-teal/8 text-carefd-navy"
+                    : "text-carefd-slate hover:bg-slate-50 hover:text-carefd-navy"
+                }`}
+              >
+                {item.label}
+                {isActive(item.href) && <span className="absolute inset-x-4 -bottom-[13px] h-0.5 rounded-full bg-carefd-teal" />}
+              </Link>
+            ))}
+          </div>
 
+          <div className="hidden md:flex items-center gap-2">
             {user ? (
-              <div className="flex items-center gap-3">
-                <Link href="/notifications" className="relative p-2 text-carefd-gray hover:text-carefd-teal hover:bg-carefd-teal/5 rounded-xl transition-all" data-testid="nav-notifications">
-                  <Bell className="w-5 h-5" />
+              <>
+                <Link href="/notifications" aria-label="התראות" className="relative flex h-10 w-10 items-center justify-center rounded-xl text-carefd-gray transition-colors hover:bg-carefd-teal/5 hover:text-carefd-teal" data-testid="nav-notifications">
+                  <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
-                    <span className="absolute -top-0.5 -start-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">{unreadCount > 9 ? "9+" : unreadCount}</span>
+                    <span className="absolute -top-0.5 -start-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">{unreadCount > 9 ? "9+" : unreadCount}</span>
                   )}
                 </Link>
-                <Link href="/chats" className="p-2 text-carefd-gray hover:text-carefd-teal hover:bg-carefd-teal/5 rounded-xl transition-all" data-testid="nav-chats">
-                  <MessageCircle className="w-5 h-5" />
+                <Link href="/chats" aria-label="הודעות" className="flex h-10 w-10 items-center justify-center rounded-xl text-carefd-gray transition-colors hover:bg-carefd-teal/5 hover:text-carefd-teal" data-testid="nav-chats">
+                  <MessageCircle className="h-5 w-5" />
                 </Link>
                 <Button asChild size="sm" data-testid="nav-dashboard">
                   <Link href={dashboardHref}>
-                    {user.role === "admin" ? <Shield className="w-4 h-4 me-2" /> : <LayoutDashboard className="w-4 h-4 me-2" />}
+                    {user.role === "admin" ? <Shield className="me-2 h-4 w-4" /> : <LayoutDashboard className="me-2 h-4 w-4" />}
                     {dashboardLabel}
                   </Link>
                 </Button>
-                <button onClick={logout} className="p-2 text-carefd-light-gray hover:text-red-500 rounded-xl transition-colors" data-testid="nav-logout">
-                  <LogOut className="w-4 h-4" />
+                <button onClick={logout} aria-label="יציאה" className="flex h-10 w-10 items-center justify-center rounded-xl text-carefd-gray transition-colors hover:bg-red-50 hover:text-red-500" data-testid="nav-logout">
+                  <LogOut className="h-4 w-4" />
                 </button>
-              </div>
+              </>
             ) : (
-              <div className="flex items-center gap-3">
+              <>
                 <Button variant="ghost" size="sm" asChild data-testid="nav-login">
-                  <Link href="/login" className="text-carefd-teal">התחברות</Link>
+                  <Link href="/login">התחברות</Link>
                 </Button>
                 <Button size="sm" asChild data-testid="nav-register">
-                  <Link href="/register">הרשמה</Link>
+                  <Link href="/register?role=provider">הצטרפות כמטפל</Link>
                 </Button>
-              </div>
+              </>
             )}
           </div>
 
-          <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 text-carefd-navy" data-testid="nav-mobile-toggle">
-            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="flex h-11 w-11 items-center justify-center rounded-xl text-carefd-navy transition-colors hover:bg-slate-50 md:hidden"
+            data-testid="nav-mobile-toggle"
+            aria-label={menuOpen ? "סגירת תפריט" : "פתיחת תפריט"}
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
       </div>
 
       {menuOpen && (
-        <div className="md:hidden bg-white border-t border-slate-100 px-4 py-4 space-y-1 animate-fade-in">
-          <Link href="/providers" className="block text-carefd-navy py-3 px-4 rounded-xl hover:bg-carefd-teal/5 font-medium" onClick={() => setMenuOpen(false)}>מטפלים</Link>
-          <Link href="/services" className="block text-carefd-navy py-3 px-4 rounded-xl hover:bg-carefd-teal/5 font-medium" onClick={() => setMenuOpen(false)}>שירותים</Link>
-          <Link href="/requests" className="block text-carefd-navy py-3 px-4 rounded-xl hover:bg-carefd-teal/5 font-medium" onClick={() => setMenuOpen(false)}>בקשות</Link>
-          <div className="border-t border-slate-100 my-3" />
-          {user ? (
-            <>
-              <Link href={dashboardHref} className="flex items-center gap-3 text-carefd-teal font-semibold py-3 px-4 rounded-xl hover:bg-carefd-teal/5" onClick={() => setMenuOpen(false)}>
-                <LayoutDashboard className="w-5 h-5" />{dashboardLabel}
+        <div className="border-t border-slate-100 bg-white px-4 pb-5 pt-3 shadow-soft md:hidden animate-fade-in">
+          <div className="space-y-1">
+            {publicLinks.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`block rounded-xl px-4 py-3 font-medium ${isActive(item.href) ? "bg-carefd-teal/8 text-carefd-navy" : "text-carefd-navy hover:bg-slate-50"}`}
+                onClick={() => setMenuOpen(false)}
+              >
+                {item.label}
               </Link>
-              <button onClick={() => { logout(); setMenuOpen(false); }} className="flex items-center gap-3 text-red-500 py-3 px-4 rounded-xl hover:bg-red-50 w-full font-medium">
-                <LogOut className="w-5 h-5" />יציאה
+            ))}
+          </div>
+          <div className="my-3 border-t border-slate-100" />
+          {user ? (
+            <div className="space-y-2">
+              <Link href={dashboardHref} className="flex items-center gap-3 rounded-xl px-4 py-3 font-semibold text-carefd-teal hover:bg-carefd-teal/5" onClick={() => setMenuOpen(false)}>
+                <LayoutDashboard className="h-5 w-5" />{dashboardLabel}
+              </Link>
+              <button onClick={() => { logout(); setMenuOpen(false); }} className="flex w-full items-center gap-3 rounded-xl px-4 py-3 font-medium text-red-500 hover:bg-red-50">
+                <LogOut className="h-5 w-5" />יציאה
               </button>
-            </>
+            </div>
           ) : (
-            <div className="flex flex-col gap-3 pt-2">
+            <div className="grid grid-cols-2 gap-3 pt-1">
               <Button variant="secondary" asChild className="w-full" onClick={() => setMenuOpen(false)}><Link href="/login">התחברות</Link></Button>
-              <Button asChild className="w-full" onClick={() => setMenuOpen(false)}><Link href="/register">הרשמה</Link></Button>
+              <Button asChild className="w-full" onClick={() => setMenuOpen(false)}><Link href="/register?role=provider">הצטרפות</Link></Button>
             </div>
           )}
         </div>
